@@ -1,10 +1,12 @@
 <template name="main">
 <nav class="main-menu">
     <ul>
-        <li><a href="javascript:void(0)" onclick="window['changeView']('home')">Home</a></li>
-        <li><a href="javascript:void(0)" onclick="window['changeView']('workspaces')">Workspaces</a></li>
+        <div id="login">{{loginButtons}}</div>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/home');">Home</a></li>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
     </ul>
 </nav>
 <div id="main">
+{{renderPage}}
 </div>
 </template>

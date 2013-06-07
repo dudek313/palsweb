@@ -155,6 +155,6 @@ form button {
 	margin-bottom: 15px;
 }
 
-.login-form h1 {
-	margin-bottom: 30px;
+#login {
+    margin: 10px 0 10px 10px;
 }
