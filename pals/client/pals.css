@@ -91,7 +91,6 @@ input {
     color: #888888;
     font: 16px sans-serif;
     height: 35px;
-    margin-bottom: 20px;
     padding: 0 4px;
     width: 500px;
 }
@@ -162,4 +161,46 @@ form button {
 .current-workspace {
     float: right;
     margin: 10px;
+}
+
+.workspace-form {
+    margin-bottom: 20px;
+}
+
+.workspace-list {
+    margin: 20px 0;
+}
+
+table
+{
+    border-collapse:collapse;
+    margin: 10px 0;
+}
+
+table tr {
+    border-bottom: 1px solid rgba(0, 20, 50, 0.1);
+    box-shadow: 0 1px 0 rgba(100, 150, 200, 0.2), 0 -1px 0 rgba(10, 20, 30, 0.3);
+}
+
+table th {
+    text-align: left;
+    background: none repeat scroll 0 0 #eeeeee;
+    color: #333333;
+    padding: 10px 15px;
+}
+
+table td {
+    background: none repeat scroll 0 0 #334455;
+    color: #EAEEFF;
+    transition: background 0.3s ease-in-out 0s, box-shadow 0.3s ease-in-out 0s, color 0.3s ease-in-out 0s;
+    font-size: 12px;
+    font-weight: bold;
+    text-rendering: optimizelegibility;
+    text-shadow: -1px -1px 0 rgba(0, 20, 50, 0.5);
+    padding: 10px 15px;
+}
+
+table td:hover {
+    cursor: pointer;
+    opacity: 0.85;
 }

@@ -6,7 +6,7 @@
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
     </ul>
 </nav>
-<a class="current-workspace">{{currentUser.username}}</a>
+<a class="current-workspace" href="/workspaces/{{currentWorkspace.name}}">{{currentWorkspace.name}}</a>
 <div id="main">
 {{renderPage}}
 </div>

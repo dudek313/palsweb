@@ -1,5 +1,28 @@
 <template name="workspaces">
 <div class="text-content">
 <h1>Workspaces</h1>
+<form class="workspace-form">
+    <div class="form-item">
+        <label>Workspace Name</label>
+        <input type="text" name="workspace.name" required="true" maxlength="200"></input>
+    </div>
+    <button class="grey" id="add-workspace">Add New Workspace</button>
+</form>
+<a href="javascript:void(0)" class="open-workspace" id="root">Root Workspace</a>
+<section class="workspace-list">
+<h2>My Workspaces</h2>
+<table>
+    <tr>
+        <th>Click to load</th>
+        <th>Delete workspace</th>
+    </tr>
+{{#each myWorkspaces}}
+    <tr>
+        <td class="open-workspace" id="{{name}}">{{name}}</td>
+        <td class="delete-workspace" id="{{name}}">Delete</td>
+    </tr>   
+{{/each}}
+</table>
+</section>
 </div>
 </template>
