@@ -158,3 +158,8 @@ form button {
 #login {
     margin: 10px 0 10px 10px;
 }
+
+.current-workspace {
+    float: right;
+    margin: 10px;
+}
