@@ -1,1 +1,1 @@
-Meteor.subscribe("workspaces");
+Meteor.subscribe('workspaces');

@@ -5,7 +5,6 @@ Template.main.currentWorkspace = function() {
             user.profile = {};
         }
         if( !user.profile.currentWorkspace ) {
-            console.log('no current workspace');
             var rootWorkspace = Workspaces.findOne({"name":"root"});
             user.profile.currentWorkspace = rootWorkspace;
             Meteor.users.update({'_id':user._id}, 

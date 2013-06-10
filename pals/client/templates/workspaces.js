@@ -1,6 +1,9 @@
 Template.workspaces.myWorkspaces = function() {
     var user = Meteor.user();
-    if( user ) return Workspaces.find({'owner':user._id});
+    if( user ) {
+        var workspaces =  Workspaces.find({'owner':user._id});
+        return workspaces;
+    }
 }
 
 Template.workspaces.events({
