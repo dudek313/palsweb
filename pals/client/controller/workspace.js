@@ -20,9 +20,10 @@ Template.workspace.workspace = function() {
 Template.workspace.users = function() {
     var users = Meteor.users.find().fetch();
     var workspace = Template.workspace.workspace();
-    if( workspace.guests ) {
+    if( workspace && workspace.guests ) {
         users.forEach(function(user){
             if( workspace.guests.lastIndexOf(user._id) >= 0 ) {
+                user.invited = true;
             }
         });
     }
