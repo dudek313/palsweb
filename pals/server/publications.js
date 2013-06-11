@@ -48,6 +48,7 @@ DataSets.allow({
         return ( userId && user.admin && doc.owner === userId );
     },
     remove: function(userId, doc) {
+        var user = Meteor.user();
         return ( userId && user.admin && doc.owner === userId );
     }
 });

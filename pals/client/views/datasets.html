@@ -1,10 +1,23 @@
 <template name="datasets">
 <div class="text-content">
     <h1>Data Sets</h1>
+    <div class="error"></div>
     <table>
-        <tr><th>Name</th></tr>
+        <tr>
+            <th>Name</th>
+            <th>Country</th>
+            <th>VegType</th>
+            <th>Created By</th>
+            <th>Delete</th>
+        </tr>
         {{#each dataSets}}
-        <tr><td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td></tr>
+        <tr>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{country}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{vegType}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{userEmail owner}}</td>
+            <td class='delete' id="{{_id}}">Delete</td>
+         </tr>
         {{/each}}
     </table>
 </div>

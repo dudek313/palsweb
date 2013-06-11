@@ -60,7 +60,8 @@ Template.dataset.performUpdate = function(fieldName,value) {
             currentDataSet[fieldName] = value;
             DataSets.insert(currentDataSet,function(error,id) {
                 if( error ) {
-                    $('.error').html(error);
+                    if( error.error == 409 ) $('.error').html('A data set with that name already exists');
+                    else $('.error').html('There was an error saving your value, please try again');
                     $('.error').show();
                 }
                 else {
