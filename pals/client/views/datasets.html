@@ -1,0 +1,11 @@
+<template name="datasets">
+<div class="text-content">
+    <h1>Data Sets</h1>
+    <table>
+        <tr><th>Name</th></tr>
+        {{#each dataSets}}
+        <tr><td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td></tr>
+        {{/each}}
+    </table>
+</div>
+</template>

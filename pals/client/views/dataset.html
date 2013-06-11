@@ -1,0 +1,19 @@
+<template name="dataset">
+<div class="text-content">
+   <h1>Data Set: {{dataSet.name}}</h1>
+   <div class="error"></div>
+   <div class="form-item">
+       <label>Data Set Name</label>
+       <div class="display">{{dataSet.name}}</div>
+       <input class="modifier" type="text" name="name" value="{{dataSet.name}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Data Set Type</label>
+       <select name="type">
+           {{#each dataSetTypes}}
+           <option value='{{_id}}'>{{name}}</option>
+           {{/each}}
+       </select>
+   </div>
+</div>
+</template>
