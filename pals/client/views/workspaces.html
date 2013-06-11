@@ -9,6 +9,7 @@
     <button class="grey" id="add-workspace">Add New Workspace</button>
 </form>
 <a href="javascript:void(0)" class="open-workspace" id="root">Root Workspace</a>
+
 <section class="workspace-list">
 <h2>My Workspaces</h2>
 <table>
@@ -24,5 +25,20 @@
 {{/each}}
 </table>
 </section>
+
+<section class="workspace-list">
+<h2>Workspaces Shared With Me</h2>
+<table>
+    <tr>
+        <th>Click to load</th>
+    </tr>
+{{#each sharedWorkspaces}}
+    <tr>
+        <td class="open-workspace-shared" id="{{name}}">{{name}}</td>
+    </tr>   
+{{/each}}
+</table>
+</section>
+
 </div>
 </template>

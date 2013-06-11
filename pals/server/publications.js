@@ -23,3 +23,7 @@ Workspaces.allow({
         return ( userId && doc.owner === userId );
     }
 });
+
+Meteor.publish('directory',function(){
+   return Meteor.users.find();
+});

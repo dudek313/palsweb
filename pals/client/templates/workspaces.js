@@ -6,6 +6,14 @@ Template.workspaces.myWorkspaces = function() {
     }
 }
 
+Template.workspaces.sharedWorkspaces = function() {
+    var user = Meteor.user();
+    if( user ) {
+        var workspaces =  Workspaces.find({'guests':user._id});
+        return workspaces;
+    }
+}
+
 Template.workspaces.events({
   'click #add-workspace': function (event) {
       event.preventDefault();
@@ -38,5 +46,17 @@ Template.workspaces.events({
               if( error ) alert(error);
           });
       }
-  }
+  },
+  'click .open-workspace-shared':function (event) {
+      var id = $(event.target).attr('id');
+      console.log(id);
+      if( id ) {
+          var user = Meteor.user();
+          console.log(user._id);
+          var workspace = Workspaces.findOne({'name':id,'guests':user._id});
+          console.log(workspace._id);
+          Meteor.users.update({'_id':user._id}, 
+            {'$set' : {'profile.currentWorkspace':workspace}});
+      }
+  },
 });
