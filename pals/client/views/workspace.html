@@ -5,12 +5,12 @@
 <table>
     <tr>
         <th>email address</th>
-        <th>invite</th>
+        {{#if isOwner}}<th>invite</th>{{/if}}
     </tr>
 {{#each users}}
     <tr>
         <td>{{emails.0.address}} {{ya}}</td>
-        <td><input type="checkbox" class="invite-user" id="{{_id}}" {{#if invited}}checked{{/if}}></input></td>
+        {{#if isOwner}}<td><input type="checkbox" class="invite-user" id="{{_id}}" {{#if invited}}checked{{/if}}></input></td>{{/if}}
     </tr>   
 {{/each}}
 </table>

@@ -9,11 +9,19 @@ Template.workspace.created = function() {
     }
 };
 
+Template.workspace.isOwner = function() {
+    var user = Meteor.user();
+    var workspace = Template.workspace.workspace();
+    if( workspace && user && workspace.owner == user._id ) return true;
+    else return false;
+}
+
 Template.workspace.workspace = function() {
     var user = Meteor.user();
     if( user ) {
         var id = Session.get('currentWorkspace');
-        return Workspaces.findOne({'_id':id});
+        var workspace =  Workspaces.findOne({'_id':id});
+        return workspace;
     }
 };
 

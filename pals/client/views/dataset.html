@@ -5,86 +5,100 @@
    <div class="form-item">
        <label>Data Set Name</label>
        <div class="display">{{dataSet.name}}</div>
-       <input class="modifier" type="text" name="name" value="{{dataSet.name}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="name" value="{{dataSet.name}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Data Set Type</label>
+       {{#if currentUser.admin}}
        <select name="type">
            {{#each reference.dataSetType}}
            <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{dataSet.type}}</div>
+       {{/if}}
    </div>
    <div class="form-item">
        <label>Country</label>
+       {{#if currentUser.admin}}
        <select name="country">
            {{#each reference.country}}
            <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{dataSet.country}}</div>
+       {{/if}}
    </div>
    <div class="form-item">
        <label>IGBP Vegetation Type</label>
+       {{#if currentUser.admin}}
        <select name="vegType">
            {{#each reference.vegType}}
            <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{dataSet.vegType}}</div>
+       {{/if}}
    </div>
+   {{#if currentUser.admin}}
    <div class="form-item">
        <label>or enter a different Vegetation Type</label>
        <div class="display">{{dataSet.vegType}}</div>
-       <input class="modifier" type="text" name="vegType" value="{{dataSet.vegType}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="vegType" value="{{dataSet.vegType}}"></input>{{/if}}
    </div>
+   {{/if}}
    <div class="form-item">
        <label>Soil Type</label>
        <div class="display">{{dataSet.soilType}}</div>
-       <input class="modifier" type="text" name="soilType" value="{{dataSet.soilType}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="soilType" value="{{dataSet.soilType}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Site Description URL</label>
        <div class="display">{{dataSet.url}}</div>
-       <input class="modifier" type="url" name="url" value="{{dataSet.url}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="url" name="url" value="{{dataSet.url}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Latitude (decimal)</label>
        <div class="display">{{dataSet.lat}}</div>
-       <input class="modifier" type="text" name="lat" value="{{dataSet.lat}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="lat" value="{{dataSet.lat}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Longitude (decimal)</label>
        <div class="display">{{dataSet.lon}}</div>
-       <input class="modifier" type="text" name="lon" value="{{dataSet.lon}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="lon" value="{{dataSet.lon}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Elevation (m)</label>
        <div class="display">{{dataSet.elevation}}</div>
-       <input class="modifier" type="text" name="elevation" value="{{dataSet.elevation}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="elevation" value="{{dataSet.elevation}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Max Vegetation Height (m)</label>
        <div class="display">{{dataSet.maxVegHeight}}</div>
-       <input class="modifier" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}"></input>{{/if}}
    </div> 
    <div class="form-item">
        <label>UTC Offset (hours)</label>
        <div class="display">{{dataSet.utcOffset}}</div>
-       <input class="modifier" type="text" name="utcOffset" value="{{dataSet.utcOffset}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="utcOffset" value="{{dataSet.utcOffset}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>Site Contact</label>
        <div class="display">{{dataSet.siteContact}}</div>
-       <input class="modifier" type="text" name="siteContact" value="{{dataSet.siteContact}}"></input>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="siteContact" value="{{dataSet.siteContact}}"></input>{{/if}}
    </div>
    <div class="form-item">
        <label>References</label>
        <div class="display">{{dataSet.references}}</div>
-       <textarea class="modifier" type="text" name="references">{{dataSet.references}}</textarea>
+       {{#if currentUser.admin}}<textarea class="modifier" type="text" name="references">{{dataSet.references}}</textarea>{{/if}}
    </div>
    <div class="form-item">
        <label>Comments</label>
        <div class="display">{{dataSet.comments}}</div>
-       <textarea class="modifier" type="text" name="comments">{{dataSet.comments}}</textarea>
+       {{#if currentUser.admin}}<textarea class="modifier" type="text" name="comments">{{dataSet.comments}}</textarea>{{/if}}
    </div>
 </div>
 </template>

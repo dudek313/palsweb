@@ -8,7 +8,7 @@
             <th>Country</th>
             <th>VegType</th>
             <th>Created By</th>
-            <th>Delete</th>
+            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         {{#each dataSets}}
         <tr>
@@ -16,7 +16,7 @@
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{country}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{vegType}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{userEmail owner}}</td>
-            <td class='delete' id="{{_id}}">Delete</td>
+            {{#if currentUser.admin}}<td class='delete' id="{{_id}}">Delete</td>{{/if}}
          </tr>
         {{/each}}
     </table>
