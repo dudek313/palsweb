@@ -4,7 +4,7 @@ Template.workspaces.myWorkspaces = function() {
         var workspaces =  Workspaces.find({'owner':user._id});
         return workspaces;
     }
-}
+};
 
 Template.workspaces.sharedWorkspaces = function() {
     var user = Meteor.user();
@@ -12,7 +12,11 @@ Template.workspaces.sharedWorkspaces = function() {
         var workspaces =  Workspaces.find({'guests':user._id});
         return workspaces;
     }
-}
+};
+
+Template.workspaces.rootWorkspace = function() {
+    return Workspaces.findOne({'name':'root'});
+};
 
 Template.workspaces.events({
   'click #add-workspace': function (event) {
@@ -41,22 +45,19 @@ Template.workspaces.events({
       var id = $(event.target).attr('id');
       var user = Meteor.user();
       if( id ) {
-          var workspace = Workspaces.findOne({'name':id,'owner':user._id});
-          Workspaces.remove({'_id':workspace._id},function(error){
+          Workspaces.remove({'_id':id},function(error){
               if( error ) alert(error);
           });
       }
   },
   'click .open-workspace-shared':function (event) {
       var id = $(event.target).attr('id');
-      console.log(id);
       if( id ) {
           var user = Meteor.user();
-          console.log(user._id);
-          var workspace = Workspaces.findOne({'name':id,'guests':user._id});
-          console.log(workspace._id);
+          var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
           Meteor.users.update({'_id':user._id}, 
             {'$set' : {'profile.currentWorkspace':workspace}});
       }
   },
 });
+

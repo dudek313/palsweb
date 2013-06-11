@@ -1,8 +1,8 @@
 Template.workspace.created = function() {
     var user = Meteor.user();
     if( user ) {
-        this.name = Session.get('currentWorkspaceName');
-        var query = {'name':name,'owner':user._id};
+        this.id = Session.get('currentWorkspace');
+        var query = {'_id':this.id,'owner':user._id};
         this.workspace = Template.workspace.workspace();
         Meteor.users.update({'_id':user._id}, 
             {'$set' : {'profile.currentWorkspace':this.workspace}});
@@ -12,9 +12,8 @@ Template.workspace.created = function() {
 Template.workspace.workspace = function() {
     var user = Meteor.user();
     if( user ) {
-        var name = Session.get('currentWorkspaceName');
-        if( name == 'root' ) return Workspaces.findOne({'name':name})
-        else return Workspaces.findOne({'name':name,'owner':user._id});
+        var id = Session.get('currentWorkspace');
+        return Workspaces.findOne({'_id':id});
     }
 };
 
@@ -24,7 +23,6 @@ Template.workspace.users = function() {
     if( workspace.guests ) {
         users.forEach(function(user){
             if( workspace.guests.lastIndexOf(user._id) >= 0 ) {
-                user.invited = true;
             }
         });
     }
@@ -37,20 +35,16 @@ Template.workspace.events({
         var id = $(event.target).attr('id');
         var checked = $(event.target).is(":checked");
         if( id && checked ) {
-            var name = Session.get('currentWorkspaceName');
-            var selector = {'name':name,'owner':user._id};
-            var workspace = Workspaces.findOne(selector);
-            selector = { '_id' : workspace._id };
+            var id = Session.get('currentWorkspace');
+            selector = { '_id' : id };
             var update = { '$addToSet' :  { 'guests' : id } };
             Workspaces.update(selector,update,function(error){
                 if( error ) alert(error);
             });
         }
         else if( id && !checked ) {
-            var name = Session.get('currentWorkspaceName');
-            var selector = {'name':name,'owner':user._id};
-            var workspace = Workspaces.findOne(selector);
-            selector = { '_id' : workspace._id };
+            var id = Session.get('currentWorkspace');
+            var selector = { '_id' : id };
             var update = { '$pull' :  { 'guests' : id } };
             Workspaces.update(selector,update,function(error){
                 if( error ) alert(error);

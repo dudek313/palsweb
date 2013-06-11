@@ -8,7 +8,7 @@
     </div>
     <button class="grey" id="add-workspace">Add New Workspace</button>
 </form>
-<a href="javascript:void(0)" class="open-workspace" id="root">Root Workspace</a>
+<a href="javascript:void(0)" class="open-workspace" id="{{rootWorkspace._id}}">Root Workspace</a>
 
 <section class="workspace-list">
 <h2>My Workspaces</h2>
@@ -19,8 +19,8 @@
     </tr>
 {{#each myWorkspaces}}
     <tr>
-        <td class="open-workspace" id="{{name}}">{{name}}</td>
-        <td class="delete-workspace" id="{{name}}">Delete</td>
+        <td class="open-workspace" id="{{_id}}">{{name}}</td>
+        <td class="delete-workspace" id="{{_id}}">Delete</td>
     </tr>   
 {{/each}}
 </table>

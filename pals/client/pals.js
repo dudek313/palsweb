@@ -5,10 +5,10 @@ Meteor.Router.add({
       if( user ) return 'workspaces';
       else return 'home';
   },
-  '/workspaces/:name': function(name) {
+  '/workspaces/:id': function(id) {
       var user = Meteor.user();
       if( user ) {
-          Session.set('currentWorkspaceName',name);
+          Session.set('currentWorkspace',id);
           return 'workspace';
       }
       else return 'home' 
