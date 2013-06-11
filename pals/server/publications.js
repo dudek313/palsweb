@@ -52,11 +52,18 @@ DataSets.allow({
     }
 });
 
-Meteor.publish('dataSetTypes',function(){
-    return DataSetTypes.find();
+Meteor.publish('reference',function(){
+    return Reference.find();
 });
 
-var fluxTower = DataSetTypes.findOne({name:'flux tower'});
-if( !fluxTower ) DataSetTypes.insert({name:'flux tower'});
-var other = DataSetTypes.findOne({name:'other'});
-if( !other ) DataSetTypes.insert({name:'other'});
+Reference.allow({
+    insert: function(userId, doc) {
+        return (userId);
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        return (userId);
+    },
+    remove: function(userId, doc) {
+        return (userId);
+    }
+});

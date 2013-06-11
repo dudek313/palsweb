@@ -10,10 +10,81 @@
    <div class="form-item">
        <label>Data Set Type</label>
        <select name="type">
-           {{#each dataSetTypes}}
-           <option value='{{_id}}'>{{name}}</option>
+           {{#each reference.dataSetType}}
+           <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
            {{/each}}
        </select>
+   </div>
+   <div class="form-item">
+       <label>Country</label>
+       <select name="country">
+           {{#each reference.country}}
+           <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
+           {{/each}}
+       </select>
+   </div>
+   <div class="form-item">
+       <label>IGBP Vegetation Type</label>
+       <select name="vegType">
+           {{#each reference.vegType}}
+           <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
+           {{/each}}
+       </select>
+   </div>
+   <div class="form-item">
+       <label>or enter a different Vegetation Type</label>
+       <div class="display">{{dataSet.vegType}}</div>
+       <input class="modifier" type="text" name="vegType" value="{{dataSet.vegType}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Soil Type</label>
+       <div class="display">{{dataSet.soilType}}</div>
+       <input class="modifier" type="text" name="soilType" value="{{dataSet.soilType}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Site Description URL</label>
+       <div class="display">{{dataSet.url}}</div>
+       <input class="modifier" type="url" name="url" value="{{dataSet.url}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Latitude (decimal)</label>
+       <div class="display">{{dataSet.lat}}</div>
+       <input class="modifier" type="text" name="lat" value="{{dataSet.lat}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Longitude (decimal)</label>
+       <div class="display">{{dataSet.lon}}</div>
+       <input class="modifier" type="text" name="lon" value="{{dataSet.lon}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Elevation (m)</label>
+       <div class="display">{{dataSet.elevation}}</div>
+       <input class="modifier" type="text" name="elevation" value="{{dataSet.elevation}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Max Vegetation Height (m)</label>
+       <div class="display">{{dataSet.maxVegHeight}}</div>
+       <input class="modifier" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}"></input>
+   </div> 
+   <div class="form-item">
+       <label>UTC Offset (hours)</label>
+       <div class="display">{{dataSet.utcOffset}}</div>
+       <input class="modifier" type="text" name="utcOffset" value="{{dataSet.utcOffset}}"></input>
+   </div>
+   <div class="form-item">
+       <label>Site Contact</label>
+       <div class="display">{{dataSet.siteContact}}</div>
+       <input class="modifier" type="text" name="siteContact" value="{{dataSet.siteContact}}"></input>
+   </div>
+   <div class="form-item">
+       <label>References</label>
+       <div class="display">{{dataSet.references}}</div>
+       <textarea class="modifier" type="text" name="references">{{dataSet.references}}</textarea>
+   </div>
+   <div class="form-item">
+       <label>Comments</label>
+       <div class="display">{{dataSet.comments}}</div>
+       <textarea class="modifier" type="text" name="comments">{{dataSet.comments}}</textarea>
    </div>
 </div>
 </template>
