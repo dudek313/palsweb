@@ -44,16 +44,16 @@ Template.workspace.events({
         var id = $(event.target).attr('id');
         var checked = $(event.target).is(":checked");
         if( id && checked ) {
-            var id = Session.get('currentWorkspace');
-            selector = { '_id' : id };
+            var workspaceId = Session.get('currentWorkspace');
+            selector = { '_id' : workspaceId };
             var update = { '$addToSet' :  { 'guests' : id } };
             Workspaces.update(selector,update,function(error){
                 if( error ) alert(error);
             });
         }
         else if( id && !checked ) {
-            var id = Session.get('currentWorkspace');
-            var selector = { '_id' : id };
+            var workspaceId = Session.get('currentWorkspace');
+            var selector = { '_id' : workspaceId };
             var update = { '$pull' :  { 'guests' : id } };
             Workspaces.update(selector,update,function(error){
                 if( error ) alert(error);
