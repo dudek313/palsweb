@@ -3,8 +3,6 @@ Meteor.publish('workspaces',function(){
 });
 
 Workspaces._ensureIndex('name', {unique: 1});
-var rootWorkspace = Workspaces.findOne({"name":"root"});
-if( !rootWorkspace ) Workspaces.insert({"name": "root"});
 
 Meteor.users.update({'emails.address':'eduthie@gmail.com'},{'$set':
     {'admin':true}});

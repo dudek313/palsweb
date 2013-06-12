@@ -81,11 +81,48 @@ Template.dataset.events({
         Template.dataset.update(event);
     },
     'click .display':function(event) {
-        $(event.target).next('.modifier').show();
-        $(event.target).hide();
+        if( Meteor.user().admin ) {
+            $(event.target).next('.modifier').show();
+            $(event.target).hide();
+        }
     },
     'change select':function(event) {
         Template.dataset.update(event);
+    },
+    'click #upload-version':function(event) {
+        event.preventDefault();
+        Template.dataset.upload();
+    },
+    'click .delete-version':function(event) {
+        if( Meteor.user().admin ) {
+            var key = $(event.target).attr('id');
+        
+            var currentDataSet = Template.dataset.dataSet();
+            if( currentDataSet.versions ) {
+                var currentVersion = undefined;
+                currentDataSet.versions.forEach(function(version) {
+                    if( version.key == key ) {
+                        currentVersion = version;
+                    }
+                });
+                if( currentVersion ) {
+                    DataSets.update({'_id':currentDataSet._id},
+                        {$pull : {'versions':{ 'key':key }}}, function(error) {
+                            if( error ) {
+                                $('.error').html('Failed to delete version, please try again');
+                                $('.error').show();
+                            }
+                        }
+                    );
+                
+                    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+                    filepicker.remove(currentVersion, {}, function(){
+                    }, function(FPError){
+                        console.log('Failed to delete the version from the file system');
+                    });
+                }
+            }
+        }
     }
 });
 
@@ -97,3 +134,29 @@ Template.dataset.reference = function() {
 Handlebars.registerHelper('selected', function(foo, bar) {
     return foo == bar ? 'selected' : '';
 });
+
+Template.dataset.upload = function() {
+    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+    filepicker.pickAndStore({},{},function(fpfiles){
+        fpfiles.forEach(function(file){
+            file.created = new Date();
+        });
+        currentDataSetId = Session.get('currentDataSet');
+        console.log(currentDataSetId);
+        console.log(JSON.stringify(fpfiles));
+        DataSets.update({'_id':currentDataSetId},
+            {'$pushAll':{'versions':fpfiles}},function(error){
+                if( error ) {
+                    console.log(error);
+                    $('.error').html('Failed to add uploaded version to the data set');
+                    $('.error').show();
+                }
+        });
+    });
+};
+
+Template.dataset.hasVersions = function() {
+    var dataSet = Template.dataset.dataSet();
+    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
+    else return false;
+};

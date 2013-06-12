@@ -65,6 +65,10 @@ body {
 	margin: 0 40px 40px 40px;
 }
 
+.data-set {
+    margin: 0 0 40px 40px;
+}
+
 h1 {
     color: #556677;
     font-size: 36px;
@@ -77,6 +81,13 @@ h2 {
     font-size: 26px;
     font-weight: 300;
     margin: 10px 0 0 0;
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10 0 10px 0;
+    color: #666666;
 }
 
 a {
@@ -170,8 +181,11 @@ form button {
 }
 
 .current-workspace {
-    float: right;
-    margin: 10px;
+    position: absolute;
+    right: 0;
+    padding: 10px;
+    z-index: 2;
+    background-color: white;
 }
 
 .workspace-form {
@@ -214,4 +228,16 @@ table td {
 table td:hover {
     cursor: pointer;
     opacity: 0.85;
+}
+
+.left-column {
+    float: left;
+    width: 50%;
+}
+
+.right-column {
+    float: right;
+    padding: 0 15px;
+    margin: 50px 0 0 20px;
+    box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.2);
 }
