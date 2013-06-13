@@ -65,7 +65,7 @@ body {
 	margin: 0 40px 40px 40px;
 }
 
-.data-set, .experiment {
+.data-set, .experiment, .model-output {
     margin: 0 0 40px 40px;
 }
 
@@ -227,7 +227,9 @@ table td {
 
 table td:hover {
     cursor: pointer;
-    opacity: 0.85;
+    /*opacity: 0.85;*/
+    background: none repeat scroll 0 0 #223344;
+    box-shadow: 0 1px #1F3042 0 -1px 0 #2E4155;
 }
 
 .left-column {

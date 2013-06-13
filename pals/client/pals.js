@@ -55,6 +55,32 @@ Meteor.Router.add({
       }
       else return 'home';
   },
+  '/modelOutput': function() {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentModelOutput',undefined);
+          return 'modelOutput';
+      }
+      else return 'home';
+  },
+  '/myModelOutputs': function() {
+      var user = Meteor.user();
+      if( user ) return 'myModelOutputs'
+      else return 'home';
+  },
+  '/modelOutputs': function() {
+      var user = Meteor.user();
+      if( user ) return 'modelOutputs'
+      else return 'home';
+  },
+  '/modelOutputs/:id': function(id) {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentModelOutput',id);
+          return 'modelOutput';
+      }
+      else return 'home';
+  },
   '*': 'home'
 });
 

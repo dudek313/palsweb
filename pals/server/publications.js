@@ -87,3 +87,22 @@ Experiments.allow({
 });
 
 Experiments._ensureIndex('name', {unique: 1});
+
+Meteor.publish('modelOutputs',function(){
+    return ModelOutputs.find();
+});
+
+ModelOutputs.allow({
+    insert: function(userId, doc) {
+        return ( userId );
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        var user = Meteor.user();
+        return ( userId && doc.owner === userId );
+    },
+    remove: function(userId, doc) {
+        return ( userId && doc.owner === userId );
+    }
+});
+
+ModelOutputs._ensureIndex('name', {unique: 1});

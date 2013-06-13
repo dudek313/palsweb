@@ -1,0 +1,20 @@
+<template name="modelOutputs">
+<div class="text-content">
+    <h1>Model Outputs</h1>
+    <div class="error"></div>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Experiment</th>
+            <th>Owner</th>
+        </tr>
+        {{#each modelOutputs}}
+        <tr>
+            <td onclick="Meteor.Router.to('/modeloutputs/{{_id}}')">{{name}}</td>
+            <td onclick="Meteor.Router.to('/experiments/{{experiment._id}}')">{{experiment.name}}</td>
+            <td>{{owner.emails.0.address}}</td>
+         </tr>
+        {{/each}}
+    </table>
+</div>
+</template>

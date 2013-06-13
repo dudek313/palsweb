@@ -3,6 +3,9 @@
     <ul>
         <div id="login">{{loginButtons}}</div>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/home');">Home</a></li>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutputs');">Model Outputs</a></li>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/myModelOutputs');">My Model Outputs</a></li>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutput');">Upload a Model Output</a></li>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
         {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiment');">Create Experiment</a></li>{{/if}}
