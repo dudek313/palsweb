@@ -65,7 +65,7 @@ body {
 	margin: 0 40px 40px 40px;
 }
 
-.data-set {
+.data-set, .experiment {
     margin: 0 0 40px 40px;
 }
 
@@ -240,4 +240,8 @@ table td:hover {
     padding: 0 15px;
     margin: 50px 0 0 20px;
     box-shadow: 0 -4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.experiment .left-column {
+    width: auto;
 }

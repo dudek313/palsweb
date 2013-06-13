@@ -1,0 +1,20 @@
+<template name="experiments">
+<div class="text-content">
+    <h1>Experiments</h1>
+    <div class="error"></div>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+        </tr>
+        {{#each experiments}}
+        <tr>
+            <td onclick="Meteor.Router.to('/experiments/{{_id}}')">{{name}}</td>
+            <td onclick="Meteor.Router.to('/experiments/{{_id}}')">{{type}}</td>
+            {{#if currentUser.admin}}<td class='delete' id="{{_id}}">Delete</td>{{/if}}
+         </tr>
+        {{/each}}
+    </table>
+</div>
+</template>

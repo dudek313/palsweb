@@ -1,0 +1,51 @@
+<template name="experiment">
+<div class="experiment">
+<div class="right-column">
+</div><!--right-column-->
+<div class="left-column">
+    <h1>Experiment: {{experiment.name}}</h1>
+    <div class="error"></div>
+    <div class="form-item">
+       <label>Experiment Name</label>
+       <div class="display">{{experiment.name}}</div>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="name" value="{{experiment.name}}"></input>{{/if}}
+   </div>
+   <div class="form-item">
+       <label>Experiment Type</label>
+       {{#if currentUser.admin}}
+       <select name="type">
+           {{#each reference.dataSetType}}
+           <option value='{{this}}' {{selected this experiment.type}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{experiment.type}}</div>
+       {{/if}}
+   </div>
+   <div class="form-item">
+       <label>Country</label>
+       {{#if currentUser.admin}}
+       <select name="country">
+           {{#each reference.country}}
+           <option value='{{this}}' {{selected this experiment.country}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{dataSet.country}}</div>
+       {{/if}}
+   </div>
+   <div class="form-item">
+       <label>IGBP Vegetation Type</label>
+       {{#if currentUser.admin}}
+       <select name="vegType">
+           {{#each reference.vegType}}
+           <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{experiment.vegType}}</div>
+       {{/if}}
+   </div>
+</div><!--left-column-->
+</div><!--experiment-->
+</template>

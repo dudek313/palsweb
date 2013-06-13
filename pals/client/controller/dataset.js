@@ -38,6 +38,7 @@ Template.dataset.performUpdate = function(fieldName,value) {
     
         var user = Meteor.user();
         currentDataSetId = Session.get('currentDataSet');
+        var reference = Template.dataset.reference();
         
         if( currentDataSetId ) {
             var selector = {'_id':currentDataSetId};
@@ -57,6 +58,9 @@ Template.dataset.performUpdate = function(fieldName,value) {
                 'created' : new Date(),
                 'workspaces' : [user.profile.currentWorkspace._id]
             };
+            if( fieldName != 'type' ) currentDataSet.type = reference.dataSetType[0];
+            if( fieldName != 'country' ) currentDataSet.country = reference.country[0];
+            if( fieldName != 'vegType' ) currentDataSet.vegType = reference.vegType[0];
             currentDataSet[fieldName] = value;
             DataSets.insert(currentDataSet,function(error,id) {
                 if( error ) {
@@ -130,10 +134,6 @@ Template.dataset.reference = function() {
     var reference = Reference.findOne();
     return reference;
 };
-
-Handlebars.registerHelper('selected', function(foo, bar) {
-    return foo == bar ? 'selected' : '';
-});
 
 Template.dataset.upload = function() {
     filepicker.setKey(Reference.findOne().filePickerAPIKey);

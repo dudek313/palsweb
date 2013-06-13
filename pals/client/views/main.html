@@ -4,6 +4,8 @@
         <div id="login">{{loginButtons}}</div>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/home');">Home</a></li>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
+        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
+        {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiment');">Create Experiment</a></li>{{/if}}
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/datasets');">Data Sets</a></li>
         {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Meteor.Router.to('/dataset');">Create Data Set</a></li>{{/if}}
     </ul>

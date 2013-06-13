@@ -66,3 +66,24 @@ Reference.allow({
         return (userId);
     }
 });
+
+Meteor.publish('experiments',function(){
+    return Experiments.find();
+});
+
+Experiments.allow({
+    insert: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        var user = Meteor.user();
+        return ( userId && user.admin && doc.owner === userId );
+    },
+    remove: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin && doc.owner === userId );
+    }
+});
+
+Experiments._ensureIndex('name', {unique: 1});

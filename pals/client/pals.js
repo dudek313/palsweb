@@ -34,6 +34,27 @@ Meteor.Router.add({
       }
       else return 'home';
   },
+  '/experiment': function() {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentExperiment',undefined);
+          return 'experiment';
+      }
+      else return 'home';
+  },
+  '/experiments': function() {
+      var user = Meteor.user();
+      if( user ) return 'experiments';
+      else return 'home';
+  },
+  '/experiments/:id': function(id) {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentExperiment',id);
+          return 'experiment';
+      }
+      else return 'home';
+  },
   '*': 'home'
 });
 
