@@ -55,7 +55,7 @@ Template.experiment.performUpdate = function(fieldName,value) {
             if( fieldName != 'country' ) currentExperiment.country = reference.country[0];
             if( fieldName != 'vegType' ) currentExperiment.vegType = reference.vegType[0];
             if( fieldName != 'spatialLevel' ) currentExperiment.spatialLevel = reference.spatialLevel[0];
-            if( fildName != 'timeStepSize' ) currentExperiment.timeStepSize = reference.timeStepSize[0];
+            if( fieldName != 'timeStepSize' ) currentExperiment.timeStepSize = reference.timeStepSize[0];
             currentExperiment[fieldName] = value;
             Experiments.insert(currentExperiment,function(error,id) {
                 if( error ) {
@@ -88,4 +88,48 @@ Template.experiment.events({
     'change select':function(event) {
         Template.experiment.update(event);
     },
+    'click #driving-data-set':function(event) {
+        event.preventDefault();
+        var selected = $('select[name="drivingDataSet"]').val();
+        if( selected ) {
+            var experimentId = Session.get('currentExperiment');
+            if( !experimentId ) alert('Please enter an experiment name before adding data sets');
+            else {
+                Experiments.update({'_id':experimentId},
+                    {'$push':{'drivingDataSets':selected}},function(error){
+                    if( error ) {
+                         $('.error').html('Error adding data set, please try again');
+                         $('.error').show();
+                    }
+                });
+            }
+        }
+    },
+    'click .remove-driving-dataset':function(event) {
+        console.log('here');
+        var dataSetId = $(event.target).attr('id');
+        var experimentId = Session.get('currentExperiment');
+        if( dataSetId && experimentId ) {
+            Experiments.update({_id:experimentId},
+                {$pull:{'drivingDataSets':dataSetId}},function(error){
+                if(error) {
+                    $('.error').html('Sorry, there was an error removing the driving data set, try again');
+                    $('.error').show();
+                }
+            });
+        }
+    }
 });
+
+Template.experiment.dataSets = function() {
+    var user = Meteor.user();
+    return  DataSets.find({'workspaces':user.profile.currentWorkspace._id});
+}
+
+Template.experiment.drivingDataSets = function() {
+    var exp = Template.experiment.experiment();
+    if( exp ) {
+        var drivingDataSets = DataSets.find({_id:{$in:exp.drivingDataSets}});
+        return drivingDataSets;
+    }
+}
