@@ -24,6 +24,30 @@
         </tr>
         {{/each}}
     </table>
+    <br/>
+    <h3>Input Data Sets</h3>
+    {{#if currentUser.admin}}
+    <div class="form-item">
+        <select name="inputDataSet">
+            {{#each dataSets}}
+            <option value="{{_id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <button class='grey' id="input-data-set">Add input data set</button>
+    {{/if}}
+    <table>
+        <tr>
+            <th>Name</th>
+            {{#if currentUser.admin}}<th>remove</th>{{/if}}
+        </tr>
+        {{#each inputDataSets}}
+        <tr>
+            <td>{{name}}</td>
+            {{#if currentUser.admin}}<td class='remove-input-dataset' id='{{_id}}'>remove</td>{{/if}}
+        </tr>
+        {{/each}}
+    </table>
 </div><!--right-column-->
 <div class="left-column">
     <h1>Experiment: {{experiment.name}}</h1>
