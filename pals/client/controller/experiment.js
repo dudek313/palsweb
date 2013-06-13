@@ -54,6 +54,8 @@ Template.experiment.performUpdate = function(fieldName,value) {
             if( fieldName != 'type' ) currentExperiment.type = reference.dataSetType[0];
             if( fieldName != 'country' ) currentExperiment.country = reference.country[0];
             if( fieldName != 'vegType' ) currentExperiment.vegType = reference.vegType[0];
+            if( fieldName != 'spatialLevel' ) currentExperiment.spatialLevel = reference.spatialLevel[0];
+            if( fildName != 'timeStepSize' ) currentExperiment.timeStepSize = reference.timeStepSize[0];
             currentExperiment[fieldName] = value;
             Experiments.insert(currentExperiment,function(error,id) {
                 if( error ) {

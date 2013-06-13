@@ -7,6 +7,8 @@ if( !reference ) {
         'dataSetType' : ['flux tower','other'],
         'country' : ['Australia','World'],
         'vegType' : ['Evergreen broadleaf','urban'],
-        'filePickerAPIKey' : 'AeyxZFgbpSHS6xZ5AfPJkz'
+        'filePickerAPIKey' : 'AeyxZFgbpSHS6xZ5AfPJkz',
+        'spatialLevel' : ['SingleSite', 'MultipleSite', 'Catchment', 'Regional', 'Global'],
+        'timeStepSize' : ['hourly','daily','monthly','yearly']
     });
 }

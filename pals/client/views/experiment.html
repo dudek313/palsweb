@@ -39,11 +39,42 @@
        {{#if currentUser.admin}}
        <select name="vegType">
            {{#each reference.vegType}}
-           <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
+           <option value='{{this}}' {{selected this experiment.vegType}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
        <div class="display">{{experiment.vegType}}</div>
+       {{/if}}
+   </div>
+   {{#if currentUser.admin}}
+   <div class="form-item">
+       <label>or enter a different Vegetation Type</label>
+       <div class="display">{{experiment.vegType}}</div>
+       {{#if currentUser.admin}}<input class="modifier" type="text" name="vegType" value="{{experiment.vegType}}"></input>{{/if}}
+   </div>
+   {{/if}}
+   <div class="form-item">
+       <label>Spatial Level</label>
+       {{#if currentUser.admin}}
+       <select name="spatialLevel">
+           {{#each reference.spatialLevel}}
+           <option value='{{this}}' {{selected this experiment.spatialLevel}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{experiment.spatialLevel}}</div>
+       {{/if}}
+   </div>
+   <div class="form-item">
+       <label>Time Step Size</label>
+       {{#if currentUser.admin}}
+       <select name="timeStepSize">
+           {{#each reference.timeStepSize}}
+           <option value='{{this}}' {{selected this experiment.timeSetSize}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{experiment.timeStepSize}}</div>
        {{/if}}
    </div>
 </div><!--left-column-->
