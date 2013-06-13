@@ -19,7 +19,7 @@
         </tr>
         {{#each drivingDataSets}}
         <tr>
-            <td>{{name}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
             {{#if currentUser.admin}}<td class='remove-driving-dataset' id='{{_id}}'>remove</td>{{/if}}
         </tr>
         {{/each}}
@@ -43,7 +43,7 @@
         </tr>
         {{#each inputDataSets}}
         <tr>
-            <td>{{name}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
             {{#if currentUser.admin}}<td class='remove-input-dataset' id='{{_id}}'>remove</td>{{/if}}
         </tr>
         {{/each}}

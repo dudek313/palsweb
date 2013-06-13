@@ -1,5 +1,6 @@
 Template.experiments.experiments = function() {
-    return Experiments.find();
+    var user = Meteor.user();
+    return Experiments.find({'workspaces':user.profile.currentWorkspace._id});
 }
 
 Template.experiments.events({
