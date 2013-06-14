@@ -1,6 +1,24 @@
 <template name="modelOutput">
 <div class="model-output">
 <div class="right-column">
+    <h3>Versions</h3>
+    {{#if owner}}<button class='grey' id="upload-version">Upload a new version</button>{{/if}}
+    {{#if hasVersions}}
+    <table>
+        <tr>
+            <th>File</th>
+            {{#if owner}}<th>delete</th>{{/if}}
+            {{#if owner}}<th>Start Analysis</th>{{/if}}
+        </tr>
+        {{#each modelOutput.versions}}
+        <tr>
+            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            {{#if owner}}<td class='delete-version' id='{{key}}'>delete</td>{{/if}}
+            {{#if owner}}<td class='start-analysis' id='{{key}}'>start new analysis!</td>{{/if}}
+        </tr>
+        {{/each}}
+    </table>
+    {{/if}}
 </div><!--right-column-->
 <div class="left-column">
     <h1>Model Output: {{modelOutput.name}}</h1>

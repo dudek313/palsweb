@@ -87,6 +87,67 @@ Template.modelOutput.events({
     },
     'change select':function(event) {
         Template.modelOutput.update(event);
+    },
+    'click #upload-version':function(event) {
+        event.preventDefault();
+        Template.modelOutput.upload();
+    },
+    'click .delete-version':function(event) {
+        if( Template.modelOutput.owner() ) {
+            var key = $(event.target).attr('id');
+        
+            var currentModelOutput = Template.modelOutput.modelOutput();
+            if( currentModelOutput.versions ) {
+                var currentVersion = undefined;
+                currentModelOutput.versions.forEach(function(version) {
+                    if( version.key == key ) {
+                        currentVersion = version;
+                    }
+                });
+                if( currentVersion ) {
+                    ModelOutputs.update({'_id':currentModelOutput._id},
+                        {$pull : {'versions':{ 'key':key }}}, function(error) {
+                            if( error ) {
+                                $('.error').html('Failed to delete version, please try again');
+                                $('.error').show();
+                            }
+                        }
+                    );
+                
+                    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+                    filepicker.remove(currentVersion, {}, function(){
+                    }, function(FPError){
+                        console.log('Failed to delete the version from the file system');
+                    });
+                }
+            }
+        }
+    },
+    'click .start-analysis':function(event) {
+    if( Template.modelOutput.owner() ) {
+            var key = $(event.target).attr('id');
+            var user = Meteor.user();
+            var currentModelOutput = Template.modelOutput.modelOutput();
+            if( currentModelOutput.versions ) {
+                var currentVersion = undefined;
+                currentModelOutput.versions.forEach(function(version) {
+                    if( version.key == key ) {
+                        currentVersion = version;
+                    }
+                });
+                if( currentVersion ) {
+                    var analysis = {
+                         'owner' : user._id,
+                         'created' : new Date(),
+                         'workspaces' : [user.profile.currentWorkspace._id],
+                         'modelOutput' : currentModelOutput._id,
+                         'modelOutputVersion' : currentVersion,
+                         'experiment' : modelOutput.experiment,
+                         'status' : 'started'
+                    };
+                }
+            }
+        }
     }
 });
 
@@ -105,4 +166,28 @@ Template.modelOutput.owner = function() {
     else {
         return true;
     }
+};
+
+Template.modelOutput.upload = function() {
+    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+    filepicker.pickAndStore({},{},function(fpfiles){
+        fpfiles.forEach(function(file){
+            file.created = new Date();
+        });
+        currentModelOutputId = Session.get('currentModelOutput');
+        ModelOutputs.update({'_id':currentModelOutputId},
+            {'$pushAll':{'versions':fpfiles}},function(error){
+                if( error ) {
+                    console.log(error);
+                    $('.error').html('Failed to add uploaded version to the model output');
+                    $('.error').show();
+                }
+        });
+    });
+};
+
+Template.modelOutput.hasVersions = function() {
+    var modelOutput = Template.modelOutput.modelOutput();
+    if( modelOutput && modelOutput.versions && modelOutput.versions.length > 0 ) return true;
+    else return false;
 };
