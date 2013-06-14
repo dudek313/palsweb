@@ -102,4 +102,7 @@ Template.modelOutput.owner = function() {
         if( modelOutput.owner == user._id ) return true;
         else return false;
     }
+    else {
+        return true;
+    }
 };

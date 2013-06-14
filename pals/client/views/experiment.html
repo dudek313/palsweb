@@ -124,6 +124,22 @@
        <div class="display">{{experiment.timeStepSize}}</div>
        {{/if}}
    </div>
+   <h3>Scripts</h3>
+    {{#if currentUser.admin}}<button class='grey' id="upload-script">Upload a new script</button>{{/if}}
+    {{#if hasScripts}}
+    <table>
+        <tr>
+            <th>File</th>
+            {{#if currentUser.admin}}<th>delete</th>{{/if}}
+        </tr>
+        {{#each experiment.scripts}}
+        <tr>
+            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            {{#if currentUser.admin}}<td class='delete-script' id='{{key}}'>delete</td>{{/if}}
+        </tr>
+        {{/each}}
+    </table>
+    {{/if}}
 </div><!--left-column-->
 </div><!--experiment-->
 </template>

@@ -150,12 +150,47 @@ Template.experiment.events({
             }
         }
     },
+    'click #upload-script':function(event) {
+        event.preventDefault();
+        Template.experiment.upload();
+    },
+    'click .delete-script':function(event) {
+        if( Meteor.user().admin ) {
+            var key = $(event.target).attr('id');
+        
+            var currentExperiment = Template.experiment.experiment();
+            if( currentExperiment.scripts ) {
+                var currentScript = undefined;
+                currentExperiment.scripts.forEach(function(script) {
+                    if( script.key == key ) {
+                        currentScript = script;
+                    }
+                });
+                if( currentScript ) {
+                    Experiments.update({'_id':currentExperiment._id},
+                        {$pull : {'scripts':{ 'key':key }}}, function(error) {
+                            if( error ) {
+                                $('.error').html('Failed to delete script, please try again');
+                                $('.error').show();
+                            }
+                        }
+                    );
+                
+                    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+                    filepicker.remove(currentScript, {}, function(){
+                    }, function(FPError){
+                        console.log('Failed to delete the script from the file system');
+                    });
+                }
+            }
+        }
+    }
 });
 
 Template.experiment.dataSets = function() {
     var user = Meteor.user();
     return  DataSets.find({'workspaces':user.profile.currentWorkspace._id});
-}
+};
 
 Template.experiment.drivingDataSets = function() {
     var exp = Template.experiment.experiment();
@@ -163,7 +198,7 @@ Template.experiment.drivingDataSets = function() {
         var drivingDataSets = DataSets.find({_id:{$in:exp.drivingDataSets}});
         return drivingDataSets;
     }
-}
+};
 
 Template.experiment.inputDataSets = function() {
     var exp = Template.experiment.experiment();
@@ -171,4 +206,31 @@ Template.experiment.inputDataSets = function() {
         var inputDataSets = DataSets.find({_id:{$in:exp.inputDataSets}});
         return inputDataSets;
     }
-}
+};
+
+Template.experiment.upload = function() {
+    var currentExperimentId = Session.get('currentExperiment');
+    if( !currentExperimentId ) {
+        alert("Please enter an experiment name before uploading scripts");
+        return;
+    }
+    filepicker.setKey(Reference.findOne().filePickerAPIKey);
+    filepicker.pickAndStore({},{},function(fpfiles){
+        fpfiles.forEach(function(file){
+            file.created = new Date();
+        });
+        Experiments.update({'_id':currentExperimentId},
+            {'$pushAll':{'scripts':fpfiles}},function(error){
+                if( error ) {
+                    $('.error').html('Failed to add uploaded script to the experiment');
+                    $('.error').show();
+                }
+        });
+    });
+};
+
+Template.experiment.hasScripts = function() {
+    var experiment = Template.experiment.experiment();
+    if( experiment && experiment.scripts && experiment.scripts.length > 0 ) return true;
+    else return false;
+};
