@@ -8,36 +8,48 @@
     <div class="form-item">
         <label>Model Output name</label>
         <div class="display">{{modelOutput.name}}</div>
-        <input class="modifier" type="text" name="name" value="{{modelOutput.name}}"></input>
+        {{#if owner}}<input class="modifier" type="text" name="name" value="{{modelOutput.name}}"></input>{{/if}}
     </div>
     <div class="form-item">
        <label>Experiment</label>
+       {{#if owner}}
        <select name="experiment">
            {{#each experiments}}
-           <option value='{{_id}}' {{selected this._id modelOutput.experiment}}>{{name}}</option>
+           <option value='{{_id}}' {{selected this._id modelOutput.experiment._id}}>{{name}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{modelOutput.experiment.name}}</div>
+       {{/if}}
    </div>
    <div class="form-item">
        <label>State Selection</label>
+       {{#if owner}}
        <select name="stateSelection">
            {{#each reference.stateSelection}}
            <option value='{{_id}}' {{selected this  modelOutput.stateSelection}}>{{this}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{modelOutput.stateSelection}}</div>
+       {{/if}}
    </div>
    <div class="form-item">
        <label>Parameter Selection</label>
+       {{#if owner}}
        <select name="parameterSelection">
            {{#each reference.parameterSelection}}
            <option value='{{_id}}' {{selected this  modelOutput.parameterSelection}}>{{this}}</option>
            {{/each}}
        </select>
+       {{else}}
+       <div class="display">{{modelOutput.parameterSelection}}</div>
+       {{/if}}
    </div>
    <div class="form-item">
        <label>Please add any comments that would aid reproducing this simulation: </label>
        <div class="display">{{modelOutput.comments}}</div>
-       <textarea class="modifier" type="text" name="comments">{{modelOutput.comments}}</textarea>
+       {{#if owner}}<textarea class="modifier" type="text" name="comments">{{modelOutput.comments}}</textarea>{{/if}}
    </div>
 </div><!--left-column-->
 </div><!--experiment-->

@@ -12,6 +12,9 @@ Template.modelOutput.rendered = function() {
 Template.modelOutput.modelOutput = function() {
     var currentModelOutputId = Session.get('currentModelOutput');
     var currentModelOutput = ModelOutputs.findOne({'_id':currentModelOutputId});
+    if( currentModelOutput && currentModelOutput.experiment ) {
+        currentModelOutput.experiment = Experiments.findOne({_id:currentModelOutput.experiment});
+    }
     return currentModelOutput;
 }
 
@@ -77,7 +80,7 @@ Template.modelOutput.events({
         Template.modelOutput.update(event);
     },
     'click .display':function(event) {
-        if( Meteor.user().admin ) {
+        if( Template.modelOutput.owner() ) {
             $(event.target).next('.modifier').show();
             $(event.target).hide();
         }
@@ -90,4 +93,13 @@ Template.modelOutput.events({
 Template.modelOutput.experiments = function() {
     var user = Meteor.user();
     return Experiments.find({'workspaces':user.profile.currentWorkspace._id});
+};
+
+Template.modelOutput.owner = function() {
+    var user = Meteor.user();
+    var modelOutput = Template.modelOutput.modelOutput();
+    if( user && modelOutput ) {
+        if( modelOutput.owner == user._id ) return true;
+        else return false;
+    }
 };
