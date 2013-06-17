@@ -126,27 +126,11 @@ Template.modelOutput.events({
     'click .start-analysis':function(event) {
     if( Template.modelOutput.owner() ) {
             var key = $(event.target).attr('id');
-            var user = Meteor.user();
-            var currentModelOutput = Template.modelOutput.modelOutput();
-            if( currentModelOutput.versions ) {
-                var currentVersion = undefined;
-                currentModelOutput.versions.forEach(function(version) {
-                    if( version.key == key ) {
-                        currentVersion = version;
-                    }
-                });
-                if( currentVersion ) {
-                    var analysis = {
-                         'owner' : user._id,
-                         'created' : new Date(),
-                         'workspaces' : [user.profile.currentWorkspace._id],
-                         'modelOutput' : currentModelOutput._id,
-                         'modelOutputVersion' : currentVersion,
-                         'experiment' : modelOutput.experiment,
-                         'status' : 'started'
-                    };
-                }
-            }
+            var currentModelOutputId = Session.get('currentModelOutput');
+            Meteor.call('startAnalysis',key,currentModelOutputId,function(error,result){
+                if( error ) alert(error);
+                console.log(result);
+            });
         }
     }
 });
