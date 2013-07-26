@@ -56,6 +56,7 @@ Template.modelOutput.performUpdate = function(fieldName,value) {
             };
             if( fieldName != 'stateSelection' ) currentModelOutput.stateSelection = reference.stateSelection[0];
             if( fieldName != 'parameterSelection' ) currentModelOutput.parameterSelection = reference.parameterSelection[0];
+            var experiments = Template.modelOutput.experiments();
             currentModelOutput[fieldName] = value;
             ModelOutputs.insert(currentModelOutput,function(error,id) {
                 if( error ) {
@@ -77,6 +78,9 @@ Template.modelOutput.events({
         Template.modelOutput.update(event);
     },
     'blur textarea': function (event) {
+        Template.modelOutput.update(event);
+    },
+    'blur select':function(event) {
         Template.modelOutput.update(event);
     },
     'click .display':function(event) {
