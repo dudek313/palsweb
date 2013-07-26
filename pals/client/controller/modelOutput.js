@@ -179,3 +179,8 @@ Template.modelOutput.hasVersions = function() {
     if( modelOutput && modelOutput.versions && modelOutput.versions.length > 0 ) return true;
     else return false;
 };
+
+Template.modelOutput.analyses = function() {
+   var modelOutput = Template.modelOutput.modelOutput();
+   return Analyses.find({'modelOutput':modelOutput._id});
+};

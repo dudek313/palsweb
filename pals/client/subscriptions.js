@@ -4,3 +4,4 @@ Meteor.subscribe('dataSets');
 Meteor.subscribe('reference');
 Meteor.subscribe('experiments');
 Meteor.subscribe('modelOutputs');
+Meteor.subscribe('analyses');

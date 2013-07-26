@@ -106,3 +106,7 @@ ModelOutputs.allow({
 });
 
 ModelOutputs._ensureIndex('name', {unique: 1});
+
+Meteor.publish('analyses',function(){
+    return Analyses.find();
+});

@@ -69,6 +69,20 @@
        <div class="display">{{modelOutput.comments}}</div>
        {{#if owner}}<textarea class="modifier" type="text" name="comments">{{modelOutput.comments}}</textarea>{{/if}}
    </div>
+   <h3>Analyses</h3>
+   <table>
+        <tr>
+            <th>id</th>
+            <th>Status</th>
+        </tr>
+        {{#each analyses}}
+        <tr>
+            <td>{{_id}}</td>
+            <td>{{status}}</td>
+        </tr>
+        {{/each}}
+    </table>
+   
 </div><!--left-column-->
-</div><!--experiment-->
+</div><!--model-output-->
 </template>
