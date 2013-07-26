@@ -73,11 +73,13 @@
    <table>
         <tr>
             <th>id</th>
+            <th>MO Version</th>
             <th>Status</th>
         </tr>
         {{#each analyses}}
         <tr>
             <td>{{_id}}</td>
+            <td>{{modelOutputVersion.filename}}</td>
             <td>{{status}}</td>
         </tr>
         {{/each}}
