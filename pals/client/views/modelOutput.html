@@ -75,12 +75,14 @@
             <th>id</th>
             <th>MO Version</th>
             <th>Status</th>
+            <th>Message</th>
         </tr>
         {{#each analyses}}
         <tr>
             <td>{{_id}}</td>
             <td>{{modelOutputVersion.filename}}</td>
             <td>{{status}}</td>
+            <td>{{message}}</td>
         </tr>
         {{/each}}
     </table>
