@@ -69,6 +69,7 @@
        <div class="display">{{modelOutput.comments}}</div>
        {{#if owner}}<textarea class="modifier" type="text" name="comments">{{modelOutput.comments}}</textarea>{{/if}}
    </div>
+   {{#if analyses}}
    <h3>Analyses</h3>
    <table>
         <tr>
@@ -88,6 +89,7 @@
         </tr>
         {{/each}}
     </table>
+    {{/if}}
    
 </div><!--left-column-->
 </div><!--model-output-->

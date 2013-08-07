@@ -182,5 +182,8 @@ Template.modelOutput.hasVersions = function() {
 
 Template.modelOutput.analyses = function() {
    var modelOutput = Template.modelOutput.modelOutput();
-   return Analyses.find({'modelOutput':modelOutput._id});
+   if( modelOutput && modelOutput._id ) {
+       return Analyses.find({'modelOutput':modelOutput._id});
+   }
+   else return undefined;
 };
