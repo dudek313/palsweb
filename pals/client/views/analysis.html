@@ -1,0 +1,13 @@
+<template name="analysis">
+<div class="data-set">
+<div class="right-column">
+</div>
+<div class="left-column">
+   <h1>Analysis of model output: {{analysis.modelOutput}}</h1>
+   {{#each analysis.results}}
+       <h3>{{type}}</h3>
+       <img src="{{url}}" title="{{type}}"></img>
+   {{/each}}
+</div><!--left-column-->
+</div><!--text-content-->
+</template>

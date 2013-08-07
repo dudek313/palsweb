@@ -75,14 +75,16 @@
             <th>id</th>
             <th>MO Version</th>
             <th>Status</th>
-            <th>Message</th>
+            <th>Error Message</th>
+            <th>View Results</th>
         </tr>
         {{#each analyses}}
         <tr>
             <td>{{_id}}</td>
             <td>{{modelOutputVersion.filename}}</td>
             <td>{{status}}</td>
-            <td>{{message}}</td>
+            <td>{{error}}</td>
+            <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
         </tr>
         {{/each}}
     </table>

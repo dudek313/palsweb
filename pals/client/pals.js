@@ -80,6 +80,14 @@ Meteor.Router.add({
           return 'modelOutput';
       }
       else return 'home';
+  },  
+  '/analysis/:id': function(id) {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentAnalysisId',id);
+          return 'analysis';
+      }
+      else return 'home';
   },
   '*': 'home'
 });

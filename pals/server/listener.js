@@ -28,9 +28,11 @@ function handleMessage(message) {
     var change = {};
     if( message.error ) {
         change.error = message.error;
+        change.status = 'error';
     }
     else {
        change.results = message.files;
+       change.status = 'complete';
     }
     var modifier = {'$set':change};
     Fiber(function(){
