@@ -1,7 +1,11 @@
 var amqp = Meteor.require('amqp');
-
 var exchangeName = 'pals';
 var routingKey = 'pals.input';
+
+var bucket = 'pals-test';
+var s3Url = 'https://s3-ap-southeast-2.amazonaws.com/'+bucket;
+var AWS = Meteor.require('aws-sdk');
+AWS.config.loadFromPath(process.cwd() + '/config.json');
 
 getLatestVersion = function(dataSet) {
     if( dataSet.versions && dataSet.versions.length > 0 ) return dataSet.versions[dataSet.versions.length-1];
@@ -47,6 +51,16 @@ analysisComplete = function(analysis) {
             exchange.publish(routingKey, analysis);
             console.log('analysis sent to exchange');
         });
+    });
+}
+
+deleteFile = function(file) {
+    var s3 = new AWS.S3();
+    s3.deleteObject({
+        Bucket : bucket,
+        Key : file.key,
+    },function(err,data){
+        if( err ) console.log("Failed to delete the file: " + file.key);
     });
 }
 
@@ -103,5 +117,20 @@ Meteor.methods({
            return analysis;
        }
        return null; 
+    },
+    deleteAnalysis: function(id) {
+        console.log('deleting analysis: ' + id);
+        var analysis = Analyses.findOne({_id:id});
+        if( analysis ) {
+             if( analysis.results ) {
+                 for( var i=0; i < analysis.results.length; ++i ) {
+                     deleteFile(analysis.results[i]);
+                 }
+             }
+             Analyses.remove({'_id':id},function(error){
+                  if( error ) console.log(error);
+             });
+        }
+        return null;
     }
 });

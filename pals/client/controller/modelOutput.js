@@ -128,12 +128,21 @@ Template.modelOutput.events({
         }
     },
     'click .start-analysis':function(event) {
-    if( Template.modelOutput.owner() ) {
+        if( Template.modelOutput.owner() ) {
             var key = $(event.target).attr('id');
             var currentModelOutputId = Session.get('currentModelOutput');
             Meteor.call('startAnalysis',key,currentModelOutputId,function(error,result){
                 if( error ) alert(error);
                 console.log(result);
+            });
+        }
+    },
+    'click .delete-analysis':function(event) {
+        console.log('deleting analysis');
+        if( Template.modelOutput.owner() ) {
+            var id = $(event.target).attr('id');
+            Meteor.call('deleteAnalysis',id,function(error,result){
+                if( error ) alert(error);
             });
         }
     }
