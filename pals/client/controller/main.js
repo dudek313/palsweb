@@ -13,3 +13,8 @@ Template.main.currentWorkspace = function() {
         return user.profile.currentWorkspace;
     }
 }
+
+Template.main.loggedIn = function() {
+    if( Meteor.user() ) return true;
+    else return false;
+}

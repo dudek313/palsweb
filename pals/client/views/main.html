@@ -1,20 +1,59 @@
 <template name="main">
-<nav class="main-menu">
-    <ul>
-        <div id="login">{{loginButtons}}</div>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/home');">Home</a></li>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutputs');">Model Outputs</a></li>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/myModelOutputs');">My Model Outputs</a></li>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutput');">Upload a Model Output</a></li>
+<nav class="navbar navbar-inverse" role="navigation">
+  <div class="container">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">PALS</a>
+  </div>
+
+  <!-- Collect the nav links, forms, and other content for toggling -->
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li class="login-buttons">{{loginButtons}}</li>
+      {{#if loggedIn}}
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutputs');">Model Outputs</a></li>
+            <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/myModelOutputs');">My Model Outputs</a></li>
+            <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutput');">Upload a Model Output</a></li>
+        </ul>
+      </li>
         <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
-        {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiment');">Create Experiment</a></li>{{/if}}
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/datasets');">Data Sets</a></li>
-        {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Meteor.Router.to('/dataset');">Create Data Set</a></li>{{/if}}
+        {{#if currentUser.admin}}
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
+                    <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiment');">Create Experiment</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets <b class="caret"></b></a>
+                 <ul class="dropdown-menu">
+                     <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/datasets');">Data Sets</a></li>
+                     <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/dataset');">Create Data Set</a></li>
+                 </ul>
+            </li>
+        {{else}}
+            <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
+            <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/datasets');">Data Sets</a></li>
+        {{/if}}
+        {{/if}}
     </ul>
+    <ul class="nav navbar-nav navbar-right">
+        <li><a href="/workspaces/{{currentWorkspace._id}}">{{currentWorkspace.name}}</a></li>
+    </ul>
+  </div><!-- /.navbar-collapse -->
+  </div><!-- /container -->
 </nav>
-<a class="current-workspace" href="/workspaces/{{currentWorkspace._id}}">{{currentWorkspace.name}}</a>
-<div id="main">
+<div class="container">
 {{renderPage}}
 </div>
 </template>
