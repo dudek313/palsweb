@@ -2,19 +2,23 @@
 <div class="text-content">
     <h1>My Model Outputs</h1>
     <div class="error"></div>
-    <table>
+    <table class="table table-hover">
+        <thead>
         <tr>
             <th>Name</th>
             <th>Experiment</th>
             <th>Delete</th>
         </tr>
+        </thead>
+        <tbody>
         {{#each modelOutputs}}
         <tr>
             <td onclick="Meteor.Router.to('/modeloutputs/{{_id}}')">{{name}}</td>
             <td onclick="Meteor.Router.to('/experiments/{{experiment._id}}')">{{experiment.name}}</td>
-            <td class='delete' id="{{_id}}">Delete</td>
+            <td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>
          </tr>
         {{/each}}
+        </tbody>
     </table>
 </div>
 </template>
