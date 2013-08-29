@@ -1,66 +1,19 @@
 <template name="experiment">
 <div class="experiment">
-<div class="right-column">
-    <h3>Driving Data Sets</h3>
-    {{#if currentUser.admin}}
-    <div class="form-item">
-        <select name="drivingDataSet">
-            {{#each dataSets}}
-            <option value="{{_id}}">{{name}}</option>
-            {{/each}}
-        </select>
-    </div>
-    <button class='grey' id="driving-data-set">Add driving data set</button>
-    {{/if}}
-    <table>
-        <tr>
-            <th>Name</th>
-            {{#if currentUser.admin}}<th>remove</th>{{/if}}
-        </tr>
-        {{#each drivingDataSets}}
-        <tr>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
-            {{#if currentUser.admin}}<td class='remove-driving-dataset' id='{{_id}}'>remove</td>{{/if}}
-        </tr>
-        {{/each}}
-    </table>
-    <br/>
-    <h3>Input Data Sets</h3>
-    {{#if currentUser.admin}}
-    <div class="form-item">
-        <select name="inputDataSet">
-            {{#each dataSets}}
-            <option value="{{_id}}">{{name}}</option>
-            {{/each}}
-        </select>
-    </div>
-    <button class='grey' id="input-data-set">Add input data set</button>
-    {{/if}}
-    <table>
-        <tr>
-            <th>Name</th>
-            {{#if currentUser.admin}}<th>remove</th>{{/if}}
-        </tr>
-        {{#each inputDataSets}}
-        <tr>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
-            {{#if currentUser.admin}}<td class='remove-input-dataset' id='{{_id}}'>remove</td>{{/if}}
-        </tr>
-        {{/each}}
-    </table>
-</div><!--right-column-->
-<div class="left-column">
+<div class="row">
+<div class="col-md-8">
+<form role="form">
     <h1>Experiment: {{experiment.name}}</h1>
     <div class="error"></div>
-    <div class="form-item">
+    <div class="form-group">
        <label>Experiment Name</label>
        <div class="display">{{experiment.name}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="name" value="{{experiment.name}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{experiment.name}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Experiment Type</label>
        {{#if currentUser.admin}}
-       <select name="type">
+       <select name="type" class="form-control">
            {{#each reference.dataSetType}}
            <option value='{{this}}' {{selected this experiment.type}}>{{this}}</option>
            {{/each}}
@@ -69,10 +22,10 @@
        <div class="display">{{experiment.type}}</div>
        {{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Country</label>
        {{#if currentUser.admin}}
-       <select name="country">
+       <select name="country" class="form-control">
            {{#each reference.country}}
            <option value='{{this}}' {{selected this experiment.country}}>{{this}}</option>
            {{/each}}
@@ -81,10 +34,10 @@
        <div class="display">{{dataSet.country}}</div>
        {{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>IGBP Vegetation Type</label>
        {{#if currentUser.admin}}
-       <select name="vegType">
+       <select name="vegType" class="form-control">
            {{#each reference.vegType}}
            <option value='{{this}}' {{selected this experiment.vegType}}>{{this}}</option>
            {{/each}}
@@ -94,16 +47,16 @@
        {{/if}}
    </div>
    {{#if currentUser.admin}}
-   <div class="form-item">
+   <div class="form-group">
        <label>or enter a different Vegetation Type</label>
        <div class="display">{{experiment.vegType}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="vegType" value="{{experiment.vegType}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="vegType" value="{{experiment.vegType}}"></input>{{/if}}
    </div>
    {{/if}}
-   <div class="form-item">
+   <div class="form-group">
        <label>Spatial Level</label>
        {{#if currentUser.admin}}
-       <select name="spatialLevel">
+       <select name="spatialLevel" class="form-control">
            {{#each reference.spatialLevel}}
            <option value='{{this}}' {{selected this experiment.spatialLevel}}>{{this}}</option>
            {{/each}}
@@ -112,10 +65,10 @@
        <div class="display">{{experiment.spatialLevel}}</div>
        {{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Time Step Size</label>
        {{#if currentUser.admin}}
-       <select name="timeStepSize">
+       <select name="timeStepSize" class="form-control">
            {{#each reference.timeStepSize}}
            <option value='{{this}}' {{selected this experiment.timeSetSize}}>{{this}}</option>
            {{/each}}
@@ -124,10 +77,14 @@
        <div class="display">{{experiment.timeStepSize}}</div>
        {{/if}}
    </div>
-   <h3>Scripts</h3>
-    {{#if currentUser.admin}}<button class='grey' id="upload-script">Upload a new script</button>{{/if}}
+   <br/>
+   <div class="panel panel-success">
+   <div class="panel-heading">Scripts</div>
+   <div class="panel-body">
+    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-script">Upload a new script</button>{{/if}}
+   </div>
     {{#if hasScripts}}
-    <table>
+    <table class="table">
         <tr>
             <th>File</th>
             {{#if currentUser.admin}}<th>delete</th>{{/if}}
@@ -135,11 +92,81 @@
         {{#each experiment.scripts}}
         <tr>
             <td onclick="window.location.href='{{url}}'">{{filename}}</td>
-            {{#if currentUser.admin}}<td class='delete-script' id='{{key}}'>delete</td>{{/if}}
+            {{#if currentUser.admin}}<td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
         </tr>
         {{/each}}
     </table>
     {{/if}}
-</div><!--left-column-->
+    </div>
+</form>
+</div>
+<div class="col-md-4">
+<form role="form">
+    <div class="panel panel-primary">
+    <div class="panel-heading">Driving Data Sets</div>
+    <div class="panel-body">
+    {{#if currentUser.admin}}
+    <div class="form-group">
+        <select name="drivingDataSet" class="form-control">
+            {{#each dataSets}}
+            <option value="{{_id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <button class='btn btn-default bottom-margin' id="driving-data-set">Add driving data set</button>
+    {{/if}}
+    </div>
+    <table class="table table-hover">
+        <thead> 
+        <tr>
+            <th>Name</th>
+            {{#if currentUser.admin}}<th>remove</th>{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each drivingDataSets}}
+        <tr>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
+            {{#if currentUser.admin}}<td><button class='remove-driving-dataset btn btn-danger btn-xs' id='{{_id}}'>remove</button></td>{{/if}}
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    </div>
+    <br/>
+    <div class="panel panel-primary">
+    <div class="panel-heading">Input Data Sets</div>
+    <div class="panel-body">
+    {{#if currentUser.admin}}
+    <div class="form-group">
+        <select name="inputDataSet" class="form-control">
+            {{#each dataSets}}
+            <option value="{{_id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <button class='btn btn-default bottom-margin' id="input-data-set">Add input data set</button>
+    {{/if}}
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            {{#if currentUser.admin}}<th>remove</th>{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each inputDataSets}}
+        <tr>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
+            {{#if currentUser.admin}}<td><button class='remove-input-dataset btn btn-danger btn-xs' id='{{_id}}'>remove</button></td>{{/if}}
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    </div>
+</form>
+</div>
+</div>
 </div><!--experiment-->
 </template>

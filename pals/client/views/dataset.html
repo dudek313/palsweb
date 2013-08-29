@@ -1,35 +1,18 @@
 <template name="dataset">
-<div class="data-set">
-<div class="right-column">
-    <h3>Versions</h3>
-    {{#if currentUser.admin}}<button class='grey' id="upload-version">Upload a new version</button>{{/if}}
-    {{#if hasVersions}}
-    <table>
-        <tr>
-            <th>File</th>
-            {{#if currentUser.admin}}<th>delete</th>{{/if}}
-        </tr>
-        {{#each dataSet.versions}}
-        <tr>
-            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
-            {{#if currentUser.admin}}<td class='delete-version' id='{{key}}'>delete</td>{{/if}}
-        </tr>
-        {{/each}}
-    </table>
-    {{/if}}
-</div>
-<div class="left-column">
+<div class="row">
+<div class="col-md-8">
+<form role="form">
    <h1>Data Set: {{dataSet.name}}</h1>
    <div class="error"></div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Data Set Name</label>
        <div class="display">{{dataSet.name}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="name" value="{{dataSet.name}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{dataSet.name}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Data Set Type</label>
        {{#if currentUser.admin}}
-       <select name="type">
+       <select name="type" class="form-control">
            {{#each reference.dataSetType}}
            <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
            {{/each}}
@@ -38,10 +21,10 @@
        <div class="display">{{dataSet.type}}</div>
        {{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Country</label>
        {{#if currentUser.admin}}
-       <select name="country">
+       <select name="country" class="form-control">
            {{#each reference.country}}
            <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
            {{/each}}
@@ -50,10 +33,10 @@
        <div class="display">{{dataSet.country}}</div>
        {{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>IGBP Vegetation Type</label>
        {{#if currentUser.admin}}
-       <select name="vegType">
+       <select name="vegType" class="form-control">
            {{#each reference.vegType}}
            <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
            {{/each}}
@@ -63,62 +46,89 @@
        {{/if}}
    </div>
    {{#if currentUser.admin}}
-   <div class="form-item">
+   <div class="form-group">
        <label>or enter a different Vegetation Type</label>
        <div class="display">{{dataSet.vegType}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="vegType" value="{{dataSet.vegType}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="vegType" value="{{dataSet.vegType}}"></input>{{/if}}
    </div>
    {{/if}}
-   <div class="form-item">
+   <div class="form-group">
        <label>Soil Type</label>
        <div class="display">{{dataSet.soilType}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="soilType" value="{{dataSet.soilType}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="soilType" value="{{dataSet.soilType}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Site Description URL</label>
        <div class="display">{{dataSet.url}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="url" name="url" value="{{dataSet.url}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="url" name="url" value="{{dataSet.url}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Latitude (decimal)</label>
        <div class="display">{{dataSet.lat}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="lat" value="{{dataSet.lat}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="lat" value="{{dataSet.lat}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Longitude (decimal)</label>
        <div class="display">{{dataSet.lon}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="lon" value="{{dataSet.lon}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="lon" value="{{dataSet.lon}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Elevation (m)</label>
        <div class="display">{{dataSet.elevation}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="elevation" value="{{dataSet.elevation}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="elevation" value="{{dataSet.elevation}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Max Vegetation Height (m)</label>
        <div class="display">{{dataSet.maxVegHeight}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}"></input>{{/if}}
    </div> 
-   <div class="form-item">
+   <div class="form-group">
        <label>UTC Offset (hours)</label>
        <div class="display">{{dataSet.utcOffset}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="utcOffset" value="{{dataSet.utcOffset}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="utcOffset" value="{{dataSet.utcOffset}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Site Contact</label>
        <div class="display">{{dataSet.siteContact}}</div>
-       {{#if currentUser.admin}}<input class="modifier" type="text" name="siteContact" value="{{dataSet.siteContact}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="siteContact" value="{{dataSet.siteContact}}"></input>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>References</label>
        <div class="display">{{dataSet.references}}</div>
-       {{#if currentUser.admin}}<textarea class="modifier" type="text" name="references">{{dataSet.references}}</textarea>{{/if}}
+       {{#if currentUser.admin}}<textarea class="modifier form-control" type="text" name="references">{{dataSet.references}}</textarea>{{/if}}
    </div>
-   <div class="form-item">
+   <div class="form-group">
        <label>Comments</label>
        <div class="display">{{dataSet.comments}}</div>
-       {{#if currentUser.admin}}<textarea class="modifier" type="text" name="comments">{{dataSet.comments}}</textarea>{{/if}}
+       {{#if currentUser.admin}}<textarea class="modifier form-control" type="text" name="comments">{{dataSet.comments}}</textarea>{{/if}}
    </div>
+</form>
 </div><!--left-column-->
-</div><!--text-content-->
+<div class="col-md-4">
+    <div class="panel panel-primary">
+    <div class="panel-heading">Versions</div>
+    <div class="panel-body">
+    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version">Upload a new version</button>{{/if}}
+    </div>
+    {{#if hasVersions}}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>File</th>
+            {{#if currentUser.admin}}<th>delete</th>{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each dataSet.versions}}
+        <tr>
+            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    {{/if}}
+    </div>
+</div>
+</div><!--row-->
 </template>

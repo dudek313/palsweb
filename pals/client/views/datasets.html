@@ -2,7 +2,8 @@
 <div class="text-content">
     <h1>Data Sets</h1>
     <div class="error"></div>
-    <table>
+    <table class="table table-hover">
+        <thead>
         <tr>
             <th>Name</th>
             <th>Country</th>
@@ -10,15 +11,18 @@
             <th>Created By</th>
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
+        </thead>
+        <tbody>
         {{#each dataSets}}
         <tr>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{country}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{vegType}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{userEmail owner}}</td>
-            {{#if currentUser.admin}}<td class='delete' id="{{_id}}">Delete</td>{{/if}}
+            {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}
+        </tbody>
     </table>
 </div>
 </template>

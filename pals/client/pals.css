@@ -19,3 +19,7 @@
 table.table-hover tbody tr:hover {
     cursor: pointer;
 }
+
+.bottom-margin {
+    margin-bottom: 20px;
+}

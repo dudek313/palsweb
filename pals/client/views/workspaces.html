@@ -1,42 +1,51 @@
 <template name="workspaces">
 <div class="text-content">
 <h1>Workspaces</h1>
-<form class="workspace-form">
-    <div class="form-item">
+<form role="form">
+    <div class="form-group">
         <label>Workspace Name</label>
-        <input type="text" name="workspace.name" required="true" maxlength="200"></input>
+        <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200"></input>
     </div>
-    <button class="grey" id="add-workspace">Add New Workspace</button>
+    <button class="btn btn-default" id="add-workspace">Add New Workspace</button>
 </form>
+<hr/>
 <a href="javascript:void(0)" class="open-workspace" id="{{rootWorkspace._id}}">Root Workspace</a>
 
 <section class="workspace-list">
 <h2>My Workspaces</h2>
-<table>
+<table class="table table-hover">
+    <thead>
     <tr>
         <th>Click to load</th>
         <th>Delete workspace</th>
     </tr>
+    </thead>
+    <tbody>
 {{#each myWorkspaces}}
     <tr>
         <td class="open-workspace" id="{{_id}}">{{name}}</td>
-        <td class="delete-workspace" id="{{_id}}">Delete</td>
+        <td><button class="delete-workspace btn btn-danger btn-xs" id="{{_id}}">Delete</button></td>
     </tr>   
 {{/each}}
+    </tbody>
 </table>
 </section>
 
 <section class="workspace-list">
 <h2>Workspaces Shared With Me</h2>
-<table>
+<table class="table table-hover">
+    <thead>
     <tr>
         <th>Click to load</th>
     </tr>
+    </thead>
+    <tbody>
 {{#each sharedWorkspaces}}
     <tr>
         <td class="open-workspace-shared" id="{{_id}}">{{name}}</td>
     </tr>   
 {{/each}}
+    </tbody>
 </table>
 </section>
 
