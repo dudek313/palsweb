@@ -3,7 +3,7 @@
 <div class="col-md-8">
 <form role="form">
    <h1>Data Set: {{dataSet.name}}</h1>
-   <div class="error"></div>
+   <div class="alert alert-danger error"></div>
    <div class="form-group">
        <label>Data Set Name</label>
        <div class="display">{{dataSet.name}}</div>
@@ -108,7 +108,7 @@
     <div class="panel panel-primary">
     <div class="panel-heading">Versions</div>
     <div class="panel-body">
-    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version">Upload a new version</button>{{/if}}
+    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version" {{uploadDisabled}}>Upload a new version</button>{{/if}}
     </div>
     {{#if hasVersions}}
     <table class="table table-hover">

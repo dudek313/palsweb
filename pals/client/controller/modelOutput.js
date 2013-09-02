@@ -196,3 +196,9 @@ Template.modelOutput.analyses = function() {
    }
    else return undefined;
 };
+
+Template.modelOutput.uploadDisabled = function() {
+    var currentMO = Template.modelOutput.modelOutput();
+    if( currentMO ) return '';
+    else return 'disabled="disabled"';
+}

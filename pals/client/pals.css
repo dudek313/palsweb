@@ -23,3 +23,8 @@ table.table-hover tbody tr:hover {
 .bottom-margin {
     margin-bottom: 20px;
 }
+
+.error {
+    cursor: pointer;
+    display: none;
+}

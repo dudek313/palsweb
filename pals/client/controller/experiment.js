@@ -234,3 +234,9 @@ Template.experiment.hasScripts = function() {
     if( experiment && experiment.scripts && experiment.scripts.length > 0 ) return true;
     else return false;
 };
+
+Template.experiment.uploadDisabled = function() {
+    var currentExperiment = Template.experiment.experiment();
+    if( currentExperiment ) return '';
+    else return 'disabled="disabled"';
+}

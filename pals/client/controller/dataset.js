@@ -160,3 +160,9 @@ Template.dataset.hasVersions = function() {
     if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
     else return false;
 };
+
+Template.dataset.uploadDisabled = function() {
+    var currentDataSet = Template.dataset.dataSet();
+    if( currentDataSet ) return '';
+    else return 'disabled="disabled"';
+}
