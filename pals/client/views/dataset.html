@@ -106,9 +106,9 @@
 </div><!--left-column-->
 <div class="col-md-4">
     <div class="panel panel-primary">
-    <div class="panel-heading">Versions</div>
+    <div class="panel-heading">Met Versions</div>
     <div class="panel-body">
-    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version" {{uploadDisabled}}>Upload a new version</button>{{/if}}
+    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version" {{uploadDisabled}}>Upload a new  met version</button>{{/if}}
     </div>
     {{#if hasVersions}}
     <table class="table table-hover">
@@ -119,7 +119,32 @@
         </tr>
         </thead>
         <tbody>
-        {{#each dataSet.versions}}
+        {{#each metVersions}}
+        <tr>
+            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+    {{/if}}
+    </div>
+    
+    <div class="panel panel-primary">
+    <div class="panel-heading">Flux Versions</div>
+    <div class="panel-body">
+    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version-flux" {{uploadDisabled}}>Upload a new flux version</button>{{/if}}
+    </div>
+    {{#if hasVersions}}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>File</th>
+            {{#if currentUser.admin}}<th>delete</th>{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each fluxVersions}}
         <tr>
             <td onclick="window.location.href='{{url}}'">{{filename}}</td>
             {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}

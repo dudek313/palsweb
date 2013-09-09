@@ -7,9 +7,14 @@ var s3Url = 'https://s3-ap-southeast-2.amazonaws.com/'+bucket;
 var AWS = Meteor.require('aws-sdk');
 AWS.config.loadFromPath(process.cwd() + '/config.json');
 
-getLatestVersion = function(dataSet) {
-    if( dataSet.versions && dataSet.versions.length > 0 ) return dataSet.versions[dataSet.versions.length-1];
-    else return null;
+getLatestVersion = function(dataSet,type) {
+    if( dataSet.versions && dataSet.versions.length > 0 ) {
+        for( var i = dataSet.versions.length-1; i >=0; --i ) {
+             var version = dataSet.versions[i];
+             if( version.component == type ) return version;
+        }
+    }
+    return null;
 }
 
 addDataSets = function(files,dataSets,type) {
@@ -21,10 +26,16 @@ addDataSets = function(files,dataSets,type) {
     for( var i=0; i < dataSets.length; ++i ) {
         var dataSetId = dataSets[i];
         var dataSet = DataSets.findOne({'_id':dataSetId});
-        var version = getLatestVersion(dataSet);
-        if( version ) { 
-            version.type = type;
-            files.push(version);
+        console.log('processing data set: ' + dataSetId);
+        var versionMet = getLatestVersion(dataSet,'met');
+        if( versionMet ) { 
+            versionMet.type = type;
+            files.push(versionMet);
+        }
+        var versionFlux = getLatestVersion(dataSet,'flux');
+        if( versionFlux ) { 
+            versionFlux.type = type;
+            files.push(versionFlux);
         }
     }
 }
