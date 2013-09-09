@@ -103,7 +103,7 @@
 <div class="col-md-4">
 <form role="form">
     <div class="panel panel-primary">
-    <div class="panel-heading">Driving Data Sets</div>
+    <div class="panel-heading">Data Sets</div>
     <div class="panel-body">
     {{#if currentUser.admin}}
     <div class="form-group">
@@ -113,7 +113,7 @@
             {{/each}}
         </select>
     </div>
-    <button class='btn btn-default bottom-margin' id="driving-data-set" {{uploadDisabled}}>Add driving data set</button>
+    <button class='btn btn-default bottom-margin' id="driving-data-set" {{uploadDisabled}}>Add data set</button>
     {{/if}}
     </div>
     <table class="table table-hover">
@@ -128,38 +128,6 @@
         <tr>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
             {{#if currentUser.admin}}<td><button class='remove-driving-dataset btn btn-danger btn-xs' id='{{_id}}'>remove</button></td>{{/if}}
-        </tr>
-        {{/each}}
-        </tbody>
-    </table>
-    </div>
-    <br/>
-    <div class="panel panel-primary">
-    <div class="panel-heading">Input Data Sets</div>
-    <div class="panel-body">
-    {{#if currentUser.admin}}
-    <div class="form-group">
-        <select name="inputDataSet" class="form-control">
-            {{#each dataSets}}
-            <option value="{{_id}}">{{name}}</option>
-            {{/each}}
-        </select>
-    </div>
-    <button class='btn btn-default bottom-margin' id="input-data-set" {{uploadDisabled}}>Add input data set</button>
-    {{/if}}
-    </div>
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Name</th>
-            {{#if currentUser.admin}}<th>remove</th>{{/if}}
-        </tr>
-        </thead>
-        <tbody>
-        {{#each inputDataSets}}
-        <tr>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
-            {{#if currentUser.admin}}<td><button class='remove-input-dataset btn btn-danger btn-xs' id='{{_id}}'>remove</button></td>{{/if}}
         </tr>
         {{/each}}
         </tbody>

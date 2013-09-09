@@ -90,8 +90,7 @@ Meteor.methods({
             
             if( !currentModelOutput.experiment ) throw new Meteor.Error(500, 'Please select an experiment first');
             
-            addDataSets(files, currentModelOutput.experiment.drivingDataSets,'DrivingDataSet');
-            addDataSets(files, currentModelOutput.experiment.inputDataSets,'InputDataSet');
+            addDataSets(files, currentModelOutput.experiment.dataSets,'DataSet');
             
             if( !currentModelOutput.experiment.scripts || currentModelOutput.experiment.scripts.length <=0 ) {
                 throw new Meteor.Error(500,'The chosen experiment does not have a script');

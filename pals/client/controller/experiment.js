@@ -96,7 +96,7 @@ Template.experiment.events({
             if( !experimentId ) alert('Please enter an experiment name before adding data sets');
             else {
                 Experiments.update({'_id':experimentId},
-                    {'$push':{'drivingDataSets':selected}},function(error){
+                    {'$push':{'dataSets':selected}},function(error){
                     if( error ) {
                          $('.error').html('Error adding data set, please try again');
                          $('.error').show();
@@ -111,43 +111,12 @@ Template.experiment.events({
         var experimentId = Session.get('currentExperiment');
         if( dataSetId && experimentId ) {
             Experiments.update({_id:experimentId},
-                {$pull:{'drivingDataSets':dataSetId}},function(error){
+                {$pull:{'dataSets':dataSetId}},function(error){
                 if(error) {
-                    $('.error').html('Sorry, there was an error removing the driving data set, try again');
+                    $('.error').html('Sorry, there was an error removing the data set, try again');
                     $('.error').show();
                 }
             });
-        }
-    },
-    'click .remove-input-dataset':function(event) {
-        console.log('here');
-        var dataSetId = $(event.target).attr('id');
-        var experimentId = Session.get('currentExperiment');
-        if( dataSetId && experimentId ) {
-            Experiments.update({_id:experimentId},
-                {$pull:{'inputDataSets':dataSetId}},function(error){
-                if(error) {
-                    $('.error').html('Sorry, there was an error removing the input data set, try again');
-                    $('.error').show();
-                }
-            });
-        }
-    },
-    'click #input-data-set':function(event) {
-        event.preventDefault();
-        var selected = $('select[name="inputDataSet"]').val();
-        if( selected ) {
-            var experimentId = Session.get('currentExperiment');
-            if( !experimentId ) alert('Please enter an experiment name before adding data sets');
-            else {
-                Experiments.update({'_id':experimentId},
-                    {'$push':{'inputDataSets':selected}},function(error){
-                    if( error ) {
-                         $('.error').html('Error adding data set, please try again');
-                         $('.error').show();
-                    }
-                });
-            }
         }
     },
     'click #upload-script':function(event) {
@@ -194,17 +163,9 @@ Template.experiment.dataSets = function() {
 
 Template.experiment.drivingDataSets = function() {
     var exp = Template.experiment.experiment();
-    if( exp && exp.drivingDataSets && exp.drivingDataSets.length > 0) {
-        var drivingDataSets = DataSets.find({_id:{$in:exp.drivingDataSets}});
+    if( exp && exp.dataSets && exp.dataSets.length > 0) {
+        var drivingDataSets = DataSets.find({_id:{$in:exp.dataSets}});
         return drivingDataSets;
-    }
-};
-
-Template.experiment.inputDataSets = function() {
-    var exp = Template.experiment.experiment();
-    if( exp && exp.inputDataSets && exp.inputDataSets.length > 0) {
-        var inputDataSets = DataSets.find({_id:{$in:exp.inputDataSets}});
-        return inputDataSets;
     }
 };
 
