@@ -1,5 +1,10 @@
-var rootWorkspace = Workspaces.findOne({"name":"root"});
-if( !rootWorkspace ) Workspaces.insert({"name": "root"});
+var rootWorkspace = Workspaces.findOne({"name":"public"});
+if( !rootWorkspace ) { 
+    Workspaces.insert({"name": "public"});
+}
+else {
+    Workspaces.update(rootWorkspace,{"name":"public"});
+}
 
 var reference = Reference.findOne();
 if( !reference ) {

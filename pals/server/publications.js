@@ -110,3 +110,21 @@ ModelOutputs._ensureIndex('name', {unique: 1});
 Meteor.publish('analyses',function(){
     return Analyses.find();
 });
+
+Meteor.publish('models',function(){
+    return Models.find();
+});
+
+Models._ensureIndex('name', {unique: 1});
+
+Models.allow({
+    insert: function(userId, doc) {
+        return ( userId && doc.owner === userId );
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        return ( userId && doc.owner === userId );
+    },
+    remove: function(userId, doc) {
+        return ( userId && doc.owner === userId );
+    }
+});

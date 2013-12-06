@@ -1,0 +1,22 @@
+<template name="models">
+<div class="text-content">
+    <h1>Models</h1>
+    <div class="alert alert-danger error"></div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+        </tr>
+        </thead>
+        <tbody>
+        {{#each models}}
+        <tr>
+            <td onclick="Meteor.Router.to('/models/{{_id}}')">{{name}}</td>
+            {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+         </tr>
+        {{/each}} 
+        </tbody>
+    </table>
+</div>
+</template>

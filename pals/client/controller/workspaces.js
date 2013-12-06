@@ -15,7 +15,7 @@ Template.workspaces.sharedWorkspaces = function() {
 };
 
 Template.workspaces.rootWorkspace = function() {
-    return Workspaces.findOne({'name':'root'});
+    return Workspaces.findOne({'name':'public'});
 };
 
 Template.workspaces.events({

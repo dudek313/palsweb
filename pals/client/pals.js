@@ -89,6 +89,27 @@ Meteor.Router.add({
       }
       else return 'home';
   },
+  '/models': function() {
+      var user = Meteor.user();
+      if( user ) return 'models'
+      else return 'home';
+  },
+  '/model': function() {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentModel',undefined);
+          return 'model';
+      }
+      else return 'home';
+  },
+  '/models/:id': function(id) {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentModel',id);
+          return 'model';
+      }
+      else return 'home';
+  },  
   '*': 'home'
 });
 
