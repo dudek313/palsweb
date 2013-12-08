@@ -23,6 +23,18 @@
        {{/if}}
    </div>
    <div class="form-group">
+       <label>Model</label>
+       {{#if owner}}
+       <select name="model" class="form-control">
+           {{#each models}}
+           <option value='{{_id}}' {{selected this._id modelOutput.model._id}}>{{name}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       <div class="display">{{modelOutput.model.name}}</div>
+       {{/if}}
+   </div>
+   <div class="form-group">
        <label>State Selection</label>
        {{#if owner}}
        <select name="stateSelection" class="form-control">

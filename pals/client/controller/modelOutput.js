@@ -15,6 +15,9 @@ Template.modelOutput.modelOutput = function() {
     if( currentModelOutput && currentModelOutput.experiment ) {
         currentModelOutput.experiment = Experiments.findOne({_id:currentModelOutput.experiment});
     }
+    if( currentModelOutput && currentModelOutput.model ) {
+        currentModelOutput.model = Models.findOne({_id:currentModelOutput.model});
+    }
     return currentModelOutput;
 }
 
@@ -151,6 +154,11 @@ Template.modelOutput.events({
 Template.modelOutput.experiments = function() {
     var user = Meteor.user();
     return Experiments.find({'workspaces':user.profile.currentWorkspace._id});
+};
+
+Template.modelOutput.models = function() {
+    var user = Meteor.user();
+    return Models.find({'workspaces':user.profile.currentWorkspace._id});
 };
 
 Template.modelOutput.owner = function() {
