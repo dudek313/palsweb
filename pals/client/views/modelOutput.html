@@ -7,61 +7,82 @@
     <div class="alert alert-danger error"></div>
     <div class="form-group">
         <label>Model Output name</label>
+        {{#if owner}}<input class="modifier form-control" type="text" name="name" value="{{modelOutput.name}}"></input>
+        {{else}}
         <div class="display">{{modelOutput.name}}</div>
-        {{#if owner}}<input class="modifier form-control" type="text" name="name" value="{{modelOutput.name}}"></input>{{/if}}
+        {{/if}}
     </div>
     <div class="form-group">
-       <label>Experiment</label>
        {{#if owner}}
+       <label>Experiment</label>
        <select name="experiment" class="form-control">
            {{#each experiments}}
            <option value='{{_id}}' {{selected this._id modelOutput.experiment._id}}>{{name}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{modelOutput.experiment.name}}</div>
+       {{#if modelOutput.model}}
+           <label>Experiment</label>
+           <div class="display">{{modelOutput.experiment.name}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>Model</label>
        {{#if owner}}
+       <label>Model</label>
        <select name="model" class="form-control">
+           <option value='n/a'></option>
            {{#each models}}
            <option value='{{_id}}' {{selected this._id modelOutput.model._id}}>{{name}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{modelOutput.model.name}}</div>
+       {{#if modelOutput.model}}
+           <label>Model</label>
+           <div class="display">{{modelOutput.model.name}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>State Selection</label>
        {{#if owner}}
+       <label>State Selection</label>
        <select name="stateSelection" class="form-control">
            {{#each reference.stateSelection}}
            <option value='{{_id}}' {{selected this  modelOutput.stateSelection}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{modelOutput.stateSelection}}</div>
+       {{#if modelOutput.stateSelection}}
+           <label>State Selection</label>
+           <div class="display">{{modelOutput.stateSelection}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>Parameter Selection</label>
        {{#if owner}}
+       <label>Parameter Selection</label>
        <select name="parameterSelection" class="form-control">
            {{#each reference.parameterSelection}}
            <option value='{{_id}}' {{selected this  modelOutput.parameterSelection}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{modelOutput.parameterSelection}}</div>
+       {{#if modelOutput.parameterSelection}}
+           <label>Parameter Selection</label>
+           <div class="display">{{modelOutput.parameterSelection}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>Please add any comments that would aid reproducing this simulation: </label>
-       <div class="display">{{modelOutput.comments}}</div>
-       {{#if owner}}<textarea class="modifier form-control" type="text" name="comments">{{modelOutput.comments}}</textarea>{{/if}}
+       {{#if owner}}
+           <label>Please add any comments that would aid reproducing this simulation: </label>
+           <textarea class="modifier form-control" type="text" name="comments">{{modelOutput.comments}}</textarea>
+       {{else}}
+           {{#if modelOutput.comments}}
+               <label>comments</label>
+               <div class="display">{{modelOutput.comments}}</div>
+           {{/if}}
+       {{/if}}
    </div>
    {{#if analyses}}
    <br/>

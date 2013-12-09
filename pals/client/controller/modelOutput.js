@@ -1,5 +1,6 @@
 Template.modelOutput.rendered = function() {
     window['directives']();
+    /*
     $('.display').each(function(index,element){
         var content = $(element).html();
         if( content && content.length > 0 ) {
@@ -7,6 +8,7 @@ Template.modelOutput.rendered = function() {
             $(element).show();
         }
     });
+    */
 };
 
 Template.modelOutput.modelOutput = function() {
@@ -40,6 +42,9 @@ Template.modelOutput.performUpdate = function(fieldName,value) {
         var reference = Template.modelOutput.reference();
         
         if( currentModelOutputId ) {
+        
+            if( value == 'n/a' ) value = null;
+        
             var selector = {'_id':currentModelOutputId};
             var fieldModifier = {};
             fieldModifier[fieldName] = value;
@@ -86,12 +91,14 @@ Template.modelOutput.events({
     'blur select':function(event) {
         Template.modelOutput.update(event);
     },
+/*
     'click .display':function(event) {
         if( Template.modelOutput.owner() ) {
             $(event.target).next('.modifier').show();
             $(event.target).hide();
         }
     },
+*/
     'change select':function(event) {
         Template.modelOutput.update(event);
     },

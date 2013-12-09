@@ -1,5 +1,6 @@
 Template.experiment.rendered = function() {
     window['directives']();
+    /*
     $('.display').each(function(index,element){
         var content = $(element).html();
         if( content && content.length > 0 ) {
@@ -7,6 +8,7 @@ Template.experiment.rendered = function() {
             $(element).show();
         }
     });
+    */
 };
 
 Template.experiment.experiment = function() {
@@ -34,6 +36,9 @@ Template.experiment.performUpdate = function(fieldName,value) {
         var reference = Template.experiment.reference();
         
         if( currentExperimentId ) {
+        
+            if( value == "n/a" ) value = null;
+        
             var selector = {'_id':currentExperimentId};
             var fieldModifier = {};
             fieldModifier[fieldName] = value;
@@ -51,9 +56,9 @@ Template.experiment.performUpdate = function(fieldName,value) {
                 'created' : new Date(),
                 'workspaces' : [user.profile.currentWorkspace._id]
             };
-            if( fieldName != 'type' ) currentExperiment.type = reference.dataSetType[0];
-            if( fieldName != 'country' ) currentExperiment.country = reference.country[0];
-            if( fieldName != 'vegType' ) currentExperiment.vegType = reference.vegType[0];
+            //if( fieldName != 'type' ) currentExperiment.type = reference.dataSetType[0];
+            //if( fieldName != 'country' ) currentExperiment.country = reference.country[0];
+            //if( fieldName != 'vegType' ) currentExperiment.vegType = reference.vegType[0];
             if( fieldName != 'spatialLevel' ) currentExperiment.spatialLevel = reference.spatialLevel[0];
             if( fieldName != 'timeStepSize' ) currentExperiment.timeStepSize = reference.timeStepSize[0];
             currentExperiment[fieldName] = value;
@@ -79,12 +84,14 @@ Template.experiment.events({
     'blur textarea': function (event) {
         Template.experiment.update(event);
     },
+    /*
     'click .display':function(event) {
         if( Meteor.user().admin ) {
             $(event.target).next('.modifier').show();
             $(event.target).hide();
         }
     },
+    */
     'change select':function(event) {
         Template.experiment.update(event);
     },

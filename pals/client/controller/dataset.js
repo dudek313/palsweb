@@ -1,5 +1,6 @@
 Template.dataset.rendered = function() {
     window['directives']();
+    /*
     $('.display').each(function(index,element){
         var content = $(element).html();
         if( content && content.length > 0 ) {
@@ -7,6 +8,7 @@ Template.dataset.rendered = function() {
             $(element).show();
         }
     });
+    */
 };
 
 Template.dataset.dataSet = function() {
@@ -62,6 +64,9 @@ Template.dataset.performUpdate = function(fieldName,value) {
         var reference = Template.dataset.reference();
         
         if( currentDataSetId ) {
+        
+            if ( value == "n/a" ) value = null;
+        
             var selector = {'_id':currentDataSetId};
             var fieldModifier = {};
             fieldModifier[fieldName] = value;
@@ -79,9 +84,10 @@ Template.dataset.performUpdate = function(fieldName,value) {
                 'created' : new Date(),
                 'workspaces' : [user.profile.currentWorkspace._id]
             };
-            if( fieldName != 'type' ) currentDataSet.type = reference.dataSetType[0];
-            if( fieldName != 'country' ) currentDataSet.country = reference.country[0];
-            if( fieldName != 'vegType' ) currentDataSet.vegType = reference.vegType[0];
+            //if( fieldName != 'type' ) currentDataSet.type = reference.dataSetType[0];
+            //if( fieldName != 'country' ) currentDataSet.country = reference.country[0];
+            //if( fieldName != 'vegType' ) currentDataSet.vegType = reference.vegType[0];
+            if( fieldName != 'spatialLevel' ) currentDataSet.spatialLevel = reference.spatialLevel[0];
             currentDataSet[fieldName] = value;
             DataSets.insert(currentDataSet,function(error,id) {
                 if( error ) {
@@ -105,12 +111,14 @@ Template.dataset.events({
     'blur textarea': function (event) {
         Template.dataset.update(event);
     },
+    /*
     'click .display':function(event) {
         if( Meteor.user().admin ) {
             $(event.target).next('.modifier').show();
             $(event.target).hide();
         }
     },
+    */
     'change select':function(event) {
         Template.dataset.update(event);
     },

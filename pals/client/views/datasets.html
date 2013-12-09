@@ -6,6 +6,7 @@
         <thead>
         <tr>
             <th>Name</th>
+            <th>Spatial Resolution</th>
             <th>Country</th>
             <th>VegType</th>
             <th>Created By</th>
@@ -16,6 +17,7 @@
         {{#each dataSets}}
         <tr>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
+            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{spatialLevel}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{country}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{vegType}}</td>
             <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{userEmail owner}}</td>

@@ -7,54 +7,71 @@
     <div class="alert alert-danger error"></div>
     <div class="form-group">
        <label>Experiment Name</label>
-       <div class="display">{{experiment.name}}</div>
-       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{experiment.name}}"></input>{{/if}}
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{experiment.name}}"></input>
+       {{else}}
+           <div class="display">{{experiment.name}}</div>
+       {{/if}}
    </div>
    <div class="form-group">
-       <label>Experiment Type</label>
        {{#if currentUser.admin}}
+       <label>Experiment Type</label>
        <select name="type" class="form-control">
+           <option value="n/a"></option>
            {{#each reference.dataSetType}}
            <option value='{{this}}' {{selected this experiment.type}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{experiment.type}}</div>
+       {{#if experiment.type}}
+           <label>Experiment Type</label>
+           <div class="display">{{experiment.type}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>Country</label>
        {{#if currentUser.admin}}
+       <label>Country</label>
        <select name="country" class="form-control">
+           <option value="n/a"></option>
            {{#each reference.country}}
            <option value='{{this}}' {{selected this experiment.country}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{dataSet.country}}</div>
+       {{#if experiment.country}}
+           <label>Country</label>
+           <div class="display">{{experiment.country}}</div>
+       {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       <label>IGBP Vegetation Type</label>
        {{#if currentUser.admin}}
+       <label>IGBP Vegetation Type</label>
        <select name="vegType" class="form-control">
+           <option value="n/a"></option>
            {{#each reference.vegType}}
            <option value='{{this}}' {{selected this experiment.vegType}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
-       <div class="display">{{experiment.vegType}}</div>
+       {{#if experiment.vegType}}
+           <label>IGBP Vegetation Type</label>
+           <div class="display">{{experiment.vegType}}</div>
+       {{/if}}
        {{/if}}
    </div>
    {{#if currentUser.admin}}
    <div class="form-group">
        <label>or enter a different Vegetation Type</label>
-       <div class="display">{{experiment.vegType}}</div>
-       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="vegType" value="{{experiment.vegType}}"></input>{{/if}}
+       {{#if currentUser.admin}}
+           <input class="modifier form-control" type="text" name="vegType" value="{{#if experiment.vegType}}{{experiment.vegType}}{{/if}}"></input>
+       {{else}}
+           <div class="display">{{experiment.vegType}}</div>
+       {{/if}}
    </div>
    {{/if}}
    <div class="form-group">
-       <label>Spatial Level</label>
+       <label>Spatial Resolution</label>
        {{#if currentUser.admin}}
        <select name="spatialLevel" class="form-control">
            {{#each reference.spatialLevel}}
