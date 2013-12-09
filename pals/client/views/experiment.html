@@ -14,22 +14,6 @@
    </div>
    <div class="form-group">
        {{#if currentUser.admin}}
-       <label>Experiment Type</label>
-       <select name="type" class="form-control">
-           <option value="n/a"></option>
-           {{#each reference.dataSetType}}
-           <option value='{{this}}' {{selected this experiment.type}}>{{this}}</option>
-           {{/each}}
-       </select>
-       {{else}}
-       {{#if experiment.type}}
-           <label>Experiment Type</label>
-           <div class="display">{{experiment.type}}</div>
-       {{/if}}
-       {{/if}}
-   </div>
-   <div class="form-group">
-       {{#if currentUser.admin}}
        <label>Country</label>
        <select name="country" class="form-control">
            <option value="n/a"></option>
