@@ -5,9 +5,13 @@
     <h1>Model: {{model.name}}</h1>
     <div class="alert alert-danger error"></div>
     <div class="form-group">
-       <label>Model Name</label>
-       <div class="display">{{model.name}}</div>
-       {{#if owner}}<input class="modifier form-control" type="text" name="name" value="{{model.name}}"></input>{{/if}}
+       {{#if owner}}
+           <label>Model Name</label>
+           <input class="modifier form-control" type="text" name="name" value="{{model.name}}"></input>
+       {{else}}
+           <label>Model Name</label>
+           <div class="display">{{model.name}}</div>
+       {{/if}}
    </div>
 </form>
 </div><!--/col-md-8-->
