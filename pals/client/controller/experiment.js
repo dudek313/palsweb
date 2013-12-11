@@ -18,6 +18,13 @@ Template.experiment.experiment = function() {
     }
 }
 
+Template.experiment.modelOutputs = function() {
+    currentExperimentId = Session.get('currentExperiment');
+    if( currentExperimentId ) {
+        return  ModelOutputs.find({'experiment':currentExperimentId});
+    }
+}
+
 Template.experiment.reference = function() {
     return Reference.findOne();
 };
