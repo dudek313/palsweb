@@ -1,6 +1,9 @@
 <template name="experiments">
 <div class="text-content">
-    <h1>Experiments</h1>
+    <h1>
+    {{#if currentSpatialResolution}}{{currentSpatialResolution}}{{/if}}
+        Experiments
+    </h1>
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>

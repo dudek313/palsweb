@@ -44,6 +44,7 @@ Meteor.Router.add({
   },
   '/experiments': function() {
       var user = Meteor.user();
+      Session.set('currentSpatialResolution',null);
       if( user ) return 'experiments';
       else return 'home';
   },
@@ -52,6 +53,14 @@ Meteor.Router.add({
       if( user ) {
           Session.set('currentExperiment',id);
           return 'experiment';
+      }
+      else return 'home';
+  },
+  '/experimentsBySpatialResolution/:resolution': function(resolution) {
+      var user = Meteor.user();
+      if( user ) {
+          Session.set('currentSpatialResolution',resolution);
+          return 'experiments';
       }
       else return 'home';
   },
