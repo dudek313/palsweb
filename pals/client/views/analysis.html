@@ -4,10 +4,18 @@
 </div>
 <div class="left-column">
    <h1>Analysis of model output: {{analysis.modelOutput}}</h1>
+   <div class="row">
    {{#each analysis.results}}
-       <h3>{{type}}</h3>
-       <img src="{{url}}" title="{{type}}"></img>
+       <div class="col-md-2">
+       <div class="panel panel-default">
+            <div class="panel-heading">{{type}}</div>
+            <div class="panel-body">
+                <a href="{{url}}"><img class="img-responsive" src="{{url}}" title="{{type}}"></img></a>
+            </div> 
+        </div>
+        </div><!--/col-->
    {{/each}}
+   </div><!--/row-->
 </div><!--left-column-->
 </div><!--text-content-->
 </template>
