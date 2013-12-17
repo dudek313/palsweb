@@ -17,25 +17,20 @@ Template.dataset.dataSet = function() {
     return currentDataSet;
 }
 
-function getVersions(dataSet,type) {
+function getVersions(dataSet) {
     if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) {
-        var metVersions = new Array();
+        var versions = new Array();
         for( var i=0; i < dataSet.versions.length; ++i ) {
             var version = dataSet.versions[i];
-            if( version.component == type ) metVersions.push(version);
+            versions.push(version);
         }
-        return metVersions;
+        return versions;
     }
 }
 
-Template.dataset.metVersions = function() {
+Template.dataset.versions = function() {
     var dataSet = Template.dataset.dataSet();
-    return getVersions(dataSet,'met');
-}
-
-Template.dataset.fluxVersions = function() {
-    var dataSet = Template.dataset.dataSet();
-    return getVersions(dataSet,'flux');
+    return getVersions(dataSet);
 }
 
 Template.dataset.update = function(event) {
@@ -124,11 +119,7 @@ Template.dataset.events({
     },
     'click #upload-version':function(event) {
         event.preventDefault();
-        Template.dataset.upload('met');
-    },
-    'click #upload-version-flux':function(event) {
-        event.preventDefault();
-        Template.dataset.upload('flux');
+        Template.dataset.upload();
     },
     'click .delete-version':function(event) {
         if( Meteor.user().admin ) {
@@ -168,12 +159,11 @@ Template.dataset.reference = function() {
     return reference;
 };
 
-Template.dataset.upload = function(component) {
+Template.dataset.upload = function() {
     filepicker.setKey(Reference.findOne().filePickerAPIKey);
     filepicker.pickAndStore({},{},function(fpfiles){
         fpfiles.forEach(function(file){
             file.created = new Date();
-            file.component = component;
         });
         currentDataSetId = Session.get('currentDataSet');
         console.log(currentDataSetId);
