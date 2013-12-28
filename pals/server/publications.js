@@ -128,3 +128,9 @@ Models.allow({
         return ( userId && doc.owner === userId );
     }
 });
+
+Meteor.publish('variables',function(){
+    return Variables.find();
+});
+
+Variables._ensureIndex('name', {unique: 1});

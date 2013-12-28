@@ -5,3 +5,4 @@ Experiments = new Meteor.Collection("experiments");
 ModelOutputs = new Meteor.Collection("modelOutputs");
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
+Variables = new Meteor.Collection("variables");

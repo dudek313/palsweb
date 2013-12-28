@@ -39,18 +39,6 @@ Template.dataset.update = function(event) {
     Template.dataset.performUpdate(fieldName,value);
 };
 
-/*
-Template.dataset.select = function(event) {
-    var fieldName = $(event.target).attr('name');
-    var id = $(event.target).val();
-    var value = undefined;
-    if( fieldName == 'type' ) {
-        value = DataSetTypes.findOne({'_id':id});
-    }
-    Template.dataset.performUpdate(fieldName,value);
-};
-*/
-
 Template.dataset.performUpdate = function(fieldName,value) {
     if( value ) {
     
@@ -114,7 +102,7 @@ Template.dataset.events({
         }
     },
     */
-    'change select':function(event) {
+    'change select.trigger':function(event) {
         Template.dataset.update(event);
     },
     'click #upload-version':function(event) {
@@ -150,6 +138,40 @@ Template.dataset.events({
                     });
                 }
             }
+        }
+    },
+    'click .add-variable':function(event){
+        if( Meteor.user().admin ) {
+            var variableId = $('select[name="variable"]').val();
+            var user = Meteor.user();
+            currentDataSetId = Session.get('currentDataSet');
+            variable = Variables.findOne({'_id':variableId});
+        
+            if( currentDataSetId && variable) {
+                var selector = {'_id':currentDataSetId};
+                var modifier = {'$addToSet': {variables:variable}};
+                DataSets.update(selector,modifier,function(error){
+                    if( error ) {
+                        $('.error').html('There was an error adding the variable, please try again');
+                        $('.error').show();
+                    }
+                });
+            }
+        }
+    },
+    'click a.remove-variable':function(event){
+        if( Meteor.user().admin ) {
+            var variableId = $(event.target).parent().attr('id');
+            currentDataSetId = Session.get('currentDataSet');
+            console.log('removing variable: ' + variableId);
+            DataSets.update({'_id':currentDataSetId},
+                {$pull : {'variables':{ '_id':variableId }}}, function(error) {
+                    if( error ) {
+                        $('.error').html('Failed to remove variable, please try again');
+                        $('.error').show();
+                    }
+                }
+            );
         }
     }
 });
@@ -189,4 +211,8 @@ Template.dataset.uploadDisabled = function() {
     var currentDataSet = Template.dataset.dataSet();
     if( currentDataSet ) return '';
     else return 'disabled="disabled"';
+}
+
+Template.dataset.variables = function() {
+    return Variables.find();
 }

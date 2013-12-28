@@ -19,3 +19,16 @@ if( !reference ) {
         'parameterSelection' : ['automated calibration','manual calibration','no calibration (model default values)','other']
     });
 }
+
+var variablesCursor = Variables.find();
+if( variablesCursor ) {
+    var numberOfVariables = variablesCursor.count();
+    if( numberOfVariables <= 0 ) {
+        Variables.insert({"name":"NEE"});
+        Variables.insert({"name":"Qg"});
+        Variables.insert({"name":"Qh"});
+        Variables.insert({"name":"Qle"});
+        Variables.insert({"name":"Rnet"});
+        Variables.insert({"name":"SWnet"});
+    }
+}

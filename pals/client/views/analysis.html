@@ -4,13 +4,14 @@
 </div>
 <div class="left-column">
    <h1>Analysis of model output: {{analysis.modelOutput}}</h1>
+   <br/>
    <div class="row">
    {{#each analysis.results}}
        <div class="col-md-2">
        <div class="panel panel-default">
             <div class="panel-heading">{{type}}</div>
             <div class="panel-body">
-                <a href="{{url}}"><img class="img-responsive" src="{{url}}" title="{{type}}"></img></a>
+                <a href="{{url}}" target="_blank"><img class="img-responsive" src="{{url}}" title="{{type}}"></img></a>
             </div> 
         </div>
         </div><!--/col-->

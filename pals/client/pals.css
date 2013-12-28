@@ -28,3 +28,8 @@ table.table-hover tbody tr:hover {
     cursor: pointer;
     display: none;
 }
+
+.delete-button {
+    cursor: pointer;
+    color: white;
+}

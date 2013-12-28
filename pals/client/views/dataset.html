@@ -15,7 +15,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
        <label>Data Set Type</label>
-       <select name="type" class="form-control">
+       <select name="type" class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.dataSetType}}
            <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
@@ -31,7 +31,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
        <label>Spatial Resolution</label>
-       <select name="spatialLevel" class="form-control">
+       <select name="spatialLevel" class="form-control trigger">
            {{#each reference.spatialLevel}}
            <option value='{{this}}' {{selected this dataSet.spatialLevel}}>{{this}}</option>
            {{/each}}
@@ -46,7 +46,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
        <label>Country</label>
-       <select name="country" class="form-control">
+       <select name="country" class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.country}}
            <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
@@ -62,7 +62,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
        <label>IGBP Vegetation Type</label>
-       <select name="vegType" class="form-control">
+       <select name="vegType" class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.vegType}}
            <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
@@ -191,6 +191,29 @@
        {{/if}}
        {{/if}}
    </div>
+   {{#if currentUser.admin}}
+   <div class="form-group">
+           <label>Variables</label>
+           <select name="variable" class="form-control">
+               {{#each variables}}
+                   <option value='{{this._id}}'>{{this.name}}</option>
+               {{/each}}
+           </select>
+   </div>
+   <a class="btn btn-success add-variable">Add Variable</a>
+   <h3>
+   {{#each dataSet.variables}}
+       <span class="label label-danger">{{this.name}} <a class="delete-button remove-variable" title="remove" id="{{this._id}}"><i class="fa fa-times-circle-o"></i></a></span>
+   {{/each}}
+   </h3>
+   {{else}}
+       <label>Variables</label>
+       <h4>
+       {{#each dataSet.variables}}
+           <span class="label label-danger">{{this.name}}</span>
+       {{/each}}
+       </h4>
+   {{/if}}
 </form>
 </div><!--left-column-->
 <div class="col-md-4">
