@@ -36,6 +36,7 @@ Template.experiment.update = function(event) {
 };
 
 Template.experiment.performUpdate = function(fieldName,value) {
+
     if( value ) {
     
         var user = Meteor.user();

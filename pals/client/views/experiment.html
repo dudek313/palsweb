@@ -78,6 +78,28 @@
        <div class="display">{{experiment.timeStepSize}}</div>
        {{/if}}
    </div>
+   <div class="form-group">
+       {{#if currentUser.admin}}
+           <label>Short Description</label>
+           <input class="modifier form-control" type="text" name="shortDescription" value="{{experiment.shortDescription}}"></input>
+       {{else}}
+       {{#if experiment.shortDescription}}
+           <label>Short Description</label>
+           <div class="display">{{experiment.shortDescription}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
+   <div class="form-group">
+       {{#if currentUser.admin}}
+           <label>Long Description</label>
+           <textarea class="modifier form-control" type="text" name="longDescription">{{experiment.longDescription}}</textarea>
+       {{else}}
+       {{#if experiment.longDescription}}
+           <label>Long Description</label>
+           <div class="display">{{experiment.longDescription}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
    <br/>
    <div class="panel panel-success">
    <div class="panel-heading">Scripts</div>
