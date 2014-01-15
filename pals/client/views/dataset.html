@@ -176,7 +176,7 @@
        {{else}}
        {{#if dataSet.references}}
            <label>References</label>
-           <div class="display">{{dataSet.references}}</div>
+           <div class="display">{{{breaklines dataSet.references}}}</div>
        {{/if}}
        {{/if}}
    </div>
@@ -187,7 +187,7 @@
        {{else}}
        {{#if dataSet.comments}}
            <label>Comments</label>
-           <div class="display">{{dataSet.comments}}</div>
+           <div class="display">{{{breaklines dataSet.comments}}}</div>
        {{/if}}
        {{/if}}
    </div>

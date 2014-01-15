@@ -79,8 +79,8 @@
            <textarea class="modifier form-control" type="text" name="comments">{{modelOutput.comments}}</textarea>
        {{else}}
            {{#if modelOutput.comments}}
-               <label>comments</label>
-               <div class="display">{{modelOutput.comments}}</div>
+               <label>Comments</label>
+               <div class="display">{{{breaklines modelOutput.comments}}}</div>
            {{/if}}
        {{/if}}
    </div>
