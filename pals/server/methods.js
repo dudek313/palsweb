@@ -5,7 +5,9 @@ var routingKey = 'pals.input';
 var bucket = 'pals-test';
 var s3Url = 'https://s3-ap-southeast-2.amazonaws.com/'+bucket;
 var AWS = Meteor.require('aws-sdk');
-AWS.config.loadFromPath(process.cwd() + '/config.json');
+var configPath = process.cwd() + '/config.json';
+configPath = '/home/eduthie/code/palsweb/pals/config.json';
+AWS.config.loadFromPath(configPath);
 
 getLatestVersion = function(dataSet,type) {
     if( dataSet.versions && dataSet.versions.length > 0 ) {

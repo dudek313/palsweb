@@ -7,3 +7,6 @@ preserve-inputs
 accounts-ui
 accounts-password
 jquery
+standard-app-packages
+npm
+router
