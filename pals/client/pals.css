@@ -8,6 +8,10 @@
     margin: 0 20px;
 }
 
+#login-name-link {
+    color: #000;
+}
+
 .accounts-dialog {
     width: 240px;
 }
@@ -32,4 +36,13 @@ table.table-hover tbody tr:hover {
 .delete-button {
     cursor: pointer;
     color: white;
+}
+
+.double-vertical-menu-item {
+   margin: 0 !important;
+   padding: 0 !important;
+}
+
+.double-vertical-menu {
+    padding-top: 5px;
 }

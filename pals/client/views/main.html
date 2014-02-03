@@ -15,8 +15,14 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-      <li class="login-buttons">{{loginButtons}}</li>
       {{#if loggedIn}}
+      <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Models <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/models');">Models</a></li>
+                <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/model');">Create Model</a></li>
+            </ul>
+      </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
         <ul class="dropdown-menu">
@@ -25,7 +31,6 @@
             <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/modelOutput');">Upload a Model Output</a></li>
         </ul>
       </li>
-        <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspaces</a></li>
         {{#if currentUser.admin}}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments <b class="caret"></b></a>
@@ -50,17 +55,13 @@
             <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/experiments');">Experiments</a></li>
             <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/datasets');">Data Sets</a></li>
         {{/if}}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Models <b class="caret"></b></a>
-            <ul class="dropdown-menu">
-                <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/models');">Models</a></li>
-                <li><a href="javascript:void(0)" onclick="Meteor.Router.to('/model');">Create Model</a></li>
-            </ul>
-        </li>
         {{/if}}
     </ul>
     <ul class="nav navbar-nav navbar-right">
-        <li><a href="/workspaces/{{currentWorkspace._id}}">{{currentWorkspace.name}}</a></li>
+        <li class="double-vertical-menu">
+            {{#if loggedIn}}<a class="double-vertical-menu-item" href="javascript:void(0)" onclick="Meteor.Router.to('/workspaces');">Workspace: {{currentWorkspace.name}}</a>{{/if}}
+            {{loginButtons}}
+        </li>
     </ul>
   </div><!-- /.navbar-collapse -->
   </div><!-- /container -->
