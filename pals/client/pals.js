@@ -119,6 +119,11 @@ Meteor.Router.add({
       }
       else return 'home';
   },  
+  '/analyses': function() {
+      var user = Meteor.user();
+      if( user ) return 'analyses';
+      else return 'home';
+  },
   '*': 'home'
 });
 
