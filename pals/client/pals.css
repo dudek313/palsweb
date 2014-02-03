@@ -44,5 +44,5 @@ table.table-hover tbody tr:hover {
 }
 
 .double-vertical-menu {
-    padding-top: 5px;
+    padding: 5px 15px 0 0;
 }
