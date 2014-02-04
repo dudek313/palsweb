@@ -13,7 +13,20 @@ Template.analyses.selectOptions = function(selectIndex) {
     var previousType = Session.get('analyses.'+previousIndex+'.type');
     
     if( type == 'model' ) {
-        return Models.find();
+        if( previousType && previousType == 'experiment') {
+            var experimentId = Session.get('analyses.experiment');
+            var modelOutputs = ModelOutputs.find( {experiment:experimentId}, {fields: {model:1}} ).fetch();
+            var modelIdArray = [];
+            for( var i=0; i < modelOutputs.length; ++i ) {
+                var modelOutput = modelOutputs[i];
+                modelIdArray.push(modelOutput.model);
+            }
+            var models = Models.find({_id : {$in : modelIdArray}});
+            return models;
+        }
+        else {
+            return Models.find();
+        }
     }
     else if( type == 'experiment' ) {
         if( previousType && previousType == 'model') {
@@ -24,7 +37,7 @@ Template.analyses.selectOptions = function(selectIndex) {
                 var modelOutput = modelOutputs[i];
                 experimentIdArray.push(modelOutput.experiment);
             }
-            var experiments = Experiments.find({_id : {$in : experimentIdArray}});;
+            var experiments = Experiments.find({_id : {$in : experimentIdArray}});
             return experiments;
         }
         else {
@@ -35,10 +48,10 @@ Template.analyses.selectOptions = function(selectIndex) {
 
 Template.analyses.events({
     'change select':function(event) {
-        var key = $(event.target).attr('id');
-        var fieldName = $(event.target).attr('name');
+        var key = $(event.target).attr('name');
+        var type = Session.get('analyses.'+key+'.type');
         var value = $(event.target).val();
-        Session.set('analyses.'+fieldName,value);
+        Session.set('analyses.'+type,value);
     },
     'dragstart .form-group':function(event) {
         event.dataTransfer.setData("id",event.target.id);
