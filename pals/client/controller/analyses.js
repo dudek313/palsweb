@@ -73,7 +73,6 @@ Template.analyses.selectOptions = function(selectIndex) {
             var modelOutputId = Session.get('analyses.modelOutput');
             if( modelOutputId ) {
                 var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {experiment:1}});
-                console.log(modelOutput);
                 if( modelOutput ) {
                     return Experiments.find({_id:modelOutput.experiment});
                 }
