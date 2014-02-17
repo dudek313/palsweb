@@ -8,6 +8,8 @@ var client = redis.createClient();
 
 process.setMaxListeners(0);
 
+processNext();
+
 function processNext() {
 	client.lpop(queue,function(err,value){
 	    if( value ) {

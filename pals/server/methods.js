@@ -34,8 +34,6 @@ addDataSets = function(files,dataSets,type) {
         console.log('processing data set: ' + dataSetId);
         var version = getLatestVersion(dataSet);
         if( version ) {
-			console.log('data set version');
-			console.log(JSON.stringify(version));
             files.push(version);
         }
     }
