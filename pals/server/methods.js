@@ -1,6 +1,6 @@
-var amqp = Meteor.require('amqp');
-var exchangeName = 'pals';
-var routingKey = 'pals.input';
+var redis = Npm.require("redis");
+var queue = 'pals.input';
+var client = redis.createClient();
 
 var bucket = 'pals-test';
 var s3Url = 'https://s3-ap-southeast-2.amazonaws.com/'+bucket;
@@ -13,7 +13,8 @@ getLatestVersion = function(dataSet,type) {
     if( dataSet.versions && dataSet.versions.length > 0 ) {
         for( var i = dataSet.versions.length-1; i >=0; --i ) {
              var version = dataSet.versions[i];
-             if( version.component == type ) return version;
+			 version.type = "DataSet";
+             return version;
         }
     }
     return null;
@@ -24,20 +25,18 @@ addDataSets = function(files,dataSets,type) {
     if( !dataSets || dataSets.length <= 0 ) {
         throw new Meteor.Error(500, 'The chosen experiment does not have any data sets of type: '+type);
     }
+	
+	console.log('Number of data sets: ' + dataSets.length);
 
     for( var i=0; i < dataSets.length; ++i ) {
         var dataSetId = dataSets[i];
         var dataSet = DataSets.findOne({'_id':dataSetId});
         console.log('processing data set: ' + dataSetId);
-        var versionMet = getLatestVersion(dataSet,'met');
-        if( versionMet ) { 
-            versionMet.type = type;
-            files.push(versionMet);
-        }
-        var versionFlux = getLatestVersion(dataSet,'flux');
-        if( versionFlux ) { 
-            versionFlux.type = type;
-            files.push(versionFlux);
+        var version = getLatestVersion(dataSet);
+        if( version ) {
+			console.log('data set version');
+			console.log(JSON.stringify(version));
+            files.push(version);
         }
     }
 }
@@ -56,15 +55,8 @@ saveAnalysis = function(analysis,callback) {
 }
 
 analysisComplete = function(analysis) {
-    console.log('Connecting to rabbitmq');
-    var connection = amqp.createConnection({url: "amqp://guest:guest@localhost:5672"},{reconnect:false});
-    connection.on('ready', function () {
-        console.log('Connection ready, sending analysis to exchange');
-        connection.exchange(exchangeName,{}, function (exchange) {
-            exchange.publish(routingKey, analysis);
-            console.log('analysis sent to exchange');
-        });
-    });
+    console.log('Sending message to redis');
+    client.rpush(queue,JSON.stringify(analysis));
 }
 
 deleteFile = function(file) {

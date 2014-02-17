@@ -2,25 +2,21 @@ var Fiber = Npm.require('fibers');
 
 if (Meteor.isServer) { Meteor.startup(function () {
 
-var amqp = Meteor.require('amqp');
-
-var exchangeName = 'pals';
-var outgoingQueue = 'pals.output';
-var outgoingRoutingKey = 'pals.output';
-var connection = amqp.createConnection({url: "amqp://guest:guest@localhost:5672"},{reconnect:false});
-var queue = undefined;
+var redis = Npm.require('redis');
+var queue = 'pals.output';
+var client = redis.createClient();
 
 process.setMaxListeners(0);
 
-connection.on('ready', function () {
-   queue = connection.queue(outgoingQueue, function(q){ 
-       console.log('Queue ' + q.name + ' is open');  
-       q.bind(exchangeName,outgoingRoutingKey);
-       q.subscribe(function (message) {
-            handleMessage(message);
-       });
-   });
-});
+function processNext() {
+	client.lpop(queue,function(err,value){
+	    if( value ) {
+			console.log('Received message');
+	    	handleMessage(JSON.parse(value));
+	    }	
+		setTimeout(processNext, 1000);
+	});
+}
 
 function handleMessage(message) {
     console.log(JSON.stringify(message));
