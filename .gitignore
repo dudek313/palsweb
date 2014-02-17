@@ -16,3 +16,4 @@ pals/.meteor/local
 .metadata
 RemoteSystemsTempFiles
 bootstrap
+.DS_Store
