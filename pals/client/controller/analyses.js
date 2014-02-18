@@ -1,10 +1,11 @@
-var maxIndex = 3;
+var maxIndex = 4;
 
 Session.set('analyses.clearIndex',maxIndex);
 
 Session.set('analyses.1.type','model');
 Session.set('analyses.2.type','experiment');
 Session.set('analyses.3.type','modelOutput');
+Session.set('analyses.4.type','analysis');
 
 Template.analyses.currentType = function(typeIndex) {
     return Session.get('analyses.'+typeIndex+'.type');
@@ -95,6 +96,20 @@ Template.analyses.selectOptions = function(selectIndex) {
             return ModelOutputs.find();
         }
     }
+	else if( type == 'analysis' ) {
+		if( previousType && previousType == 'modelOutput' ) {
+			var modelOutputId = Session.get('analyses.modelOutput');
+			if( modelOutputId ) {
+				var analysis = Analyses.findOne({modelOutput:modelOutputId},{sort:{created:-1}});
+				var results = analysis.results;
+				for( var i=0; i < results.length; ++i ) {
+					var result = results[i];
+					result.name = result.type;
+				}
+				return results;
+			}
+		}
+	}
 }
 
 Template.analyses.events({
