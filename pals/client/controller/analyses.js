@@ -119,6 +119,10 @@ Template.analyses.selectOptions = function(selectIndex) {
 			var modelOutputs = ModelOutputs.find({model:modelId}).fetch();
 			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
 		}
+		else {
+			var modelOutputs = ModelOutputs.find().fetch();
+			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+		}
 	}
 }
 
