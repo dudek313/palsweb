@@ -78,7 +78,6 @@ Template.analyses.selectOptions = function(selectIndex) {
 			else {
 			    return new Array();
 		    }
-			return new Array();
 		}
         else {
             return Models.find();
@@ -105,6 +104,26 @@ Template.analyses.selectOptions = function(selectIndex) {
                 }
             }
         }
+		else if( previousType && previousType == 'analysis' ) {
+			var analysisType = Session.get('analyses.analysis');
+			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+			var uniqueExperiments = new Array();
+			var haveExperiment;
+			for( var i = 0; i < analysesWithType.length; ++i ) {
+				var experiment = Experiments.findOne({_id:analysesWithType[i].experiment});
+				if( experiment ) {
+					haveExperiment = true;
+					uniqueExperiments[experiment.id]=experiment;
+				}
+			}
+			var experiments = new Array();
+			if( haveExperiment ) {
+				for( var key in uniqueExperiments ) {
+					experiments.push(uniqueExperiments[key]);
+				}
+			}
+			return experiments;
+		}
         else {
             return Experiments.find();
         }
@@ -118,6 +137,26 @@ Template.analyses.selectOptions = function(selectIndex) {
             var modelId = Session.get('analyses.model');
             if( modelId ) return ModelOutputs.find({model:modelId});
         }
+		else if( previousType && previousType == 'analysis' ) {
+			var analysisType = Session.get('analyses.analysis');
+			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+			var uniqueModelOutputs = new Array();
+			var haveModelOutput;
+			for( var i = 0; i < analysesWithType.length; ++i ) {
+				var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
+				if( modelOutput ) {
+					haveModelOutput = true;
+					uniqueModelOutputs[modelOutput.id]=modelOutput
+				}
+			}
+			var modelOutputs = new Array();
+			if( haveModelOutput ) {
+				for( var key in uniqueModelOutputs ) {
+					modelOutputs.push(uniqueModelOutputs[key]);
+				}
+			}
+			return modelOutputs;
+		}
         else {
             return ModelOutputs.find();
         }
@@ -127,13 +166,15 @@ Template.analyses.selectOptions = function(selectIndex) {
 			var modelOutputId = Session.get('analyses.modelOutput');
 			if( modelOutputId ) {
 				var analysis = Analyses.findOne({modelOutput:modelOutputId},{sort:{created:-1}});
-				var results = analysis.results;
-				for( var i=0; i < results.length; ++i ) {
-					var result = results[i];
-					result.name = result.type;
-					result._id = result.type;
-				}
-				return results;
+				if( analysis && analysis.results ) {
+				    var results = analysis.results;
+				    for( var i=0; i < results.length; ++i ) {
+					    var result = results[i];
+					    result.name = result.type;
+					    result._id = result.type;
+				    }
+				    return results;
+			    }
 			}
 		}
 		else if( previousType && previousType == 'experiment' ) {
@@ -157,13 +198,15 @@ Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 	var analyses = new Array();
     for( var i=0; i < modelOutputs.length; ++i ) {
 		var analysis = Analyses.findOne({modelOutput:modelOutputs[i]._id},{sort:{created:-1}});
-		var results = analysis.results;
-		for( var j=0; j < results.length; ++j ) {
-			var result = results[j];
-			result.name = result.type;
-			result._id = result.type;
-			analyses[result.name] = result;
-		}
+		if( analysis && analysis.results ) {
+		    var results = analysis.results;
+		    for( var j=0; j < results.length; ++j ) {
+			    var result = results[j];
+			    result.name = result.type;
+			    result._id = result.type;
+			    analyses[result.name] = result;
+		    }
+	    }
 	}
 	var analysesArray = new Array();
 	for( var key in analyses ) {
