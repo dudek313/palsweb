@@ -54,6 +54,32 @@ Template.analyses.selectOptions = function(selectIndex) {
                 }
             }
         }
+		else if( previousType && previousType == 'analysis' ) {
+			var analysisType = Session.get('analyses.analysis');
+			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+			var uniqueModelIds = new Array();
+			var haveModelId;
+			for( var i = 0; i < analysesWithType.length; ++i ) {
+				var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
+				if( modelOutput && modelOutput.model ) {
+					haveModelId = true;
+					uniqueModelIds[modelOutput.model]=modelOutput.model;
+				}
+			}
+			
+			var modelIds = new Array();
+			if( haveModelId ) {
+			    for( var key in uniqueModelIds ) {
+				    modelIds.push(key);
+			    }
+				var models = Models.find({_id : {$in : modelIds}});
+				return models;
+			}
+			else {
+			    return new Array();
+		    }
+			return new Array();
+		}
         else {
             return Models.find();
         }
@@ -105,6 +131,7 @@ Template.analyses.selectOptions = function(selectIndex) {
 				for( var i=0; i < results.length; ++i ) {
 					var result = results[i];
 					result.name = result.type;
+					result._id = result.type;
 				}
 				return results;
 			}
@@ -134,6 +161,7 @@ Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 		for( var j=0; j < results.length; ++j ) {
 			var result = results[j];
 			result.name = result.type;
+			result._id = result.type;
 			analyses[result.name] = result;
 		}
 	}
