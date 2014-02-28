@@ -109,7 +109,35 @@ Template.analyses.selectOptions = function(selectIndex) {
 				return results;
 			}
 		}
+		else if( previousType && previousType == 'experiment' ) {
+			var experimentId = Session.get('analyses.experiment');
+			var modelOutputs = ModelOutputs.find({experiment:experimentId}).fetch();
+			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+		}
+		else if( previousType && previousType == 'model' ) {
+			var modelId = Session.get('analyses.model');
+			var modelOutputs = ModelOutputs.find({model:modelId}).fetch();
+			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+		}
 	}
+}
+
+Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
+	var analyses = new Array();
+    for( var i=0; i < modelOutputs.length; ++i ) {
+		var analysis = Analyses.findOne({modelOutput:modelOutputs[i]._id},{sort:{created:-1}});
+		var results = analysis.results;
+		for( var j=0; j < results.length; ++j ) {
+			var result = results[j];
+			result.name = result.type;
+			analyses[result.name] = result;
+		}
+	}
+	var analysesArray = new Array();
+	for( var key in analyses ) {
+	    analysesArray.push(analyses[key]);
+	}
+	return analysesArray;
 }
 
 Template.analyses.events({

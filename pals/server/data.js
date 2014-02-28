@@ -32,3 +32,5 @@ if( variablesCursor ) {
         Variables.insert({"name":"SWnet"});
     }
 }
+
+Meteor.users.update({"_id": "LFFr5uEgNAog6XDYL"}, {$set: {admin: 'true'}})
