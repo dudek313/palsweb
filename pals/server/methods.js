@@ -71,6 +71,19 @@ deleteFile = function(file) {
     });
 }
 
+createFileRecord = function(fileName,fileSize,fileData) {
+    var fileToken = uuid.v4();
+    fs.writeFile(fileBucket+'/'+fileToken, fileData);
+    var fileRecord = {
+        url: fileBucket+'/'+fileToken,
+        filename: fileName,
+        size: fileSize,
+        key: fileToken,
+        created: new Date()
+    };
+    return fileRecord;
+}
+
 Meteor.methods({
     startAnalysis: function (key,modelOutputId) {
      
@@ -140,20 +153,32 @@ Meteor.methods({
         return null;
     },
     uploadDataSet: function(dataSetId, fileName, fileSize, fileData) {
-        var fileToken = uuid.v4();
-        fs.writeFile(fileBucket+'/'+fileToken, fileData);
-        var fileRecord = {
-            url: fileBucket+'/'+fileToken,
-            filename: fileName,
-            size: fileSize,
-            key: fileToken,
-            created: new Date()
-        };
+        var fileRecord = createFileRecord(fileName,fileSize,fileData);
         DataSets.update({'_id':dataSetId},
             {'$push':{'versions':fileRecord}},function(error){
                 if( error ) {
                     console.log(error);
                     console.log('Failed to add uploaded version to the data set');
+                }
+        });
+    },
+    uploadScript: function(experimentId, fileName, fileSize, fileData) {
+        var fileRecord = createFileRecord(fileName,fileSize,fileData);
+        Experiments.update({'_id':experimentId},
+            {'$push':{'scripts':fileRecord}},function(error){
+                if( error ) {
+                    console.log(error);
+                    console.log('Failed to add uploaded script to the experiment');
+                }
+        });
+    },
+    uploadModelOutput: function(modelOutputId, fileName, fileSize, fileData) {
+        var fileRecord = createFileRecord(fileName,fileSize,fileData);
+        ModelOutputs.update({'_id':modelOutputId},
+            {'$push':{'versions':fileRecord}},function(error){
+                if( error ) {
+                    console.log(error);
+                    console.log('Failed to add uploaded model output version');
                 }
         });
     },

@@ -104,7 +104,10 @@
    <div class="panel panel-success">
    <div class="panel-heading">Scripts</div>
    <div class="panel-body">
-    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-script">Upload a new script</button>{{/if}}
+    {{#if currentUser.admin}}
+        <label>Upload a new script</label>
+        <input type="file" class="file-select" name="file-select"/>
+    {{/if}}
    </div>
     {{#if hasScripts}}
     <table class="table">

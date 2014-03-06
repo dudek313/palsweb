@@ -170,6 +170,10 @@ Template.dataset.events({
         var file = event.target.files[0];
         var reader = new FileReader();
         var currentDataSetId = Session.get('currentDataSet');
+        if( !ccurrentDataSetId ) {
+            alert("Please enter a data set name before uploading scripts");
+            return;
+        }
         reader.onload = function(fileLoadEvent) {
             Meteor.call('uploadDataSet', currentDataSetId, file.name, file.size, reader.result);
         };

@@ -134,10 +134,6 @@ Template.experiment.events({
             });
         }
     },
-    'click #upload-script':function(event) {
-        event.preventDefault();
-        Template.experiment.upload();
-    },
     'click .delete-script':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
@@ -160,14 +156,23 @@ Template.experiment.events({
                         }
                     );
                 
-                    filepicker.setKey(Reference.findOne().filePickerAPIKey);
-                    filepicker.remove(currentScript, {}, function(){
-                    }, function(FPError){
-                        console.log('Failed to delete the script from the file system');
-                    });
+                    Meteor.call('removeFileByUrl',currentScript.url);
                 }
             }
         }
+    },
+    'change .file-select': function(event, template){
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        var currentExperimentId = Session.get('currentExperiment');
+        if( !currentExperimentId ) {
+            alert("Please enter an experiment name before uploading scripts");
+            return;
+        }
+        reader.onload = function(fileLoadEvent) {
+            Meteor.call('uploadScript', currentExperimentId, file.name, file.size, reader.result);
+        };
+        reader.readAsBinaryString(file);
     }
 });
 
@@ -182,27 +187,6 @@ Template.experiment.drivingDataSets = function() {
         var drivingDataSets = DataSets.find({_id:{$in:exp.dataSets}});
         return drivingDataSets;
     }
-};
-
-Template.experiment.upload = function() {
-    var currentExperimentId = Session.get('currentExperiment');
-    if( !currentExperimentId ) {
-        alert("Please enter an experiment name before uploading scripts");
-        return;
-    }
-    filepicker.setKey(Reference.findOne().filePickerAPIKey);
-    filepicker.pickAndStore({},{},function(fpfiles){
-        fpfiles.forEach(function(file){
-            file.created = new Date();
-        });
-        Experiments.update({'_id':currentExperimentId},
-            {'$pushAll':{'scripts':fpfiles}},function(error){
-                if( error ) {
-                    $('.error').html('Failed to add uploaded script to the experiment');
-                    $('.error').show();
-                }
-        });
-    });
 };
 
 Template.experiment.hasScripts = function() {

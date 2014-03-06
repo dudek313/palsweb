@@ -102,10 +102,6 @@ Template.modelOutput.events({
     'change select':function(event) {
         Template.modelOutput.update(event);
     },
-    'click #upload-version':function(event) {
-        event.preventDefault();
-        Template.modelOutput.upload();
-    },
     'click .delete-version':function(event) {
         if( Template.modelOutput.owner() ) {
             var key = $(event.target).attr('id');
@@ -128,11 +124,7 @@ Template.modelOutput.events({
                         }
                     );
                 
-                    filepicker.setKey(Reference.findOne().filePickerAPIKey);
-                    filepicker.remove(currentVersion, {}, function(){
-                    }, function(FPError){
-                        console.log('Failed to delete the version from the file system');
-                    });
+                    Meteor.call('removeFileByUrl',currentVersion.url);
                 }
             }
         }
@@ -155,6 +147,19 @@ Template.modelOutput.events({
                 if( error ) alert(error);
             });
         }
+    },
+    'change .file-select': function(event, template){
+        var file = event.target.files[0];
+        var reader = new FileReader();
+        var currentModelOutputId = Session.get('currentModelOutput');
+        if( !currentModelOutputId ) {
+            alert("Please enter a model output name before uploading files");
+            return;
+        }
+        reader.onload = function(fileLoadEvent) {
+            Meteor.call('uploadModelOutput', currentModelOutputId, file.name, file.size, reader.result);
+        };
+        reader.readAsBinaryString(file);
     }
 });
 
@@ -178,24 +183,6 @@ Template.modelOutput.owner = function() {
     else {
         return true;
     }
-};
-
-Template.modelOutput.upload = function() {
-    filepicker.setKey(Reference.findOne().filePickerAPIKey);
-    filepicker.pickAndStore({},{},function(fpfiles){
-        fpfiles.forEach(function(file){
-            file.created = new Date();
-        });
-        currentModelOutputId = Session.get('currentModelOutput');
-        ModelOutputs.update({'_id':currentModelOutputId},
-            {'$pushAll':{'versions':fpfiles}},function(error){
-                if( error ) {
-                    console.log(error);
-                    $('.error').html('Failed to add uploaded version to the model output');
-                    $('.error').show();
-                }
-        });
-    });
 };
 
 Template.modelOutput.hasVersions = function() {

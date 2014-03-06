@@ -115,7 +115,10 @@
     <div class="panel panel-primary">
     <div class="panel-heading">Versions</div>
     <div class="panel-body">
-    {{#if owner}}<button class='btn btn-default' id="upload-version" {{uploadDisabled}}>Upload a new version</button>{{/if}}
+    {{#if owner}}
+        <label>Upload a new version</label>
+        <input type="file" class="file-select" name="file-select"/>
+    {{/if}}
     </div>
     {{#if hasVersions}}
     <table class="table table-hover">
