@@ -220,7 +220,10 @@
     <div class="panel panel-primary">
     <div class="panel-heading">Versions</div>
     <div class="panel-body">
-    {{#if currentUser.admin}}<button class='btn btn-default bottom-margin' id="upload-version" {{uploadDisabled}}>Upload a new version</button>{{/if}}
+    {{#if currentUser.admin}}
+        <label>Upload a new version</label>
+        <input type="file" class="file-select" name="file-select"/>
+    {{/if}}
     </div>
     {{#if hasVersions}}
     <table class="table table-hover">

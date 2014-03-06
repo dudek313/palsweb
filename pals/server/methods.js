@@ -9,6 +9,10 @@ var configPath = process.cwd() + '/config.json';
 configPath = '/vagrant/palsweb/pals/config.json';
 AWS.config.loadFromPath(configPath);
 
+var fileBucket = '/pals/data';
+var uuid = Npm.require('node-uuid');
+var fs = Npm.require('fs');
+
 getLatestVersion = function(dataSet,type) {
     if( dataSet.versions && dataSet.versions.length > 0 ) {
         for( var i = dataSet.versions.length-1; i >=0; --i ) {
@@ -134,5 +138,28 @@ Meteor.methods({
              });
         }
         return null;
+    },
+    uploadDataSet: function(dataSetId, fileName, fileSize, fileData) {
+        var fileToken = uuid.v4();
+        fs.writeFile(fileBucket+'/'+fileToken, fileData);
+        var fileRecord = {
+            url: fileBucket+'/'+fileToken,
+            filename: fileName,
+            size: fileSize,
+            key: fileToken,
+            created: new Date()
+        };
+        DataSets.update({'_id':dataSetId},
+            {'$push':{'versions':fileRecord}},function(error){
+                if( error ) {
+                    console.log(error);
+                    console.log('Failed to add uploaded version to the data set');
+                }
+        });
+    },
+    removeFileByUrl: function(url) {
+        fs.unlink(url,function(){
+            console.log('deleted file ' + url);
+        })
     }
 });
