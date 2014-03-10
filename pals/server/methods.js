@@ -75,7 +75,7 @@ createFileRecord = function(fileName,fileSize,fileData) {
     var fileToken = uuid.v4();
     fs.writeFile(fileBucket+'/'+fileToken, fileData);
     var fileRecord = {
-        url: fileBucket+'/'+fileToken,
+        path: fileBucket+'/'+fileToken,
         filename: fileName,
         size: fileSize,
         key: fileToken,

@@ -46,3 +46,7 @@ table.table-hover tbody tr:hover {
 .double-vertical-menu {
     padding: 5px 15px 0 0;
 }
+
+.progress {
+    margin-top: 12px;
+}

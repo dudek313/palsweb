@@ -9,6 +9,7 @@ Template.dataset.rendered = function() {
         }
     });
     */
+    $('.progress').hide();
 };
 
 Template.dataset.dataSet = function() {
@@ -170,16 +171,38 @@ Template.dataset.events({
         var file = event.target.files[0];
         var reader = new FileReader();
         var currentDataSetId = Session.get('currentDataSet');
-        if( !ccurrentDataSetId ) {
+        if( !currentDataSetId ) {
             alert("Please enter a data set name before uploading scripts");
             return;
         }
+        
+        Template.dataset.showProgress();
         reader.onload = function(fileLoadEvent) {
             Meteor.call('uploadDataSet', currentDataSetId, file.name, file.size, reader.result);
         };
+        reader.onprogress = function(pr) {
+            if(pr.lengthComputable) {
+                var max = pr.total;
+                var value = pr.loaded;
+                var percentage = (value/max)*100;
+                Template.dataset.setProgress(percentage); 
+            }
+        }
         reader.readAsBinaryString(file);
     }
 });
+
+Template.dataset.showProgress = function() {
+    Template.dataset.setProgress(0);
+     $('.progress').show();
+};
+
+Template.dataset.setProgress = function(percentage) {
+    var progressBar = $('.progress-bar');
+    progressBar.attr('aria-valuenow',percentage);
+    var width = percentage+'%';
+    progressBar.css('width',width);
+}
 
 Template.dataset.reference = function() {
     var reference = Reference.findOne();
