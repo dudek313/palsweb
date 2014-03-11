@@ -31,5 +31,10 @@ templateSharedObjects.progress = function(spec) {
     }
     that.setProgress = setProgress;
     
+    function hide() {
+        $(progressClass).hide();
+    }
+    that.hide = hide;
+    
     return that;
 };

@@ -1,14 +1,6 @@
 Template.experiment.rendered = function() {
     window['directives']();
-    /*
-    $('.display').each(function(index,element){
-        var content = $(element).html();
-        if( content && content.length > 0 ) {
-            $(element).next('.modifier').hide();
-            $(element).show();
-        }
-    });
-    */
+    //templateSharedObjects.progress().hide();
 };
 
 Template.experiment.experiment = function() {
@@ -92,14 +84,6 @@ Template.experiment.events({
     'blur textarea': function (event) {
         Template.experiment.update(event);
     },
-    /*
-    'click .display':function(event) {
-        if( Meteor.user().admin ) {
-            $(event.target).next('.modifier').show();
-            $(event.target).hide();
-        }
-    },
-    */
     'change select':function(event) {
         Template.experiment.update(event);
     },
@@ -169,9 +153,12 @@ Template.experiment.events({
             alert("Please enter an experiment name before uploading scripts");
             return;
         }
+        var progress = templateSharedObjects.progress();
+        progress.showProgress();
         reader.onload = function(fileLoadEvent) {
             Meteor.call('uploadScript', currentExperimentId, file.name, file.size, reader.result);
         };
+        reader.onprogress = progress.readerProgress;
         reader.readAsBinaryString(file);
     }
 });

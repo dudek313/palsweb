@@ -1,14 +1,6 @@
 Template.modelOutput.rendered = function() {
     window['directives']();
-    /*
-    $('.display').each(function(index,element){
-        var content = $(element).html();
-        if( content && content.length > 0 ) {
-            $(element).next('.modifier').hide();
-            $(element).show();
-        }
-    });
-    */
+    templateSharedObjects.progress().hide();
 };
 
 Template.modelOutput.modelOutput = function() {
@@ -156,9 +148,12 @@ Template.modelOutput.events({
             alert("Please enter a model output name before uploading files");
             return;
         }
+        var progress = templateSharedObjects.progress();
+        progress.showProgress();
         reader.onload = function(fileLoadEvent) {
             Meteor.call('uploadModelOutput', currentModelOutputId, file.name, file.size, reader.result);
         };
+        reader.onprogress = progress.readerProgress;
         reader.readAsBinaryString(file);
     }
 });

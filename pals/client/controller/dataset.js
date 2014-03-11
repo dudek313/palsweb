@@ -1,15 +1,6 @@
 Template.dataset.rendered = function() {
     window['directives']();
-    /*
-    $('.display').each(function(index,element){
-        var content = $(element).html();
-        if( content && content.length > 0 ) {
-            $(element).next('.modifier').hide();
-            $(element).show();
-        }
-    });
-    */
-    $('.progress').hide();
+    templateSharedObjects.progress().hide();
 };
 
 Template.dataset.dataSet = function() {
