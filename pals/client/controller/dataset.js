@@ -86,14 +86,6 @@ Template.dataset.events({
     'blur textarea': function (event) {
         Template.dataset.update(event);
     },
-    /*
-    'click .display':function(event) {
-        if( Meteor.user().admin ) {
-            $(event.target).next('.modifier').show();
-            $(event.target).hide();
-        }
-    },
-    */
     'change select.trigger':function(event) {
         Template.dataset.update(event);
     },

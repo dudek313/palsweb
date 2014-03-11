@@ -1,4 +1,4 @@
-templateSharedObjects = {};
+if( typeof templateSharedObjects === 'undefined' ) templateSharedObjects = {};
 
 templateSharedObjects.progress = function(spec) {
     var that = {};
