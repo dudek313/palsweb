@@ -16,11 +16,11 @@
         <tbody>
         {{#each dataSets}}
         <tr>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{spatialLevel}}</td>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{country}}</td>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{vegType}}</td>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{userEmail owner}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{spatialLevel}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{country}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{vegType}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{userEmail owner}}</td>
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}

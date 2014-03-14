@@ -9,4 +9,4 @@ accounts-password
 jquery
 standard-app-packages
 npm
-router
+iron-router

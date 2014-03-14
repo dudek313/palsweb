@@ -38,7 +38,7 @@ Template.workspaces.events({
   'click .open-workspace':function (event) {
       var id = $(event.target).attr('id');
       if( id ) {
-          Meteor.Router.to('/workspaces/'+id);
+          Router.go('/workspaces/'+id);
       }
   },
   'click .delete-workspace':function (event) {

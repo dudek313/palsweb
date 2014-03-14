@@ -16,8 +16,8 @@
         <tbody>
         {{#each experiments}}
         <tr>
-            <td onclick="Meteor.Router.to('/experiments/{{_id}}')">{{name}}</td>
-            <td onclick="Meteor.Router.to('/experiments/{{_id}}')">{{spatialLevel}}</td>
+            <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/experiments/{{_id}}')">{{spatialLevel}}</td>
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}

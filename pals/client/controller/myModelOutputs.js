@@ -1,13 +1,19 @@
 Template.myModelOutputs.modelOutputs = function() {
     var user = Meteor.user();
-    var modelOutputs = ModelOutputs.find({'owner':user._id,'workspaces':user.profile.currentWorkspace._id}).fetch();
-    if( modelOutputs )
-    {
-        modelOutputs.forEach(function(modelOutput){
-            if( modelOutput.experiment ) modelOutput.experiment = Experiments.findOne({'_id':modelOutput.experiment},{'_id':1,'name':1});
-        });
+    if( user ) {
+        var modelOutputs = 
+            ModelOutputs.find({'owner':user._id,'workspaces':user.profile.currentWorkspace._id}).fetch();
+        if( modelOutputs )
+        {
+            modelOutputs.forEach(function(modelOutput){
+                if( modelOutput.experiment ) {
+                    modelOutput.experiment = 
+                        Experiments.findOne({'_id':modelOutput.experiment},{'_id':1,'name':1});
+                }
+            });
+        }
+        return modelOutputs;
     }
-    return modelOutputs;
 }
 
 Template.myModelOutputs.events({

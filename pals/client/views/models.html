@@ -12,7 +12,7 @@
         <tbody>
         {{#each models}}
         <tr>
-            <td onclick="Meteor.Router.to('/models/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/models/{{_id}}')">{{name}}</td>
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}} 

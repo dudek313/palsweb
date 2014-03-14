@@ -1,11 +1,13 @@
 Template.experiments.experiments = function() {
     var user = Meteor.user();
-    var selector = {'workspaces':user.profile.currentWorkspace._id};
-    var resolution = Template.experiments.currentSpatialResolution();
-    if( resolution ) {
-        selector.spatialLevel = resolution;
+    if( user ) {
+        var selector = {'workspaces':user.profile.currentWorkspace._id};
+        var resolution = Template.experiments.currentSpatialResolution();
+        if( resolution ) {
+            selector.spatialLevel = resolution;
+        }
+        return Experiments.find(selector);
     }
-    return Experiments.find(selector);
 }
 
 Template.experiments.currentSpatialResolution = function() {

@@ -1,13 +1,15 @@
 Template.models.models = function() {
     var user = Meteor.user();
-    var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
-    if( models )
-    {
-        models.forEach(function(model){
-            if( model.owner ) model.owner = Meteor.users.findOne({'_id':model.owner},{'_id':1,'name':1});
-        });
+    if( user ) {
+        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+        if( models )
+        {
+            models.forEach(function(model){
+                if( model.owner ) model.owner = Meteor.users.findOne({'_id':model.owner},{'_id':1,'name':1});
+            });
+        }    
+        return models;
     }
-    return models;
 }
 
 Template.models.events({

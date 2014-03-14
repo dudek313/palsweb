@@ -13,8 +13,8 @@
         <tbody>
         {{#each modelOutputs}}
         <tr>
-            <td onclick="Meteor.Router.to('/modeloutputs/{{_id}}')">{{name}}</td>
-            <td onclick="Meteor.Router.to('/experiments/{{experiment._id}}')">{{experiment.name}}</td>
+            <td onclick="Router.go('/modeloutputs/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/experiments/{{experiment._id}}')">{{experiment.name}}</td>
             <td>{{owner.emails.0.address}}</td>
          </tr>
         {{/each}}
