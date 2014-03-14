@@ -125,9 +125,17 @@ Router.map(function () {
         ]
     });
     this.route('analyses');
-})
-
-/*
-Meteor.startup(function(){
 });
-*/
+
+Router.before(function(){
+    if (!Meteor.user()) {
+        this.render('login');
+        this.stop();
+    }
+}, {except: ['home','root']});
+
+if( Meteor.isClient ) {
+    Router.configure({
+      autoRender: false
+    });
+}
