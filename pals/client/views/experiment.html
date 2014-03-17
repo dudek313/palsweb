@@ -122,7 +122,7 @@
         </tr>
         {{#each experiment.scripts}}
         <tr>
-            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
             {{#if currentUser.admin}}<td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
         </tr>
         {{/each}}
@@ -157,7 +157,7 @@
         <tbody>
         {{#each drivingDataSets}}
         <tr>
-            <td onclick="Meteor.Router.to('/datasets/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/datasets/{{_id}}')">{{name}}</td>
             {{#if currentUser.admin}}<td><button class='remove-driving-dataset btn btn-danger btn-xs' id='{{_id}}'>remove</button></td>{{/if}}
         </tr>
         {{/each}}
@@ -176,7 +176,7 @@
         <tbody>
         {{#each modelOutputs}}
         <tr>
-            <td onclick="Meteor.Router.to('/modelOutputs/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/modelOutputs/{{_id}}')">{{name}}</td>
         </tr>
         {{/each}}
         </tbody>

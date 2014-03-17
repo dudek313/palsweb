@@ -4,3 +4,9 @@ Handlebars.registerHelper('breaklines',
         return text;
     }
 );
+
+Handlebars.registerHelper('encode',
+    function(str) {
+        return encodeURIComponent(str);
+    }
+);

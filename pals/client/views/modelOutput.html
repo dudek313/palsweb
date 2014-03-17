@@ -137,7 +137,7 @@
         <tbody>
         {{#each modelOutput.versions}}
         <tr>
-            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            <td onclick="window.location.href='/file/{{key}}/{{encode "application/x-ncdf"}}'">{{filename}}</td>
             {{#if owner}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
             {{#if owner}}<td><button class='start-analysis btn btn-primary btn-xs' id='{{key}}'>start new analysis!</button></td>{{/if}}
         </tr>

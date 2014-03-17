@@ -241,7 +241,7 @@
         <tbody>
         {{#each versions}}
         <tr>
-            <td onclick="window.location.href='{{url}}'">{{filename}}</td>
+            <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{filename}}</td>
             {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
         </tr>
         {{/each}}
