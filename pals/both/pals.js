@@ -125,6 +125,21 @@ Router.map(function () {
         ]
     });
     this.route('analyses');
+    this.route('file',{
+        where: 'server',
+        path: '/file/:id',
+        action: function() {
+            var id = this.params.id;
+            var filename = '/pals/data/'+id;
+            var fs = Npm.require('fs');
+            var file = fs.readFileSync(filename);
+            var headers = {
+                'Content-type': 'image/png'
+            };
+            this.response.writeHead(200, headers);
+            return this.response.end(file);
+        }
+    });
 });
 
 Router.before(function(){
@@ -132,7 +147,7 @@ Router.before(function(){
         this.render('login');
         this.stop();
     }
-}, {except: ['home','root']});
+}, {except: ['home','root','file']});
 
 if( Meteor.isClient ) {
     Router.configure({
