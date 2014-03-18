@@ -27,9 +27,10 @@ Template.analyses.getFirstChoice = function(type) {
 Template.analyses.image = function() {
     var modelOutputId = Session.get('analyses.modelOutput');
     var analysisType = Session.get('analyses.analysis');
+    var experimentId = Session.get('analyses.experiment');
     
-    if( modelOutputId && analysisType ) {
-    	var analysis = Analyses.findOne({modelOutput:modelOutputId, results: {$elemMatch: {type: analysisType}}});
+    if( modelOutputId && analysisType && experimentId ) {
+    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {$elemMatch: {type: analysisType}}});
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
 			    var result = analysis.results[j];
