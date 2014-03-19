@@ -30,7 +30,7 @@ Template.analyses.image = function() {
     var experimentId = Session.get('analyses.experiment');
     
     if( modelOutputId && analysisType && experimentId ) {
-    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {$elemMatch: {type: analysisType}}});
+    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId} );
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
 			    var result = analysis.results[j];
@@ -53,6 +53,7 @@ Template.analyses.selectOptions = function(selectIndex) {
         if( previousType && previousType == 'experiment') {
             var experimentId = Session.get('analyses.experiment');
             var modelOutputs = ModelOutputs.find( {experiment:experimentId}, {fields: {model:1}} ).fetch();
+            console.log(modelOutputs[0]);
             var modelIdArray = [];
             for( var i=0; i < modelOutputs.length; ++i ) {
                 var modelOutput = modelOutputs[i];
