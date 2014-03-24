@@ -100,6 +100,33 @@
        {{/if}}
        {{/if}}
    </div>
+   <div class="form-group">
+       {{#if currentUser.admin}}
+           <label>Region</label>
+           <input class="modifier form-control" type="text" name="region" value="{{experiment.region}}"></input>
+       {{else}}
+       {{#if experiment.region}}
+           <label>Region</label>
+           <div class="display">{{experiment.region}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
+   <div class="form-group">
+       {{#if currentUser.admin}}
+       <label>Resolution</label>
+       <select name="resolution" class="form-control trigger">
+           <option value="n/a"></option>
+           {{#each reference.resolution}}
+           <option value='{{this}}' {{selected this experiment.resolution}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       {{#if experiment.resolution}}
+           <label>Resolution</label>
+           <div class="display">{{experiment.resolution}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
    <br/>
    <div class="panel panel-success">
    <div class="panel-heading">Scripts</div>

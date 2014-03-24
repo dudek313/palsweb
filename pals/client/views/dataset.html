@@ -214,6 +214,33 @@
        {{/each}}
        </h4>
    {{/if}}
+   <div class="form-group">
+       {{#if currentUser.admin}}
+           <label>Region</label>
+           <input class="modifier form-control" type="text" name="region" value="{{dataSet.region}}"></input>
+       {{else}}
+       {{#if dataSet.region}}
+           <label>Region</label>
+           <div class="display">{{dataSet.region}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
+   <div class="form-group">
+       {{#if currentUser.admin}}
+       <label>Resolution</label>
+       <select name="resolution" class="form-control trigger">
+           <option value="n/a"></option>
+           {{#each reference.resolution}}
+           <option value='{{this}}' {{selected this dataSet.resolution}}>{{this}}</option>
+           {{/each}}
+       </select>
+       {{else}}
+       {{#if dataSet.resolution}}
+           <label>Resolution</label>
+           <div class="display">{{dataSet.resolution}}</div>
+       {{/if}}
+       {{/if}}
+   </div>
 </form>
 </div><!--left-column-->
 <div class="col-md-4">

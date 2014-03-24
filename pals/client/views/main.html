@@ -32,7 +32,7 @@
             <li><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
         </ul>
       </li>
-        {{#if currentUser.admin}}
+        
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments <b class="caret"></b></a>
                 <ul class="dropdown-menu">
@@ -42,9 +42,10 @@
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Catchment');">Catchment</a></li>
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Regional');">Regional</a></li>
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Global');">Global</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>
+                    {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>{{/if}}
                 </ul>
             </li>
+        {{#if currentUser.admin}}
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets <b class="caret"></b></a>
                  <ul class="dropdown-menu">
@@ -53,7 +54,6 @@
                  </ul>
             </li>
         {{else}}
-            <li><a href="javascript:void(0)" onclick="Router.go('/experiments');">Experiments</a></li>
             <li><a href="javascript:void(0)" onclick="Router.go('/datasets');">Data Sets</a></li>
         {{/if}}
         {{/if}}
