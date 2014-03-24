@@ -43,6 +43,10 @@ table.table-hover tbody tr:hover {
    padding: 0 !important;
 }
 
+.double-vertical-menu a{
+    font-size: 12px;
+}
+
 .double-vertical-menu {
     padding: 5px 15px 0 0;
 }
