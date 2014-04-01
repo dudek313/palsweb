@@ -30,6 +30,7 @@ addDataSets = function(files,dataSets,type) {
         var dataSet = DataSets.findOne({'_id':dataSetId});
         console.log('processing data set: ' + dataSetId);
         var version = getLatestVersion(dataSet);
+        version.name = dataSet.name;
         if( version ) {
             files.push(version);
         }
@@ -99,6 +100,7 @@ Meteor.methods({
         
             var files = new Array();
             currentVersion.type = 'ModelOutput';
+            currentVersion.name = currentModelOutput.name;
             files.push(currentVersion);
             
             if( !currentModelOutput.experiment ) throw new Meteor.Error(500, 'Please select an experiment first');
