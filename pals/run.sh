@@ -1,1 +1,1 @@
-nohup meteor > /dev/null 2<&1 &
+nohup meteor --port=80 > /dev/null 2<&1 &
