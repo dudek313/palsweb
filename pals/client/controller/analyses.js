@@ -31,6 +31,7 @@ Template.analyses.image = function() {
     
     if( modelOutputId && analysisType && experimentId ) {
     	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId} );
+        console.log(analysis);
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
 			    var result = analysis.results[j];

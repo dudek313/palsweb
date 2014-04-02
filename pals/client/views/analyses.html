@@ -43,12 +43,16 @@
            </form>
        </div><!--/col-->
        {{#if image}}
-       <div class="col-md-6">
+       <div class="col-md-12">
            <br/>
            <div class="panel panel-default">
                 <div class="panel-heading">{{image.type}}</div>
                 <div class="panel-body">
+                    {{#if image.error}}
+                        <p>{{image.error}}<p>
+                    {{else}}
                     <a href="/file/{{image.key}}/{{encode image.mimetype}}" target="_blank"><img class="img-responsive" src="/file/{{image.key}}/{{encode image.mimetype}}" title="{{image.type}}"></img></a>
+                    {{/if}}
                 </div> 
             </div>
        </div>
