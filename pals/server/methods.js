@@ -56,13 +56,7 @@ analysisComplete = function(analysis) {
 }
 
 deleteFile = function(file) {
-    var s3 = new AWS.S3();
-    s3.deleteObject({
-        Bucket : bucket,
-        Key : file.key,
-    },function(err,data){
-        if( err ) console.log("Failed to delete the file: " + file.key);
-    });
+    fs.unlink(file.filename,function(){})
 }
 
 createFileRecord = function(fileName,fileSize,fileData) {
