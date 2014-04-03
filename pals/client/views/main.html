@@ -61,13 +61,13 @@
     <ul class="nav navbar-nav navbar-right">
         <li class="double-vertical-menu">
             {{#if loggedIn}}<a class="double-vertical-menu-item" href="javascript:void(0)" onclick="Router.go('/workspaces');">Workspace: {{currentWorkspace.name}}</a>{{/if}}
-            {{loginButtons}}
+            {{> loginButtons}}
         </li>
     </ul>
   </div><!-- /.navbar-collapse -->
   </div><!-- /container -->
 </nav>
 <div class="container main">
-{{yield}}
+{{> yield}}
 </div>
 </template>

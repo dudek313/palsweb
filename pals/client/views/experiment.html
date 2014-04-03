@@ -7,7 +7,7 @@
     <div class="alert alert-danger error"></div>
     <div class="form-group">
        <label>Experiment Name</label>
-       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{experiment.name}}"></input>
+       {{#if currentUser.admin}}<input class="modifier form-control" type="text" name="name" value="{{experiment.name}}">
        {{else}}
            <div class="display">{{experiment.name}}</div>
        {{/if}}
@@ -48,7 +48,7 @@
    <div class="form-group">
        <label>or enter a different Vegetation Type</label>
        {{#if currentUser.admin}}
-           <input class="modifier form-control" type="text" name="vegType" value="{{#if experiment.vegType}}{{experiment.vegType}}{{/if}}"></input>
+           <input class="modifier form-control" type="text" name="vegType" value="{{#if experiment.vegType}}{{experiment.vegType}}{{/if}}">
        {{else}}
            <div class="display">{{experiment.vegType}}</div>
        {{/if}}
@@ -81,7 +81,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
            <label>Short Description</label>
-           <input class="modifier form-control" type="text" name="shortDescription" value="{{experiment.shortDescription}}"></input>
+           <input class="modifier form-control" type="text" name="shortDescription" value="{{experiment.shortDescription}}">
        {{else}}
        {{#if experiment.shortDescription}}
            <label>Short Description</label>
@@ -103,7 +103,7 @@
    <div class="form-group">
        {{#if currentUser.admin}}
            <label>Region</label>
-           <input class="modifier form-control" type="text" name="region" value="{{experiment.region}}"></input>
+           <input class="modifier form-control" type="text" name="region" value="{{experiment.region}}">
        {{else}}
        {{#if experiment.region}}
            <label>Region</label>

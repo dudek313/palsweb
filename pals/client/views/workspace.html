@@ -9,9 +9,9 @@
     </tr>
 {{#each users}}
     <tr>
-        <td>{{emails.0.address}} {{ya}}</td>
+        <td>{{emails[0].address}} {{ya}}</td>
         {{#if isOwner}}<td>
-            <input type="checkbox" class="invite-user" id="{{_id}}" {{#if invited}}checked{{/if}}></input>
+            <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}}>
         </td>{{/if}}
     </tr>   
 {{/each}}

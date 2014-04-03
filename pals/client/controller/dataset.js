@@ -3,96 +3,11 @@ Template.dataset.rendered = function() {
     templateSharedObjects.progress().hide();
 };
 
-Template.dataset.dataSet = function() {
-    var currentDataSetId = Session.get('currentDataSet');
-    var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
-    return currentDataSet;
-}
-
-function getVersions(dataSet) {
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) {
-        var versions = new Array();
-        for( var i=0; i < dataSet.versions.length; ++i ) {
-            var version = dataSet.versions[i];
-            versions.push(version);
-        }
-        return versions;
-    }
-}
-
-Template.dataset.versions = function() {
-    var dataSet = Template.dataset.dataSet();
-    return getVersions(dataSet);
-}
-
-Template.dataset.update = function(event) {
-    var fieldName = $(event.target).attr('name');
-    var value = $(event.target).val();
-    Template.dataset.performUpdate(fieldName,value);
-};
-
-Template.dataset.performUpdate = function(fieldName,value) {
-    if( value ) {
-    
-        var user = Meteor.user();
-        currentDataSetId = Session.get('currentDataSet');
-        var reference = Template.dataset.reference();
-        
-        if( currentDataSetId ) {
-        
-            if ( value == "n/a" ) value = null;
-        
-            var selector = {'_id':currentDataSetId};
-            var fieldModifier = {};
-            fieldModifier[fieldName] = value;
-            var modifier = {'$set':fieldModifier};
-            DataSets.update(selector,modifier,function(error){
-                if( error ) {
-                    $('.error').html('There was an error saving the field, please try again');
-                    $('.error').show();
-                }
-            });
-        }
-        else {
-            currentDataSet = {
-                'owner' : user._id,
-                'created' : new Date(),
-                'workspaces' : [user.profile.currentWorkspace._id]
-            };
-            //if( fieldName != 'type' ) currentDataSet.type = reference.dataSetType[0];
-            //if( fieldName != 'country' ) currentDataSet.country = reference.country[0];
-            //if( fieldName != 'vegType' ) currentDataSet.vegType = reference.vegType[0];
-            if( fieldName != 'spatialLevel' ) currentDataSet.spatialLevel = reference.spatialLevel[0];
-            currentDataSet[fieldName] = value;
-            DataSets.insert(currentDataSet,function(error,id) {
-                if( error ) {
-                    if( error.error == 409 ) $('.error').html('A data set with that name already exists');
-                    else $('.error').html('There was an error saving your value, please try again');
-                    $('.error').show();
-                }
-                else {
-                    currentDataSet._id = id;
-                    Session.set('currentDataSet',id);
-                }
-            });
-        }
-    }
-};
-
-Template.dataset.events({
-    'blur input': function (event) {
-        Template.dataset.update(event);
-    },
-    'blur textarea': function (event) {
-        Template.dataset.update(event);
-    },
-    'change select.trigger':function(event) {
-        Template.dataset.update(event);
-    },
+var events = {
     'click .delete-version':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-        
+
             var currentDataSet = Template.dataset.dataSet();
             if( currentDataSet.versions ) {
                 var currentVersion = undefined;
@@ -110,7 +25,6 @@ Template.dataset.events({
                             }
                         }
                     );
-                
                     Meteor.call('removeFileByUrl',currentVersion.url);
                 }
             }
@@ -122,7 +36,7 @@ Template.dataset.events({
             var user = Meteor.user();
             currentDataSetId = Session.get('currentDataSet');
             variable = Variables.findOne({'_id':variableId});
-        
+
             if( currentDataSetId && variable) {
                 var selector = {'_id':currentDataSetId};
                 var modifier = {'$addToSet': {variables:variable}};
@@ -166,7 +80,34 @@ Template.dataset.events({
         reader.onprogress = progress.readerProgress;
         reader.readAsBinaryString(file);
     }
-});
+};
+
+Template.dataset.events(templateSharedObjects.form({
+    meteorSessionId: 'currentDataSet',
+    collectionName: 'DataSets'
+}).events().extend(events));
+
+Template.dataset.dataSet = function() {
+    var currentDataSetId = Session.get('currentDataSet');
+    var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
+    return currentDataSet;
+}
+
+function getVersions(dataSet) {
+    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) {
+        var versions = new Array();
+        for( var i=0; i < dataSet.versions.length; ++i ) {
+            var version = dataSet.versions[i];
+            versions.push(version);
+        }
+        return versions;
+    }
+}
+
+Template.dataset.versions = function() {
+    var dataSet = Template.dataset.dataSet();
+    return getVersions(dataSet);
+}
 
 Template.dataset.reference = function() {
     var reference = Reference.findOne();

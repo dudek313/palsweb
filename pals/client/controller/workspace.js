@@ -61,3 +61,9 @@ Template.workspace.events({
         }
     }
 });
+
+Template.workspace.helpers({
+  checkedIfTrue: function (isTrue) {
+      if( isTrue ) return 'checked';
+  }
+});
