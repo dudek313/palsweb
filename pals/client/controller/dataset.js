@@ -3,10 +3,7 @@ Template.dataset.rendered = function() {
     templateSharedObjects.progress().hide();
 };
 
-var eventArray = {
-    'click h1':function(event) {
-        console.log('h1 clicked');
-    },
+var events = {
     'click .delete-version':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
@@ -88,7 +85,7 @@ var eventArray = {
 Template.dataset.events(templateSharedObjects.form({
     meteorSessionId: 'currentDataSet',
     collectionName: 'DataSets'
-}).eventArray().extend(eventArray));
+}).events().extend(events));
 
 Template.dataset.dataSet = function() {
     var currentDataSetId = Session.get('currentDataSet');
