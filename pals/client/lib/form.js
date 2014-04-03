@@ -1,15 +1,14 @@
 if( typeof templateSharedObjects === 'undefined' ) templateSharedObjects = {};
 
-templateSharedObjects.progress = function(spec) {
+templateSharedObjects.form = function(spec) {
     var that = {};
     
     var meteorSessionId = spec.meteorSessionId;
-    var collection = spec.collection;
+    var collectionName = spec.collectionName;
     
     function eventArray() {
         return {
             'blur input': function (event) {
-                console.log('blur');
                 update(event);
             },
             'blur textarea': function (event) {
@@ -17,6 +16,16 @@ templateSharedObjects.progress = function(spec) {
             },
             'change select.trigger':function(event) {
                 update(event);
+            },
+            'extend':function(other) {
+                console.log(other);
+                for( var i in other ) {
+                    if( other.hasOwnProperty(i) ) {
+                        this[i] = other[i];
+                    }
+                }
+                console.log(this);
+                return this;
             }
         }
     };
@@ -40,7 +49,7 @@ templateSharedObjects.progress = function(spec) {
                 var fieldModifier = {};
                 fieldModifier[fieldName] = value;
                 var modifier = {'$set':fieldModifier};
-                collection.update(selector,modifier,function(error){
+                GetCollectionByName(collectionName).update(selector,modifier,function(error){
                     if( error ) {
                         $('.error').html('There was an error saving the field, please try again');
                         $('.error').show();
@@ -55,7 +64,7 @@ templateSharedObjects.progress = function(spec) {
                 };
                 if( fieldName != 'spatialLevel' ) currentDocument.spatialLevel = reference.spatialLevel[0];
                 currentDocument[fieldName] = value;
-                collection.insert(currentDocument,function(error,id) {
+                GetCollectionByName(collectionName).insert(currentDocument,function(error,id) {
                     if( error ) {
                         if( error.error == 409 ) $('.error').html('A document with that name already exists');
                         else $('.error').html('There was an error saving your value, please try again');
