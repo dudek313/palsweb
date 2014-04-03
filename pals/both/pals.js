@@ -15,7 +15,7 @@ Router.map(function () {
     this.route('workspace',{
        path: '/workspaces/:id',
        template: 'workspace',
-       before: [
+       onBeforeAction: [
            function() {
                Session.set('currentWorkspace',this.params.id);
            }
@@ -25,7 +25,7 @@ Router.map(function () {
     this.route('dataset',{
         path: '/datasets/:id',
         template: 'dataset',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
             }
@@ -34,7 +34,7 @@ Router.map(function () {
     this.route('createDataset',{
         path: '/dataset',
         template: 'dataset',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentDataSet',undefined);
             }
@@ -43,7 +43,7 @@ Router.map(function () {
     this.route('experiment',{
         path: '/experiment',
         template: 'experiment',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentExperiment',undefined);
             }
@@ -52,7 +52,7 @@ Router.map(function () {
     this.route('experiments',{
         path: '/experiments',
         template: 'experiments',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',null);
             }
@@ -61,7 +61,7 @@ Router.map(function () {
     this.route('experimentsById',{
         path: '/experiments/:id',
         template: 'experiment',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
             }
@@ -70,7 +70,7 @@ Router.map(function () {
     this.route('experimentsBySpatialResolution',{
         path: '/experimentsBySpatialResolution/:resolution',
         template: 'experiments',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',this.params.resolution);
             }
@@ -79,7 +79,7 @@ Router.map(function () {
     this.route('modelOutput',{
         path: '/modelOutput',
         template: 'modelOutput',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',undefined);
             }
@@ -90,7 +90,7 @@ Router.map(function () {
     this.route('modelOutputsById',{
         path: '/modelOutputs/:id',
         template: 'modelOutput',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',this.params.id);
             }
@@ -99,7 +99,7 @@ Router.map(function () {
     this.route('analysis',{
         path: '/analysis/:id',
         template: 'analysis',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentAnalysisId',this.params.id);
             }
@@ -109,7 +109,7 @@ Router.map(function () {
     this.route('model',{
         path: '/model',
         template: 'model',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentModel',undefined);
             }
@@ -118,7 +118,7 @@ Router.map(function () {
     this.route('modelsById',{
         path: '/models/:id',
         template: 'model',
-        before: [
+        onBeforeAction: [
             function() {
                 Session.set('currentModel',this.params.id);
             }
@@ -140,15 +140,15 @@ Router.map(function () {
     });
 });
 
-Router.before(function(){
-    if (!Meteor.user()) {
-        this.render('login');
-        this.stop();
-    }
-}, {except: ['home','root','file']});
-
-if( Meteor.isClient ) {
-    Router.configure({
-      autoRender: false
-    });
-}
+// Router.onBeforeAction(function(){
+//     if (!Meteor.user()) {
+//         this.render('login');
+//         this.stop();
+//     }
+// }, {except: ['home','root','file']});
+// 
+// if( Meteor.isClient ) {
+//     Router.configure({
+//       autoRender: false
+//     });
+// }

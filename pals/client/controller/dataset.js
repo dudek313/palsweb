@@ -79,20 +79,32 @@ Template.dataset.performUpdate = function(fieldName,value) {
     }
 };
 
-Template.dataset.events({
-    'blur input': function (event) {
-        Template.dataset.update(event);
-    },
-    'blur textarea': function (event) {
-        Template.dataset.update(event);
-    },
-    'change select.trigger':function(event) {
-        Template.dataset.update(event);
-    },
+Template.dataset.reference = function() {
+    var reference = Reference.findOne();
+    return reference;
+};
+
+Template.dataset.hasVersions = function() {
+    var dataSet = Template.dataset.dataSet();
+    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
+    else return false;
+};
+
+Template.dataset.uploadDisabled = function() {
+    var currentDataSet = Template.dataset.dataSet();
+    if( currentDataSet ) return '';
+    else return 'disabled="disabled"';
+}
+
+Template.dataset.variables = function() {
+    return Variables.find();
+}
+
+var eventArray = {
     'click .delete-version':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-        
+    
             var currentDataSet = Template.dataset.dataSet();
             if( currentDataSet.versions ) {
                 var currentVersion = undefined;
@@ -110,7 +122,7 @@ Template.dataset.events({
                             }
                         }
                     );
-                
+            
                     Meteor.call('removeFileByUrl',currentVersion.url);
                 }
             }
@@ -122,7 +134,7 @@ Template.dataset.events({
             var user = Meteor.user();
             currentDataSetId = Session.get('currentDataSet');
             variable = Variables.findOne({'_id':variableId});
-        
+    
             if( currentDataSetId && variable) {
                 var selector = {'_id':currentDataSetId};
                 var modifier = {'$addToSet': {variables:variable}};
@@ -166,25 +178,11 @@ Template.dataset.events({
         reader.onprogress = progress.readerProgress;
         reader.readAsBinaryString(file);
     }
-});
-
-Template.dataset.reference = function() {
-    var reference = Reference.findOne();
-    return reference;
-};
-
-Template.dataset.hasVersions = function() {
-    var dataSet = Template.dataset.dataSet();
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
-    else return false;
-};
-
-Template.dataset.uploadDisabled = function() {
-    var currentDataSet = Template.dataset.dataSet();
-    if( currentDataSet ) return '';
-    else return 'disabled="disabled"';
 }
 
-Template.dataset.variables = function() {
-    return Variables.find();
-}
+// var form = form({
+//     meteorSessionId: 'currentDataSet',
+//     collection: DataSets
+// });
+// eventArray.push(form.eventArray());
+// Template.dataset.events(eventArray);
