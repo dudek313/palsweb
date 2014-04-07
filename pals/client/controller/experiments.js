@@ -28,3 +28,11 @@ Template.experiments.events({
         }
     }
 });
+
+Template.experiments.helpers({
+   areEqual: function(firstString,secondString) {
+       if( firstString === secondString ) {
+           return true;
+       }
+   } 
+});
