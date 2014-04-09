@@ -4,7 +4,18 @@ Template.datasets.rendered = function() {
 
 Template.datasets.dataSets = function() {
     var user = Meteor.user();
-    if( user ) return  DataSets.find({'workspaces':user.profile.currentWorkspace._id});
+    if( user ) {
+        var selector = {'workspaces':user.profile.currentWorkspace._id};
+        var resolution = Template.datasets.currentSpatialResolution();
+        if( resolution ) {
+            selector.spatialLevel = resolution;
+        }
+        return DataSets.find(selector);
+    }
+}
+
+Template.datasets.currentSpatialResolution = function() {
+    return Session.get('currentSpatialResolution');
 }
 
 Template.datasets.userEmail = function(userId) {
@@ -17,6 +28,9 @@ Template.datasets.userEmail = function(userId) {
 
 Template.datasets.events({
     'click .delete' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
         var id = $(event.target).attr('id');
         if( id ) {
             console.log(id);
@@ -27,5 +41,20 @@ Template.datasets.events({
                 }
             });
         }
+    },
+    'click tr' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        var id = $(event.target).parent().attr('id');
+        Router.go('/datasets/'+id);
     }
+});
+
+Template.datasets.helpers({
+   areEqual: function(firstString,secondString) {
+       if( firstString === secondString ) {
+           return true;
+       }
+   } 
 });

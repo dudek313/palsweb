@@ -16,6 +16,9 @@ Template.experiments.currentSpatialResolution = function() {
 
 Template.experiments.events({
     'click .delete' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
         var id = $(event.target).attr('id');
         if( id ) {
             console.log(id);
@@ -26,6 +29,13 @@ Template.experiments.events({
                 }
             });
         }
+    },
+    'click tr' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        var id = $(event.target).parent().attr('id');
+        Router.go('/experiments/'+id);
     }
 });
 

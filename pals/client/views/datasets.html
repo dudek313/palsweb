@@ -1,26 +1,63 @@
 <template name="datasets">
 <div class="text-content">
-    <h1>Data Sets</h1>
+    <h1>
+        {{#if currentSpatialResolution}}{{currentSpatialResolution}}{{/if}}
+        Data Sets
+    </h1>
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>
         <tr>
+            {{#if currentSpatialResolution}}
+                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+                    {{> singleSiteHeadings}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                    {{> multipleSiteHeadings}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                    {{> catchmentHeadings}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Regional'}}
+                    {{> regionalHeadings}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Global'}}
+                    {{> globalHeadings}}
+                {{/if}}
+            {{else}}
             <th>Name</th>
-            <th>Spatial Resolution</th>
-            <th>Country</th>
-            <th>VegType</th>
+            <th>Spatial Level</th>
+            <th>Resolution</th>
             <th>Created By</th>
+            {{/if}}
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
         {{#each dataSets}}
-        <tr>
-            <td onclick="Router.go('/datasets/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/datasets/{{_id}}')">{{spatialLevel}}</td>
-            <td onclick="Router.go('/datasets/{{_id}}')">{{country}}</td>
-            <td onclick="Router.go('/datasets/{{_id}}')">{{vegType}}</td>
-            <td onclick="Router.go('/datasets/{{_id}}')">{{userEmail owner}}</td>
+        <tr id="{{_id}}">
+            {{#if currentSpatialResolution}}
+                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+                    {{> singleSiteRow}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                    {{> multipleSiteRow}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                    {{> catchmentRow}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Regional'}}
+                    {{> regionalRow}}
+                {{/if}}
+                {{#if areEqual currentSpatialResolution 'Global'}}
+                    {{> globalRow}}
+                {{/if}}
+            {{else}}
+            <td>{{name}}</td>
+            <td>{{spatialLevel}}</td>
+            <td>{{resolution}}</td>
+            <td>{{userEmail owner}}</td>
+            {{/if}}
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}

@@ -21,13 +21,30 @@ Router.map(function () {
            }
        ] 
     });
-    this.route('datasets');
+    this.route('datasets',{
+        path: '/datasets',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('currentSpatialResolution',null);
+            }
+        ]
+    });
     this.route('dataset',{
         path: '/datasets/:id',
         template: 'dataset',
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
+            }
+        ]
+    });
+    this.route('dataSetsBySpatialResolution',{
+        path: '/dataSetsBySpatialResolution/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('currentSpatialResolution',this.params.resolution);
             }
         ]
     });

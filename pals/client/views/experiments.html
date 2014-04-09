@@ -35,7 +35,7 @@
         </thead>
         <tbody>
         {{#each experiments}}
-        <tr>
+        <tr id="{{_id}}">
             {{#if currentSpatialResolution}}
                 {{#if areEqual currentSpatialResolution 'SingleSite'}}
                     {{> singleSiteRow}}
@@ -53,10 +53,10 @@
                     {{> globalRow}}
                 {{/if}}
             {{else}}
-            <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/experiments/{{_id}}')">{{spatialLevel}}</td>
-            <td onclick="Router.go('/experiments/{{_id}}')">{{resolution}}</td>
-            <td onclick="Router.go('/experiments/{{_id}}')">{{timeStepSize}}</td>
+            <td>{{name}}</td>
+            <td>{{spatialLevel}}</td>
+            <td>{{resolution}}</td>
+            <td>{{timeStepSize}}</td>
             {{/if}}
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
@@ -64,63 +64,4 @@
         </tbody>
     </table>
 </div>
-</template>
-
-<template name="singleSiteHeadings">
-    <th>Name</th>
-    <th>Vegetation Type</th>
-    <th>Country</th>
-    <th>Time Step Size</th>
-</template>
-<template name="singleSiteRow">
-    <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{vegType}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{country}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{timeStepSize}}</td>
-</template>
-
-<template name="multipleSiteHeadings">
-    <th>Name</th>
-    <th>Short Description</th>
-</template>
-<template name="multipleSiteRow">
-    <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{shortDescription}}</td>
-</template>
-
-<template name="catchmentHeadings">
-    <th>Name</th>
-    <th>Region</th>
-    <th>Resolution</th>
-    <th>Time Step Size</th>
-</template>
-<template name="catchmentRow">
-    <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{region}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{resolution}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{timeStepSize}}</td>
-</template>
-
-<template name="regionalHeadings">
-    <th>Name</th>
-    <th>Region</th>
-    <th>Resolution</th>
-    <th>Time Step Size</th>
-</template>
-<template name="regionalRow">
-    <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{region}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{resolution}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{timeStepSize}}</td>
-</template>
-
-<template name="globalHeadings">
-    <th>Name</th>
-    <th>Resolution</th>
-    <th>Time Step Size</th>
-</template>
-<template name="globalRow">
-    <td onclick="Router.go('/experiments/{{_id}}')">{{name}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{resolution}}</td>
-    <td onclick="Router.go('/experiments/{{_id}}')">{{timeStepSize}}</td>
 </template>
