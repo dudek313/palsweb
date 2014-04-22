@@ -6,7 +6,7 @@ Template.experiments.experiments = function() {
         if( resolution ) {
             selector.spatialLevel = resolution;
         }
-        return Experiments.find(selector);
+        return Experiments.find(selector,{sort:{created:-1}});
     }
 }
 

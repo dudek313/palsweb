@@ -6,14 +6,21 @@ Template.experiment.rendered = function() {
 Template.experiment.experiment = function() {
     currentExperimentId = Session.get('currentExperiment');
     if( currentExperimentId ) {
-        return Experiments.findOne({'_id':currentExperimentId});
+        var experiment = Experiments.findOne({'_id':currentExperimentId});
+        if( experiment && experiment.scripts ) {
+            experiment.scripts.sort(function(a,b){
+                if(a.created >= b.created) return -1
+                else return 1
+            });
+        }
+        return experiment;
     }
 }
 
 Template.experiment.modelOutputs = function() {
     currentExperimentId = Session.get('currentExperiment');
     if( currentExperimentId ) {
-        return  ModelOutputs.find({'experiment':currentExperimentId});
+        return  ModelOutputs.find({'experiment':currentExperimentId},{sort:{created:-1}});
     }
 }
 

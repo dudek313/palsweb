@@ -10,7 +10,7 @@ Template.datasets.dataSets = function() {
         if( resolution ) {
             selector.spatialLevel = resolution;
         }
-        return DataSets.find(selector);
+        return DataSets.find(selector,{sort:{created:-1}});
     }
 }
 
