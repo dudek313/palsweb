@@ -47,6 +47,9 @@ templateSharedObjects.form = function(spec) {
             'change select.trigger':function(event) {
                 update(event);
             },
+            'change input[type="checkbox"]':function(event) {
+                update(event);
+            },
             // add all the event handlers from the given object to this object
             // actually adds all attributes, but not those from the prototype chain
             'extend':function(other) { 
@@ -65,6 +68,13 @@ templateSharedObjects.form = function(spec) {
     function update(event) {
         var fieldName = $(event.target).attr('name');
         var value = $(event.target).val();
+        if( value === 'on' ) { // it is a checkbox
+            value = $(event.target).prop('checked');
+            // set the true/false value as a string because otherwise a false
+            // value will not propogate
+            if( value ) value = 'true';
+            else value = 'false';
+        }
         performUpdate(fieldName,value);
     };
     

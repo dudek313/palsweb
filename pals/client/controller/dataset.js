@@ -129,3 +129,28 @@ Template.dataset.uploadDisabled = function() {
 Template.dataset.variables = function() {
     return Variables.find();
 }
+
+Template.dataset.helpers({
+  isPublic: function() {
+    var dataSet = Template.dataset.dataSet();
+    if( dataSet ) {
+        if( !dataSet.public ) return 'checked'
+        if( dataSet.public === 'true') return 'checked'
+        else return undefined
+    }
+    else return 'checked';
+  },
+  isPublicOrOwner: function() {
+    var dataSet = Template.dataset.dataSet();
+    if( dataSet ) {
+        if( !dataSet.public ) return true
+        if( dataSet.public === 'true') return true
+        else {
+            var user = Meteor.user();
+            if( user._id === dataSet.owner ) return true;
+            else return false;
+        }
+    }
+    else return true;
+  }
+});

@@ -241,6 +241,13 @@
        {{/if}}
        {{/if}}
    </div>
+   {{#if currentUser.admin}}
+   <div class="checkbox">
+       <label>
+         <input type="checkbox" name="public" {{isPublic}}> Make this Data Set public
+       </label>
+   </div>
+   {{/if}}
 </form>
 </div><!--left-column-->
 <div class="col-md-4">
@@ -268,7 +275,11 @@
         <tbody>
         {{#each versions}}
         <tr>
+            {{#if isPublicOrOwner}}
             <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{filename}}</td>
+            {{else}}
+            <td>{{filename}}</td>
+            {{/if}}
             {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
         </tr>
         {{/each}}
