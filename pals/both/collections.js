@@ -12,5 +12,8 @@ GetCollectionByName = function(name) {
         case 'DataSets':
             return DataSets;
             break;
+        case 'Models':
+            return Models;
+            break;
     }
 }
