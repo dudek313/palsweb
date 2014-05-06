@@ -165,7 +165,11 @@ Template.modelOutput.experiments = function() {
 
 Template.modelOutput.models = function() {
     var user = Meteor.user();
-    return Models.find({'workspaces':user.profile.currentWorkspace._id});
+    var selector = {
+        'workspaces':user.profile.currentWorkspace._id,
+        'owner':user._id
+    }
+    return Models.find(selector);
 };
 
 Template.modelOutput.owner = function() {
