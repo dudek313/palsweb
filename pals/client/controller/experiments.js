@@ -1,7 +1,7 @@
 Template.experiments.experiments = function() {
     var user = Meteor.user();
     if( user ) {
-        var selector = {'workspaces':user.profile.currentWorkspace._id};
+        var selector = {};
         var resolution = Template.experiments.currentSpatialResolution();
         if( resolution ) {
             selector.spatialLevel = resolution;

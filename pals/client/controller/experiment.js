@@ -19,8 +19,13 @@ Template.experiment.experiment = function() {
 
 Template.experiment.modelOutputs = function() {
     currentExperimentId = Session.get('currentExperiment');
+    var user = Meteor.user();
+    var selector = {'experiment':currentExperimentId};
+    if( user && user.profile.currentWorkspace ) {
+        selector.workspaces = user.profile.currentWorkspace._id;
+    }
     if( currentExperimentId ) {
-        return  ModelOutputs.find({'experiment':currentExperimentId},{sort:{created:-1}});
+        return  ModelOutputs.find(selector,{sort:{created:-1}});
     }
 }
 
@@ -171,8 +176,8 @@ Template.experiment.events({
 });
 
 Template.experiment.dataSets = function() {
-    var user = Meteor.user();
-    return  DataSets.find({'workspaces':user.profile.currentWorkspace._id});
+    var publicWorkspace = Workspaces.findOne({"name":"public"});
+    return  DataSets.find({'workspaces':publicWorkspace._id});
 };
 
 Template.experiment.drivingDataSets = function() {
