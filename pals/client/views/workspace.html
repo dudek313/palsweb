@@ -9,7 +9,7 @@
     </tr>
 {{#each users}}
     <tr>
-        <td>{{emails[0].address}} {{ya}}</td>
+        <td>{{email}} {{ya}}</td>
         {{#if isOwner}}<td>
             <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}}>
         </td>{{/if}}
