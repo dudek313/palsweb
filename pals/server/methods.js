@@ -1,5 +1,6 @@
 var redis = Npm.require("redis");
 var queue = 'pals.input';
+
 var REDIS_HOST = process.env.REDIS_HOST;
 if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
 var REDIS_PORT = process.env.REDIS_PORT;
