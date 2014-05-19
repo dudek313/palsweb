@@ -77,6 +77,38 @@ createFileRecord = function(fileName,fileSize,fileData) {
     return fileRecord;
 }
 
+/**
+ * Loads all the current versions of the model outputs which are associated with the given experiment.
+ * A list of model output file records are returned.
+ **/
+loadAllModelOutputsForExperimentExceptOne = function(experimentId,modelOutputId) {
+    var modelOutputs = ModelOutputs.find({'experiment':experimentId},{sort:{created:-1}});
+    var versions = [];
+    modelOutputs.forEach(function(modelOutput){
+        if(modelOutput._id != modelOutputId) {
+            version = extractLatestVersion(modelOutput);
+            if( version ) versions.push(version);
+        } 
+    });
+    return versions;
+}
+
+/**
+ * Returns the version of the given model output with the most recent created date.
+ **/
+extractLatestVersion = function(modelOutput) {
+    mostRecentVersion = undefined;
+    modelOutput.versions.forEach(function(version){
+        if(mostRecentVersion) {
+            if( version.created > mostRecentVersion.created ) {
+                mostRecentVersion = version;
+            }
+        }
+        else mostRecentVersion = version;
+    });
+    return mostRecentVersion;
+}
+
 Meteor.methods({
     startAnalysis: function (key,modelOutputId) {
      
@@ -114,6 +146,8 @@ Meteor.methods({
                 script.type = 'Script';
                 files.push(script);
             }
+            
+            experimentModelOutputs = loadAllModelOutputsForExperimentExceptOne(currentModelOutput.experiment._id,currentModelOutput._id);
         
             var analysis = {
                'owner' : user._id,
@@ -123,7 +157,8 @@ Meteor.methods({
                'modelOutputVersion' : currentVersion,
                'experiment' : currentModelOutput.experiment._id,
                'status' : 'started',
-               'files' : files
+               'files' : files,
+               'experimentModelOutputs' : experimentModelOutputs
            };
            
            saveAnalysis(analysis,analysisComplete);
