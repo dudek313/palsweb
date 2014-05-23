@@ -1,6 +1,7 @@
 {
   "packages": {
     "npm": {},
-    "iron-router": {}
+    "iron-router": {},
+    "redis": {}
   }
 }

@@ -9,3 +9,4 @@ jquery
 standard-app-packages
 npm
 iron-router
+redis
