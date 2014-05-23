@@ -19,15 +19,17 @@ Template.experiments.events({
         event.stopPropagation();
         event.stopImmediatePropagation();
         event.preventDefault();
-        var id = $(event.target).attr('id');
-        if( id ) {
-            console.log(id);
-            Experiments.remove({'_id':id},function(error){
-                if(error) {
-                    $('.error').html('Failed to delete the experiment, please try again');
-                    $('.error').show();
-                }
-            });
+        if( confirm("Are you sure?")) {
+            var id = $(event.target).attr('id');
+            if( id ) {
+                console.log(id);
+                Experiments.remove({'_id':id},function(error){
+                    if(error) {
+                        $('.error').html('Failed to delete the experiment, please try again');
+                        $('.error').show();
+                    }
+                });
+            }
         }
     },
     'click tr' : function(event) {
