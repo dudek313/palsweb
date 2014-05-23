@@ -2,9 +2,13 @@ var Fiber = Npm.require('fibers');
 
 if (Meteor.isServer) { Meteor.startup(function () {
 
-var redis = Npm.require('redis');
 var queue = 'pals.output';
-var client = redis.createClient();
+
+var REDIS_HOST = process.env.REDIS_HOST;
+if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
+var REDIS_PORT = process.env.REDIS_PORT;
+if( !REDIS_PORT ) REDIS_PORT = 6379;
+var client = redis.createClient(REDIS_PORT,REDIS_HOST);
 
 process.setMaxListeners(0);
 
