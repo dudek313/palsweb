@@ -316,18 +316,17 @@ function loadAndCopyWorkspaces(pgInstance,mongoInstance,users,callback) {
 }
 
 function saveWorkspace(mongoInstance,mongoWorkspace,callback) {
-    console.log(mongoWorkspace._id);
     mongoInstance.findOne('workspaces',{_id:mongoWorkspace._id},function(err,doc){
         if( err ) console.log(err);
         if( doc ) {
-            console.log('Already have workspace with id ' + mongoWorkspace._id);
+            //console.log('Already have workspace with id ' + mongoWorkspace._id);
         }
         else {
             mongoInstance.findOne('workspaces',{name:mongoWorkspace.name},function(err,doc2){
                 if( err ) console.log(err);
-                if( doc ) {
-                    console.log('Already have workspace with name ' + mongoWorkspace.name + ' trying new name');
-                    mongoWorkspace.name = mongoWorkspace.name + 'new';
+                if( doc2 ) {
+                    //console.log('Already have workspace with name ' + mongoWorkspace.name + ' trying new name');
+                    mongoWorkspace.name = mongoWorkspace.name + '(new)';
                 }
                 mongoInstance.insert('workspaces',mongoWorkspace,function(err){
                     if( err ) console.log(err);
