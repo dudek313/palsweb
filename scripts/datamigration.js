@@ -156,7 +156,7 @@ function processUser(docs,err,doc,callback,users,db) {
     }
 }
 
-function processDataSets(users,mongoInstance) {
+function processDataSets(users,mongoInstance,workspaces,pgInstance) {
     
     console.log("Processing data sets");
     
@@ -190,9 +190,10 @@ function processDataSets(users,mongoInstance) {
     dsv.enddate AS dsv_enddate,\
     a.name AS a_name,\
     a.status AS a_status,\
-    a.owner_username AS a_owner \
-    FROM dataset as ds, datasetversion as dsv, analysable as a, country as c \
-    WHERE dsv.id = ds.latestversion_id AND a.id = ds.id AND c.id = ds.country_id;";
+    a.owner_username AS a_owner, \
+    e.experiment_id AS e_id \
+    FROM dataset as ds, datasetversion as dsv, analysable as a, country as c, experimentable as e \
+    WHERE dsv.id = ds.latestversion_id AND a.id = ds.id AND c.id = ds.country_id AND e.id = ds.id;";
 
     pgInstance.sql(loadDataSetsQuery,function(result,client){
         result.rows.forEach(function(row){
@@ -218,7 +219,7 @@ function processDataSets(users,mongoInstance) {
                             //console.log(fileData);
                             user = users[row.ds_username];
                             if( user ) {
-                                copyDataSet(filename,fileData,row,user,mongoInstance);
+                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces);
                             }
                             else console.log('Could not locate username ' + row.ds_username);
                         }
@@ -230,12 +231,13 @@ function processDataSets(users,mongoInstance) {
     });
 }
 
-function copyDataSet(filename,fileData,row,user,mongoInstance) {
+function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
     console.log('Copying data set: ' + row.a_name);
     copyFile(filename,fileData.path,function(err){
         if( err ) console.log(err);
         else {
             var dataSet = {
+                _id : row.ds_id.toString(),
                 created : row.dsv_uploaddate,
                 name : row.a_name,
                 spatialLevel : 'SingleSite',
@@ -261,7 +263,10 @@ function copyDataSet(filename,fileData,row,user,mongoInstance) {
                 enddate : row.dsv_enddate,
                 versions : [fileData]
             }
-            //mongoInstance.insert('dataSet',dataSet);
+            if( row.e_id ) {
+                dataSet.workspaces = [row.e_id.toString()];
+            }
+            mongoInstance.insert('dataSets',dataSet,function(){});
         }
     });
 }
@@ -304,8 +309,8 @@ function loadAndCopyWorkspaces(pgInstance,mongoInstance,users,callback) {
                     for( var j=0; j < waiting2; ++j ) {
                         saveWorkspace(mongoInstance,mongoWorkspaces[j],function(){
                             --waiting2;
-                            if( waiting <=0 ) {
-                                return mongoWorkspaces;
+                            if( waiting2 <=0 ) {
+                                callback(mongoWorkspaces);
                             }
                         });
                     }
@@ -320,6 +325,7 @@ function saveWorkspace(mongoInstance,mongoWorkspace,callback) {
         if( err ) console.log(err);
         if( doc ) {
             //console.log('Already have workspace with id ' + mongoWorkspace._id);
+            callback();
         }
         else {
             mongoInstance.findOne('workspaces',{name:mongoWorkspace.name},function(err,doc2){
@@ -383,11 +389,10 @@ function process() {
                 pgInstance.connect(function(err){
                     if( !err ) {
                         loadAndCopyWorkspaces(pgInstance,mongoInstance,users,function(workspaces){
+                             processDataSets(users,mongoInstance,workspaces,pgInstance);
                         });
                     }
                 });
-        
-                //processDataSets(users,mongoInstance);
             });
         }
     });
