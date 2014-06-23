@@ -37,6 +37,7 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
             },function(e){console.log(e)}));
             if( !user ) {
                 // user doesn't exist, we create the user
+                console.log('creating user ' + row.username);
                 try
                 {
                     var newUser = Accounts.createUser({
@@ -56,6 +57,9 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
                 catch(ex) {
                     console.log('duplcate user: ' + row.email + ' ' + row.username);
                 }
+            }
+            else {
+                console.log('user already exists ' + row.username);
             }
         }).run();
     })

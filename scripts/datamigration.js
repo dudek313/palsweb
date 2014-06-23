@@ -12,20 +12,30 @@ var postgres = function () {
     that.connectionString = "pg://postgres:password@localhost:5432/pals"
 
     function sql(query,callback) {
-        that.pg.connect(that.connectionString,function(err,client){
-            that.client = client;
-            if(err) callback(err);
-            else {
-                var sqlStmt = "SELECT * FROM palsuser";
-                client.query(query,null,function(err,result){
-                    if( err ) console.log(err);
-                    else callback(result,client);
-                });
-            }
+        that.client.query(query,null,function(err,result){
+            if( err ) console.log(err);
+            else callback(result,that.client);
         });
     }
-    
     that.sql = sql;
+    
+    function connect(callback) {
+        console.log('connecting to postgres');
+        that.pg.connect(that.connectionString,function(err,client){
+            that.client = client;
+            console.log('connected to postgres');
+            if(err) console.log(err);
+            callback(err);
+        });
+    }
+    that.connect = connect;
+    
+    function end() {
+        if( that.pg ) {
+            that.pg.end();
+        }
+    }
+    that.end = end;
 
     return that;
 }
@@ -37,66 +47,59 @@ var mongo = function() {
     that.host = 'localhost';
     that.port = 81;
     that.db = new that.mongo.Db('meteor',new that.mongo.Server(that.host,that.port,[]),{fsync:true});
+    
+    function connect(callback) {
+        console.log('connecting to mongo');
+        that.db.open(function(err,db){
+            console.log('connected to mongo');
+            if( err ) console.log(err);
+            callback(err); 
+        });
+    };
+    that.connect = connect;
 
     function find(table,query,callback) {
-        that.db.open(function(err,db){
-           if(err) console.log(err);
-           else {
-               db.collection(table,function(err,collection){
-                  if(err) console.log(err);
-                  else {
-                      collection.find(query,function(err,docs){
-                         if(err) console.log(err);
-                         else {
-                             callback(docs,that.db);
-                         }
-                      });
-                  }
-               });
-           }
-        });
+       that.db.collection(table,function(err,collection){
+          if(err) console.log(err);
+          else {
+              collection.find(query,function(err,docs){
+                 if(err) console.log(err);
+                 else {
+                     callback(docs,that.db);
+                 }
+              });
+          }
+       });
     };
     that.find = find;
     
     function findOne(table,query,callback) {
-        that.db.open(function(err,db){
-           if(err) console.log(err);
-           else {
-               db.collection(table,function(err,collection){
-                  if(err) console.log(err);
-                  else {
-                      collection.findOne(query,function(err,doc){
-                         if(err) console.log(err);
-                         else {
-                             that.db.close();
-                             callback(doc,that.db);
-                         }
-                      });
-                  }
-               });
-           }
-        });
+       that.db.collection(table,function(err,collection){
+          if(err) console.log(err);
+          else {
+              collection.findOne(query,function(err,doc){
+                 if(err) console.log(err);
+                 else {
+                     callback(err,doc);
+                 }
+              });
+          }
+       });
     };
     that.findOne = findOne;
     
     function insert(table,doc,callback) {
-        that.db.open(function(err,db){
-           if(err) console.log(err);
-           else {
-               db.collection(table,function(err,collection){
-                  if(err) console.log(err);
-                  else {
-                      collection.insert(doc,function(err,result){
-                         if(err) console.log(err);
-                         else {
-                             that.db.close();
-                             callback();
-                         }
-                      });
-                  }
-               });
-           }
-        });
+       that.db.collection(table,function(err,collection){
+          if(err) console.log(err);
+          else {
+              collection.insert(doc,function(err,result){
+                 if(err) console.log(err);
+                 else {
+                     callback();
+                 }
+              });
+          }
+       });
     };
     that.insert = insert;
 
@@ -124,8 +127,6 @@ function copyFile(source, target, cb) {
   }
 }
 
-var pgInstance = postgres();
-
 function loadUsers(mongoI,callback) {
     console.log('Loading Users');
     
@@ -140,11 +141,9 @@ function loadUsers(mongoI,callback) {
 function processUser(docs,err,doc,callback,users,db) {
     if( err ) {
         console.log(err);
-        db.close();
         callback(users);
     }
     else if( !doc ) {
-        db.close();
         callback(users);
     }
     else if( doc.username ) {
@@ -267,6 +266,106 @@ function copyDataSet(filename,fileData,row,user,mongoInstance) {
     });
 }
 
+function loadWorkspaces(pgInstance,callback) {
+    
+    var loadWorkspacesQuery = "SELECT id, name, owner_username from experiment";
+    
+    pgInstance.sql(loadWorkspacesQuery,function(result,client){
+        var workspaces = [];
+        result.rows.forEach(function(row){
+            workspaces.push(row);
+        });
+        callback(workspaces);
+    });
+}
+
+function loadSharedList(pgInstance,workspace,callback) {
+    var loadSharedListQuery = "SELECT sharedlist_username FROM experiment_palsuser WHERE experiments_id = " + workspace.id;
+    
+    pgInstance.sql(loadSharedListQuery,function(result,client){
+        workspace.users = [];
+        result.rows.forEach(function(row){
+            workspace.users.push(row);
+        });
+        callback();
+    });
+}
+
+function loadAndCopyWorkspaces(pgInstance,mongoInstance,users,callback) {
+    loadWorkspaces(pgInstance,function(workspaces){
+        var waiting = workspaces.length;
+        console.log("Loading shared lists");
+        for( var i=0; i < workspaces.length; ++i ) {
+            loadSharedList(pgInstance,workspaces[i],function(){
+                --waiting;
+                if( waiting <= 0 ) {
+                    var mongoWorkspaces = mapWorkspaces(pgInstance,workspaces,users);
+                    var waiting2 = mongoWorkspaces.length;
+                    for( var j=0; j < waiting2; ++j ) {
+                        saveWorkspace(mongoInstance,mongoWorkspaces[j],function(){
+                            --waiting2;
+                            if( waiting <=0 ) {
+                                return mongoWorkspaces;
+                            }
+                        });
+                    }
+                }
+            })
+        }
+    });
+}
+
+function saveWorkspace(mongoInstance,mongoWorkspace,callback) {
+    console.log(mongoWorkspace._id);
+    mongoInstance.findOne('workspaces',{_id:mongoWorkspace._id},function(err,doc){
+        if( err ) console.log(err);
+        if( doc ) {
+            console.log('Already have workspace with id ' + mongoWorkspace._id);
+        }
+        else {
+            mongoInstance.findOne('workspaces',{name:mongoWorkspace.name},function(err,doc2){
+                if( err ) console.log(err);
+                if( doc ) {
+                    console.log('Already have workspace with name ' + mongoWorkspace.name + ' trying new name');
+                    mongoWorkspace.name = mongoWorkspace.name + 'new';
+                }
+                mongoInstance.insert('workspaces',mongoWorkspace,function(err){
+                    if( err ) console.log(err);
+                    callback();
+                });
+            });
+        }
+    });
+
+}
+
+function mapWorkspaces(pgInstance,workspaces,users) {
+    var mongoWorkspaces = [];
+    for( var i=0; i < workspaces.length; ++i ) {
+        workspace = workspaces[i];
+        var user = users[workspace.owner_username];
+        if( !user ) {
+            console.log('Could not find user: ' + workspace.owner_username);
+        }
+        else {
+            var guests = [];
+            for( var j=0; j < workspace.users.length; ++j ) {
+                var guest = users[workspace.users[j].sharedlist_username];
+                if( guest ) guests.push(guest._id);
+            }
+            
+            var newWorkspace = {
+                _id : workspace.id.toString(),
+                name : workspace.name,
+                owner : user._id,
+                guests : guests
+            }
+            mongoWorkspaces.push(newWorkspace);
+        }
+    }
+    return mongoWorkspaces;
+}
+
 // var mongoInstance = mongo();
 // mongoInstance.find('users',{},function(docs,db){
 //     docs.each(function(err,doc){
@@ -277,8 +376,21 @@ function copyDataSet(filename,fileData,row,user,mongoInstance) {
 function process() {
     
     var mongoInstance = mongo();
-    loadUsers(mongoInstance,function(users) {
-        processDataSets(users,mongoInstance);
+    var pgInstance = postgres();
+    
+    mongoInstance.connect(function(err){
+        if( !err ) {
+            loadUsers(mongoInstance,function(users) {
+                pgInstance.connect(function(err){
+                    if( !err ) {
+                        loadAndCopyWorkspaces(pgInstance,mongoInstance,users,function(workspaces){
+                        });
+                    }
+                });
+        
+                //processDataSets(users,mongoInstance);
+            });
+        }
     });
 }
 
