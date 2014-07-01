@@ -63,7 +63,7 @@ deleteFile = function(file) {
 }
 
 createFileRecord = function(fileName,fileSize,fileData) {
-    var fileToken = uuid.v4();
+    var fileToken = Meteor.uuid();
     fs.writeFile(fileBucket+'/'+fileToken, fileData, 'binary');
     var fileRecord = {
         path: fileBucket+'/'+fileToken,
