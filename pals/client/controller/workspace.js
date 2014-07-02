@@ -28,11 +28,15 @@ Template.workspace.workspace = function() {
 Template.workspace.users = function() {
     var users = Meteor.users.find().fetch();
     var workspace = Template.workspace.workspace();
-    if( workspace && workspace.guests ) {
+    if( workspace ) {
         users.forEach(function(user){
-            if( workspace.guests.lastIndexOf(user._id) >= 0 ) {
+            if( workspace.guests && workspace.guests.lastIndexOf(user._id) >= 0 ) {
                 user.invited = true;
             }
+            if( user.emails && user.emails.length > 0 ) {
+                user.email = user.emails[0].address;
+            }
+            if( !user.email ) user.email = user.username;
         });
     }
     return users;
