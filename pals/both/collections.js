@@ -19,5 +19,5 @@ GetCollectionByName = function(name) {
 }
 
 Files = new FS.Collection("files", {
-  stores: [new FS.Store.FileSystem("files", {path: "/pals/collectionfs"})]
+  stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });

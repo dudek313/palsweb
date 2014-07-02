@@ -25,7 +25,9 @@ var events = {
                             }
                         }
                     );
-                    Meteor.call('removeFileByUrl',currentVersion.url);
+                    Files.remove({_id:currentVersion.fileObjId},function(err){
+                       if(err) console.log(err);
+                    });
                 }
             }
         }
@@ -64,22 +66,6 @@ var events = {
             );
         }
     },
-    // 'change .file-select': function(event, template){
-    //     var file = event.target.files[0];
-    //     var reader = new FileReader();
-    //     var currentDataSetId = Session.get('currentDataSet');
-    //     if( !currentDataSetId ) {
-    //         alert("Please enter a data set name before uploading scripts");
-    //         return;
-    //     }
-    //     var progress = templateSharedObjects.progress();
-    //     progress.showProgress();
-    //     reader.onload = function(fileLoadEvent) {
-    //         Meteor.call('uploadDataSet', currentDataSetId, file.name, file.size, reader.result);
-    //     };
-    //     reader.onprogress = progress.readerProgress;
-    //     reader.readAsBinaryString(file);
-    // }
     'change .file-select':function(event, template){
         
         var currentDataSetId = Session.get('currentDataSet');
