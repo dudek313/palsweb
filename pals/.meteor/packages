@@ -10,3 +10,5 @@ standard-app-packages
 npm
 iron-router
 redis
+collectionFS
+cfs-filesystem

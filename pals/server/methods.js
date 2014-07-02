@@ -6,7 +6,7 @@ var REDIS_PORT = process.env.REDIS_PORT;
 if( !REDIS_PORT ) REDIS_PORT = 6379;
 var client = redis.createClient(REDIS_PORT,REDIS_HOST);
 
-var fileBucket = '/pals/data';
+var fileBucket = FILE_BUCKET;
 var fs = Npm.require('fs');
 
 getLatestVersion = function(dataSet,type) {

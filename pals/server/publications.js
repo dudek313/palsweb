@@ -134,3 +134,15 @@ Meteor.publish('variables',function(){
 });
 
 Variables._ensureIndex('name', {unique: 1});
+
+Files.allow({
+    insert: function(userId, doc) {
+        return (userId);
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        return (userId);
+    },
+    remove: function(userId, doc) {
+        return (userId);
+    }
+});

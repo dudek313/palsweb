@@ -1,3 +1,7 @@
+// GLOBALS
+
+FILE_BUCKET = '/pals/data';
+
 Router.configure({
     layoutTemplate: 'main'
 });
