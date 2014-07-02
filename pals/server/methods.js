@@ -179,36 +179,6 @@ Meteor.methods({
         }
         return null;
     },
-    uploadDataSet: function(dataSetId, fileName, fileSize, fileData) {
-        var fileRecord = createFileRecord(fileName,fileSize,fileData);
-        DataSets.update({'_id':dataSetId},
-            {'$push':{'versions':fileRecord}},function(error){
-                if( error ) {
-                    console.log(error);
-                    console.log('Failed to add uploaded version to the data set');
-                }
-        });
-    },
-    uploadScript: function(experimentId, fileName, fileSize, fileData) {
-        var fileRecord = createFileRecord(fileName,fileSize,fileData);
-        Experiments.update({'_id':experimentId},
-            {'$push':{'scripts':fileRecord}},function(error){
-                if( error ) {
-                    console.log(error);
-                    console.log('Failed to add uploaded script to the experiment');
-                }
-        });
-    },
-    uploadModelOutput: function(modelOutputId, fileName, fileSize, fileData) {
-        var fileRecord = createFileRecord(fileName,fileSize,fileData);
-        ModelOutputs.update({'_id':modelOutputId},
-            {'$push':{'versions':fileRecord}},function(error){
-                if( error ) {
-                    console.log(error);
-                    console.log('Failed to add uploaded model output version');
-                }
-        });
-    },
     removeFileByUrl: function(url) {
         fs.unlink(url,function(){
             console.log('deleted file ' + url);

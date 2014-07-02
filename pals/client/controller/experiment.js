@@ -152,26 +152,62 @@ Template.experiment.events({
                         }
                     );
                 
-                    Meteor.call('removeFileByUrl',currentScript.url);
+                    Files.remove({_id:currentScript.fileObjId},function(err){
+                       if(err) console.log(err);
+                    });
                 }
             }
         }
     },
+    // 'change .file-select': function(event, template){
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
+    //     var currentExperimentId = Session.get('currentExperiment');
+    //     if( !currentExperimentId ) {
+    //         alert("Please enter an experiment name before uploading scripts");
+    //         return;
+    //     }
+    //     var progress = templateSharedObjects.progress();
+    //     progress.showProgress();
+    //     reader.onload = function(fileLoadEvent) {
+    //         Meteor.call('uploadScript', currentExperimentId, file.name, file.size, reader.result);
+    //     };
+    //     reader.onprogress = progress.readerProgress;
+    //     reader.readAsBinaryString(file);
+    // }
     'change .file-select': function(event, template){
-        var file = event.target.files[0];
-        var reader = new FileReader();
+        
         var currentExperimentId = Session.get('currentExperiment');
         if( !currentExperimentId ) {
             alert("Please enter an experiment name before uploading scripts");
             return;
         }
-        var progress = templateSharedObjects.progress();
-        progress.showProgress();
-        reader.onload = function(fileLoadEvent) {
-            Meteor.call('uploadScript', currentExperimentId, file.name, file.size, reader.result);
-        };
-        reader.onprogress = progress.readerProgress;
-        reader.readAsBinaryString(file);
+        
+        FS.Utility.eachFile(event, function(file) {
+            Files.insert(file, function (err, fileObj) {
+                if(err) console.log(err);
+                else {
+                    var originalFilename = fileObj.name();
+                    var name = 'files-' + fileObj._id + '-' + originalFilename;
+                    
+                    var fileRecord = {
+                        path: FILE_BUCKET+'/'+name,
+                        filename: originalFilename,
+                        size: fileObj.size(),
+                        key: name,
+                        fileObjId: fileObj._id,
+                        created: new Date()
+                    };
+                    Experiments.update({'_id':currentExperimentId},
+                        {'$push':{'scripts':fileRecord}},function(error){
+                            if( error ) {
+                                console.log(error);
+                                console.log('Failed to add uploaded script to the experiment');
+                            }
+                    });
+                }
+            });
+        });
     }
 });
 

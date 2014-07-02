@@ -116,7 +116,9 @@ Template.modelOutput.events({
                         }
                     );
                 
-                    Meteor.call('removeFileByUrl',currentVersion.url);
+                    Files.remove({_id:currentVersion.fileObjId},function(err){
+                       if(err) console.log(err);
+                    });
                 }
             }
         }
@@ -140,34 +142,74 @@ Template.modelOutput.events({
             });
         }
     },
+    // 'change .file-select': function(event, template){
+    //     var file = event.target.files[0];
+    //     var reader = new FileReader();
+    //     var currentModelOutputId = Session.get('currentModelOutput');
+    //     if( !currentModelOutputId ) {
+    //         alert("Please enter a model output name before uploading files");
+    //         return;
+    //     }
+    //     var progress = templateSharedObjects.progress();
+    //     progress.showProgress();
+    //     reader.onload = function(fileLoadEvent) {
+    //         Meteor.call('uploadModelOutput', currentModelOutputId, file.name, file.size, reader.result);
+    //     };
+    //     reader.onprogress = progress.readerProgress;
+    //     reader.readAsBinaryString(file);
+    // },
     'change .file-select': function(event, template){
-        var file = event.target.files[0];
-        var reader = new FileReader();
+        
         var currentModelOutputId = Session.get('currentModelOutput');
         if( !currentModelOutputId ) {
             alert("Please enter a model output name before uploading files");
             return;
         }
-        var progress = templateSharedObjects.progress();
-        progress.showProgress();
-        reader.onload = function(fileLoadEvent) {
-            Meteor.call('uploadModelOutput', currentModelOutputId, file.name, file.size, reader.result);
-        };
-        reader.onprogress = progress.readerProgress;
-        reader.readAsBinaryString(file);
+        
+        FS.Utility.eachFile(event, function(file) {
+            Files.insert(file, function (err, fileObj) {
+                if(err) console.log(err);
+                else {
+                    var originalFilename = fileObj.name();
+                    var name = 'files-' + fileObj._id + '-' + originalFilename;
+                    
+                    var fileRecord = {
+                        path: FILE_BUCKET+'/'+name,
+                        filename: originalFilename,
+                        size: fileObj.size(),
+                        key: name,
+                        fileObjId: fileObj._id,
+                        created: new Date()
+                    };
+                    ModelOutputs.update({'_id':currentModelOutputId},
+                        {'$push':{'versions':fileRecord}},function(error){
+                            if( error ) {
+                                console.log(error);
+                                console.log('Failed to add uploaded model output version');
+                            }
+                    });
+                }
+            });
+        });
     }
 });
 
 Template.modelOutput.experiments = function() {
     var user = Meteor.user();
-    return Experiments.find({'workspaces':user.profile.currentWorkspace._id});
+    var experiments =  Experiments.find();
+    if( experiments ) return experiments;
 };
 
 Template.modelOutput.models = function() {
     var user = Meteor.user();
-    var selector = {
-        'workspaces':user.profile.currentWorkspace._id,
-        'owner':user._id
+    if( user ) {
+        var selector = {
+            'workspaces':user.profile.currentWorkspace._id,
+            'owner':user._id
+        }
+    }
+    else {
+        selector = {};
     }
     return Models.find(selector);
 };
