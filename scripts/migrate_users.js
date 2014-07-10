@@ -30,37 +30,40 @@ var pgInstance = postgres();
 pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id = institution.id",function(result,client){
     result.rows.forEach(function(row){
         Fiber(function(){
-            var user = Meteor.users.findOne({username:row.username},Meteor.bindEnvironment(function(error,result) { 
-                if( error ) {
-                    console.log(error);
-                }
-            },function(e){console.log(e)}));
-            if( !user ) {
+            // var user = Meteor.users.findOne({username:row.username},Meteor.bindEnvironment(function(error,result) {
+//                 if( error ) {
+//                     console.log(error);
+//                 }
+//             },function(e){console.log(e)}));
+//            if( !user ) {
                 // user doesn't exist, we create the user
                 console.log('creating user ' + row.username);
-                try
-                {
-                    var newUser = Accounts.createUser({
-                        username: row.username,
-                        email: row.email,
-                        password: 'password',
-                        profile: {
-                            fullname: row.fullname,
-                            shortname: row.shortname,
-                            institution: row.name,
-                            researchinterest: row.researchinterest,
-                            showemail: row.showemail,
-                            isadmin: row.isadmin
-                        }
-                    });
+                if( row.username != 'axel' ) {
+                    try
+                    {
+                        var newUser = Accounts.createUser({
+                            username: row.username,
+                            email: row.email,
+                            password: 'password',
+                            profile: {
+                                fullname: row.fullname,
+                                shortname: row.shortname,
+                                institution: row.name,
+                                researchinterest: row.researchinterest,
+                                showemail: row.showemail,
+                                isadmin: row.isadmin
+                            }
+                        });
+                    }
+                    catch(ex) {
+                        console.log(ex);
+                        console.log('duplcate user: ' + row.email + ' ' + row.username);
+                    }
                 }
-                catch(ex) {
-                    console.log('duplcate user: ' + row.email + ' ' + row.username);
-                }
-            }
-            else {
-                console.log('user already exists ' + row.username);
-            }
+            // }
+            // else {
+            //     console.log('user already exists ' + row.username);
+            // }
         }).run();
     })
     client.end();

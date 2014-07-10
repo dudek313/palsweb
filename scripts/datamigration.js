@@ -1,7 +1,7 @@
 var baseDir = '/vagrant/data/webappdata'
 var palsDataDir = '/pals/data'
 
-var fs = require('fs');
+var fs = require('fs-extra');
 var uuid = require('node-uuid')
 
 var postgres = function () {
@@ -107,24 +107,7 @@ var mongo = function() {
 };
 
 function copyFile(source, target, cb) {
-  var cbCalled = false;
-
-  var rd = fs.createReadStream(source);
-  rd.on("error", done);
-
-  var wr = fs.createWriteStream(target);
-  wr.on("error", done);
-  wr.on("close", function(ex) {
-    done();
-  });
-  rd.pipe(wr);
-
-  function done(err) {
-    if (!cbCalled) {
-      cb(err);
-      cbCalled = true;
-    }
-  }
+    fs.copy(source,target,cb);
 }
 
 function loadUsers(mongoI,callback) {
@@ -266,8 +249,39 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
             if( row.e_id ) {
                 dataSet.workspaces = [row.e_id.toString()];
             }
-            mongoInstance.insert('dataSets',dataSet,function(){});
+            mongoInstance.insert('dataSets',dataSet,function(err){
+                if(err) console.log(err);
+                else {
+                    insertDefaultExperiment(dataSet,mongoInstance);
+                }
+            });
         }
+    });
+}
+
+function insertDefaultExperiment(dataSet,mongoInstance) {
+    var experiment = {
+        _id : dataSet._id.toString(),
+        name : dataSet.name,
+        created : dataSet.created,
+        spatialLevel : 'SingleSite',
+        scripts : [{
+            path : '/pals/data/SingleSiteExperiment.R',
+            filename : 'SingleSiteExperiment.R',
+            key : 'SingleSiteExperimnet.R',
+        }],
+        dataSets : [dataSet._id],
+        owner : dataSet.owner,
+        country : dataSet.country,
+        vegType : dataSet.vegType,
+        shortDescription : dataSet.comments,
+        longDescription : dataSet.references
+    }
+    if( dataSet.workspaces ) {
+        experiment.workspaces = dataSet.workspaces;
+    }
+    mongoInstance.insert('experiments',experiment,function(err){
+        if(err) console.log(err);
     });
 }
 
@@ -324,14 +338,14 @@ function saveWorkspace(mongoInstance,mongoWorkspace,callback) {
     mongoInstance.findOne('workspaces',{_id:mongoWorkspace._id},function(err,doc){
         if( err ) console.log(err);
         if( doc ) {
-            //console.log('Already have workspace with id ' + mongoWorkspace._id);
+            console.log('Already have workspace with id ' + mongoWorkspace._id);
             callback();
         }
         else {
             mongoInstance.findOne('workspaces',{name:mongoWorkspace.name},function(err,doc2){
                 if( err ) console.log(err);
                 if( doc2 ) {
-                    //console.log('Already have workspace with name ' + mongoWorkspace.name + ' trying new name');
+                    console.log('Already have workspace with name ' + mongoWorkspace.name + ' trying new name');
                     mongoWorkspace.name = mongoWorkspace.name + '(new)';
                 }
                 mongoInstance.insert('workspaces',mongoWorkspace,function(err){
