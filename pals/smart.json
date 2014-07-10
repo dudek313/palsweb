@@ -2,7 +2,7 @@
   "packages": {
     "npm": {},
     "iron-router": {},
-    "redis": {},
-    "collectionFS": {}
+    "collectionFS": {},
+    "redis": {}
   }
 }
