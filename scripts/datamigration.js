@@ -1,4 +1,4 @@
-var baseDir = '/vagrant/data/webappdata'
+var baseDir = '/vagrant/data/pals/webappdata'
 var palsDataDir = '/pals/data'
 
 var fs = require('fs-extra');
@@ -92,11 +92,8 @@ var mongo = function() {
        that.db.collection(table,function(err,collection){
           if(err) console.log(err);
           else {
-              collection.insert(doc,function(err,result){
-                 if(err) console.log(err);
-                 else {
-                     callback();
-                 }
+              collection.insert(doc,{w:1},function(err,result){
+                 callback(err);
               });
           }
        });
@@ -139,7 +136,7 @@ function processUser(docs,err,doc,callback,users,db) {
     }
 }
 
-function processDataSets(users,mongoInstance,workspaces,pgInstance) {
+function processDataSets(users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
     
     console.log("Processing data sets");
     
@@ -202,7 +199,7 @@ function processDataSets(users,mongoInstance,workspaces,pgInstance) {
                             //console.log(fileData);
                             user = users[row.ds_username];
                             if( user ) {
-                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces);
+                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace);
                             }
                             else console.log('Could not locate username ' + row.ds_username);
                         }
@@ -214,7 +211,7 @@ function processDataSets(users,mongoInstance,workspaces,pgInstance) {
     });
 }
 
-function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
+function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace) {
     console.log('Copying data set: ' + row.a_name);
     copyFile(filename,fileData.path,function(err){
         if( err ) console.log(err);
@@ -249,17 +246,27 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
             if( row.e_id ) {
                 dataSet.workspaces = [row.e_id.toString()];
             }
+            else {
+                dataSet.workspaces = [publicWorkspace._id.toString()];
+            }
             mongoInstance.insert('dataSets',dataSet,function(err){
-                if(err) console.log(err);
-                else {
-                    insertDefaultExperiment(dataSet,mongoInstance);
+                if(err) {
+                    console.log(err);
+                    console.log('Trying with different name');
+                    dataSet.name = dataSet.name + '.1';
+                    mongoInstance.insert('dataSets',dataSet,function(err){
+                        if( err ) console.log(err);
+                        else insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace);
+                    });
                 }
+                else insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace);
             });
+        
         }
     });
 }
 
-function insertDefaultExperiment(dataSet,mongoInstance) {
+function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
     var experiment = {
         _id : dataSet._id.toString(),
         name : dataSet.name,
@@ -277,12 +284,13 @@ function insertDefaultExperiment(dataSet,mongoInstance) {
         shortDescription : dataSet.comments,
         longDescription : dataSet.references
     }
-    if( dataSet.workspaces ) {
+    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
         experiment.workspaces = dataSet.workspaces;
+        mongoInstance.insert('experiments',experiment,function(err){
+            if(err) console.log(err);
+        });
     }
-    mongoInstance.insert('experiments',experiment,function(err){
-        if(err) console.log(err);
-    });
+
 }
 
 function loadWorkspaces(pgInstance,callback) {
@@ -385,6 +393,12 @@ function mapWorkspaces(pgInstance,workspaces,users) {
     return mongoWorkspaces;
 }
 
+function loadPublicWorkspace(mongoInstance,callback) {
+    mongoInstance.findOne('workspaces',{name:'public'},function(err,result){
+       callback(err,result); 
+    });
+}
+
 // var mongoInstance = mongo();
 // mongoInstance.find('users',{},function(docs,db){
 //     docs.each(function(err,doc){
@@ -403,7 +417,13 @@ function process() {
                 pgInstance.connect(function(err){
                     if( !err ) {
                         loadAndCopyWorkspaces(pgInstance,mongoInstance,users,function(workspaces){
-                             processDataSets(users,mongoInstance,workspaces,pgInstance);
+                            console.log('loading public workspace');
+                            loadPublicWorkspace(mongoInstance,function(err,result){
+                                if( err ) console.log(err);
+                                else {
+                                    processDataSets(users,mongoInstance,workspaces,pgInstance,result);
+                                }
+                            });
                         });
                     }
                 });
