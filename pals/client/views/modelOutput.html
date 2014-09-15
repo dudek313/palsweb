@@ -33,7 +33,7 @@
        <select name="model" class="form-control">
            <option value='n/a'></option>
            {{#each models}}
-           <option value='{{_id}}' {{selected this._id modelOutput.model._id}}>{{name}}</option>
+           <option value='{{_id}}' {{selected this._id modelOutput.model}}>{{name}}</option>
            {{/each}}
        </select>
        {{else}}
