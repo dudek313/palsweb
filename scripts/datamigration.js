@@ -564,21 +564,27 @@ function saveModel(mongoInstance,model,callback) {
             callback();
         }
         else {
-            mongoInstance.findOne('models',{name:model.name},function(err,doc2){
+            findAndSaveModelUniqueName(mongoInstance,model,callback)
+        }
+    });
+}
+
+function findAndSaveModelUniqueName(mongoInstance,model,callback) {
+    mongoInstance.findOne('models',{name:model.name},function(err,doc2){
+        if( err ) console.log(err);
+        if( doc2 ) {
+            console.log('Already have model with name ' + model.name + ' trying new name');
+            model.name = model.name + '.1';
+            findAndSaveModelUniqueName(mongoInstance,model,callback)
+        }
+        else {
+            console.log('Model name: ' + model.name);
+            mongoInstance.insert('models',model,function(err){
                 if( err ) console.log(err);
-                if( doc2 ) {
-                    console.log('Already have model with name ' + model.name + ' trying new name');
-                    model.name = model.name + '(new)';
-                }
-                console.log('Model name: ' + model.name);
-                mongoInstance.insert('models',model,function(err){
-                    if( err ) console.log(err);
-                    callback();
-                });
+                callback();
             });
         }
     });
-
 }
 
 // var mongoInstance = mongo();
