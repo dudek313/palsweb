@@ -526,7 +526,6 @@ function loadPublicWorkspace(mongoInstance,callback) {
 function loadAndCopyModels(pgInstance,mongoInstance,users,publicWorkspace,callback) {
     console.log('Loading and copying models');
     loadModels(pgInstance,function(models){
-        var waiting = models.length;
         var mongoModels = [];
         for( var i=0; i < models.length; ++i ) {
             model = models[i];
@@ -544,16 +543,29 @@ function loadAndCopyModels(pgInstance,mongoInstance,users,publicWorkspace,callba
                 mongoModels.push(mongoModel);
             }
         }
-        for( var i=0; i < mongoModels.length; ++i ) {
-            saveModel(mongoInstance,mongoModels[i],function(){
-                --waiting;
-                if( waiting <=0 ) {
+        processMongoModels(mongoInstance,mongoModels,callback)
+    });
+}
+
+function processMongoModels(mongoInstance,mongoModels,callback) {
+    remaining = [];
+    waiting = mongoModels.length;
+    for( var i=0; i < mongoModels.length; ++i ) {
+        saveModel(mongoInstance,mongoModels[i],function(model){
+            if(model) {
+                remaining.push(model);
+            }
+            --waiting;
+            if( waiting <=0 ) {
+                if(remaining.len > 0 ) {
+                    processMongoModels(mongoInstance,remaining,callback);
+                }
+                else {
                     callback(mongoModels);
                 }
-            });
-        }
-    });
-    
+            }
+        });
+    }
 }
 
 function saveModel(mongoInstance,model,callback) {
@@ -575,7 +587,7 @@ function findAndSaveModelUniqueName(mongoInstance,model,callback) {
         if( doc2 ) {
             console.log('Already have model with name ' + model.name + ' trying new name');
             model.name = model.name + '.1';
-            findAndSaveModelUniqueName(mongoInstance,model,callback)
+            callback(model);
         }
         else {
             console.log('Model name: ' + model.name);
