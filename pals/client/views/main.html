@@ -42,7 +42,7 @@
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Catchment');">Catchment</a></li>
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Regional');">Regional</a></li>
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Global');">Global</a></li>
-                    {{#if currentUser.admin}}<li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>{{/if}}
+                    {{#if currentUser.admin}}{{#if isPublicWorkspace}}<li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>{{/if}}{{/if}}
                 </ul>
             </li>
             <li class="dropdown">

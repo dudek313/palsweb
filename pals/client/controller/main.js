@@ -1,3 +1,5 @@
+UI._allowJavascriptUrls();
+
 Template.main.currentWorkspace = function() {
     var user = Meteor.user();
     if( user ) {
@@ -5,6 +7,7 @@ Template.main.currentWorkspace = function() {
             user.profile = {};
         }
         if( !user.profile.currentWorkspace ) {
+            console.log('here')
             var rootWorkspace = Workspaces.findOne({"name":"public"});
             user.profile.currentWorkspace = rootWorkspace;
             Meteor.users.update({'_id':user._id}, 
@@ -17,4 +20,14 @@ Template.main.currentWorkspace = function() {
 Template.main.loggedIn = function() {
     if( Meteor.user() ) return true;
     else return false;
+}
+
+Template.main.isPublicWorkspace = function() {
+    currentWorkspace = Template.main.currentWorkspace();
+    if( currentWorkspace && (currentWorkspace.name == 'public')) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
