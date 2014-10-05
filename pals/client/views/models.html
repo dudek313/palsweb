@@ -8,6 +8,9 @@
             <th>Name</th>
             <th>Owner</th>
             <th>Created</th>
+            <th>URL</th>
+            <th>References</th>
+            <th>Comments</th>
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
@@ -17,6 +20,9 @@
             <td onclick="Router.go('/models/{{_id}}')">{{name}}</td>
             <td onclick="Router.go('/models/{{_id}}')">{{owner.email}}</td>
             <td onclick="Router.go('/models/{{_id}}')">{{created}}</td>
+            <td onclick="Router.go('/models/{{_id}}')">{{url}}</td>
+            <td onclick="Router.go('/models/{{_id}}')">{{references}}</td>
+            <td onclick="Router.go('/models/{{_id}}')">{{comments}}</td>
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}} 
