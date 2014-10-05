@@ -95,30 +95,32 @@ Template.modelOutput.events({
         Template.modelOutput.update(event);
     },
     'click .delete-version':function(event) {
-        if( Template.modelOutput.owner() ) {
-            var key = $(event.target).attr('id');
+        if( confirm("Are you sure?")) {
+            if( Template.modelOutput.owner() ) {
+                var key = $(event.target).attr('id');
         
-            var currentModelOutput = Template.modelOutput.modelOutput();
-            if( currentModelOutput.versions ) {
-                var currentVersion = undefined;
-                currentModelOutput.versions.forEach(function(version) {
-                    if( version.key == key ) {
-                        currentVersion = version;
-                    }
-                });
-                if( currentVersion ) {
-                    ModelOutputs.update({'_id':currentModelOutput._id},
-                        {$pull : {'versions':{ 'key':key }}}, function(error) {
-                            if( error ) {
-                                $('.error').html('Failed to delete version, please try again');
-                                $('.error').show();
-                            }
+                var currentModelOutput = Template.modelOutput.modelOutput();
+                if( currentModelOutput.versions ) {
+                    var currentVersion = undefined;
+                    currentModelOutput.versions.forEach(function(version) {
+                        if( version.key == key ) {
+                            currentVersion = version;
                         }
-                    );
-                
-                    Files.remove({_id:currentVersion.fileObjId},function(err){
-                       if(err) console.log(err);
                     });
+                    if( currentVersion ) {
+                        ModelOutputs.update({'_id':currentModelOutput._id},
+                            {$pull : {'versions':{ 'key':key }}}, function(error) {
+                                if( error ) {
+                                    $('.error').html('Failed to delete version, please try again');
+                                    $('.error').show();
+                                }
+                            }
+                        );
+                
+                        Files.remove({_id:currentVersion.fileObjId},function(err){
+                           if(err) console.log(err);
+                        });
+                    }
                 }
             }
         }
@@ -135,11 +137,13 @@ Template.modelOutput.events({
     },
     'click .delete-analysis':function(event) {
         console.log('deleting analysis');
-        if( Template.modelOutput.owner() ) {
-            var id = $(event.target).attr('id');
-            Meteor.call('deleteAnalysis',id,function(error,result){
-                if( error ) alert(error);
-            });
+        if( confirm("Are you sure?")) {
+            if( Template.modelOutput.owner() ) {
+                var id = $(event.target).attr('id');
+                Meteor.call('deleteAnalysis',id,function(error,result){
+                    if( error ) alert(error);
+                });
+            }
         }
     },
     // 'change .file-select': function(event, template){

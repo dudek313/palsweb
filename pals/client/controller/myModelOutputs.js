@@ -21,12 +21,14 @@ Template.myModelOutputs.events({
     'click .delete' : function(event) {
         var id = $(event.target).attr('id');
         if( id ) {
-            ModelOutputs.remove({'_id':id},function(error){
-                if(error) {
-                    $('.error').html('Failed to delete the model output, please try again');
-                    $('.error').show();
-                }
-            });
+            if( confirm("Are you sure?")) {
+                ModelOutputs.remove({'_id':id},function(error){
+                    if(error) {
+                        $('.error').html('Failed to delete the model output, please try again');
+                        $('.error').show();
+                    }
+                });
+            }
         }
     }
 });
