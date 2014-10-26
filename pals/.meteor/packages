@@ -3,12 +3,12 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
+meteor-platform
+insecure
+cfs:standard-packages
+cfs:filesystem
+iron:router
+mrt:redis
 accounts-ui
 accounts-password
-jquery
-standard-app-packages
-npm
-iron-router
-collectionFS
-cfs-filesystem
-redis
+
