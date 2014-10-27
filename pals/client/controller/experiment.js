@@ -1,6 +1,6 @@
 Template.experiment.rendered = function() {
-    window['directives']();
-    templateSharedObjects.progress().hide();
+    //window['directives']();
+    //templateSharedObjects.progress().hide();
 };
 
 Template.experiment.experiment = function() {
