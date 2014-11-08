@@ -418,7 +418,9 @@ function loadWorkspaces(pgInstance,callback) {
 }
 
 function loadModels(pgInstance,callback) {
-    var loadModelsQuery = "SELECT * FROM model";
+    var loadModelsQuery = "SELECT m.createddate,m.modelname,m.ownerusername,"+
+        "m.version,m.id,m.commentsm,m.referencesm,m.urlm,e.experiment_id"+
+        " FROM model m INNER JOIN experimentable e on e.id = m.id";
     
     pgInstance.sql(loadModelsQuery,function(result,client){
         var models = [];
@@ -534,12 +536,22 @@ function loadAndCopyModels(pgInstance,mongoInstance,users,publicWorkspace,callba
                 console.log('Could not find user: ' + model.owner_username);
             }
             else {
+                workspaceId = publicWorkspace._id
+                if( model.experiment_id ) {
+                    workspaceId = model.experiment_id.toString();
+                }
+                
                 var mongoModel = {
                     _id : model.id.toString(),
                     name : model.modelname,
                     owner : user._id,
-                    workspaces : [publicWorkspace._id]
+                    workspaces : [workspaceId]
                 }
+                if(model.version) mongoModel.version = model.version;
+                if(model.commentsm) mongoModel.comments = model.commentsm;
+                if(model.referencesm) mongoModel.references = model.referencesm
+                if(model.urlm) mongoModel.url = model.urlm;
+                if(model.createddate) mongoModel.created = model.createddate;
                 mongoModels.push(mongoModel);
             }
         }
@@ -592,7 +604,10 @@ function findAndSaveModelUniqueName(mongoInstance,model,callback) {
         else {
             console.log('Model name: ' + model.name);
             mongoInstance.insert('models',model,function(err){
-                if( err ) console.log(err);
+                if( err ) {
+                    model.name = model.name + '.1';
+                    findAndSaveModelUniqueName(mongoInstance,model,callback)
+                }
                 callback();
             });
         }
