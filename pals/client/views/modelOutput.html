@@ -15,7 +15,8 @@
     <div class="form-group">
        {{#if owner}}
        <label>Experiment</label>
-       <select name="experiment" class="form-control">
+       <select name="experiment" class="form-control" id="experiment_select">
+           <option value='n/a'></option>
            {{#each experiments}}
            <option value='{{_id}}' {{selected this._id modelOutput.experiment._id}}>{{name}}</option>
            {{/each}}

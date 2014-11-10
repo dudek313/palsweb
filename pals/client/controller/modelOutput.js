@@ -201,7 +201,9 @@ Template.modelOutput.events({
 Template.modelOutput.experiments = function() {
     var user = Meteor.user();
     var experiments =  Experiments.find();
-    if( experiments ) return experiments;
+    if( experiments ) {
+        return experiments;
+    }
 };
 
 Template.modelOutput.models = function() {
