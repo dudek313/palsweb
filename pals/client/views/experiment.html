@@ -171,7 +171,11 @@
             {{/each}}
         </select>
     </div>
-    <button class='btn btn-default bottom-margin' id="driving-data-set" {{uploadDisabled}}>Add data set</button>
+    {{#if experiment }}
+        <button class='btn btn-default bottom-margin' id="driving-data-set">Add data set</button>
+    {{else}}
+        <button class='btn btn-default bottom-margin' id="driving-data-set" disabled="disabled">Add data set</button>
+    {{/if}}
     {{/if}}
     </div>
     <table class="table table-hover">

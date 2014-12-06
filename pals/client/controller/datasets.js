@@ -26,6 +26,14 @@ Template.datasets.userEmail = function(userId) {
     else return '';
 }
 
+Template.datasets.userFullname = function(userId) {
+    var user = Meteor.users.findOne({'_id':userId});
+    if( user && user.profile ) {
+        return Meteor.users.findOne({'_id':userId}).profile.fullname;
+    }
+    else return '';
+}
+
 Template.datasets.events({
     'click .delete' : function(event) {
         event.stopPropagation();

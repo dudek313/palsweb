@@ -232,6 +232,13 @@ Template.experiment.hasScripts = function() {
 
 Template.experiment.uploadDisabled = function() {
     var currentExperiment = Template.experiment.experiment();
-    if( currentExperiment ) return '';
-    else return 'disabled="disabled"';
+    console.log('loaded current experiment')
+    if( currentExperiment ) {
+        console.log('not disabled')
+        return '';
+    }
+    else {
+        console.log('disabled')
+        return "disabled='disabled'";
+    }
 }

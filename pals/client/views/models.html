@@ -18,7 +18,7 @@
         {{#each models}}
         <tr>
             <td onclick="Router.go('/models/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{owner.email}}</td>
+            <td onclick="Router.go('/models/{{_id}}')">{{owner.profile.fullname}}</td>
             <td onclick="Router.go('/models/{{_id}}')">{{created}}</td>
             <td onclick="Router.go('/models/{{_id}}')">{{url}}</td>
             <td onclick="Router.go('/models/{{_id}}')">{{references}}</td>
