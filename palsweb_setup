@@ -1,0 +1,46 @@
+#!/bin/bash
+# Sets up the palsweb environment to run automatically
+
+# Mount larger drive to fit all docker containers
+sudo mount /dev/sdb /home/danny/containers/
+
+# Remove old docker containers that might exist
+sudo docker rm -f mongo redis palsweb
+
+# Ensure Docker is not running:
+sudo service docker stop
+
+# Set a larger drive as default installation drive for images
+sudo sed -i.bak '/DOCKER_OPTS=/d' /etc/default/docker
+sudo sed -i.bak '$ a\DOCKER_OPTS="-dns 8.8.8.8 -dns 8.8.4.4 -g /home/danny/containers"' /etc/default/docker
+
+# Restart docker
+sudo service docker restart
+
+# Write MongoDb dockerfile
+sudo cp /home/danny/mongo_docker /home/danny/docker/Dockerfile
+
+# Build mongoDb docker image
+cd /home/danny/docker
+sudo docker build --tag ravdanny/mongo .
+
+# Create an instance of the image
+sudo docker run -p 27017:27017 --name mongo -d ravdanny/mongo
+mongo_ip="$(sudo docker inspect mongo | grep IPAddress | cut -d '"' -f 4 | tail -1)"
+
+sleep 2
+# Database migration to mongoDb
+# Note: I already untarred the database dump, although in future will have to do that here. But for now:
+sudo mongorestore -h $mongo_ip -p 27017 --db 'Meteor' /home/danny/mongo-data/dump/meteor
+#sudo docker run -it --link mongo -v /home/danny/mongo-data/dump/meteor:/tmp mon                                                                                                                                                             go bash -c 'mongorestore -h 172.17.0.2:27017 --db 'meteor' /tmp'
+
+# Create redis dockerfile, build redis image and run redis service
+sudo cp /home/danny/redis_docker /home/danny/docker/Dockerfile
+cd /home/danny/docker
+sudo docker build -t danny/redis .
+sudo docker run --name redis -d danny/redis
+
+# Create palsweb dockerfile and build palweb image
+sudo cp /home/danny/palsweb_docker /home/danny/docker/Dockerfile
+cd /home/danny/docker
+sudo docker build -t ravdanny/palsweb --build-arg MONGO_URL="mongodb://"$mongo_ip"/meteor" .
