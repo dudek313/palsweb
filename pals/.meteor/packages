@@ -3,12 +3,11 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
+iron:router
+mrt:redis
+cfs:standard-packages
+cfs:filesystem
 accounts-ui
 accounts-password
-jquery
 standard-app-packages
-npm
-iron-router
-collectionFS
-cfs-filesystem
-redis
+jquery
