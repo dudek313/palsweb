@@ -1,5 +1,6 @@
 FROM    ubuntu:14.04
 ARG     MONGO_URL
+ARG	REDIS_HOST
 
 RUN     apt-get update
 RUN     apt-get install -y make g++ curl initscripts git
@@ -32,16 +33,16 @@ RUN     npm -v
 RUN     node -v
 
 WORKDIR /root
-RUN     git clone http://github.com/dudek313/palsweb.git
+
+RUN     git clone -b devd http://github.com/dudek313/palsweb.git
 RUN     curl https://install.meteor.com/ | sh
 
 ENV     PATH /root/pals/.meteor:$PATH
 WORKDIR /root/palsweb/pals
 
 #migrate project to new meteor
-RUN     meteor list
 RUN     meteor list # --using not needed anymore
-RUN     meteor remove accounts-ui accounts-password jquery standard-app-packages npm iron-router collectionFS cfs-filesystem redis
+RUN     meteor remove accounts-ui accounts-password jquery standard-app-packages
 RUN     meteor update
 RUN     npm install -g meteorite
 
@@ -72,10 +73,13 @@ RUN     meteor add standard-app-packages
 
 RUN     meteor add jquery
 
+RUN	meteor add meteorhacks:npm
+RUN	npm install pg
+
 # may need to check the actual ip address of the mongodb using:
 #sudo docker inspect $containerID | grep IPAddress | cut -d '"' -f 4
 
-ENV     REDIS_HOST 192.168.100.151
+#ENV     REDIS_HOST 192.168.100.151
 ENV     BIND_IP 0.0.0.0 # (*for meteor in dev mode)
 #ENV     MONGO_URL="mongodb://$mongo_ip"/meteor" # need to change this to set dynamically
 RUN     echo $MONGO_URL
