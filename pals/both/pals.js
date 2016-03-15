@@ -22,6 +22,7 @@ Router.map(function () {
        onBeforeAction: [
            function() {
                Session.set('currentWorkspace',this.params.id);
+	       this.next();
            }
        ] 
     });
@@ -31,6 +32,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',null);
+		this.next();
             }
         ]
     });
@@ -40,6 +42,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
+                this.next();
             }
         ]
     });
@@ -49,6 +52,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
             }
         ]
     });
@@ -58,6 +62,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',undefined);
+		this.next();
             }
         ]
     });
@@ -67,6 +72,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',undefined);
+                this.next();
             }
         ]
     });
@@ -76,6 +82,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',null);
+                this.next();
             }
         ]
     });
@@ -85,6 +92,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
+                this.next();
             }
         ]
     });
@@ -94,6 +102,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
             }
         ]
     });
@@ -103,6 +112,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',undefined);
+                this.next();
             }
         ]
     });
@@ -114,6 +124,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',this.params.id);
+		this.next();
             }
         ]
     });
@@ -123,6 +134,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentAnalysisId',this.params.id);
+                this.next();
             }
         ]
     });
@@ -133,6 +145,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModel',undefined);
+                this.next();
             }
         ]
     });
@@ -142,6 +155,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModel',this.params.id);
+                this.next();
             }
         ]
     });
