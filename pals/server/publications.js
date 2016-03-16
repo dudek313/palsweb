@@ -7,6 +7,9 @@ Workspaces._ensureIndex('name', {unique: 1});
 Meteor.users.update({'emails.address':'eduthie@gmail.com'},{'$set':
     {'admin':true}});
 
+Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
+    {'admin':true}});
+
 Meteor.users.allow({
     update: function (userId, doc, fields, modifier) {
         return (userId && doc._id === userId);
