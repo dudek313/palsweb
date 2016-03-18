@@ -68,6 +68,7 @@ function process() {
         wsHelpers.migrateWorkspaces(mongoInstance, pgInstance, users, pgWorkspaces);
         console.log('workspaces migrated...')
 
+/*	Intending to get rid of public workspace
         var future = new Future;
         helpers.loadPublicWorkspace(mongoInstance, future.resolver());
         var publicWorkspace = future.wait();
@@ -81,19 +82,10 @@ function process() {
         *******************************************************/
 
         var future = new Future;
-        moHelpers.migrateModels(pgInstance, mongoInstance, users, publicWorkspace, future.resolver())
+/*        moHelpers.migrateModels(pgInstance, mongoInstance, users, publicWorkspace, future.resolver()) */
+        moHelpers.migrateModels(pgInstance, mongoInstance, users, null, future.resolver())
 	      future.wait()
         console.log('models migrated...')
-
-
-        /*******************************************************
-        *
-        * Migrate model outputs
-        *
-        *******************************************************/
-
-        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
-        console.log('model outputs migrated...')
 
 
         /*******************************************************
@@ -102,8 +94,22 @@ function process() {
         *
         *******************************************************/
 
-        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance,publicWorkspace)
+// (old)       dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance,publicWorkspace)
+
+        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance)
         console.log('data sets migrated...')
+
+
+        /*******************************************************
+        *
+        * Migrate model outputs
+        *
+        *******************************************************/
+/*
+        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
+        console.log('model outputs migrated...')
+
+*/
       }).run();
 };
 

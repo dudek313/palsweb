@@ -3,7 +3,8 @@ var uuid = require('node-uuid')
 
 
 
-exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
+//exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
+exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance) {
 
     console.log("Processing data sets");
 
@@ -66,7 +67,8 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                             //console.log(fileData);
                             user = users[row.ds_username];
                             if( user ) {
-                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace);
+//                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace);
+                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces);
                             }
                             else console.log('Could not locate username ' + row.ds_username);
                         }
@@ -78,7 +80,8 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     });
 }
 
-function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace) {
+//function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace) {
+function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
     console.log('Copying data set: ' + row.a_name);
     copyFile(filename,fileData.path,function(err){
         if( err ) console.log(err);
@@ -114,26 +117,29 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicW
                 dataSet.workspaces = [row.e_id.toString()];
             }
             else {
-                dataSet.workspaces = [publicWorkspace._id.toString()];
+//                dataSet.workspaces = [publicWorkspace._id.toString()];
+                dataSet.workspaces = [];
             }
             mongoInstance.insert('dataSets',dataSet,function(err){
                 if(err) {
                     console.log(err);
-                    console.log('Trying with different name');
-                    dataSet.name = dataSet.name + '.1';
-                    mongoInstance.insert('dataSets',dataSet,function(err){
-                        if( err ) console.log(err);
-                        else insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace);
-                    });
+//                    console.log('Trying with different name');
+//                    dataSet.name = dataSet.name + '.1';
+//                    mongoInstance.insert('dataSets',dataSet,function(err){
+//                        if( err ) console.log(err);
+//                        else insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace);
+//                        else insertDefaultExperiment(dataSet,mongoInstance);
+//                    });
                 }
-                else insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace);
+                else insertDefaultExperiment(dataSet,mongoInstance);
             });
 
         }
     });
 }
 
-function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
+//function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
+function insertDefaultExperiment(dataSet,mongoInstance) {
     var experiment = {
         _id : dataSet._id.toString(),
         name : dataSet.name,
@@ -151,7 +157,8 @@ function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
         shortDescription : dataSet.comments,
         longDescription : dataSet.references
     }
-    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
+//    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
+    if( dataSet.workspaces && dataSet.workspaces.length > 0) {
         experiment.workspaces = dataSet.workspaces;
         mongoInstance.insert('experiments',experiment,function(err){
             if(err) console.log(err);
