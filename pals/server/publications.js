@@ -118,7 +118,10 @@ Meteor.publish('models',function(){
     return Models.find();
 });
 
-Models._ensureIndex('name', {unique: 1});
+// Old code assumed unique model name. Only needs to be unique for workspace.
+//Models._ensureIndex('name', {unique: 1});
+Models._ensureIndex('_id', {unique: 1});
+
 
 Models.allow({
     insert: function(userId, doc) {

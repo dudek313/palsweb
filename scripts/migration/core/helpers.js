@@ -8,7 +8,7 @@ exports.postgres = function () {
     that = {};
 
     that.pg = require('pg');
-    that.connectionString = "pg://docker:docker@192.168.56.101:32770/docker"
+    that.connectionString = "pg://docker:docker@192.168.56.101:32772/docker"
 
     function sql(query,callback) {
         that.client.query(query,null,function(err,result){
@@ -58,6 +58,21 @@ exports.mongo = function() {
         });
     };
     that.connect = connect;
+
+    function dropIndexes(table,callback) {
+	that.db.collection(function(err,collection){
+	  if(err) console.log(err);
+	  else {
+	      collection.dropIndexes(function(err,status){
+		 if(err) console.log(err);
+		 else {
+		     callback(docs,that.db);
+		 }
+	      });
+	  }
+	});
+    };   
+
 
     function find(table,query,callback) {
        that.db.collection(table,function(err,collection){
@@ -126,7 +141,7 @@ exports.loadUsers = function(mongoI,callback) {
 
 
 function processUser(docs,err,doc,callback,users,db) {
-    //console.log(doc);
+//    console.log('Danny was here ' + doc.username);
     if( err ) {
         console.log(err);
         callback(err, users);

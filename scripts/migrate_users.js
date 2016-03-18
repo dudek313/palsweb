@@ -38,6 +38,14 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
 //             },function(e){console.log(e)}));
 //            if( !user ) {
                 // user doesn't exist, we create the user
+		try
+		{
+			console.log('dropping username index');
+			Meteor.collection("users").dropIndex("username_1");
+		}
+		catch(ex) {
+			console.log(ex);
+		}
                 console.log('creating user ' + row.username);
                 if( row.username != 'axel' ) {
                     try
