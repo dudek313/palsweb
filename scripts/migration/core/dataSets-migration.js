@@ -11,6 +11,43 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     var loadDataSetsQuery =
 
     "SELECT \
+    distinct e.id AS ds_id, \
+    ds.comments AS ds_comments,\
+    ds.datasettype AS ds_datasettype,\
+    ds.downloadcount AS ds_downloadcount,\
+    ds.elevation AS ds_elevation,\
+    ds.latitude AS ds_latitude,\
+    ds.longitude AS ds_longitude,\
+    ds.maxvegheight AS ds_maxvegheight,\
+    ds.measurementaggregation AS ds_measurementaggregation,\
+    ds.refs AS ds_refs,\
+    ds.timezoneoffsethours AS ds_timezoneoffsethours,\
+    ds.towerheight AS ds_towerheight,\
+    ds.url AS ds_url,\
+    ds.username AS ds_username,\
+    c.name AS country_name,\
+    ds.vegtype_vegetationtype AS ds_vegtype,\
+    ds.soiltype AS ds_soiltype,\
+    ds.sitecontact AS ds_sitecontact,\
+    ds.latestversion_id as latestversion_id,\
+    dsv.id as dsv_id, \
+    dsv.description AS dsv_description,\
+    dsv.ispublic AS dsv_ispublic,\
+    dsv.originalfilename AS dsv_originalfilename,\
+    dsv.uploaddate AS dsv_uploaddate,\
+    dsv.startdate AS dsv_startdate,\
+    dsv.enddate AS dsv_enddate,\
+    a.name as a_name,\
+    a.status AS a_status,\
+    a.owner_username AS a_owner, \
+    dsv.ispublic AS dsv_ispublic,\
+    e.experiment_id as e_id\
+    FROM experimentable as e, datasetversion as dsv, dataset as ds, analysable as a, country as c\
+    WHERE dsv.datasetid = e.id AND dsv.datasetid=ds.id AND\
+    (e.experiment_id = 35209 OR e.experiment_id IS NULL) AND\
+    a.id=dsv.datasetid AND c.id = ds.country_id AND dsv.id = ds.latestversion_id;";
+
+/*    "SELECT \
     ds.comments AS ds_comments,\
     ds.datasettype AS ds_datasettype,\
     ds.downloadcount AS ds_downloadcount,\
@@ -42,6 +79,7 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     e.experiment_id AS e_id \
     FROM dataset as ds, datasetversion as dsv, analysable as a, country as c, experimentable as e \
     WHERE dsv.id = ds.latestversion_id AND a.id = ds.id AND c.id = ds.country_id AND e.id = ds.id;";
+*/
 
     pgInstance.sql(loadDataSetsQuery,function(result,client){
         result.rows.forEach(function(row){
