@@ -5,7 +5,11 @@ Template.datasets.rendered = function() {
 Template.datasets.dataSets = function() {
     var user = Meteor.user();
     if( user ) {
-        var selector = {'workspaces':user.profile.currentWorkspace._id};
+//        var selector = {'workspaces':user.profile.currentWorkspace._id};
+	if (user.profile.currentWorkspace.name == 'public')
+		var selector = {};
+	else
+	        var selector = {'workspaces':user.profile.currentWorkspace._id};
         var resolution = Template.datasets.currentSpatialResolution();
         if( resolution ) {
             selector.spatialLevel = resolution;
