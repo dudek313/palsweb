@@ -8,7 +8,7 @@ exports.postgres = function () {
     that = {};
 
     that.pg = require('pg');
-    that.connectionString = "pg://docker:docker@192.168.56.101:32772/docker"
+    that.connectionString = "pg://docker:docker@192.168.56.102:32769/docker"
 
     function sql(query,callback) {
         that.client.query(query,null,function(err,result){
@@ -43,7 +43,7 @@ exports.mongo = function() {
 
     var that = {};
     that.mongo = require('mongodb');
-    that.host = '192.168.56.102';
+    that.host = '192.168.56.101';
     //DF: that.host = 'localhost';
     that.port = 27017;
     //DF: that.port = 81;

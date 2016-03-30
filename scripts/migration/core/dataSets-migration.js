@@ -100,7 +100,8 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                                 filename : row.dsv_originalfilename,
                                 size : stats['size'],
                                 key : newFilename,
-                                created : row.dsv_uploaddate
+                                created : row.dsv_uploaddate,
+				fileversion : '1.0'
                             }
                             //console.log(fileData);
                             user = users[row.ds_username];
@@ -149,7 +150,7 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
                 versionDescription : row.dsv_description,
                 startdate : row.dsv_startdate,
                 enddate : row.dsv_enddate,
-                versions : [fileData]
+                versions : ['1.0', [fileData]]
             }
             if( row.e_id ) {
                 dataSet.workspaces = [row.e_id.toString()];
@@ -169,7 +170,11 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
 //                        else insertDefaultExperiment(dataSet,mongoInstance);
 //                    });
                 }
-                else insertDefaultExperiment(dataSet,mongoInstance);
+
+                else {
+//			console.log('inserting experiment ' + dataSet.name);
+			insertDefaultExperiment(dataSet,mongoInstance);
+		}
             });
 
         }
@@ -196,12 +201,14 @@ function insertDefaultExperiment(dataSet,mongoInstance) {
         longDescription : dataSet.references
     }
 //    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
-    if( dataSet.workspaces && dataSet.workspaces.length > 0) {
+//    console.log(dataSet.name + ' included in ' + dataSet.workspaces.length + ' workspaces');
+    if( dataSet.workspaces && dataSet.workspaces.length > 0)
         experiment.workspaces = dataSet.workspaces;
-        mongoInstance.insert('experiments',experiment,function(err){
-            if(err) console.log(err);
-        });
-    }
+    mongoInstance.insert('experiments',experiment,function(err){
+        if(err) console.log(err);
+    });
+    console.log('created experiment ' + dataSet.name');
+    
 
 }
 
