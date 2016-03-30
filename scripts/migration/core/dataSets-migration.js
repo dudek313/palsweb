@@ -207,7 +207,7 @@ function insertDefaultExperiment(dataSet,mongoInstance) {
     mongoInstance.insert('experiments',experiment,function(err){
         if(err) console.log(err);
     });
-    console.log('created experiment ' + dataSet.name');
+    console.log('created experiment ' + dataSet.name);
     
 
 }
