@@ -150,7 +150,10 @@ function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces) {
                 versionDescription : row.dsv_description,
                 startdate : row.dsv_startdate,
                 enddate : row.dsv_enddate,
-                versions : ['1.0', [fileData]]
+                versions : { 
+			number: '1.0',
+			files: [fileData]
+		}
             }
             if( row.e_id ) {
                 dataSet.workspaces = [row.e_id.toString()];
