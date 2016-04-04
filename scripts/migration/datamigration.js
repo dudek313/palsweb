@@ -1,4 +1,4 @@
-var oldDataDir = '/mnt/sharing/migration-data/pals/pals/webappdata'
+var oldDataDir = '/mnt/sharing/pals-nci/webappdata'
 var newDataDir = '/pals/data'
 //DF: var baseDir = '/vagrant/data/pals/webappdata'
 //DF: var palsDataDir = '/pals/data-new'
