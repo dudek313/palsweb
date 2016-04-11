@@ -60,19 +60,17 @@ exports.mongo = function() {
     that.connect = connect;
 
     function dropIndexes(table,callback) {
-	that.db.collection(function(err,collection){
-	  if(err) console.log(err);
-	  else {
-	      collection.dropIndexes(function(err,status){
-		 if(err) console.log(err);
-		 else {
-		     callback(docs,that.db);
-		 }
-	      });
-	  }
-	});
-    };   
-
+      that.db.collection(table,function(err,collection){
+	       if(err) console.log(err);
+	        else {
+	           collection.dropIndexes(function(err,status){
+               if(err) console.log(err);
+               callback(err);
+             });
+	        }
+	    });
+    };
+    that.dropIndexes = dropIndexes;
 
     function find(table,query,callback) {
        that.db.collection(table,function(err,collection){
@@ -181,3 +179,4 @@ exports.loadPublicWorkspace = function(mongoInstance,callback) {
        callback(err,result);
     });
 }
+
