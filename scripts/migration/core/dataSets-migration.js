@@ -11,41 +11,43 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     var loadDataSetsQuery =
 
     "SELECT \
-    distinct e.id AS ds_id, \
-    ds.comments AS ds_comments,\
-    ds.datasettype AS ds_datasettype,\
-    ds.downloadcount AS ds_downloadcount,\
-    ds.elevation AS ds_elevation,\
-    ds.latitude AS ds_latitude,\
-    ds.longitude AS ds_longitude,\
-    ds.maxvegheight AS ds_maxvegheight,\
-    ds.measurementaggregation AS ds_measurementaggregation,\
-    ds.refs AS ds_refs,\
-    ds.timezoneoffsethours AS ds_timezoneoffsethours,\
-    ds.towerheight AS ds_towerheight,\
-    ds.url AS ds_url,\
-    ds.username AS ds_username,\
-    c.name AS country_name,\
-    ds.vegtype_vegetationtype AS ds_vegtype,\
-    ds.soiltype AS ds_soiltype,\
-    ds.sitecontact AS ds_sitecontact,\
-    ds.latestversion_id as latestversion_id,\
-    dsv.id as dsv_id, \
-    dsv.description AS dsv_description,\
-    dsv.ispublic AS dsv_ispublic,\
-    dsv.originalfilename AS dsv_originalfilename,\
-    dsv.uploaddate AS dsv_uploaddate,\
-    dsv.startdate AS dsv_startdate,\
-    dsv.enddate AS dsv_enddate,\
-    a.name as a_name,\
-    a.status AS a_status,\
-    a.owner_username AS a_owner, \
-    dsv.ispublic AS dsv_ispublic,\
-    e.experiment_id as e_id\
-    FROM experimentable as e, datasetversion as dsv, dataset as ds, analysable as a, country as c\
-    WHERE dsv.datasetid = e.id AND dsv.datasetid=ds.id AND\
-    (e.experiment_id = 35209 OR e.experiment_id = 19106 OR e.experiment_id IS NULL) AND\
-    a.id=dsv.datasetid AND c.id = ds.country_id AND dsv.id = ds.latestversion_id;";
+        distinct e.id AS ds_id, \
+        ds.comments AS ds_comments,\
+        ds.datasettype AS ds_datasettype,\
+        ds.downloadcount AS ds_downloadcount,\
+        ds.elevation AS ds_elevation,\
+        ds.latitude AS ds_latitude,\
+        ds.longitude AS ds_longitude,\
+        ds.maxvegheight AS ds_maxvegheight,\
+        ds.measurementaggregation AS ds_measurementaggregation,\
+        ds.refs AS ds_refs,\
+        ds.timezoneoffsethours AS ds_timezoneoffsethours,\
+        ds.towerheight AS ds_towerheight,\
+        ds.url AS ds_url,\
+        ds.username AS ds_username,\
+        c.name AS country_name,\
+        ds.vegtype_vegetationtype AS ds_vegtype,\
+        ds.soiltype AS ds_soiltype,\
+        ds.sitecontact AS ds_sitecontact,\
+        ds.latestversion_id as latestversion_id,\
+        dsv.id as dsv_id, \
+        dsv.description AS dsv_description,\
+        dsv.ispublic AS dsv_ispublic,\
+        dsv.originalfilename AS dsv_originalfilename,\
+        dsv.uploaddate AS dsv_uploaddate,\
+        dsv.startdate AS dsv_startdate,\
+        dsv.enddate AS dsv_enddate,\
+        a.name as a_name,\
+        a.status AS a_status,\
+        a.owner_username AS a_owner, \
+        dsv.ispublic AS dsv_ispublic,\
+        e.experiment_id as e_id\
+        FROM experimentable as e, datasetversion as dsv, dataset as ds, analysable as a, country as c\
+        WHERE dsv.datasetid = e.id AND dsv.datasetid=ds.id AND\
+        a.id=dsv.datasetid AND c.id = ds.country_id AND dsv.id = ds.latestversion_id AND\
+        ((e.experiment_id = 35209 OR e.experiment_id = 19106) OR\
+        (e.experiment_id IS NULL AND e.id IN (995,1004,997,4353,871,4113,5660,3993,6802,5630,7032,7002,6772,1003,994,4233,1005,4203,4083,4053,4143,4173)))\
+        ORDER BY a.name;"
 
     mongoInstance.dropIndexes('dataSets',function(err){
         if(err) console.log(err)
@@ -135,7 +137,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         name : row.a_name,
         latestVersion : 1,
         owner : user._id,
-        experiments : [{id : row.ds_id.toString(), workspaceId : null}]
+        experiments : [{id : row.ds_id.toString(), workspace : null}]
     }
 
     var dsversionId = row.ds_id + 60000;
@@ -171,12 +173,13 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
     }
 
     if( row.e_id ) {
-        dataSetVersion.experiments = [{id : dsversionId.toString, workspaceId : row.e_id.toString()}];
+        dataSetVersion.experiments = [{id : dsversionId.toString, workspace : row.e_id.toString()}];
     }
     else {
 //                dataSet.workspaces = [publicWorkspace._id.toString()];
         dataSetVersion.experiments = [{}];
     }
+
     mongoInstance.insert('dataSets',dataSetParent,function(err){
         if(err) {
             console.log(err);
