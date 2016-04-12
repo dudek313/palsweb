@@ -219,7 +219,7 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
         }
     });
 
-    var templateVersionId = dataSetParent._id + 60000;
+    var templateVersionId = parseInt(dataSetParent._id) + 60000;
     var experimentTemplateVersion = {
         _id : templateVersionId.toString(),
         name : dataSetVersion.name,
@@ -250,7 +250,7 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
 // if this data set came from within a workspace (other than the public one) create an experiment instance to associate it with
     console.log('experiment ID: ' + row.e_id);
     if( row.e_id !== null ) {
-        var instanceVersionId = templateVersionId + 60000;
+        var instanceVersionId = parseInt(templateVersionId) + 60000;
         var experimentInstanceVersion = {
             _id : instanceVersionId.toString(),
             name : dataSetVersion.name,
@@ -270,8 +270,8 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
             vegType : dataSetVersion.vegType,
             shortDescription : dataSetVersion.comments,
             longDescription : dataSetVersion.references,
-            workspace : row.e_id,
-            versionDescription : 'Original version'
+            workspace : row.e_id.toString(),
+            versionDescription : 'Imported version'
         }
         mongoInstance.insert('experiments',experimentInstanceVersion,function(err){
             if(err) console.log(err)
