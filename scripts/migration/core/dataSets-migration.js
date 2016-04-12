@@ -44,32 +44,37 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     e.experiment_id as e_id\
     FROM experimentable as e, datasetversion as dsv, dataset as ds, analysable as a, country as c\
     WHERE dsv.datasetid = e.id AND dsv.datasetid=ds.id AND\
-    (e.experiment_id = 35209 OR e.experiment_id IS NULL) AND\
+    (e.experiment_id = 35209 OR e.experiment_id = 19106 OR e.experiment_id IS NULL) AND\
     a.id=dsv.datasetid AND c.id = ds.country_id AND dsv.id = ds.latestversion_id;";
 
     mongoInstance.dropIndexes('dataSets',function(err){
         if(err) console.log(err)
         else {
-          pgInstance.sql(loadDataSetsQuery,function(result,client){
-              result.rows.forEach(function(row){
-                  //console.log(row);
-                  var filenameHead = row.dsv_originalfilename.substr(0, row.dsv_originalfilename.length - 4);
-      
-                  var metFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_met.nc';
-                  var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
-      
-                  var metFileData = processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces);
-                  var fluxFileData = processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces);
-                  copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
-      
+          mongoInstance.dropIndexes('experiments', function(err){
+            if(err) console.log(err)
+            else {
+              pgInstance.sql(loadDataSetsQuery,function(result,client){
+                  result.rows.forEach(function(row){
+                      //console.log(row);
+                      var filenameHead = row.dsv_originalfilename.substr(0, row.dsv_originalfilename.length - 4);
+
+                      var metFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_met.nc';
+                      var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
+
+                      var metFileData = processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces);
+                      var fluxFileData = processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces);
+                      copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+
+                  });
+                  client.end();
               });
-              client.end();
+            }
           });
-      }
-        
+        }
+
     });
 }
-    
+
 
 function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces) {
   fs.exists(filename, function (exists) {
@@ -130,7 +135,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         name : row.a_name,
         latestVersion : 1,
         owner : user._id,
-        experiments : [row.ds_id.toString()]
+        experiments : [{id : row.ds_id.toString(), workspaceId : null}]
     }
 
     var dsversionId = row.ds_id + 60000;
@@ -140,6 +145,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         created : row.dsv_uploaddate,
         name : row.a_name,
         version : 1,
+        source_id : row.ds_id,
         spatialLevel : 'SingleSite',
         owner : user._id,
         comments : row.ds_comments,
@@ -164,15 +170,13 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         files: [metFileData, fluxFileData]
     }
 
-// HAVE TO FILL IN EXPERIMENT AND WORKSPACES DATA
-
-/*    if( row.e_id ) {
-        dataSet.workspaces = [row.e_id.toString()];
+    if( row.e_id ) {
+        dataSetVersion.experiments = [{id : dsversionId.toString, workspaceId : row.e_id.toString()}];
     }
     else {
 //                dataSet.workspaces = [publicWorkspace._id.toString()];
-        dataSet.workspaces = [];
-    } */
+        dataSetVersion.experiments = [{}];
+    }
     mongoInstance.insert('dataSets',dataSetParent,function(err){
         if(err) {
             console.log(err);
@@ -186,7 +190,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
               }
               else {
                   console.log('Inserted Data Set Version: ' + dataSetVersion.name)
-//              else insertDefaultExperiment(dataSetParent,mongoInstance);
+                  insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstance);
               }
 
             });
@@ -197,33 +201,87 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
 }
 
 //function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
-function insertDefaultExperiment(dataSet,mongoInstance) {
-    var experiment = {
-        _id : dataSet._id.toString(),
-        name : dataSet.name,
-        created : dataSet.created,
+function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstance) {
+  // Creates an experiment template parent and experiment template version corresponding to the Data Set being migrated
+    var experimentTemplateParent = {
+        _id : dataSetParent._id.toString(),
+        name : dataSetParent.name,
+        recordType : 'templateParent',
+        created : dataSetParent.created,
+        owner : dataSetParent.owner,
+        latestVersion : 1
+    }
+
+    mongoInstance.insert('experiments',experimentTemplateParent,function(err){
+        if(err) console.log(err)
+        else {
+          console.log('Created Experiment Template Parent: ' + experimentTemplateParent.name);
+        }
+    });
+
+    var templateVersionId = dataSetParent._id + 60000;
+    var experimentTemplateVersion = {
+        _id : templateVersionId.toString(),
+        name : dataSetVersion.name,
+        recordType : 'templateVersion',
+        version : 1,
+        created : dataSetVersion.created,
         spatialLevel : 'SingleSite',
         scripts : [{
             path : '/pals/data/SingleSiteExperiment.R',
             filename : 'SingleSiteExperiment.R',
             key : 'SingleSiteExperimnet.R',
         }],
-        dataSets : [dataSet._id],
-        owner : dataSet.owner,
-        country : dataSet.country,
-        vegType : dataSet.vegType,
-        shortDescription : dataSet.comments,
-        longDescription : dataSet.references
+        dataSets : [dataSetVersion._id],
+        owner : dataSetVersion.owner,
+        country : dataSetVersion.country,
+        vegType : dataSetVersion.vegType,
+        shortDescription : dataSetVersion.comments,
+        longDescription : dataSetVersion.references
+    }
+
+    mongoInstance.insert('experiments',experimentTemplateVersion,function(err){
+        if(err) console.log(err)
+        else {
+          console.log('Created Experiment Template Version: ' + experimentTemplateVersion.name);
+        }
+    });
+
+// if this data set came from within a workspace (other than the public one) create an experiment instance to associate it with
+    console.log('experiment ID: ' + row.e_id);
+    if( row.e_id !== null ) {
+        var instanceVersionId = templateVersionId + 60000;
+        var experimentInstanceVersion = {
+            _id : instanceVersionId.toString(),
+            name : dataSetVersion.name,
+            recordType : 'instanceVersion',
+            version : 1,
+            created : dataSetVersion.created,
+            modified : dataSetVersion.created,
+            spatialLevel : 'SingleSite',
+            scripts : [{
+                path : '/pals/data/SingleSiteExperiment.R',
+                filename : 'SingleSiteExperiment.R',
+                key : 'SingleSiteExperimnet.R',
+            }],
+            dataSets : [dataSetVersion._id],
+            owner : dataSetVersion.owner,
+            country : dataSetVersion.country,
+            vegType : dataSetVersion.vegType,
+            shortDescription : dataSetVersion.comments,
+            longDescription : dataSetVersion.references,
+            workspace : row.e_id,
+            versionDescription : 'Original version'
+        }
+        mongoInstance.insert('experiments',experimentInstanceVersion,function(err){
+            if(err) console.log(err)
+            else {
+              console.log('Created Experiment Instance Version: ' + experimentInstanceVersion.name);
+            }
+        });
     }
 //    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
 //    console.log(dataSet.name + ' included in ' + dataSet.workspaces.length + ' workspaces');
-    if( dataSet.workspaces && dataSet.workspaces.length > 0)
-        experiment.workspaces = dataSet.workspaces;
-    mongoInstance.insert('experiments',experiment,function(err){
-        if(err) console.log(err);
-    });
-    console.log('created experiment ' + dataSet.name);
-
 
 }
 
@@ -231,4 +289,3 @@ function copyFile(source, target, cb) {
     fs.copySync(source,target);
     cb();
 }
-
