@@ -69,17 +69,11 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                       var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
 
                       var future = new Future;
-                      processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, future.resolver());
-                      var metFileData = null;
-//                      var metFileData = future.wait();
-
-                      var future = new Future;
-                      processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, future.resolver());
-                      var fluxFileData = null;
-//                      var fluxFileData = future.wait();
-
-                      var future = new Future;
-                      copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces, future.resolver());
+                      processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, function(metFileData){
+                          processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, function(fluxFileData) {
+                              copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+                          });
+                      });
 //                      future.wait();
 
 /*                      function wait(){
@@ -145,7 +139,7 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                   user = users[row.ds_username];
                   if( user ) {
                       copyDataFile(filename,fileData);
-                      callback(false, fileData);
+                      callback(fileData);
 
                   }
                   else console.log('Could not locate username ' + row.ds_username);
@@ -167,7 +161,7 @@ function copyDataFile(filename,fileData,row) {
     });
 }
 
-function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces, callback) {
+function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces) {
     // creates a Data Set Parent and initial Data Set version in the DataSets collection
     console.log('Copying data set: ' + row.a_name);
     var user = users[row.ds_username];
@@ -243,7 +237,6 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
 
         }
     });
-    callback(false);
 }
 
 //function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
