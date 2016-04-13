@@ -9,7 +9,7 @@ Template.datasets.dataSets = function() {
 	if (user.profile.currentWorkspace.name == 'public')
 		var selector = {};
 	else
-	        var selector = {'workspaces':user.profile.currentWorkspace._id};
+	        var selector = {'experiments.workspace':user.profile.currentWorkspace._id};
         var resolution = Template.datasets.currentSpatialResolution();
         if( resolution ) {
             selector.spatialLevel = resolution;
@@ -62,5 +62,5 @@ Template.datasets.helpers({
        if( firstString === secondString ) {
            return true;
        }
-   } 
+   }
 });
