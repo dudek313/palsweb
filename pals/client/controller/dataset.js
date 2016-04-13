@@ -4,28 +4,28 @@ Template.dataset.rendered = function() {
 };
 
 var events = {
-    'click .delete-version':function(event) {
+    'click .delete-file':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
 
             var currentDataSet = Template.dataset.dataSet();
-            if( currentDataSet.versions ) {
-                var currentVersion = undefined;
-                currentDataSet.versions.forEach(function(version) {
-                    if( version.key == key ) {
-                        currentVersion = version;
+            if( currentDataSet.files ) {
+                var currentFile = undefined;
+                currentDataSet.files.forEach(function(file) {
+                    if( file.key == key ) {
+                        currentFile = file;
                     }
                 });
-                if( currentVersion ) {
+                if( currentFile ) {
                     DataSets.update({'_id':currentDataSet._id},
-                        {$pull : {'versions':{ 'key':key }}}, function(error) {
+                        {$pull : {'files':{ 'key':key }}}, function(error) {
                             if( error ) {
-                                $('.error').html('Failed to delete version, please try again');
+                                $('.error').html('Failed to delete file, please try again');
                                 $('.error').show();
                             }
                         }
                     );
-                    Files.remove({_id:currentVersion.fileObjId},function(err){
+                    Files.remove({_id:currentFile.fileObjId},function(err){
                        if(err) console.log(err);
                     });
                 }
@@ -67,20 +67,20 @@ var events = {
         }
     },
     'change .file-select':function(event, template){
-        
+
         var currentDataSetId = Session.get('currentDataSet');
         if( !currentDataSetId ) {
             alert("Please enter a data set name before uploading scripts");
             return;
         }
-        
+
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
                     var originalFilename = fileObj.name();
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    
+
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         filename: originalFilename,
@@ -90,10 +90,10 @@ var events = {
                         created: new Date()
                     };
                     DataSets.update({'_id':currentDataSetId},
-                        {'$push':{'versions':fileRecord}},function(error){
+                        {'$push':{'files':fileRecord}},function(error){
                             if( error ) {
                                 console.log(error);
-                                console.log('Failed to add uploaded version to the data set');
+                                console.log('Failed to add uploaded file to the data set');
                             }
                     });
                 }
@@ -113,20 +113,22 @@ Template.dataset.dataSet = function() {
     return currentDataSet;
 }
 
-function getVersions(dataSet) {
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) {
-        var versions = new Array();
-        for( var i=0; i < dataSet.versions.length; ++i ) {
-            var version = dataSet.versions[i];
-            versions.push(version);
+function getFiles(dataSet) {
+    console.log('Data Set files: ' + dataSet.files);
+    if( dataSet && dataSet.files && dataSet.files.length > 0 ) {
+        var files = new Array();
+        for( var i=0; i < dataSet.files.length; ++i ) {
+            var file = dataSet.files[i];
+            files.push(file);
+            console.log('DS file path' + i + ': ' + dataSet.files[i].name)
         }
-        return versions;
+        return files;
     }
 }
 
-Template.dataset.versions = function() {
+Template.dataset.files = function() {
     var dataSet = Template.dataset.dataSet();
-    return getVersions(dataSet);
+    return getFiles(dataSet);
 }
 
 Template.dataset.reference = function() {
@@ -134,9 +136,9 @@ Template.dataset.reference = function() {
     return reference;
 };
 
-Template.dataset.hasVersions = function() {
+Template.dataset.hasFiles = function() {
     var dataSet = Template.dataset.dataSet();
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
+    if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
     else return false;
 };
 
@@ -174,3 +176,4 @@ Template.dataset.helpers({
     else return true;
   }
 });
+

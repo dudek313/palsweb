@@ -33,7 +33,7 @@ Meteor.publish('directory',function(){
 });
 
 
-DataSets._ensureIndex('name', {unique: 1});
+DataSets._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('dataSets',function(){
     return DataSets.find();
@@ -89,7 +89,7 @@ Experiments.allow({
     }
 });
 
-Experiments._ensureIndex('name', {unique: 1});
+Experiments._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('modelOutputs',function(){
     return ModelOutputs.find();
@@ -152,3 +152,4 @@ Files.allow({
         return (userId);
     }
 });
+
