@@ -1,4 +1,4 @@
-var oldDataDir = '/mnt/sharing/migration-data/pals/pals/webappdata'
+var oldDataDir = '/mnt/sharing/pals-nci/webappdata'
 var newDataDir = '/pals/data'
 //DF: var baseDir = '/vagrant/data/pals/webappdata'
 //DF: var palsDataDir = '/pals/data-new'
@@ -105,11 +105,12 @@ function process() {
         * Migrate model outputs
         *
         *******************************************************/
-/*
-        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
-        console.log('model outputs migrated...')
 
-*/
+ //       mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
+//        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
+//        console.log('model outputs migrated...')
+
+
       }).run();
 };
 

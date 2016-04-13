@@ -141,7 +141,7 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                       downloadable : forDownload,
                       version : 1
                   }
-                  //console.log(fileData);
+                  console.log(fileData);
                   user = users[row.ds_username];
                   if( user ) {
                       copyDataFile(filename,fileData);
@@ -215,7 +215,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
     }
 
     if( row.e_id ) {
-        dataSetVersion.experiments = [{id : dsversionId.toString, workspace : row.e_id.toString()}];
+        dataSetVersion.experiments = [{id : dsversionId.toString(), workspace : row.e_id.toString()}];
     }
     else {
 //                dataSet.workspaces = [publicWorkspace._id.toString()];
