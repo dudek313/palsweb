@@ -1,7 +1,12 @@
-var fs = require('fs-extra');
+
+
+
+var Fiber  = require('fibers')
+var Future = require('fibers/future');
+
+//var fs = require('fs-extra');
+var fs = Future.wrap(require('fs-extra'));
 var uuid = require('node-uuid')
-
-
 
 //exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
 exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance) {
@@ -63,10 +68,32 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                       var metFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_met.nc';
                       var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
 
-                      var metFileData = processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces);
-                      var fluxFileData = processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces);
-                      copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+                      var future = new Future;
+                      processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, future.resolver());
+                      var metFileData = null;
+//                      var metFileData = future.wait();
 
+                      var future = new Future;
+                      processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, future.resolver());
+                      var fluxFileData = null;
+//                      var fluxFileData = future.wait();
+
+                      var future = new Future;
+                      copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces, future.resolver());
+//                      future.wait();
+
+/*                      function wait(){
+                        console.log('entered wait function');
+                        if (metFileData == null || fluxFileData == null){
+                          setTimeout(wait,100);
+                        } else {
+                          console.log('metFileData and fluxFileData ready');
+//                          copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+
+                        }
+                      }
+                      wait();
+*/
                   });
                   client.end();
               });
@@ -77,11 +104,26 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     });
 }
 
+/*
+var metFileData = processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, function(err){
+    if(err) console.log(err)
+    else {
+        console.log('metFileData: ' + metFileData);
+        var fluxFileData = processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, function(err){
+            if(err) console.log(err)
+            else {
+                console.log('metFileData: ' + fluxFileData);
+                copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+            }
+        });
+    }
+});
+*/
 
-function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces) {
+function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces, callback) {
   fs.exists(filename, function (exists) {
       if( exists ) {
-          console.log('File exists: ' + filename);
+          //console.log('File exists: ' + filename);
           // copy the file
           var newFilename = uuid.v4();
           fs.stat(filename,function(err,stats){
@@ -102,9 +144,9 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                   //console.log(fileData);
                   user = users[row.ds_username];
                   if( user ) {
-//                                copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace);
                       copyDataFile(filename,fileData);
-                      return fileData;
+                      callback(false, fileData);
+
                   }
                   else console.log('Could not locate username ' + row.ds_username);
               }
@@ -119,13 +161,13 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
 
 //function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace) {
 function copyDataFile(filename,fileData,row) {
-    console.log('Copying data file: ' + fileData.name);
+    console.log('Copying data file: ' + fileData.name + ' to ' + fileData.path);
     copyFile(filename,fileData.path,function(err){
         if( err ) console.log(err);
     });
 }
 
-function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces) {
+function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces, callback) {
     // creates a Data Set Parent and initial Data Set version in the DataSets collection
     console.log('Copying data set: ' + row.a_name);
     var user = users[row.ds_username];
@@ -201,6 +243,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
 
         }
     });
+    callback(false);
 }
 
 //function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
