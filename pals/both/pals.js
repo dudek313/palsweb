@@ -24,15 +24,27 @@ Router.map(function () {
                Session.set('currentWorkspace',this.params.id);
 	       this.next();
            }
-       ] 
+       ]
     });
-    this.route('datasets',{
-        path: '/datasets',
+    this.route('datasets/Anywhere',{
+        path: '/datasets/Anywhere',
         template: 'datasets',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',null);
-		this.next();
+              Session.set('source',null);
+              Session.set('currentSpatialResolution',null);
+		          this.next();
+            }
+        ]
+    });
+    this.route('datasets/Workspace',{
+        path: '/datasets/Workspace',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+              Session.set('source','workspace');
+              Session.set('currentSpatialResolution',null);
+              this.next();
             }
         ]
     });
@@ -51,6 +63,28 @@ Router.map(function () {
         template: 'datasets',
         onBeforeAction: [
             function() {
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('dataSets/Anywhere/BySpatialResolution',{
+        path: '/dataSets/Anywhere/BySpatialResolution/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('dataSets/Workspace/BySpatialResolution',{
+        path: '/dataSets/Workspace/BySpatialResolution/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
                 Session.set('currentSpatialResolution',this.params.resolution);
                 this.next();
             }
@@ -181,7 +215,7 @@ Router.map(function () {
 //         this.stop();
 //     }
 // }, {except: ['home','root','file']});
-// 
+//
 // if( Meteor.isClient ) {
 //     Router.configure({
 //       autoRender: false
