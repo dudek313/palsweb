@@ -120,6 +120,28 @@ Router.map(function () {
             }
         ]
     });
+    this.route('experiments/Anywhere',{
+        path: '/experiments/Anywhere',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',null);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace',{
+        path: '/experiments/Workspace',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialResolution',null);
+                this.next();
+            }
+        ]
+    });
     this.route('experimentsById',{
         path: '/experiments/:id',
         template: 'experiment',
@@ -135,6 +157,28 @@ Router.map(function () {
         template: 'experiments',
         onBeforeAction: [
             function() {
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Anywhere/BySpatialResolution',{
+        path: '/experiments/Anywhere/BySpatialResolution/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace/BySpatialResolution',{
+        path: '/experiments/Workspace/BySpatialResolution/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
                 Session.set('currentSpatialResolution',this.params.resolution);
                 this.next();
             }

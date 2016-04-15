@@ -183,6 +183,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         created : row.dsv_uploaddate,
         name : row.a_name,
         version : 1,
+        latestVersion : 1,
         source_id : row.ds_id,
         spatialLevel : 'SingleSite',
         owner : user._id,
@@ -264,6 +265,7 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
         name : dataSetVersion.name,
         recordType : 'templateVersion',
         version : 1,
+        latestVersion : 1,
         created : dataSetVersion.created,
         spatialLevel : 'SingleSite',
         scripts : [{
@@ -272,6 +274,7 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
             key : 'SingleSiteExperimnet.R',
         }],
         dataSets : [dataSetVersion._id],
+        workspaces : [],
         owner : dataSetVersion.owner,
         country : dataSetVersion.country,
         vegType : dataSetVersion.vegType,
@@ -279,12 +282,6 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
         longDescription : dataSetVersion.references
     }
 
-    mongoInstance.insert('experiments',experimentTemplateVersion,function(err){
-        if(err) console.log(err)
-        else {
-          console.log('Created Experiment Template Version: ' + experimentTemplateVersion.name);
-        }
-    });
 
 // if this data set came from within a workspace (other than the public one) create an experiment instance to associate it with
     console.log('experiment ID: ' + row.e_id);
@@ -312,6 +309,9 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
             workspace : row.e_id.toString(),
             versionDescription : 'Imported version'
         }
+
+        experimentTemplateVersion.workspaces = [row.e_id.toString()];
+
         mongoInstance.insert('experiments',experimentInstanceVersion,function(err){
             if(err) console.log(err)
             else {
@@ -319,6 +319,14 @@ function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstan
             }
         });
     }
+
+    mongoInstance.insert('experiments',experimentTemplateVersion,function(err){
+        if(err) console.log(err)
+        else {
+          console.log('Created Experiment Template Version: ' + experimentTemplateVersion.name);
+        }
+    });
+
 //    if( dataSet.workspaces && dataSet.workspaces.length > 0 && dataSet.workspaces[0] == publicWorkspace._id) {
 //    console.log(dataSet.name + ' included in ' + dataSet.workspaces.length + ' workspaces');
 

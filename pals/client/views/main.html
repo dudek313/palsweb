@@ -33,7 +33,7 @@
         </ul>
       </li>
 
-            <li class="dropdown">
+<!--            <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li><a href="javascript:void(0)" onclick="Router.go('/experiments');">All Experiments</a></li>
@@ -44,6 +44,37 @@
                     <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialResolution/Global');">Global</a></li>
                     {{#if currentUser.admin}}{{#if isPublicWorkspace}}<li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>{{/if}}{{/if}}
                 </ul>
+            </li>
+-->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
+                 <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+                   <li class="dropdown-submenu">
+                     <a tabindex="-1" href="#">From Anywhere</a>
+                     <ul class="dropdown-menu">
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/');">All Types</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialResolution/SingleSite');">SingleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialResolution/MultipleSite');">MultipleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialResolution/Catchment');">Catchment</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialResolution/Regional');">Regional</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialResolution/Global');">Global</a></li>
+                     </ul>
+                   </li>
+                   <li class="dropdown-submenu">
+                     <a tabindex="-1" href="#">From Current Workspace</a>
+                     <ul class="dropdown-menu">
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/');">All Types</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialResolution/SingleSite');">SingleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialResolution/MultipleSite');">MultipleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialResolution/Catchment');">Catchment</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialResolution/Regional');">Regional</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialResolution/Global');">Global</a></li>
+                     </ul>
+                   </li>
+                   {{#if currentUser.admin}}
+                         <li><a href="javascript:void(0)" onclick="Router.go('/dataset');">Create Data Set</a></li>
+                     {{/if}}
+                 </ul>
             </li>
 
             <li class="dropdown">

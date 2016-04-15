@@ -107,7 +107,7 @@ function process() {
         *******************************************************/
 
  //       mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
-//        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
+        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
 //        console.log('model outputs migrated...')
 
 

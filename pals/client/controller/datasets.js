@@ -12,15 +12,18 @@ Template.datasets.dataSets = function() {
 //          var selector = {'experiments.workspace':user.profile.currentWorkspace._id};
       var source = Template.datasets.source();
       var selector = {};
-      console.log('Source: '+source);
+
       if( source ) {
           selector = {'experiments.workspace':user.profile.currentWorkspace._id};
       }
       selector.recordType = 'version';
+      selector.$where = 'this.version == this.latestVersion';
+
       var resolution = Template.datasets.currentSpatialResolution();
       if( resolution ) {
           selector.spatialLevel = resolution;
       }
+
       return DataSets.find(selector,{sort:{created:-1}});
   }
 }
