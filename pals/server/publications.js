@@ -7,6 +7,9 @@ Workspaces._ensureIndex('name', {unique: 1});
 Meteor.users.update({'emails.address':'eduthie@gmail.com'},{'$set':
     {'admin':true}});
 
+Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
+    {'admin':true}});
+
 Meteor.users.allow({
     update: function (userId, doc, fields, modifier) {
         return (userId && doc._id === userId);
@@ -30,7 +33,7 @@ Meteor.publish('directory',function(){
 });
 
 
-DataSets._ensureIndex('name', {unique: 1});
+DataSets._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('dataSets',function(){
     return DataSets.find();
@@ -86,7 +89,7 @@ Experiments.allow({
     }
 });
 
-Experiments._ensureIndex('name', {unique: 1});
+Experiments._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('modelOutputs',function(){
     return ModelOutputs.find();
@@ -115,7 +118,10 @@ Meteor.publish('models',function(){
     return Models.find();
 });
 
-Models._ensureIndex('name', {unique: 1});
+// Old code assumed unique model name. Only needs to be unique for workspace.
+//Models._ensureIndex('name', {unique: 1});
+Models._ensureIndex('_id', {unique: 1});
+
 
 Models.allow({
     insert: function(userId, doc) {
