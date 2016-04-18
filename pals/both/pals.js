@@ -54,6 +54,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
+                Session.set('inEditMode', false);
                 this.next();
             }
         ]

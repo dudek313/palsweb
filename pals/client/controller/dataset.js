@@ -1,12 +1,21 @@
+
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
+    Session.set('disableUpdate',false);
+    this.autorun( function(){
+      if(Session.equals('inEditMode', true))
+        return;
+
+    });
+//    console.log(Session.get('editMode'));
 };
 
 var events = {
     'click .delete-file':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
+            console.log('Key: ' + key);
 
             var currentDataSet = Template.dataset.dataSet();
             if( currentDataSet.files ) {
@@ -22,6 +31,7 @@ var events = {
                             if( error ) {
                                 $('.error').html('Failed to delete file, please try again');
                                 $('.error').show();
+                                console.log(error);
                             }
                         }
                     );
@@ -66,6 +76,11 @@ var events = {
             );
         }
     },
+    'click .update-dataset':function(event){
+        Session.set('inEditMode', true);
+        Session.set('disableUpdate', true);
+        console.log(Session.get('disableUpdate'));
+    },
     'change .file-select':function(event, template){
 
         var currentDataSetId = Session.get('currentDataSet');
@@ -83,10 +98,10 @@ var events = {
 
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
-                        filename: originalFilename,
+                        name: originalFilename,
                         size: fileObj.size(),
                         key: name,
-                        fileObjId: fileObj._id,
+//                        fileObjId: fileObj._id,
                         created: new Date()
                     };
                     DataSets.update({'_id':currentDataSetId},
@@ -108,19 +123,18 @@ Template.dataset.events(templateSharedObjects.form({
 }).events().extend(events));
 
 Template.dataset.dataSet = function() {
+    console.log()
     var currentDataSetId = Session.get('currentDataSet');
     var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
     return currentDataSet;
 }
 
 function getFiles(dataSet) {
-    console.log('Data Set files: ' + dataSet.files);
     if( dataSet && dataSet.files && dataSet.files.length > 0 ) {
         var files = new Array();
         for( var i=0; i < dataSet.files.length; ++i ) {
             var file = dataSet.files[i];
             files.push(file);
-            console.log('DS file path' + i + ': ' + dataSet.files[i].name)
         }
         return files;
     }
@@ -142,10 +156,11 @@ Template.dataset.hasFiles = function() {
     else return false;
 };
 
-Template.dataset.uploadDisabled = function() {
-    var currentDataSet = Template.dataset.dataSet();
-    if( currentDataSet ) return '';
-    else return 'disabled="disabled"';
+Template.dataset.updateDisabled = function() {
+    var toDisable = Session.get(disableUpdate);
+    console.log(toDisable);
+    if ( toDisable ) return true
+    else return '';
 }
 
 Template.dataset.variables = function() {
@@ -174,6 +189,11 @@ Template.dataset.helpers({
         }
     }
     else return true;
+  },
+  inEditMode: function() {
+    return Session.get('ininEditMode');
+  },
+  updateDisabled: function() {
+    return Session.get('disableUpdate');
   }
 });
-
