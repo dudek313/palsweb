@@ -5,7 +5,8 @@ var postgres = function () {
     that = {};
     
     that.pg = Npm.require('pg');
-    that.connectionString = "pg://postgres:password@localhost:5432/pals"
+    that.connectionString = "pg://docker:docker@192.168.56.101:32770/docker"
+    //DF: that.connectionString = "pg://postgres:password@localhost:5432/pals"
 
     function sql(query,callback) {
         that.pg.connect(that.connectionString,function(err,client){
@@ -37,16 +38,24 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
 //             },function(e){console.log(e)}));
 //            if( !user ) {
                 // user doesn't exist, we create the user
+		try
+		{
+			console.log('dropping username index');
+			Meteor.collection("users").dropIndex("username_1");
+		}
+		catch(ex) {
+			console.log(ex);
+		}
                 console.log('creating user ' + row.username);
                 if( row.username != 'axel' ) {
                     try
                     {
                         var newUser = Accounts.createUser({
-                            username: row.username,
                             email: row.email,
+			    username: row.username,
                             password: 'password',
                             profile: {
-                                fullname: row.fullname,
+				fullname: row.fullname,
                                 shortname: row.shortname,
                                 institution: row.name,
                                 researchinterest: row.researchinterest,
@@ -58,8 +67,51 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
                     catch(ex) {
                         console.log(ex);
                         console.log('duplcate user: ' + row.email + ' ' + row.username);
-                    }
-                }
+			var new_email = row.email + '1';
+			console.log('will try to store as: ' + new_email + ' ' + row.username);
+			try
+			{
+	                    var newUser = Accounts.createUser({
+                                email: new_email,
+				username: row.username,
+                                password: 'password',
+                                profile: {
+                                    fullname: row.fullname,
+                                    shortname: row.shortname,
+                                    institution: row.name,
+                                    researchinterest: row.researchinterest,
+                                    showemail: row.showemail,
+                                    isadmin: row.isadmin
+                                }
+                           });
+			}
+			catch(ex) {
+				console.log(ex);
+				var new_username = row.username + '1';
+				console.log('duplicate user: ' + row.username);
+				console.log('will try to store as: ' + new_username);
+				try
+				{
+					var newUser = Accounts.createUser({
+	                                email: new_email,
+	                                username: new_username,
+	                                password: 'password',
+	                                profile: {
+	                                    fullname: row.fullname,
+	                                    shortname: row.shortname,
+	                                    institution: row.name,
+	                                    researchinterest: row.researchinterest,
+	                                    showemail: row.showemail,
+	                                    isadmin: row.isadmin
+	                                }
+	                           });
+	                        }
+				catch(ex) {
+					console.log('unable to store user: ' + new_username);
+				}
+			}
+     		   }
+               }
             // }
             // else {
             //     console.log('user already exists ' + row.username);

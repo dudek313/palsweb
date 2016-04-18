@@ -6,9 +6,9 @@ var uuid = require('node-uuid')
 exports.postgres = function () {
 
     that = {};
-    
+
     that.pg = require('pg');
-    that.connectionString = "pg://postgres:postgres@172.17.0.15:5432/pals"
+    that.connectionString = "pg://docker:docker@192.168.56.102:32769/docker"
 
     function sql(query,callback) {
         that.client.query(query,null,function(err,result){
@@ -17,7 +17,7 @@ exports.postgres = function () {
         });
     }
     that.sql = sql;
-    
+
     function connect(callback) {
         console.log('connecting to postgres');
         that.pg.connect(that.connectionString,function(err,client){
@@ -28,7 +28,7 @@ exports.postgres = function () {
         });
     }
     that.connect = connect;
-    
+
     function end() {
         if( that.pg ) {
             that.pg.end();
@@ -43,21 +43,34 @@ exports.mongo = function() {
 
     var that = {};
     that.mongo = require('mongodb');
-    that.host = '192.168.100.151';
+    that.host = '192.168.56.101';
     //DF: that.host = 'localhost';
     that.port = 27017;
     //DF: that.port = 81;
     that.db = new that.mongo.Db('meteor',new that.mongo.Server(that.host,that.port,[]),{fsync:true,journal : true});
-    
+
     function connect(callback) {
         console.log('connecting to mongo');
         that.db.open(function(err,db){
             console.log('connected to mongo');
             if( err ) console.log(err);
-            callback(err); 
+            callback(err);
         });
     };
     that.connect = connect;
+
+    function dropIndexes(table,callback) {
+      that.db.collection(table,function(err,collection){
+	       if(err) console.log(err);
+	        else {
+	           collection.dropIndexes(function(err,status){
+               if(err) console.log(err);
+               callback(err);
+             });
+	        }
+	    });
+    };
+    that.dropIndexes = dropIndexes;
 
     function find(table,query,callback) {
        that.db.collection(table,function(err,collection){
@@ -73,9 +86,9 @@ exports.mongo = function() {
        });
     };
     that.find = find;
-   
+
     //function find2(table,query,callback
- 
+
     function findOne(table,query,callback) {
        that.db.collection(table,function(err,collection){
           if(err) console.log(err);
@@ -90,7 +103,7 @@ exports.mongo = function() {
        });
     };
     that.findOne = findOne;
-    
+
     function insert(table,doc,callback) {
        that.db.collection(table,function(err,collection){
           if(err) console.log(err);
@@ -115,18 +128,18 @@ function copyFile(source, target, cb) {
 
 exports.loadUsers = function(mongoI,callback) {
     console.log('Loading Users');
-    
+
     mongoI.find('users',{},function(docs,db){
         var users = {};
         docs.nextObject(function(err, doc){
-            processUser(docs,err,doc,callback,users,db); 
+            processUser(docs,err,doc,callback,users,db);
         });
     })
 }
 
 
 function processUser(docs,err,doc,callback,users,db) {
-    //console.log(doc);
+//    console.log('Danny was here ' + doc.username);
     if( err ) {
         console.log(err);
         callback(err, users);
@@ -163,8 +176,7 @@ exports.loadPgWorkspaces = function(pgInstance,callback) {
 
 exports.loadPublicWorkspace = function(mongoInstance,callback) {
     mongoInstance.findOne('workspaces',{name:'public'},function(err,result){
-       callback(err,result); 
+       callback(err,result);
     });
 }
-
 

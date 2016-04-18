@@ -1,7 +1,12 @@
 Template.models.models = function() {
     var user = Meteor.user();
     if( user ) {
-        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+	if (user.profile.currentWorkspace.name == 'public')
+		var models = Models.find().fetch();
+	else
+	        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+//        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+
         if( models )
         {
             models.forEach(function(model){

@@ -22,15 +22,29 @@ Router.map(function () {
        onBeforeAction: [
            function() {
                Session.set('currentWorkspace',this.params.id);
+	       this.next();
            }
-       ] 
+       ]
     });
-    this.route('datasets',{
-        path: '/datasets',
+    this.route('datasets/Anywhere',{
+        path: '/datasets/Anywhere',
         template: 'datasets',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',null);
+              Session.set('source',null);
+              Session.set('currentSpatialResolution',null);
+		          this.next();
+            }
+        ]
+    });
+    this.route('datasets/Workspace',{
+        path: '/datasets/Workspace',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+              Session.set('source','workspace');
+              Session.set('currentSpatialResolution',null);
+              this.next();
             }
         ]
     });
@@ -40,6 +54,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
+                this.next();
             }
         ]
     });
@@ -49,6 +64,29 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('dataSets/Anywhere/BySpatialResolution',{
+        path: '/dataSets/Anywhere/BySpatialResolution/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('dataSets/Workspace/BySpatialResolution',{
+        path: '/dataSets/Workspace/BySpatialResolution/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
             }
         ]
     });
@@ -58,6 +96,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',undefined);
+		this.next();
             }
         ]
     });
@@ -67,6 +106,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',undefined);
+                this.next();
             }
         ]
     });
@@ -76,6 +116,29 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',null);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Anywhere',{
+        path: '/experiments/Anywhere',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',null);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace',{
+        path: '/experiments/Workspace',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialResolution',null);
+                this.next();
             }
         ]
     });
@@ -85,6 +148,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
+                this.next();
             }
         ]
     });
@@ -94,6 +158,29 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Anywhere/BySpatialResolution',{
+        path: '/experiments/Anywhere/BySpatialResolution/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace/BySpatialResolution',{
+        path: '/experiments/Workspace/BySpatialResolution/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialResolution',this.params.resolution);
+                this.next();
             }
         ]
     });
@@ -103,6 +190,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',undefined);
+                this.next();
             }
         ]
     });
@@ -114,6 +202,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',this.params.id);
+		this.next();
             }
         ]
     });
@@ -123,6 +212,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentAnalysisId',this.params.id);
+                this.next();
             }
         ]
     });
@@ -133,6 +223,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModel',undefined);
+                this.next();
             }
         ]
     });
@@ -142,6 +233,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentModel',this.params.id);
+                this.next();
             }
         ]
     });
@@ -167,7 +259,7 @@ Router.map(function () {
 //         this.stop();
 //     }
 // }, {except: ['home','root','file']});
-// 
+//
 // if( Meteor.isClient ) {
 //     Router.configure({
 //       autoRender: false
