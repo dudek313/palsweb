@@ -2,12 +2,18 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-    Session.set('disableUpdate',false);
-    this.autorun( function(){
-      if(Session.equals('inEditMode', true))
-        return;
-
-    });
+    var screenMode = Session.get('screenMode')
+    if(screenMode == 'display') {
+        Session.set('disableUpdateBtn',false);
+        this.autorun( function(){
+          if(Session.equals('inEditMode', true)){
+            return;
+          }
+        });
+    }
+//    else { // in Create mode
+//      Session.set('inEditMode', true);
+//    }
 //    console.log(Session.get('editMode'));
 };
 
@@ -15,8 +21,6 @@ var events = {
     'click .delete-file':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-            console.log('Key: ' + key);
-
             var currentDataSet = Template.dataset.dataSet();
             if( currentDataSet.files ) {
                 var currentFile = undefined;
@@ -76,10 +80,20 @@ var events = {
             );
         }
     },
-    'click .update-dataset':function(event){
+    'click .enable-update':function(event){
         Session.set('inEditMode', true);
-        Session.set('disableUpdate', true);
-        console.log(Session.get('disableUpdate'));
+        Session.set('disableUpdateBtn', true);
+    },
+    'click .save-update':function(event){
+        var oldDSVersion = Template.dataset.dataSet();
+        var newDSVersion = Template.dataset.cloneDataSet();
+        updateVersion('dataSet', oldDSVersion, newDSVersion);
+    },
+    'click .cancel-update':function(event){
+        console.log('updated canceled');
+        Session.set('inEditMode', false);
+        Session.set('disableUpdateBtn', false);
+//        window.location.reload();
     },
     'change .file-select':function(event, template){
 
@@ -123,10 +137,16 @@ Template.dataset.events(templateSharedObjects.form({
 }).events().extend(events));
 
 Template.dataset.dataSet = function() {
-    console.log()
     var currentDataSetId = Session.get('currentDataSet');
     var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
     return currentDataSet;
+}
+
+Template.dataset.cloneDataSet = function() {
+    var cloneDS = jQuery.extend({}, Template.dataset.dataSet());
+    delete cloneDS._id;
+    cloneDS.version = 0;
+    return cloneDS;
 }
 
 function getFiles(dataSet) {
@@ -156,8 +176,11 @@ Template.dataset.hasFiles = function() {
     else return false;
 };
 
-Template.dataset.updateDisabled = function() {
-    var toDisable = Session.get(disableUpdate);
+Template.dataset.inDisplayMode = function() {
+    return (Session.get('screenMode')=='display');
+}
+Template.dataset.updateBtnDisabled = function() {
+    var toDisable = Session.get(disableUpdateBtn);
     console.log(toDisable);
     if ( toDisable ) return true
     else return '';
@@ -191,9 +214,9 @@ Template.dataset.helpers({
     else return true;
   },
   inEditMode: function() {
-    return Session.get('ininEditMode');
+    return Session.get('inEditMode');
   },
-  updateDisabled: function() {
-    return Session.get('disableUpdate');
+  updateBtnDisabled: function() {
+    return Session.get('disableUpdateBtn');
   }
 });

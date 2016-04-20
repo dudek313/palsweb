@@ -1,15 +1,16 @@
 <template name="dataset">
 <div class="row">
 <div class="col-md-8">
-
 <form role="form">
    <h1>Data Set: {{dataSet.name}}</h1>
    <div class="alert alert-danger error"></div>
-   {{#if currentUser.admin}}<a class="btn btn-success update-dataset margin-right" disabled={{updateDisabled}}>Update Data Set</a>{{/if}}
+   {{#if inDisplayMode}}<a class="btn btn-success enable-update pull-right" disabled={{updateBtnDisabled}}>Update Data Set</a>{{/if}}
+   <br>
    <div class="form-group">
        <label>Data Set Name</label>
        {{#if inEditMode}}
-           <input class="modifier form-control" type="text" name="name" value="{{dataSet.name}}">
+          <input class="modifier form-control" type="text" value="{{cloneDataSet.name}}">
+<!--           <input class="modifier form-control" type="text" name="name" value="{{dataSet.name}}"> -->
        {{else}}
            <div class="display">{{dataSet.name}}</div>
        {{/if}}
@@ -17,10 +18,10 @@
    <div class="form-group">
        {{#if inEditMode}}
        <label>Data Set Type</label>
-       <select name="type" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.dataSetType}}
-           <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.type}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -33,9 +34,9 @@
    <div class="form-group">
        {{#if inEditMode}}
        <label>Spatial Level</label>
-       <select name="spatialLevel" class="form-control trigger">
+       <select class="form-control trigger">
            {{#each reference.spatialLevel}}
-           <option value='{{this}}' {{selected this dataSet.spatialLevel}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.spatialLevel}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -48,10 +49,10 @@
    <div class="form-group">
        {{#if inEditMode}}
        <label>Country</label>
-       <select name="country" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.country}}
-           <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.country}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -64,10 +65,10 @@
    <div class="form-group">
        {{#if inEditMode}}
        <label>IGBP Vegetation Type</label>
-       <select name="vegType" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.vegType}}
-           <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.vegType}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -80,13 +81,13 @@
    {{#if inEditMode}}
    <div class="form-group">
        <label>or enter a different Vegetation Type</label>
-       <input class="modifier form-control" type="text" name="vegType" value="{{#if dataSet.vegType}}{{dataSet.vegType}}{{/if}}">
+       <input class="modifier form-control" type="text" value="{{#if cloneDataSet.vegType}}{{cloneDataSet.vegType}}{{/if}}">
    </div>
    {{/if}}
    <div class="form-group">
        {{#if inEditMode}}
            <label>Soil Type</label>
-           <input class="modifier form-control" type="text" name="soilType" value="{{dataSet.soilType}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.soilType}}">
        {{else}}
            {{#if dataSet.soilType}}
                <label>Soil Type</label>
@@ -97,7 +98,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Site Description URL</label>
-           <input class="modifier form-control" type="url" name="url" value="{{dataSet.url}}">
+           <input class="modifier form-control" type="url" value="{{cloneDataSet.url}}">
        {{else}}
        {{#if dataSet.url}}
            <label>Site Description URL</label>
@@ -108,7 +109,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Latitude (decimal)</label>
-           <input class="modifier form-control" type="text" name="lat" value="{{dataSet.lat}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.lat}}">
        {{else}}
        {{#if dataSet.lat}}
            <label>Latitude (decimal)</label>
@@ -119,7 +120,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Longitude (decimal)</label>
-           <input class="modifier form-control" type="text" name="lon" value="{{dataSet.lon}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.lon}}">
        {{else}}
        {{#if dataSet.lon}}
            <label>Longitude (decimal)</label>
@@ -130,7 +131,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Elevation (m)</label>
-           <input class="modifier form-control" type="text" name="elevation" value="{{dataSet.elevation}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.elevation}}">
        {{else}}
        {{#if dataSet.elevation}}
            <label>Elevation (m)</label>
@@ -141,7 +142,7 @@
    <div class="form-group">
        {{#if inEditMode}}
           <label>Max Vegetation Height (m)</label>
-          <input class="modifier form-control" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}">
+          <input class="modifier form-control" type="text" value="{{cloneDataSet.maxVegHeight}}">
        {{else}}
        {{#if dataSet.maxVegHeight}}
            <label>Max Vegetation Height (m)</label>
@@ -152,7 +153,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>UTC Offset (hours)</label>
-           <input class="modifier form-control" type="text" name="utcOffset" value="{{dataSet.utcOffset}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.utcOffset}}">
        {{else}}
        {{#if dataSet.utcOffset}}
            <label>UTC Offset (hours)</label>
@@ -163,7 +164,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Site Contact</label>
-           <input class="modifier form-control" type="text" name="siteContact" value="{{dataSet.siteContact}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.siteContact}}">
        {{else}}
        {{#if dataSet.siteContact}}
            <label>Site Contact</label>
@@ -174,7 +175,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>References</label>
-           <textarea class="modifier form-control" type="text" name="references">{{dataSet.references}}</textarea>
+           <textarea class="modifier form-control" type="text" >{{cloneDataSet.references}}</textarea>
        {{else}}
        {{#if dataSet.references}}
            <label>References</label>
@@ -185,7 +186,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Comments</label>
-           <textarea class="modifier form-control" type="text" name="comments">{{dataSet.comments}}</textarea>
+           <textarea class="modifier form-control" type="text" >{{cloneDataSet.comments}}</textarea>
        {{else}}
        {{#if dataSet.comments}}
            <label>Comments</label>
@@ -196,7 +197,8 @@
    {{#if inEditMode}}
    <div class="form-group">
            <label>Variables</label>
-           <select name="variable" class="form-control">
+<!--           <select name="variable" class="form-control"> -->
+           <select class="form-control">
                {{#each variables}}
                    <option value='{{this._id}}'>{{this.name}}</option>
                {{/each}}
@@ -204,14 +206,14 @@
    </div>
    <a class="btn btn-success add-variable">Add Variable</a>
    <h3>
-   {{#each dataSet.variables}}
+   {{#each cloneDataSet.variables}}
        <span class="label label-danger">{{this.name}} <a class="delete-button remove-variable" title="remove" id="{{this._id}}"><i class="fa fa-times-circle-o"></i></a></span>
    {{/each}}
    </h3>
    {{else}}
        <label>Variables</label>
        <h4>
-       {{#each dataSet.variables}}
+       {{#each cloneDataSet.variables}}
            <span class="label label-danger">{{this.name}}</span>
        {{/each}}
        </h4>
@@ -219,7 +221,7 @@
    <div class="form-group">
        {{#if inEditMode}}
            <label>Region</label>
-           <input class="modifier form-control" type="text" name="region" value="{{dataSet.region}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.region}}">
        {{else}}
        {{#if dataSet.region}}
            <label>Region</label>
@@ -230,10 +232,11 @@
    <div class="form-group">
        {{#if inEditMode}}
        <label>Resolution</label>
-       <select name="resolution" class="form-control trigger">
+<!--       <select name="resolution" class="form-control trigger"> -->
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.resolution}}
-           <option value='{{this}}' {{selected this dataSet.resolution}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.resolution}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -260,7 +263,7 @@
         <thead>
         <tr>
             <th>File</th>
-            {{#if inEditModeUser.admin}}<th>delete</th>{{/if}}
+            {{#if currentUser.admin}}<th>delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
@@ -289,6 +292,10 @@
     {{/if}}
     </div>
   </div>
+  {{#if inEditMode}}
+    <a class="btn btn-success save-update">Save As New Version</a>
+    <a class="btn btn-default cancel-update">Cancel</a>
+  {{/if}}
 </div>
 </div><!--row-->
 </template>

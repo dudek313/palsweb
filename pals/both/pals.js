@@ -54,6 +54,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
+                Session.set('screenMode', 'display');
                 Session.set('inEditMode', false);
                 this.next();
             }
@@ -96,8 +97,10 @@ Router.map(function () {
         template: 'dataset',
         onBeforeAction: [
             function() {
+                Session.set('screenMode', 'create');
+                Session.set('inEditMode', true);
                 Session.set('currentDataSet',undefined);
-		this.next();
+		            this.next();
             }
         ]
     });
