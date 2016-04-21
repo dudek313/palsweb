@@ -16,8 +16,8 @@ Template.datasets.dataSets = function() {
       if( source ) {
           selector = {'experiments.workspace':user.profile.currentWorkspace._id};
       }
-      selector.recordType = 'version';
-      selector.$where = 'this.version == this.latestVersion';
+//      selector.recordType = 'version';
+      selector.$where = 'this.latest == true';
 
       var resolution = Template.datasets.currentSpatialResolution();
       if( resolution ) {

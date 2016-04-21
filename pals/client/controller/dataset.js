@@ -84,10 +84,13 @@ var events = {
         Session.set('inEditMode', true);
         Session.set('disableUpdateBtn', true);
     },
+
     'click .save-update':function(event){
         var oldDSVersion = Template.dataset.dataSet();
         var newDSVersion = Template.dataset.cloneDataSet();
         updateVersion('dataSet', oldDSVersion, newDSVersion);
+        Session.set('inEditMode', false);
+        Session.set('disableUpdateBtn', false);
     },
     'click .cancel-update':function(event){
         console.log('updated canceled');

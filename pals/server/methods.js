@@ -108,21 +108,26 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
-    'dataSets.insert': function(dataset) {
-        DataSets.insert(dataset, function(error,id) {
+    'dataSets.insert': function(dataset, callback) {
+        DataSets.insert(dataset, function(error,doc) {
             if( error ) {
                 console.log('Error saving the new dataSet');
             }
-        })
+            else {
+                console.log('Method.insert: ' + doc);
+                return doc;
+            }
+        });
+
     },
     'dataSets.update': function(selector, update) {
-        DataSets.update(selector, update, function(error, id) {
+        DataSets.update(selector, update, function(error, doc) {
             if( error ) {
                 console.log('Error updating dataSet record');
             }
         });
     },
-    
+
     startAnalysis: function (key,modelOutputId) {
 
         console.log('starting analysis for model output: ' + modelOutputId);

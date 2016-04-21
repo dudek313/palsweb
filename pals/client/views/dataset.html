@@ -4,7 +4,7 @@
 <form role="form">
    <h1>Data Set: {{dataSet.name}}</h1>
    <div class="alert alert-danger error"></div>
-   {{#if inDisplayMode}}<a class="btn btn-success enable-update pull-right" disabled={{updateBtnDisabled}}>Update Data Set</a>{{/if}}
+   {{#if inDisplayMode}}{{#if currentUser.admin}}<a class="btn btn-success enable-update pull-right" disabled={{updateBtnDisabled}}>Update Data Set</a>{{/if}}{{/if}}
    <br>
    <div class="form-group">
        <label>Data Set Name</label>

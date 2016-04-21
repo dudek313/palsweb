@@ -7,8 +7,8 @@ Template.experiments.experiments = function() {
       if( source ) {
         selector = {'workspaces':user.profile.currentWorkspace._id};
       }
-      selector.recordType='templateVersion';
-      selector.$where = 'this.version == this.latestVersion';
+      selector.recordType='template';
+      selector.$where = 'this.latest == true';
 
       var resolution = Template.experiments.currentSpatialResolution();
       if( resolution ) {
