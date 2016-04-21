@@ -74,20 +74,6 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                               copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
                           });
                       });
-//                      future.wait();
-
-/*                      function wait(){
-                        console.log('entered wait function');
-                        if (metFileData == null || fluxFileData == null){
-                          setTimeout(wait,100);
-                        } else {
-                          console.log('metFileData and fluxFileData ready');
-//                          copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
-
-                        }
-                      }
-                      wait();
-*/
                   });
                   client.end();
               });
@@ -98,21 +84,6 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
     });
 }
 
-/*
-var metFileData = processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, function(err){
-    if(err) console.log(err)
-    else {
-        console.log('metFileData: ' + metFileData);
-        var fluxFileData = processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, function(err){
-            if(err) console.log(err)
-            else {
-                console.log('metFileData: ' + fluxFileData);
-                copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
-            }
-        });
-    }
-});
-*/
 
 function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces, callback) {
   fs.exists(filename, function (exists) {
@@ -166,25 +137,13 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
     console.log('Copying data set: ' + row.a_name);
     var user = users[row.ds_username];
 
-    var dataSetParent = {
+    var dataSet = {
         _id : row.ds_id.toString(),
-        recordType : 'parent',
-        created : row.dsv_uploaddate,
-        name : row.a_name,
-        latestVersion : 1,
-        owner : user._id,
-        experiments : [{id : row.ds_id.toString(), workspace : null}]
-    }
-
-    var dsversionId = row.ds_id + 60000;
-    var dataSetVersion = {
-        _id : dsversionId.toString(),
-        recordType : 'version',
         created : row.dsv_uploaddate,
         name : row.a_name,
         version : 1,
-        latestVersion : 1,
-        source_id : row.ds_id,
+        latest : true,
+        source_id : row.ds_id.toString(),
         spatialLevel : 'SingleSite',
         owner : user._id,
         comments : row.ds_comments,
@@ -206,124 +165,96 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         versionDescription : row.dsv_description,
         startdate : row.dsv_startdate,
         enddate : row.dsv_enddate,
-        files: [metFileData, fluxFileData]
+        files: [metFileData, fluxFileData],
+	experiments : [{id : row.ds_id.toString(), workspace : null}]
     }
 
     if( row.e_id ) {
-        dataSetVersion.experiments = [{id : dsversionId.toString(), workspace : row.e_id.toString()}];
-    }
-    else {
-//                dataSet.workspaces = [publicWorkspace._id.toString()];
-        dataSetVersion.experiments = [{}];
+	experimentInstanceId = row.ds_id + 60000;
+        dataSet.experiments.push({id : experimentInstanceId.toString(), workspace : row.e_id.toString()});
     }
 
-    mongoInstance.insert('dataSets',dataSetParent,function(err){
+    mongoInstance.insert('dataSets',dataSet,function(err){
         if(err) {
             console.log(err);
         }
 
         else {
-            console.log('Inserted Data Set Parent: ' + dataSetParent.name);
-            mongoInstance.insert('dataSets',dataSetVersion, function(err){
-              if(err) {
-                console.log(err);
-              }
-              else {
-                  console.log('Inserted Data Set Version: ' + dataSetVersion.name)
-                  insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstance);
-              }
-
-            });
-//			console.log('inserting experiment ' + dataSet.name);
-
+            console.log('Inserted Data Set: ' + dataSet.name);
+            insertDefaultExperiment(dataSet, row, mongoInstance);
         }
     });
 }
 
 //function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
-function insertDefaultExperiment(dataSetParent, dataSetVersion, row, mongoInstance) {
-  // Creates an experiment template parent and experiment template version corresponding to the Data Set being migrated
-    var experimentTemplateParent = {
-        _id : dataSetParent._id.toString(),
-        name : dataSetParent.name,
-        recordType : 'templateParent',
-        created : dataSetParent.created,
-        owner : dataSetParent.owner,
-        latestVersion : 1
-    }
+function insertDefaultExperiment(dataSet, row, mongoInstance) {
+  // Creates an experiment template corresponding to the Data Set being migrated
 
-    mongoInstance.insert('experiments',experimentTemplateParent,function(err){
-        if(err) console.log(err)
-        else {
-          console.log('Created Experiment Template Parent: ' + experimentTemplateParent.name);
-        }
-    });
-
-    var templateVersionId = parseInt(dataSetParent._id) + 60000;
-    var experimentTemplateVersion = {
-        _id : templateVersionId.toString(),
-        name : dataSetVersion.name,
-        recordType : 'templateVersion',
+    var experimentTemplate = {
+        _id : dataSet._id.toString(),
+        name : dataSet.name,
+        recordType : 'template',
         version : 1,
-        latestVersion : 1,
-        created : dataSetVersion.created,
+        latest : true,
+        created : dataSet.created,
         spatialLevel : 'SingleSite',
         scripts : [{
             path : '/pals/data/SingleSiteExperiment.R',
             filename : 'SingleSiteExperiment.R',
             key : 'SingleSiteExperimnet.R',
         }],
-        dataSets : [dataSetVersion._id],
+        dataSets : [dataSet._id],
         workspaces : [],
-        owner : dataSetVersion.owner,
-        country : dataSetVersion.country,
-        vegType : dataSetVersion.vegType,
-        shortDescription : dataSetVersion.comments,
-        longDescription : dataSetVersion.references
+        owner : dataSet.owner,
+        country : dataSet.country,
+        vegType : dataSet.vegType,
+        shortDescription : dataSet.comments,
+        longDescription : dataSet.references
     }
 
 
 // if this data set came from within a workspace (other than the public one) create an experiment instance to associate it with
     console.log('experiment ID: ' + row.e_id);
     if( row.e_id !== null ) {
-        var instanceVersionId = parseInt(templateVersionId) + 60000;
-        var experimentInstanceVersion = {
-            _id : instanceVersionId.toString(),
-            name : dataSetVersion.name,
+        var instanceId = parseInt(experimentTemplate._id) + 60000;
+        var experimentInstance = {
+            _id : instanceId.toString(),
+            name : dataSet.name,
             recordType : 'instanceVersion',
             version : 1,
-            created : dataSetVersion.created,
-            modified : dataSetVersion.created,
+	    latest : true,
+            created : dataSet.created,
+            modified : dataSet.created,
             spatialLevel : 'SingleSite',
             scripts : [{
                 path : '/pals/data/SingleSiteExperiment.R',
                 filename : 'SingleSiteExperiment.R',
                 key : 'SingleSiteExperimnet.R',
             }],
-            dataSets : [dataSetVersion._id],
-            owner : dataSetVersion.owner,
-            country : dataSetVersion.country,
-            vegType : dataSetVersion.vegType,
-            shortDescription : dataSetVersion.comments,
-            longDescription : dataSetVersion.references,
+            dataSets : [dataSet._id],
+            owner : dataSet.owner,
+            country : dataSet.country,
+            vegType : dataSet.vegType,
+            shortDescription : dataSet.comments,
+            longDescription : dataSet.references,
             workspace : row.e_id.toString(),
             versionDescription : 'Imported version'
         }
 
-        experimentTemplateVersion.workspaces = [row.e_id.toString()];
+        experimentTemplate.workspaces = [row.e_id.toString()];
 
-        mongoInstance.insert('experiments',experimentInstanceVersion,function(err){
+        mongoInstance.insert('experiments',experimentInstance,function(err){
             if(err) console.log(err)
             else {
-              console.log('Created Experiment Instance Version: ' + experimentInstanceVersion.name);
+              console.log('Created Experiment Instance: ' + experimentInstance.name);
             }
         });
     }
 
-    mongoInstance.insert('experiments',experimentTemplateVersion,function(err){
+    mongoInstance.insert('experiments',experimentTemplate,function(err){
         if(err) console.log(err)
         else {
-          console.log('Created Experiment Template Version: ' + experimentTemplateVersion.name);
+          console.log('Created Experiment Template Version: ' + experimentTemplate.name);
         }
     });
 
