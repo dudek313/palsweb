@@ -18,7 +18,7 @@ Meteor.users.allow({
 
 Workspaces.allow({
     insert: function(userId, doc) {
-        return ( userId && doc.owner === userId );
+        return ( userId && doc.owner == userId );
     },
     update: function(userId, doc, fieldNames, modifier) {
         return ( userId && doc.owner === userId );
@@ -35,6 +35,7 @@ Meteor.publish('directory',function(){
 
 DataSets._ensureIndex('_id', {unique: 1});
 
+
 Meteor.publish('dataSets',function(){
     return DataSets.find();
 });
@@ -46,11 +47,11 @@ DataSets.allow({
     },
     update: function(userId, doc, fieldNames, modifier) {
         var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
+        return ( userId && user.admin );
     },
     remove: function(userId, doc) {
         var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
+        return ( userId && user.admin );
     }
 });
 

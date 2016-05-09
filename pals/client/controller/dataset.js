@@ -2,26 +2,66 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-    var screenMode = Session.get('screenMode')
-    if(screenMode == 'display') {
-        Session.set('disableUpdateBtn',false);
-        this.autorun( function(){
-          if(Session.equals('inEditMode', true)){
-            return;
-          }
-        });
-    }
-//    else { // in Create mode
-//      Session.set('inEditMode', true);
-//    }
-//    console.log(Session.get('editMode'));
+    this.autorun( function(){
+        if(Session.equals('screenMode', 'update'))
+          return;
+
+    });
 };
 
-var events = {
+AutoForm.hooks({
+    createDatasetForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            event.preventDefault();
+            insertDoc._version = 1;
+            var draftDataSetId = new Meteor.Collection.ObjectID()._str;
+            console.log(draftDataSetId);
+            insertDoc._id = draftDataSetId
+            Session.set('currentDataSet', draftDataSetId)
+            Meteor.call('insertDataSet', insertDoc);
+            console.log('doc inserted');
+            this.done();
+            return false;
+        },
+        before: {
+            normal: function(doc) {
+                doc._id = Session.get(currentDataSet);
+            }
+        },
+/*
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            event.preventDefault();
+            updateDoc._version = 1;
+            console.log('currentDoc: ' + currentDoc);
+//            currentDoc._id = Session.get('currentDataSet');
+            console.log('ready to insert doc: ' + currentDoc);
+            Meteor.call('updateDataSet', currentDoc, updateDoc);
+// need to include code to Router.go to the new inserted dataSet
+            this.done();
+            return false;
+        },
+        onSuccess: function(doc) {
+//            Router.go('/dataset/display/'+this.docId);
+        }
+        */
+    },
+    updateDatasetForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            Meteor.call('updateDataSet', currentDoc, updateDoc);
+            this.done();
+            return false;
+        }
+    }
+})
+
+Template.dataset.events = {
+//    'click .create-btn':function(event) {
+//        console.log('created new dataSet');
+//    },
     'click .delete-file':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-            var currentDataSet = Template.dataset.dataSet();
+            var currentDataSet = getCurrentDataSet();
             if( currentDataSet.files ) {
                 var currentFile = undefined;
                 currentDataSet.files.forEach(function(file) {
@@ -46,6 +86,7 @@ var events = {
             }
         }
     },
+/*
     'click .add-variable':function(event){
         if( Meteor.user().admin ) {
             var variableId = $('select[name="variable"]').val();
@@ -79,12 +120,11 @@ var events = {
                 }
             );
         }
-    },
+    },*/
     'click .enable-update':function(event){
-        Session.set('inEditMode', true);
-        Session.set('disableUpdateBtn', true);
+        Session.set('screenMode', 'update');
     },
-
+/*
     'click .save-update':function(event){
         var oldDSVersion = Template.dataset.dataSet();
         var newDSVersion = Template.dataset.cloneDataSet();
@@ -93,15 +133,31 @@ var events = {
         Session.set('disableUpdateBtn', false);
     },
     'click .cancel-update':function(event){
-        console.log('updated canceled');
+        console.log('update canceled');
         Session.set('inEditMode', false);
         Session.set('disableUpdateBtn', false);
 //        window.location.reload();
+    },
+*/
+    'click .file-select':function(event, template){
+        var currentDataSetId = Session.get('currentDataSet');
+        if( !currentDataSetId ) {
+            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
+            if ( !name ) {
+                alert("name not entered");
+            }
+  //            alert("Please enter a data set name before uploading scripts");
+            return;
+
+        }
     },
     'change .file-select':function(event, template){
 
         var currentDataSetId = Session.get('currentDataSet');
         if( !currentDataSetId ) {
+//            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
+//            if ( !name )
+//                alert("name not entered");
             alert("Please enter a data set name before uploading scripts");
             return;
         }
@@ -134,19 +190,25 @@ var events = {
     }
 };
 
-Template.dataset.events(templateSharedObjects.form({
-    meteorSessionId: 'currentDataSet',
-    collectionName: 'DataSets'
-}).events().extend(events));
+//Template.dataset.events(templateSharedObjects.form({
+//    meteorSessionId: 'currentDataSet',
+//    collectionName: 'DataSets'
+//}).events().extend(events));
 
-Template.dataset.dataSet = function() {
+/*Template.dataset.dataSet = function() {
     var currentDataSetId = Session.get('currentDataSet');
     var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
     return currentDataSet;
 }
+*/
+function getCurrentDataSet() {
+  var currentDataSetId = Session.get('currentDataSet');
+  var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
+  return currentDataSet;
+}
 
 Template.dataset.cloneDataSet = function() {
-    var cloneDS = jQuery.extend({}, Template.dataset.dataSet());
+    var cloneDS = jQuery.extend({}, getCurrentDataSet());
     delete cloneDS._id;
     cloneDS.version = 0;
     return cloneDS;
@@ -163,8 +225,8 @@ function getFiles(dataSet) {
     }
 }
 
-Template.dataset.files = function() {
-    var dataSet = Template.dataset.dataSet();
+/*Template.dataset.files = function() {
+    var dataSet = getCurrentDataSet();
     return getFiles(dataSet);
 }
 
@@ -174,14 +236,12 @@ Template.dataset.reference = function() {
 };
 
 Template.dataset.hasFiles = function() {
-    var dataSet = Template.dataset.dataSet();
+    var dataSet = getCurrentDataSet();
     if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
     else return false;
 };
+*/
 
-Template.dataset.inDisplayMode = function() {
-    return (Session.get('screenMode')=='display');
-}
 Template.dataset.updateBtnDisabled = function() {
     var toDisable = Session.get(disableUpdateBtn);
     console.log(toDisable);
@@ -194,17 +254,61 @@ Template.dataset.variables = function() {
 }
 
 Template.dataset.helpers({
+/*  invokeAfterLoad: function() {
+      Meteor.defer(function() {
+          var id_value = new Meteor.Collection.ObjectID()._str;
+          var draftDataSet = {
+
+              _id: id_value,
+              name: id_value,
+              type: 'flux tower',
+              spatialLevel: 'SingleSite',
+              draft: true
+          };
+          console.log('draft name: ' + draftDataSet.name);
+          console.log('draft id: ' + draftDataSet._id);
+          Meteor.call('insertDataSet', draftDataSet);
+          Session.set('currentDataSet', draftDataSet._id);
+      });
+  },
+  */
+  dataSet: function() {
+      return getCurrentDataSet();
+  },
+  files: function() {
+      var dataSet = getCurrentDataSet();
+      return getFiles(dataSet);
+  },
+  hasFiles: function() {
+      var dataSet = getCurrentDataSet();
+      if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
+      else return false;
+  },
+  reference: function() {
+      var reference = Reference.findOne();
+      return reference;
+  },
+  inEditMode: function() {
+      var screenMode = Session.get('screenMode');
+      return (screenMode =='update' || screenMode =='create');
+  },
+  inUpdateMode: function() {
+      return (Session.get('screenMode')=='update');
+  },
+  inDisplayMode: function() {
+      return (Session.get('screenMode')=='display');
+  },
   isPublic: function() {
-    var dataSet = Template.dataset.dataSet();
-    if( dataSet ) {
-        if( !dataSet.public ) return 'checked'
-        if( dataSet.public === 'true') return 'checked'
-        else return undefined
-    }
-    else return 'checked';
+      var dataSet = getCurrentDataSet();
+      if( dataSet ) {
+          if( !dataSet.public ) return 'checked'
+          if( dataSet.public === 'true') return 'checked'
+          else return undefined
+      }
+      else return 'checked';
   },
   isPublicOrOwner: function() {
-    var dataSet = Template.dataset.dataSet();
+    var dataSet = getCurrentDataSet();
     if( dataSet ) {
         if( !dataSet.public ) return true
         if( dataSet.public === 'true') return true
@@ -216,8 +320,17 @@ Template.dataset.helpers({
     }
     else return true;
   },
-  inEditMode: function() {
-    return Session.get('inEditMode');
+  inCreateMode: function() {
+    var screenMode = Session.get('screenMode');
+    return (screenMode == 'create')
+  },
+  latestVersion: function() {
+    var currentDataSet = getCurrentDataSet();
+    if(currentDataSet)
+        return currentDataSet.latest
+    else {
+        return false;
+    }
   },
   updateBtnDisabled: function() {
     return Session.get('disableUpdateBtn');

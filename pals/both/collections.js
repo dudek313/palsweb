@@ -1,7 +1,7 @@
 Workspaces = new Meteor.Collection("workspaces");
-DataSets = new Meteor.Collection("dataSets");
+DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId: 'modifierId'});
 Reference = new Meteor.Collection("reference");
-Experiments = new Meteor.Collection("experiments");
+Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
 ModelOutputs = new Meteor.Collection("modelOutputs");
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
@@ -21,3 +21,156 @@ GetCollectionByName = function(name) {
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
+
+var reference = Reference.findOne();
+if( !reference ) {
+    Reference.insert({
+        'dataSetType' : ['flux tower','reanalysis', 'remotely sensed', 'empirical', 'observational synthesis','other'],
+        'country' : ['Andorra','United Arab Emirates','Afghanistan','Antigua and Barbuda','Anguilla','Albania','Armenia','Netherlands Antilles','Angola','Antarctica','Argentina','American Samoa','Austria','Australia','Aruba','Aland Islands','Azerbaijan','Bosnia and Herzegovina','Barbados','Bangladesh','Belgium','Burkina Faso','Bulgaria','Bahrain','Burundi','Benin','Saint Barthélemy','Bermuda','Brunei','Bolivia','Brazil','Bahamas','Bhutan','Bouvet Island','Botswana','Belarus','Belize','Canada','Cocos Islands','Democratic Republic of the Congo','Central African Republic','Republic of the Congo','Switzerland','Ivory Coast','Cook Islands','Chile','Cameroon','China','Colombia','Costa Rica','Cuba','Cape Verde','Christmas Island','Cyprus','Czech Republic','Germany','Djibouti','Denmark','Dominica','Dominican Republic','Algeria','Ecuador','Estonia','Egypt','Western Sahara','Eritrea','Spain','Ethiopia','Finland','Fiji','Falkland Islands','Micronesia','Faroe Islands','France','Gabon','United Kingdom','Grenada','Georgia','French Guiana','Guernsey','Ghana','Gibraltar','Greenland','Gambia','Guinea','Guadeloupe','Equatorial Guinea','Greece','South Georgia and the South Sandwich Islands','Guatemala','Guam','Guinea-Bissau','Guyana','Hong Kong','Heard Island and McDonald Islands','Honduras','Croatia','Haiti','Hungary','Indonesia','Ireland','Israel','Isle of Man','India','British Indian Ocean Territory','Iraq','Iran','Iceland','Italy','Jersey','Jamaica','Jordan','Japan','Kenya','Kyrgyzstan','Cambodia','Kiribati','Comoros','Saint Kitts and Nevis','North Korea','South Korea','Kuwait','Cayman Islands','Kazakhstan','Laos','Lebanon','Saint Lucia','Liechtenstein','Sri Lanka','Liberia','Lesotho','Lithuania','Luxembourg','Latvia','Libya','Morocco','Monaco','Moldova','Montenegro','Saint Martin','Madagascar','Marshall Islands','Macedonia','Mali','Myanmar','Mongolia','Macao','Northern Mariana Islands','Martinique','Mauritania','Montserrat','Malta','Mauritius','Maldives','Malawi','Mexico','Malaysia','Mozambique','Namibia','New Caledonia','Niger','Norfolk Island','Nigeria','Nicaragua','Netherlands','Norway','Nepal','Nauru','Niue','New Zealand','Oman','Panama','Peru','French Polynesia','Papua New Guinea','Philippines','Pakistan','Poland','Saint Pierre and Miquelon','Pitcairn','Puerto Rico','Palestinian Territory','Portugal','Palau','Paraguay','Qatar','Reunion','Romania','Serbia','Russia','Rwanda','Saudi Arabia','Solomon Islands','Seychelles','Sudan','Sweden','Singapore','Saint Helena','Slovenia','Svalbard and Jan Mayen','Slovakia','Sierra Leone','San Marino','Senegal','Somalia','Suriname','Sao Tome and Principe','El Salvador','Syria','Swaziland','Turks and Caicos Islands','Chad','French Southern Territories','Togo','Thailand','Tajikistan','Tokelau','East Timor','Turkmenistan','Tunisia','Tonga','Turkey','Trinidad and Tobago','Tuvalu','Taiwan','Tanzania','Ukraine','Uganda','United States Minor Outlying Islands','United States','Uruguay','Uzbekistan','Vatican','Saint Vincent and the Grenadines','Venezuela','British Virgin Islands','U.S. Virgin Islands','Vietnam','Vanuatu','Wallis and Futuna','Samoa','Yemen','Mayotte','South Africa','Zambia','Zimbabwe','Serbia and Montenegro'],
+        'vegType' : ['Evergreen broadleaf','Deciduous needleleaf','Deciduous broadleaf','Mixed forest','Closed shrubland','Open shrubland','Woody savanna','Savanna','Grassland','Permanent wetland','Cropland','Urban','Cropland / natural vegetation mosaic','Snow / ice landscape','Barren / sparsely vegetated','Water bodies','Eucalypt Forest','Evergreen needleleaf','Other'],
+        'filePickerAPIKey' : 'AeyxZFgbpSHS6xZ5AfPJkz',
+        'spatialLevel' : ['SingleSite', 'MultipleSite', 'Catchment', 'Regional', 'Global'],
+        'timeStepSize' : ['single value','half-hourly','hourly','daily','monthly','annual'],
+        'stateSelection' :['values measured at site','model spin-up on site data','default model initialisation','other'],
+        'parameterSelection' : ['automated calibration','manual calibration','no calibration (model default values)','other'],
+        'resolution' : ['0.01 deg','0.5 deg','1 deg','2 deg','Other']
+    });
+}
+
+DataSets.attachSchema(new SimpleSchema({
+  name: {
+    type: String,
+    label: "Name",
+    max: 50,
+    index: true,
+    unique: true
+  },
+  type: {
+    type: String,
+    label: "Type",
+    allowedValues: Reference.findOne().dataSetType
+  },
+  spatialLevel: {
+    type: String,
+    label: "Spatial Resolution",
+    allowedValues: Reference.findOne().spatialLevel
+  },
+  country: {
+    type: String,
+    label: "Country",
+    allowedValues: Reference.findOne().country,
+    optional: true
+  },
+  vegType: {
+    type: String,
+    label: "IGBP Vegetation Type",
+    allowedValues: Reference.findOne().vegType,
+    optional: true
+  },
+  otherVegType: {
+    type: String,
+    label: "Other Vegetation Type",
+    optional: true
+  },
+  soilType: {
+    type: String,
+    label: "Soil Type",
+    optional: true
+  },
+  url: {
+    type: SimpleSchema.RegEx.Url,
+    label: "Site Description URL",
+    optional: true
+  },
+  lat: {
+    type: Number,
+    label: "Latitude (decimal)",
+    min: -90,
+    max: 90,
+    decimal: true,
+    optional: true
+  },
+  lon: {
+    type: Number,
+    label: "Longitude (decimal)",
+    min: -180,
+    max: 180,
+    decimal: true,
+    optional: true
+  },
+  elevation: {
+    type: Number,
+    label: "Elevation (m)",
+    min: 0,
+    decimal: true,
+    optional: true
+  },
+  maxVegHeight: {
+    type: Number,
+    label: "Max Vegetation Height (m)",
+    min: 0,
+    decimal: true,
+    optional: true
+  },
+  utcOffset: {
+    type: Number,
+    label: "UTC Offset (hours)",
+    min: -12,
+    max: 12,
+    optional: true
+  },
+  siteContact: {
+    type: String,
+    label: "Site Contact",
+    optional: true
+  },
+  references: {
+    type: String,
+    label: "References",
+    optional: true
+  },
+  comments: {
+    type: String,
+    label: "Comments",
+    optional: true
+  },
+  "variables.NEE": {
+    type: Boolean,
+    label: "NEE"
+  },
+  "variables.Qg": {
+    type: Boolean,
+    label: "Qg"
+  },
+  "variables.Qh": {
+    type: Boolean,
+    label: "Qh"
+  },
+  "variables.Qle": {
+    type: Boolean,
+    label: "Qle"
+  },
+  "variables.Rnet": {
+    type: Boolean,
+    label: "Rnet"
+  },
+  "variables.SWnet": {
+    type: Boolean,
+    label: "Swnet"
+  },
+  region: {
+    type: String,
+    label: "Region",
+    optional: true
+  },
+  resolution: {
+    type: String,
+    label: "Resolution",
+    allowedValues: Reference.findOne().resolution,
+    optional: true
+  },
+  _version: {
+    type: Number,
+    optional: true
+  }
+}));

@@ -1,6 +1,7 @@
 updateVersion = function(type, oldRecord, newRecord) {
     if(type == 'dataSet') {
-        newRecord.version = oldRecord.latestVersion + 1;
+        newRecord.version = oldRecord.version + 1;
+        newRecord.latest = true;
         var newRecordId = '';
         Meteor.call('dataSets.insert', newRecord, function(error, newRecordId) {
             if( error ) {
@@ -13,7 +14,7 @@ updateVersion = function(type, oldRecord, newRecord) {
             }
         });
 
-	Meteor.call('dataSets.update', {id : oldRecord._id}, {$set:{latest:false}});
+	Meteor.call('dataSets.update', {_id : oldRecord._id}, {$set:{latest:false}});
         // update latest version in parent dataSet and other versions
 //        Meteor.call('dataSets.update', {_id: oldRecord.source_id}, {$set:{latestVersion:newRecord.version}});
 //        var oldversions = DataSets.find({source_id : oldRecord.source_id},{_id:1});

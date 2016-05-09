@@ -72,7 +72,7 @@
                      </ul>
                    </li>
                    {{#if currentUser.admin}}
-                         <li><a href="javascript:void(0)" onclick="Router.go('/dataset');">Create Data Set</a></li>
+                         <li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>
                      {{/if}}
                  </ul>
             </li>
@@ -84,27 +84,27 @@
                    <li class="dropdown-submenu">
                      <a tabindex="-1" href="#">From Anywhere</a>
                      <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/BySpatialResolution/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/BySpatialResolution/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/BySpatialResolution/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/BySpatialResolution/Regional');">Regional</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/BySpatialResolution/Global');">Global</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/AllTypes');">All Types</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/SingleSite');">SingleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/MultipleSite');">MultipleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Catchment');">Catchment</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Regional');">Regional</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Global');">Global</a></li>
                      </ul>
                    </li>
                    <li class="dropdown-submenu">
                      <a tabindex="-1" href="#">From Current Workspace</a>
                      <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialResolution/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialResolution/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialResolution/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialResolution/Regional');">Regional</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/AllTypes');">All Types</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/SingleSite');">SingleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/MultipleSite');">MultipleSite</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Catchment');">Catchment</a></li>
+                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Regional');">Regional</a></li>
                        <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialResolution/Global');">Global</a></li>
                      </ul>
                    </li>
                    {{#if currentUser.admin}}
-                         <li><a href="javascript:void(0)" onclick="Router.go('/dataset');">Create Data Set</a></li>
+                         <li><a href="javascript:void(0)" onclick="Router.go('/dataset/create');">Create Data Set</a></li>
                      {{/if}}
                  </ul>
             </li>

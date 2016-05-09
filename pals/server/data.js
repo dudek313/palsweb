@@ -1,11 +1,12 @@
 var rootWorkspace = Workspaces.findOne({"name":"public"});
-if( !rootWorkspace ) { 
+if( !rootWorkspace ) {
     Workspaces.insert({"name": "public"});
 }
 else {
     Workspaces.update(rootWorkspace,{"name":"public"});
 }
 
+/* Already included in both/collections.js
 var reference = Reference.findOne();
 if( !reference ) {
     Reference.insert({
@@ -20,6 +21,7 @@ if( !reference ) {
         'resolution' : ['0.01 deg','0.5 deg','1 deg','2 deg','Other']
     });
 }
+*/
 
 var variablesCursor = Variables.find();
 if( variablesCursor ) {

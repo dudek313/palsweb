@@ -26,7 +26,39 @@ Router.map(function () {
            }
        ]
     });
-    this.route('datasets/Anywhere',{
+    this.route('datasets',{
+        path: '/datasets/:source/:resolution',
+        template: 'datasets',
+        onBeforeAction: [
+            function() {
+                if (this.params.source == 'Anywhere')
+                    Session.set('source',null)
+                else {
+                    Session.set('source',this.params.source);
+                }
+                if (this.params.resolution == 'AllTypes')
+                    Session.set('currentSpatialResolution', null)
+                else {
+                    Session.set('currentSpatialResolution',this.params.resolution);
+                }
+                this.next();
+            }
+        ]
+    });
+    this.route('dataset',{
+        path: '/dataset/display/:id',
+        template: 'dataset',
+        onBeforeAction: [
+            function() {
+                Session.set('currentDataSet',this.params.id);
+                Session.set('screenMode', 'display');
+                Session.set('inEditMode', false);
+                this.next();
+            }
+        ]
+    });
+
+/*    this.route('datasets/Anywhere',{
         path: '/datasets/Anywhere',
         template: 'datasets',
         onBeforeAction: [
@@ -45,18 +77,6 @@ Router.map(function () {
               Session.set('source','workspace');
               Session.set('currentSpatialResolution',null);
               this.next();
-            }
-        ]
-    });
-    this.route('dataset',{
-        path: '/datasets/:id',
-        template: 'dataset',
-        onBeforeAction: [
-            function() {
-                Session.set('currentDataSet',this.params.id);
-                Session.set('screenMode', 'display');
-                Session.set('inEditMode', false);
-                this.next();
             }
         ]
     });
@@ -91,9 +111,9 @@ Router.map(function () {
                 this.next();
             }
         ]
-    });
+    }); */
     this.route('createDataset',{
-        path: '/dataset',
+        path: '/dataset/create',
         template: 'dataset',
         onBeforeAction: [
             function() {

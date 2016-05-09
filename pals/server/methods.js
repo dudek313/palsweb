@@ -108,6 +108,12 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
+    'updateDataSet': function(currentDoc, dataSetDoc) {
+        return DataSets.update(currentDoc, dataSetDoc);
+    },
+    'insertDataSet': function(dataSetDoc) {
+        return DataSets.insert(dataSetDoc);
+    },
     'dataSets.insert': function(dataset, callback) {
         DataSets.insert(dataset, function(error,doc) {
             if( error ) {
@@ -115,7 +121,8 @@ Meteor.methods({
             }
             else {
                 console.log('Method.insert: ' + doc);
-                return doc;
+//                return doc;
+                callback(false,doc);
             }
         });
 
@@ -124,6 +131,9 @@ Meteor.methods({
         DataSets.update(selector, update, function(error, doc) {
             if( error ) {
                 console.log('Error updating dataSet record');
+            }
+            else {
+                console.log('Update successful of ' + selector._id);
             }
         });
     },

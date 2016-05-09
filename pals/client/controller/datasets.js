@@ -67,7 +67,7 @@ Template.datasets.events({
         event.stopImmediatePropagation();
         event.preventDefault();
         var id = $(event.target).parent().attr('id');
-        Router.go('/datasets/'+id);
+        Router.go('/dataset/display/'+id);
     }
 
 
