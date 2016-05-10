@@ -29,7 +29,27 @@ AutoForm.hooks({
         },
     },
     updateDatasetForm: {
-        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+      onSubmit: function(insertDoc, updateDoc, currentDoc) {
+          event.preventDefault();
+          insertDoc._version = 1;
+          insertDoc.draft = true;
+          Meteor.call('insertDataSet', insertDoc, function(error, docId){
+              if(error) {
+                  console.log(error.reason);
+              }
+              else {
+                  Router.go('/dataset/display/' + docId);
+              }
+          });
+
+          this.done();
+          return false;
+      },
+  }
+
+/*       onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            console.log('entered onSubmit');
+
             event.preventDefault();
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
@@ -39,10 +59,13 @@ AutoForm.hooks({
                     Router.go('dataset/display/' + docId);
                 }
             });
+
             this.done();
             return false;
         }
+
     }
+*/
 })
 
 Template.dataset.events = {
