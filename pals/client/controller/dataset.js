@@ -23,7 +23,7 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-                    console.log(results);
+                    console.log(docId);
                     Router.go('/dataset/display/' + docId);
                 }
             });
