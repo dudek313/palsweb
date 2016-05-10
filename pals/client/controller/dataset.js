@@ -15,15 +15,11 @@ AutoForm.hooks({
             event.preventDefault();
             insertDoc._version = 1;
             insertDoc.draft = true;
-//            var draftDataSetId = new Meteor.Collection.ObjectID()._str;
-//            insertDoc._id = draftDataSetId
-//            Session.set('currentDataSet', draftDataSetId)
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
                     console.log(error.reason);
                 }
                 else {
-                    console.log(results);
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -31,31 +27,18 @@ AutoForm.hooks({
             this.done();
             return false;
         },
-        before: {
-            normal: function(doc) {
-
-            }
-        },
-/*
-        onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            event.preventDefault();
-            updateDoc._version = 1;
-            console.log('currentDoc: ' + currentDoc);
-//            currentDoc._id = Session.get('currentDataSet');
-            console.log('ready to insert doc: ' + currentDoc);
-            Meteor.call('updateDataSet', currentDoc, updateDoc);
-// need to include code to Router.go to the new inserted dataSet
-            this.done();
-            return false;
-        },
-        onSuccess: function(doc) {
-//            Router.go('/dataset/display/'+this.docId);
-        }
-        */
     },
     updateDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            Meteor.call('updateDataSet', currentDoc, updateDoc);
+            event.preventDefault();
+            Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                    console.log(error.reason);
+                }
+                else {
+                    Router.go('dataset/display/' + docId);
+                }
+            });
             this.done();
             return false;
         }

@@ -38,6 +38,11 @@ if( !reference ) {
 }
 
 DataSets.attachSchema(new SimpleSchema({
+  _id: {
+    type: String,
+    index: true,
+    unique: true
+  },
   name: {
     type: String,
     label: "Name",
@@ -171,6 +176,26 @@ DataSets.attachSchema(new SimpleSchema({
   },
   _version: {
     type: Number,
+    optional: true
+  },
+  'files.$.path': {
+    type: String,
+    optional: true
+  },
+  'files.$.name': {
+    type: String,
+    optional: true
+  },
+  'files.$.size': {
+    type: Number,
+    optional: true
+  },
+  'files.$.key': {
+    type: String,
+    optional: true
+  },
+  'files.$.date': {
+    type: Date,
     optional: true
   }
 }));
