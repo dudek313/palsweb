@@ -33,7 +33,7 @@ AutoForm.hooks({
         },
         before: {
             normal: function(doc) {
-
+                doc._id = Session.get(currentDataSet);
             }
         },
 /*
@@ -148,14 +148,18 @@ Template.dataset.events = {
     },
 */
     'click .file-select':function(event, template){
-
         var currentDataSetId = Session.get('currentDataSet');
         if( !currentDataSetId ) {
+            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
+            if ( !name ) {
+                alert("name not entered");
+            }
+  //            alert("Please enter a data set name before uploading scripts");
+            return;
 
         }
     },
     'change .file-select':function(event, template){
-        event.preventDefault();
 
         var currentDataSetId = Session.get('currentDataSet');
         if( !currentDataSetId ) {
@@ -181,12 +185,8 @@ Template.dataset.events = {
 //                        fileObjId: fileObj._id,
                         created: new Date()
                     };
-                    console.log('fileRecord: ');
-                    console.log(fileRecord);
-                    var selector = {'_id':currentDataSetId};
-                    var updateDoc = {'$push':{'files':{'path':"/1234"}}};
-                    Meteor.call('updateDataSet', selector, updateDoc, function(error,docId){
-//                        {'$push':{'files':fileRecord}},function(error,docId){
+                    DataSets.update({'_id':currentDataSetId},
+                        {'$push':{'files':fileRecord}},function(error){
                             if( error ) {
                                 console.log(error);
                                 console.log('Failed to add uploaded file to the data set');

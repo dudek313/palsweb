@@ -108,7 +108,7 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
-    'updateDataSet': function(currentDoc, dataSetDoc, callback) {
+    'updateDataSet': function(currentDoc, dataSetDoc) {
         return DataSets.update(currentDoc, dataSetDoc);
     },
     'insertDataSet': function(dataSetDoc) {
