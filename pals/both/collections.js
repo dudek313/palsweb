@@ -38,11 +38,6 @@ if( !reference ) {
 }
 
 DataSets.attachSchema(new SimpleSchema({
-  _id: {
-    type: String,
-    index: true,
-    unique: true
-  },
   name: {
     type: String,
     label: "Name",

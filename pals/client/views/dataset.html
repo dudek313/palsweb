@@ -72,82 +72,9 @@
     {{/autoForm}}
   {{else}}
     {{#if inUpdateMode}}
-      {{#autoForm collection="DataSets" id="createDatasetForm" type="normal" validation='blur'}}
-        <fieldset>
-          <legend>Create New Data Set</legend>
-          <div class="alert alert-danger error"></div>
-          {{> afQuickField name='name'}}
-          {{> afQuickField name='type' type='select' firstOption="(Select One)" options='allowed'}}
-          {{> afQuickField name='spatialLevel' type='select' firstOption="(Select One)" options='allowed'}}
-          {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
-          {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
-          {{> afQuickField name='soilType'}}
-          {{> afQuickField name='url'}}
-          {{> afQuickField name='lat'}}
-          {{> afQuickField name='lon'}}
-          {{> afQuickField name='elevation'}}
-          {{> afQuickField name='maxVegHeight'}}
-          {{> afQuickField name='utcOffset'}}
-          {{> afQuickField name='siteContact'}}
-          {{> afQuickField name='references' rows=6}}
-          {{> afQuickField name='comments' rows=6}}
-          <b>Variables</b>
-          {{> afQuickField name='variables.NEE' type='boolean-checkbox'}}
-          {{> afQuickField name='variables.Qg' type='boolean-checkbox'}}
-          {{> afQuickField name='variables.Qh' type='boolean-checkbox'}}
-          {{> afQuickField name='variables.Qle' type='boolean-checkbox'}}
-          {{> afQuickField name='variables.Rnet' type='boolean-checkbox'}}
-          {{> afQuickField name='variables.SWnet' type='boolean-checkbox'}}
-          {{> afQuickField name='region'}}
-          {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
-          <button type="submit" class="create-btn btn btn-primary">Save</button>
-          <br> <br>
-          <div class="col-md-6">
-            <div class="panel panel-primary">
-              <div class="panel-heading">Files</div>
-              {{#if hasFiles}}
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>File</th>
-                        {{#if currentUser.admin}}<th>delete</th>{{/if}}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {{#each files}}
-                    <tr>
-                        {{#if isPublicOrOwner}}
-                        <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{name}}</td>
-                        {{else}}
-                        <td>{{name}}</td>
-                        {{/if}}
-                        {{#if inEditMode}}<td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
-                    </tr>
-                    {{/each}}
-                    </tbody>
-                </table>
-              {{/if}}
-              <div class="panel-body">
-              {{#if inEditMode}}
-                  <label>Upload a new file</label>
-                  <input type="file" class="file-select" name="file-select"/>
-                  <div class="progress progress-striped active">
-                    <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                        style="width:0%">
-                    </div>
-                  </div>
-              {{/if}}
-              </div>
-            </div>
-          </div>
-        </fieldset>
-      {{/autoForm}}
-
-
-<!--      {{#autoForm collection="DataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
+      {{#autoForm collection="DataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
         <fieldset>
           <h1>Data Set: {{dataSet.name}}</h1>
-          <div class="alert alert-danger error"></div>
           <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
           <br>
           {{> afQuickField name='name'}}
@@ -177,7 +104,6 @@
           {{> afQuickField name='variables.SWnet' type='boolean-checkbox'}}
           {{> afQuickField name='region'}}
           {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
-          <button type="submit" class="create-btn btn btn-primary">Save</button>
           <div class="col-md-6">
             <div class="panel panel-primary">
               <div class="panel-heading">Files</div>
@@ -220,13 +146,12 @@
         <button type="submit" class="btn btn-primary">Save New Version</button>
         <button type="reset" class="btn btn-primary">Cancel</button>
       {{/autoForm}}
-    -->
     {{else}}
 
       <form role="form">
         <h1>Data Set: {{dataSet.name}}</h1>
         <div class="alert alert-danger error"></div>
-        {{#if currentUser.admin}}<a class="btn btn-success enable-update pull-right">Update Data Set</a>{{/if}}
+        {{#if currentUser.admin}}{{#if latestVersion}}<a class="btn btn-success enable-update pull-right">Update Data Set</a>{{/if}}{{/if}}
         <br>
         <div class="form-group">
             <label>Name</label>
