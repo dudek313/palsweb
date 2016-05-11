@@ -38,19 +38,15 @@ AutoForm.hooks({
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             var currentDraftDataSet = getCurrentDraftDataSet();
             updateDoc.$set.files = getDraftFiles(currentDraftDataSet);
-            console.log('updating... updateDoc');
-            console.log(updateDoc);
-            console.log('currentDoc');
-            console.log(currentDoc);
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
                     console.log(error.reason);
                 }
-//                else {
-//                    Session.set('screenMode', 'display');
-//                    var currentDataSetId = Session.get('currentDataSet');
-//                    Router.go('/dataset/display/' + currentDataSetId);
-//                }
+                else {
+                    Session.set('screenMode', 'display');
+                    var currentDataSetId = Session.get('currentDataSet');
+                    Router.go('/dataset/display/' + currentDataSetId);
+                }
             });
 
             this.done();
@@ -153,7 +149,7 @@ Template.dataset.events = {
 //                        fileObjId: fileObj._id,
                         created: new Date()
                     };
-                    DataSets.update({'_id':currentDataSetId},
+                    Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
                         {'$push':{'files':fileRecord}},function(error){
                             if( error ) {
                                 console.log(error);
