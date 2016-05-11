@@ -116,6 +116,15 @@ Meteor.methods({
           return DraftDataSets.insert(dataSetDoc);
         }
     },
+    'updateDraftDataSet': function(currentDoc, updateDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return DraftDataSets.update(currentDoc, updateDoc);
+        }
+
+    },
     'updateDataSet': function(currentDoc, dataSetDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')

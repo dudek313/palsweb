@@ -107,7 +107,7 @@
           <div class="col-md-6">
             <div class="panel panel-primary">
               <div class="panel-heading">Files</div>
-              {{#if hasFiles}}
+              {{#if draftHasFiles}}
                 <table class="table table-hover">
                     <thead>
                     <tr>
@@ -116,7 +116,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {{#each files}}
+                    {{#each draftFiles}}
                     <tr>
                         {{#if isPublicOrOwner}}
                         <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{name}}</td>
@@ -144,7 +144,7 @@
           </div>
         </fieldset>
         <button type="submit" class="btn btn-primary">Save New Version</button>
-        <button type="reset" class="btn btn-primary">Cancel</button>
+        <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
       {{/autoForm}}
     {{else}}
 

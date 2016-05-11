@@ -40,6 +40,10 @@ Meteor.publish('dataSets',function(){
     return DataSets.find();
 });
 
+Meteor.publish('draftDataSets',function(){
+    return DraftDataSets.find();
+});
+
 DataSets.allow({
     insert: function(userId, doc) {
         var user = Meteor.user();

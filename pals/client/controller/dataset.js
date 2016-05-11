@@ -36,15 +36,21 @@ AutoForm.hooks({
     },
     updateDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            var currentDraftDataSet = getCurrentDraftDataSet();
+            updateDoc.$set.files = getDraftFiles(currentDraftDataSet);
+            console.log('updating... updateDoc');
+            console.log(updateDoc);
+            console.log('currentDoc');
+            console.log(currentDoc);
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
                     console.log(error.reason);
                 }
-                else {
-                    Session.set('screenMode', 'display');
-                    var currentDataSetId = Session.get('currentDataSet');
-                    Router.go('/dataset/display/' + currentDataSetId);
-                }
+//                else {
+//                    Session.set('screenMode', 'display');
+//                    var currentDataSetId = Session.get('currentDataSet');
+//                    Router.go('/dataset/display/' + currentDataSetId);
+//                }
             });
 
             this.done();
@@ -53,20 +59,26 @@ AutoForm.hooks({
     }
 })
 
+
 Template.dataset.events = {
+    'click .cancel-update':function(event){
+        event.preventDefault();
+        Session.set('screenMode','display');
+    },
     'click .delete-file':function(event) {
+        event.preventDefault();
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-            var currentDataSet = getCurrentDataSet();
-            if( currentDataSet.files ) {
+            var currentDraftDataSet = getCurrentDraftDataSet();
+            if( currentDraftDataSet.files ) {
                 var currentFile = undefined;
-                currentDataSet.files.forEach(function(file) {
+                currentDraftDataSet.files.forEach(function(file) {
                     if( file.key == key ) {
                         currentFile = file;
                     }
                 });
                 if( currentFile ) {
-                    updateDraftDataSet({'_id':currentDataSet._id},
+                    Meteor.call('updateDraftDataSet', {'_id':currentDraftDataSet._id},
                         {$pull : {'files':{ 'key':key }}}, function(error) {
                             if( error ) {
                                 $('.error').html('Failed to delete file, please try again');
@@ -87,8 +99,7 @@ Template.dataset.events = {
     'click .enable-update':function(event){
         var dataSetId = Session.get('currentDataSet');
         var draftExists = DraftDataSets.findOne({_id: dataSetId});
-        console.log(draftExists);
-        if( !draftExists ) {
+        if( draftExists ) {
             DraftDataSets.remove({_id:dataSetId});
         }
         var currentDataSet = getCurrentDataSet();
@@ -156,9 +167,15 @@ Template.dataset.events = {
 };
 
 function getCurrentDataSet() {
-  var currentDataSetId = Session.get('currentDataSet');
-  var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
-  return currentDataSet;
+    var currentDataSetId = Session.get('currentDataSet');
+    var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
+    return currentDataSet;
+}
+
+function getCurrentDraftDataSet() {
+    var currentDataSetId = Session.get('currentDataSet');
+    var currentDraftDataSet = DraftDataSets.findOne({'_id':currentDataSetId});
+    return currentDraftDataSet;
 }
 
 function cloneDataSet() {
@@ -172,6 +189,17 @@ function getFiles(dataSet) {
         var files = new Array();
         for( var i=0; i < dataSet.files.length; ++i ) {
             var file = dataSet.files[i];
+            files.push(file);
+        }
+        return files;
+    }
+}
+
+function getDraftFiles(draftDataSet) {
+    if( draftDataSet && draftDataSet.files && draftDataSet.files.length > 0 ) {
+        var files = new Array();
+        for( var i=0; i < draftDataSet.files.length; ++i ) {
+            var file = draftDataSet.files[i];
             files.push(file);
         }
         return files;
@@ -197,9 +225,18 @@ Template.dataset.helpers({
       var dataSet = getCurrentDataSet();
       return getFiles(dataSet);
   },
+  draftFiles: function() {
+      var draftDataSet = getCurrentDraftDataSet();
+      return getDraftFiles(draftDataSet);
+  },
   hasFiles: function() {
       var dataSet = getCurrentDataSet();
       if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
+      else return false;
+  },
+  draftHasFiles: function() {
+      var draftDataSet = getCurrentDraftDataSet();
+      if( draftDataSet && draftDataSet.files && draftDataSet.files.length > 0 ) return true;
       else return false;
   },
   reference: function() {
