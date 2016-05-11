@@ -1,6 +1,6 @@
 <template name="dataset">
   {{#if inCreateMode}}
-    {{#autoForm collection="DataSets" id="createDatasetForm" type="normal" validation='blur'}}
+    {{#autoForm collection="DraftDataSets" id="createDatasetForm" type="normal" validation='blur'}}
       <fieldset>
         <legend>Create New Data Set</legend>
         <div class="alert alert-danger error"></div>
@@ -28,12 +28,10 @@
         {{> afQuickField name='variables.SWnet' type='boolean-checkbox'}}
         {{> afQuickField name='region'}}
         {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
-        <button type="submit" class="create-btn btn btn-primary">Save</button>
-        <br> <br>
         <div class="col-md-6">
           <div class="panel panel-primary">
             <div class="panel-heading">Files</div>
-            {{#if hasFiles}}
+            {{#if draftHasFiles}}
               <table class="table table-hover">
                   <thead>
                   <tr>
@@ -42,7 +40,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                  {{#each files}}
+                  {{#each draftFiles}}
                   <tr>
                       {{#if isPublicOrOwner}}
                       <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{name}}</td>
@@ -68,12 +66,17 @@
             </div>
           </div>
         </div>
+        <br> <br> <br> <br> <br> <br> <br>
+        <button type="submit" class="create-btn btn btn-primary">Save</button>
+        <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
       </fieldset>
     {{/autoForm}}
   {{else}}
     {{#if inUpdateMode}}
       {{#autoForm collection="DraftDataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
         <fieldset>
+            <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+                <br>Data Set won't be saved until "Save New Version" is clicked below.</b></div>
           <h1>Data Set: {{dataSet.name}}</h1>
           <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
           <br>
@@ -143,6 +146,10 @@
             </div>
           </div>
         </fieldset>
+        <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+            <br>Data Set won't be saved until "Save New Version" is clicked below.</b></div>
+        <br>
+        <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
         <button type="submit" class="btn btn-primary">Save New Version</button>
         <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
       {{/autoForm}}
@@ -284,8 +291,12 @@
          </div>
        </div>
       </div>
+        {{#if currentUser.admin}}
+            <div class="form-group">
+                <a class="btn btn-success enable-update pull-right">Update Data Set</a>
+            </div>
+        {{/if}}
     {{/if}}
-
   {{/if}}
 </template>
 

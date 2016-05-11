@@ -2,6 +2,9 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
+    if(Session.equals('screenMode', 'create')) {
+        createDummyDataSet();
+    }
     this.autorun( function(){
         if(Session.equals('screenMode', 'update'))
           return;
@@ -9,18 +12,36 @@ Template.dataset.rendered = function() {
     });
 };
 
+function createDummyDataSet() {
+    var dummyDataSet = {
+        name: new Meteor.Collection.ObjectID()._str,
+        type: 'flux tower',
+        spatialLevel: 'SingleSite'
+    };
+    Meteor.call('createDraftDataSet', dummyDataSet, function(error, docId){
+        if(error) {
+            console.log(error.reason);
+        }
+        else {
+            Session.set('currentDataSet', docId);
+        }
+    });
+}
+
 AutoForm.hooks({
     createDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             event.preventDefault();
             insertDoc._version = 1;
-            insertDoc.draft = true;
+            var currentDraftDataSet = getCurrentDraftDataSet();
+            insertDoc.files = getDraftFiles(currentDraftDataSet);
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
                     console.log(error.reason);
                 }
                 else {
                     console.log(docId);
+                    DraftDataSets.remove({_id:currentDraftDataSet._id});
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -60,6 +81,10 @@ Template.dataset.events = {
     'click .cancel-update':function(event){
         event.preventDefault();
         Session.set('screenMode','display');
+    },
+    'click .cancel-create':function(event){
+        event.preventDefault();
+        Router.go('/home')
     },
     'click .delete-file':function(event) {
         event.preventDefault();
@@ -106,12 +131,11 @@ Template.dataset.events = {
                 console.log(error);
             }
             else {
-                console.log('Drafted Data Set: ' + docId);
                 Session.set('screenMode', 'update');
             }
         });
     },
-    'click .file-select':function(event, template){
+/*    'click .file-select':function(event, template){
         var currentDataSetId = Session.get('currentDataSet');
         if( !currentDataSetId ) {
             var name = AutoForm.getFieldValue("createDatasetForm", 'name');
@@ -123,17 +147,18 @@ Template.dataset.events = {
 
         }
     },
+*/
     'change .file-select':function(event, template){
 
         var currentDataSetId = Session.get('currentDataSet');
-        if( !currentDataSetId ) {
+/*        if( !currentDataSetId ) {
 //            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
 //            if ( !name )
 //                alert("name not entered");
             alert("Please enter a data set name before uploading scripts");
             return;
         }
-
+*/
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
@@ -214,6 +239,7 @@ Template.dataset.variables = function() {
 }
 
 Template.dataset.helpers({
+
   dataSet: function() {
       return getCurrentDataSet();
   },
