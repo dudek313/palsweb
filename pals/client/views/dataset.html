@@ -72,7 +72,7 @@
     {{/autoForm}}
   {{else}}
     {{#if inUpdateMode}}
-      {{#autoForm collection="DataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
+      {{#autoForm collection="DraftDataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
         <fieldset>
           <h1>Data Set: {{dataSet.name}}</h1>
           <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
@@ -151,7 +151,7 @@
       <form role="form">
         <h1>Data Set: {{dataSet.name}}</h1>
         <div class="alert alert-danger error"></div>
-        {{#if currentUser.admin}}{{#if latestVersion}}<a class="btn btn-success enable-update pull-right">Update Data Set</a>{{/if}}{{/if}}
+        {{#if currentUser.admin}}<a class="btn btn-success enable-update pull-right">Update Data Set</a>{{/if}}
         <br>
         <div class="form-group">
             <label>Name</label>

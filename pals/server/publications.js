@@ -55,6 +55,21 @@ DataSets.allow({
     }
 });
 
+DraftDataSets.allow({
+    insert: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    },
+    remove: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    }
+});
+
 Meteor.publish('reference',function(){
     return Reference.find();
 });

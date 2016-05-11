@@ -108,6 +108,14 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
+    'createDraftDataSet': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return DraftDataSets.insert(dataSetDoc);
+        }
+    },
     'updateDataSet': function(currentDoc, dataSetDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')

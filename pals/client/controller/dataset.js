@@ -66,7 +66,7 @@ Template.dataset.events = {
                     }
                 });
                 if( currentFile ) {
-                    DataSets.update({'_id':currentDataSet._id},
+                    updateDraftDataSet({'_id':currentDataSet._id},
                         {$pull : {'files':{ 'key':key }}}, function(error) {
                             if( error ) {
                                 $('.error').html('Failed to delete file, please try again');
@@ -85,7 +85,24 @@ Template.dataset.events = {
         }
     },
     'click .enable-update':function(event){
-        Session.set('screenMode', 'update');
+        var dataSetId = Session.get('currentDataSet');
+        var draftExists = DraftDataSets.findOne({_id: dataSetId});
+        console.log(draftExists);
+        if( !draftExists ) {
+            DraftDataSets.remove({_id:dataSetId});
+        }
+        var currentDataSet = getCurrentDataSet();
+        Meteor.call('createDraftDataSet', currentDataSet, function(error, docId){
+            if(error) {
+                $('.error').html('Unable to update data set. Please try again.');
+                $('.error').show();
+                console.log(error);
+            }
+            else {
+                console.log('Drafted Data Set: ' + docId);
+                Session.set('screenMode', 'update');
+            }
+        });
     },
     'click .file-select':function(event, template){
         var currentDataSetId = Session.get('currentDataSet');
@@ -144,9 +161,8 @@ function getCurrentDataSet() {
   return currentDataSet;
 }
 
-Template.dataset.cloneDataSet = function() {
+function cloneDataSet() {
     var cloneDS = jQuery.extend({}, getCurrentDataSet());
-    delete cloneDS._id;
     cloneDS.version = 0;
     return cloneDS;
 }
