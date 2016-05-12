@@ -88,7 +88,7 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
 function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces, callback) {
   fs.exists(filename, function (exists) {
       if( exists ) {
-          //console.log('File exists: ' + filename);
+          console.log('File exists: ' + filename);
           // copy the file
           var newFilename = uuid.v4();
           fs.stat(filename,function(err,stats){
