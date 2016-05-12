@@ -66,7 +66,6 @@
             </div>
           </div>
         </div>
-        <br> <br> <br> <br> <br> <br> <br>
         <button type="submit" class="create-btn btn btn-primary">Save</button>
         <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
       </fieldset>
@@ -75,8 +74,8 @@
     {{#if inUpdateMode}}
       {{#autoForm collection="DraftDataSets" doc=dataSet id="updateDatasetForm" type="normal"}}
         <fieldset>
-            <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
-                <br>Data Set won't be saved until "Save New Version" is clicked below.</b></div>
+            <div class="alert-danger" align="center"><b>Warning: Update is currently in Draft Mode.
+                <br>Updated data set won't be saved until "Save New Version" is clicked below.</b></div>
           <h1>Data Set: {{dataSet.name}}</h1>
           <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
           <br>
@@ -146,8 +145,9 @@
             </div>
           </div>
         </fieldset>
-        <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
-            <br>Data Set won't be saved until "Save New Version" is clicked below.</b></div>
+        <div class="alert-danger" align="center"><b>Warning: Update is currently in Draft Mode.
+            <br>Updated data set won't be saved until "Save New Version" is clicked below.</b>
+        </div>
         <br>
         <a class="btn btn-success enable-update pull-right" disabled=true>Update Data Set</a>
         <button type="submit" class="btn btn-primary">Save New Version</button>
@@ -292,7 +292,7 @@
        </div>
       </div>
         {{#if currentUser.admin}}
-            <div class="form-group">
+            <div class="col-md-12">
                 <a class="btn btn-success enable-update pull-right">Update Data Set</a>
             </div>
         {{/if}}

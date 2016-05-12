@@ -20,6 +20,8 @@ function createDummyDataSet() {
     };
     Meteor.call('createDraftDataSet', dummyDataSet, function(error, docId){
         if(error) {
+            $('.error').html('There was a server error. Are you logged in?');
+            $('.error').show();
             console.log(error.reason);
         }
         else {
@@ -37,6 +39,8 @@ AutoForm.hooks({
             insertDoc.files = getDraftFiles(currentDraftDataSet);
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
+                    $('.error').html('Failed to create the data set. Please try again.');
+                    $('.error').show();
                     console.log(error.reason);
                 }
                 else {
@@ -61,6 +65,8 @@ AutoForm.hooks({
             updateDoc.$set.files = getDraftFiles(currentDraftDataSet);
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
+                    $('.error').html('Failed to update the data set. Please try again.');
+                    $('.error').show();
                     console.log(error.reason);
                 }
                 else {
@@ -75,7 +81,6 @@ AutoForm.hooks({
         }
     }
 })
-
 
 Template.dataset.events = {
     'click .cancel-update':function(event){
@@ -104,7 +109,7 @@ Template.dataset.events = {
                             if( error ) {
                                 $('.error').html('Failed to delete file, please try again');
                                 $('.error').show();
-                                console.log(error);
+                                console.log(error.reason);
                             }
                         }
                     );
@@ -177,8 +182,9 @@ Template.dataset.events = {
                     Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
                         {'$push':{'files':fileRecord}},function(error){
                             if( error ) {
-                                console.log(error);
-                                console.log('Failed to add uploaded file to the data set');
+                                $('.error').html('Failed to add uploaded file, please try again');
+                                $('.error').show();
+                                console.log(error.reason);
                             }
                     });
                 }
