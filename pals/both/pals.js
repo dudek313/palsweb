@@ -57,61 +57,6 @@ Router.map(function () {
             }
         ]
     });
-
-/*    this.route('datasets/Anywhere',{
-        path: '/datasets/Anywhere',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-              Session.set('source',null);
-              Session.set('currentSpatialResolution',null);
-		          this.next();
-            }
-        ]
-    });
-    this.route('datasets/Workspace',{
-        path: '/datasets/Workspace',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-              Session.set('source','workspace');
-              Session.set('currentSpatialResolution',null);
-              this.next();
-            }
-        ]
-    });
-    this.route('dataSetsBySpatialResolution',{
-        path: '/dataSetsBySpatialResolution/:resolution',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialResolution',this.params.resolution);
-                this.next();
-            }
-        ]
-    });
-    this.route('dataSets/Anywhere/BySpatialResolution',{
-        path: '/dataSets/Anywhere/BySpatialResolution/:resolution',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-                Session.set('source',null);
-                Session.set('currentSpatialResolution',this.params.resolution);
-                this.next();
-            }
-        ]
-    });
-    this.route('dataSets/Workspace/BySpatialResolution',{
-        path: '/dataSets/Workspace/BySpatialResolution/:resolution',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-                Session.set('source','workspace');
-                Session.set('currentSpatialResolution',this.params.resolution);
-                this.next();
-            }
-        ]
-    }); */
     this.route('createDataset',{
         path: '/dataset/create',
         template: 'dataset',
@@ -119,8 +64,8 @@ Router.map(function () {
             function() {
                 Session.set('screenMode', 'create');
                 Session.set('inEditMode', true);
-                Session.set('currentDataSet',undefined);
-		            this.next();
+                createDummyDataSet();
+	            this.next();
             }
         ]
     });
@@ -276,6 +221,25 @@ Router.map(function () {
         }
     });
 });
+
+function createDummyDataSet() {
+    var dummyDataSet = {
+        name: new Meteor.Collection.ObjectID()._str,
+        type: 'flux tower',
+        spatialLevel: 'SingleSite'
+    };
+    Meteor.call('createDraftDataSet', dummyDataSet, function(error, docId){
+        if(error) {
+            $('.error').html('There was a server error. Are you logged in?');
+            $('.error').show();
+            console.log(error.reason);
+        }
+        else {
+            console.log('Draft data set created: ' + docId);
+            Session.set('currentDataSet', docId);
+        }
+    });
+}
 
 // Router.onBeforeAction(function(){
 //     if (!Meteor.user()) {

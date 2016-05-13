@@ -2,33 +2,8 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-    if(Session.equals('screenMode', 'create')) {
-        createDummyDataSet();
-    }
-    this.autorun( function(){
-        if(Session.equals('screenMode', 'update'))
-          return;
-
-    });
 };
 
-function createDummyDataSet() {
-    var dummyDataSet = {
-        name: new Meteor.Collection.ObjectID()._str,
-        type: 'flux tower',
-        spatialLevel: 'SingleSite'
-    };
-    Meteor.call('createDraftDataSet', dummyDataSet, function(error, docId){
-        if(error) {
-            $('.error').html('There was a server error. Are you logged in?');
-            $('.error').show();
-            console.log(error.reason);
-        }
-        else {
-            Session.set('currentDataSet', docId);
-        }
-    });
-}
 
 AutoForm.hooks({
     createDatasetForm: {
