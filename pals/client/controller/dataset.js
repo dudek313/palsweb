@@ -97,6 +97,9 @@ Template.dataset.events = {
             }
         }
     },
+    'change #downloadable': function() {
+
+    },
     'click .enable-update':function(event){
         var dataSetId = Session.get('currentDataSet');
         var draftExists = DraftDataSets.findOne({_id: dataSetId});
@@ -115,44 +118,24 @@ Template.dataset.events = {
             }
         });
     },
-/*    'click .file-select':function(event, template){
-        var currentDataSetId = Session.get('currentDataSet');
-        if( !currentDataSetId ) {
-            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
-            if ( !name ) {
-                alert("name not entered");
-            }
-  //            alert("Please enter a data set name before uploading scripts");
-            return;
-
-        }
-    },
-*/
     'change .file-select':function(event, template){
-
         var currentDataSetId = Session.get('currentDataSet');
-/*        if( !currentDataSetId ) {
-//            var name = AutoForm.getFieldValue("createDatasetForm", 'name');
-//            if ( !name )
-//                alert("name not entered");
-            alert("Please enter a data set name before uploading scripts");
-            return;
-        }
-*/
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
                     var originalFilename = fileObj.name();
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
-
+                    var isDownloadable = document.getElementById('downloadable').checked;
+                    console.log(isDownloadable);
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         name: originalFilename,
                         size: fileObj.size(),
                         key: name,
 //                        fileObjId: fileObj._id,
-                        created: new Date()
+                        created: new Date(),
+                        downloadable: isDownloadable
                     };
                     Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
                         {'$push':{'files':fileRecord}},function(error){
@@ -165,6 +148,9 @@ Template.dataset.events = {
                 }
             });
         });
+    },
+    'click .download-file':function(event, template){
+        event.preventDefault();
     }
 };
 
@@ -221,6 +207,13 @@ Template.dataset.variables = function() {
 
 Template.dataset.helpers({
 
+  isDownloadable: function() {
+      if (this.downloadable)
+          return "Yes"
+      else {
+          return "No"
+      }
+  },
   dataSet: function() {
       return getCurrentDataSet();
   },
