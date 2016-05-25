@@ -127,6 +127,7 @@ Template.dataset.events = {
                     var originalFilename = fileObj.name();
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
                     var isDownloadable = document.getElementById('downloadable').checked;
+                    var fileType = $("input[type='radio'][name='fileType']:checked").val();
                     console.log(isDownloadable);
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
@@ -135,7 +136,8 @@ Template.dataset.events = {
                         key: name,
 //                        fileObjId: fileObj._id,
                         created: new Date(),
-                        downloadable: isDownloadable
+                        downloadable: isDownloadable,
+                        type: fileType
                     };
                     Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
                         {'$push':{'files':fileRecord}},function(error){

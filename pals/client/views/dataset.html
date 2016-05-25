@@ -36,6 +36,7 @@
                   <thead>
                   <tr>
                       <th>File</th>
+                      <th>Type</th>
                       <th>Public</th>
                       <th>Download</th>
                       {{#if currentUser.admin}}<th>Delete</th>{{/if}}
@@ -45,6 +46,7 @@
                   {{#each draftFiles}}
                   <tr>
                       <td>{{name}}</td>
+                      <td>{{type}}</td>
                       <td>{{isDownloadable}}</td>
                       <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
                             onclick="window.location.href='/file/{{key}}/{{name}}'">Download</button></td>
@@ -58,7 +60,14 @@
             {{#if inEditMode}}
                 <label>Upload a new file</label>
                 <input type="file" class="file-select" name="file-select"/>
-                <input type="submit" class="upload-file" name="upload-file">
+                <br>
+                <input type="checkbox" id="downloadable">Downloadable<br><br>
+                <div class="form-group">
+                  <label>Type:</label>
+                  <input type="radio" name="fileType" value="driving">Driving
+                  <input type="radio" name="fileType" value="evaluation">Evaluation
+                  <input type="radio" name="fileType" value="other">Other
+                </div>
                 <div class="progress progress-striped active">
                   <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                       style="width:0%">
@@ -118,7 +127,8 @@
                     <thead>
                     <tr>
                         <th>File</th>
-                        <th align="center">Public</th>
+                        <th>Type</th>
+                        <th>Public</th>
                         <th>Download</th>
                         {{#if currentUser.admin}}<th>Delete</th>{{/if}}
                     </tr>
@@ -127,6 +137,7 @@
                     {{#each draftFiles}}
                     <tr>
                         <td>{{name}}</td>
+                        <td>{{type}}</td>
                         <td>{{isDownloadable}}</td>
                         <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
                                 onclick="window.location.href='/file/{{key}}/{{name}}'">Download</button></td>
@@ -140,7 +151,14 @@
               {{#if inEditMode}}
                   <label>Upload a new file</label>
                   <input type="file" class="file-select" name="file-select"/>
-                  <input type="checkbox" id="downloadable">Downloadable
+                  <br>
+                  <input type="checkbox" id="downloadable">Downloadable<br><br>
+                  <div class="form-group">
+                    <label>Type:</label>
+                    <input type="radio" name="fileType" value="Driving" checked>Driving
+                    <input type="radio" name="fileType" value="Evaluation">Evaluation
+                    <input type="radio" name="fileType" value="Other">Other
+                  </div>
                   <div class="progress progress-striped active">
                     <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                         style="width:0%">
@@ -278,6 +296,7 @@
              <thead>
              <tr>
                  <th>File</th>
+                 <th>Type</th>
                  <th>Public</th>
                  <th>Download</th>
              </tr>
@@ -286,12 +305,13 @@
              {{#each files}}
              <tr>
                 <td>{{name}}</td>
+                <td>{{type}}</td>
                 <td>{{isDownloadable}}</td>
                 {{#if downloadable}}
                     <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
                             onclick="window.location.href='/file/{{key}}/{{name}}'">Download</button></td>
                 {{else}}
-                    <td>-</td>
+                    <td></td>
                 {{/if}}
               </tr>
              {{/each}}
