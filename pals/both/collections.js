@@ -1,5 +1,5 @@
 Workspaces = new Meteor.Collection("workspaces");
-DataSets = new Meteor.Collection("dataSets");//.vermongo({timestamps: true, userId: 'modifierId'});
+DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId: 'modifierId'});
 DraftDataSets = new Meteor.Collection("draftDataSets");
 Reference = new Meteor.Collection("reference");
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
@@ -43,6 +43,7 @@ dataSetSchema = new SimpleSchema({
     type: String,
     label: "Name",
     max: 50,
+    index: true,
     unique: true
   },
   type: {
@@ -193,16 +194,12 @@ dataSetSchema = new SimpleSchema({
     type: Date,
     optional: true
   },
-  'files.$.type': {
-    type: String,
-    optional: true
-  },
   'files.$.downloadable': {
     type: Boolean,
     optional: true
   },
-  'files.$.version': {
-    type: Number,
+  'files.$.type': {
+    type: String,
     optional: true
   }
 });

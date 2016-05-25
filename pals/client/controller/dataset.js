@@ -128,7 +128,6 @@ Template.dataset.events = {
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
                     var isDownloadable = document.getElementById('downloadable').checked;
                     var fileType = $("input[type='radio'][name='fileType']:checked").val();
-                    console.log(isDownloadable);
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         name: originalFilename,
@@ -208,7 +207,18 @@ Template.dataset.variables = function() {
 }
 
 Template.dataset.helpers({
-
+  formType: function() {
+    var screenMode = Session.get('screenMode');
+    if(screenMode == 'create') return "createDatasetForm"
+    else if(screenMode == 'update') return "updateDatasetForm"
+    else return null;
+  },
+  dataIfNeeded: function() {
+    var screenMode = Session.get('screenMode');
+    if(screenMode == 'create') return null
+    else if(screenMode == 'update') return getCurrentDataSet()
+    else return null;
+  },
   isDownloadable: function() {
       if (this.downloadable)
           return "Yes"
