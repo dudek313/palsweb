@@ -52,7 +52,6 @@ Router.map(function () {
             function() {
                 Session.set('currentDataSet',this.params.id);
                 Session.set('screenMode', 'display');
-                Session.set('inEditMode', false);
                 this.next();
             }
         ]
@@ -63,7 +62,6 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('screenMode', 'create');
-                Session.set('inEditMode', true);
                 createDummyDataSet();
 	            this.next();
             }
@@ -202,7 +200,6 @@ Router.map(function () {
             function() {
                 Session.set('currentModel',undefined);
                 Session.set('screenMode', 'create');
-                Session.set('inEditMode', true);
                 this.next();
             }
         ]
@@ -214,7 +211,6 @@ Router.map(function () {
             function() {
                 Session.set('currentModel',this.params.id);
                 Session.set('screenMode', 'display');
-                Session.set('inEditMode', false);
                 this.next();
             }
         ]

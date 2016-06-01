@@ -46,23 +46,33 @@ Models.attachSchema(new SimpleSchema({
   },
   owner: {
     type: String,
-    label: "Owner"
+    label: "Owner",
+    optional: true
   },
   created: {
     type: Date,
     label: "Created",
+    optional: true
+  },
+  modified: {
+    type: Date,
+    label: "Last Modified",
+    optional: true
   },
   url: {
     type: SimpleSchema.RegEx.Url,
-    label: "URL"
+    label: "URL",
+    optional: true
   },
   references: {
     type: String,
-    label: "References"
+    label: "References",
+    optional: true
   },
   comments: {
     type: String,
-    label: "Comments"
+    label: "Comments",
+    optional: true
   }
 }));
 

@@ -294,9 +294,6 @@ Template.dataset.helpers({
     else {
         return false;
     }
-  },
-  updateBtnDisabled: function() {
-    return Session.get('disableUpdateBtn');
   }
 });
 

@@ -2,50 +2,56 @@ Template.model.rendered = function() {
     window['directives']();
 };
 
-Template.model.model = function() {
-    currentModelId = Session.get('currentModel');
-    if( currentModelId ) {
-        var model = Models.findOne({'_id':currentModelId});
-        if( model.owner ) {
-            model.owner = Meteor.users.findOne({'_id':model.owner},{'_id':1,'name':1});
-            if( model.owner && model.owner.emails && model.owner.emails.length > 0) {
-                model.owner.email = model.owner.emails[0].address;
-            }
-        }
-        console.log(model.owner);
-        return model;
-    }
-}
-
-Template.model.events(templateSharedObjects.form({
-    meteorSessionId: 'currentModel',
-    collectionName: 'Models'
-}).events());
-
 AutoForm.hooks({
     createModelForm: {
-        onSuccess: function(formType, result) {
-            Session.set('screenMode', 'display');
-            Router.go('/dataset/display/' + docId);
-        }
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            event.preventDefault();
+            insertDoc._version = 1;
+            insertDoc.owner = Meteor.user()._id;
+            insertDoc.created = new Date();
+            Meteor.call('insertModel', insertDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to create the model profile. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    console.log(docId);
+                    Router.go('/model/display/' + docId);
+                }
+            });
+
+            this.done();
+            return false;
+        },
+        before: {
+            normal: function(doc) {
+                doc._id = Session.get(currentDataSet);
+            }
+        },
     },
-    updateDatasetForm: {
-        
+
+    updateModelForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            updateDoc.$set.modified = new Date();
+            Meteor.call('updateModel', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to update the model. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    Session.set('screenMode', 'display');
+                    var currentModelId = Session.get('currentModel');
+                    Router.go('/model/display/' + currentModelId);
+                }
+            });
+
+            this.done();
+            return false;
+        }
     }
 })
-
-
-Template.model.owner = function() {
-    var user = Meteor.user();
-    var model = Template.model.model();
-    if( user && model ) {
-        if( model.owner == user._id ) return true;
-        else return false;
-    }
-    else {
-        return true;
-    }
-};
 
 function getCurrentModel() {
     var currentModelId = Session.get('currentModel');
@@ -53,8 +59,21 @@ function getCurrentModel() {
     return currentModel;
 }
 
+Template.model.events = {
+    'click .cancel-update':function(event){
+        event.preventDefault();
+        Session.set('screenMode','display');
+    },
+    'click .cancel-create':function(event){
+        event.preventDefault();
+        Router.go('/home')
+    },
+    'click .enable-update':function(event){
+        Session.set('screenMode', 'update');
+    }
+};
 
-Template.dataset.helpers({
+Template.model.helpers({
   formId: function() {
     var screenMode = Session.get('screenMode');
     if(screenMode == 'create') return "createModelForm"
@@ -67,10 +86,57 @@ Template.dataset.helpers({
     else if(screenMode == 'update') return getCurrentModel()
     else return null;
   },
+  inCreateMode: function() {
+      return (Session.get('screenMode')=='create');
+  },
+  inUpdateMode: function() {
+      return (Session.get('screenMode')=='update');
+  },
+  inEditMode: function() {
+      var screenMode = Session.get('screenMode');
+      return (screenMode =='update' || screenMode =='create');
+  },
   formType: function() {
     var screenMode = Session.get('screenMode');
     if(screenMode == 'create') return "insert"
     else if(screenMode == 'update') return "update"
     else return null;
+  },
+  owner: function() {
+      var user = Meteor.user();
+      var model = getCurrentModel();
+      if( user && model ) {
+          if( model.owner == user._id ) return true;
+          else return false;
+      }
+      else {
+          return true;
+      }
+  },
+  ownerEmail: function() {
+      var model = getCurrentModel();
+      if (model) {
+          ownerId = model.owner;
+          var owner = Meteor.users.findOne({_id:ownerId});
+          if (owner) {
+              return owner.emails[0].address;
+          }
+          else {
+              console.log('Owner name not registered');
+          }
+      }
+  },
+  userEmail: function() {
+      user = Meteor.user();
+      if (user) {
+          return user.emails[0].address;
+      }
+  },
+  model: function() {
+      return getCurrentModel();
+
+  },
+  updateBtnDisabled: function() {
+    return Session.get('disableUpdateBtn');
   }
 });
