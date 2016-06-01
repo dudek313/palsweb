@@ -185,23 +185,36 @@ Router.map(function () {
             }
         ]
     });
-    this.route('models');
-    this.route('model',{
-        path: '/model',
-        template: 'model',
+    this.route('models', {
+        path: '/models/:selector',
+        template: 'models',
         onBeforeAction: [
             function() {
-                Session.set('currentModel',undefined);
+                Session.set('selector', this.params.selector);
                 this.next();
             }
         ]
     });
-    this.route('modelsById',{
-        path: '/models/:id',
+    this.route('createModel',{
+        path: '/model/create',
+        template: 'model',
+        onBeforeAction: [
+            function() {
+                Session.set('currentModel',undefined);
+                Session.set('screenMode', 'create');
+                Session.set('inEditMode', true);
+                this.next();
+            }
+        ]
+    });
+    this.route('modelById',{
+        path: '/model/display/:id',
         template: 'model',
         onBeforeAction: [
             function() {
                 Session.set('currentModel',this.params.id);
+                Session.set('screenMode', 'display');
+                Session.set('inEditMode', false);
                 this.next();
             }
         ]

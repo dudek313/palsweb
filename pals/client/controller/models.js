@@ -1,11 +1,28 @@
 Template.models.models = function() {
     var user = Meteor.user();
     if( user ) {
-	if (user.profile.currentWorkspace.name == 'public')
-		var models = Models.find().fetch();
-	else
-	        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
-//        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+      var selector = Session.get('selector');
+      if (selector == 'mine')
+          var models = Models.find({'owner':user._id}).fetch();
+      else if (selector == 'workspace') {
+      // looks for model profiles belonging to model outputs in the current workspace
+          var models = [];
+          var model_ids = [];
+          var modelOutputs = ModelOutputs.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+          modelOutputs.forEach(function(modelOutput){
+              var modelId = modelOutput.model;
+              if (model_ids.indexOf(modelId) == -1) {
+                  var model = Models.findOne({_id:modelId});
+                  models.push(model);
+                  model_ids.push(modelId);
+              }
+          });
+      }
+      else {
+          $('.error').html('Unable to display models');
+          $('.error').show();
+      }
+    //        var models = Models.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
 
         if( models )
         {
@@ -17,7 +34,7 @@ Template.models.models = function() {
                     }
                 }
             });
-        }    
+        }
         return models;
     }
 }
@@ -38,3 +55,17 @@ Template.models.events({
         }
     }
 });
+
+Template.models.helpers({
+    pageTitle: function() {
+        var selector = Session.get('selector');
+        if (selector == 'mine')
+            return "My Model Profiles";
+        else if (selector == 'workspace')
+            return "Model Profiles in the Current Workspace";
+        else {
+          $('.error').html('An error occurred in displaying the page. Please try again.');
+          $('.error').show();
+        }
+    }
+})

@@ -207,7 +207,7 @@ Template.dataset.variables = function() {
 }
 
 Template.dataset.helpers({
-  formType: function() {
+  formId: function() {
     var screenMode = Session.get('screenMode');
     if(screenMode == 'create') return "createDatasetForm"
     else if(screenMode == 'update') return "updateDatasetForm"
@@ -304,12 +304,10 @@ Template.dataset.helpers({
     var dataSet = getCurrentDataSet();
     return getFiles(dataSet);
 }
-
 Template.dataset.reference = function() {
     var reference = Reference.findOne();
     return reference;
 };
-
 Template.dataset.hasFiles = function() {
     var dataSet = getCurrentDataSet();
     if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
@@ -324,7 +322,6 @@ Template.dataset.hasFiles = function() {
             var user = Meteor.user();
             currentDataSetId = Session.get('currentDataSet');
             variable = Variables.findOne({'_id':variableId});
-
             if( currentDataSetId && variable) {
                 var selector = {'_id':currentDataSetId};
                 var modifier = {'$addToSet': {variables:variable}};

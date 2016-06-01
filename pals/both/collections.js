@@ -38,6 +38,34 @@ if( !reference ) {
     });
 }
 
+
+Models.attachSchema(new SimpleSchema({
+  name: {
+    type: String,
+    label: "Name",
+  },
+  owner: {
+    type: String,
+    label: "Owner"
+  },
+  created: {
+    type: Date,
+    label: "Created",
+  },
+  url: {
+    type: SimpleSchema.RegEx.Url,
+    label: "URL"
+  },
+  references: {
+    type: String,
+    label: "References"
+  },
+  comments: {
+    type: String,
+    label: "Comments"
+  }
+}));
+
 dataSetSchema = new SimpleSchema({
   name: {
     type: String,
