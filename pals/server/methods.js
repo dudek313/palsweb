@@ -107,7 +107,6 @@ extractLatestVersion = function(modelOutput) {
     return mostRecentVersion;
 }
 
-
 Meteor.methods({
     'createDraftDataSet': function(dataSetDoc) {
         if( !Meteor.user().admin ) {
