@@ -1,27 +1,32 @@
 <template name="experiments">
 <div class="text-content">
     <h1>
-    {{#if currentSpatialResolution}}{{currentSpatialResolution}}{{/if}}
+    {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
         Experiments
     </h1>
+    <h3>
+      {{#if source}}In Current Workspace
+      {{else}}Anywhere
+      {{/if}}
+    </h3>
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>
         <tr>
-            {{#if currentSpatialResolution}}
-                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+            {{#if currentSpatialLevel}}
+                {{#if areEqual currentSpatialLevel 'SingleSite'}}
                     {{> singleSiteHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
                     {{> multipleSiteHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                {{#if areEqual currentSpatialLevel 'Catchment'}}
                     {{> catchmentHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Regional'}}
+                {{#if areEqual currentSpatialLevel 'Regional'}}
                     {{> regionalHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Global'}}
+                {{#if areEqual currentSpatialLevel 'Global'}}
                     {{> globalHeadings}}
                 {{/if}}
             {{else}}
@@ -36,20 +41,20 @@
         <tbody>
         {{#each experiments}}
         <tr id="{{_id}}">
-            {{#if currentSpatialResolution}}
-                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+            {{#if currentSpatialLevel}}
+                {{#if areEqual currentSpatialLevel 'SingleSite'}}
                     {{> singleSiteRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
                     {{> multipleSiteRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                {{#if areEqual currentSpatialLevel 'Catchment'}}
                     {{> catchmentRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Regional'}}
+                {{#if areEqual currentSpatialLevel 'Regional'}}
                     {{> regionalRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Global'}}
+                {{#if areEqual currentSpatialLevel 'Global'}}
                     {{> globalRow}}
                 {{/if}}
             {{else}}

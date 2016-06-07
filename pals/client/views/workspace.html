@@ -1,21 +1,28 @@
 <template name="workspace">
 <div class="text-content">
-<h1>Workspace: {{workspace.name}}</h1>
-<h2>Shared With</h2>
-<table class="table">
-    <tr>
-        <th>email address</th>
-        {{#if isOwner}}<th>invite</th>{{/if}}
-    </tr>
-{{#each users}}
-    <tr>
-        <td>{{email}}</td>
-        {{#if isOwner}}<td>
-            <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}}>
-        </td>{{/if}}
-    </tr>   
-{{/each}}
-</table>
+<h1>Workspace: {{workspace.name}}</h1><br>
+<input type="checkbox" class="make-public" {{checkedIfTrue isPublic}}> Make Public
+
+<!--{{#if isPublic}}
+{{else}}-->
+  <div class="shared">
+    <h2>Shared With</h2>
+    <table class="table">
+        <tr>
+            <th>email address</th>
+            {{#if isOwner}}<th>invite</th>{{/if}}
+        </tr>
+    {{#each users}}
+        <tr>
+            <td>{{email}}</td>
+            {{#if isOwner}}<td>
+                <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
+            </td>{{/if}}
+        </tr>
+    {{/each}}
+    </table>
+  </div>
+<!--{{/if}}-->
 </div>
 {{guests}}
 </template>

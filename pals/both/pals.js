@@ -17,52 +17,53 @@ Router.map(function () {
     });
     this.route('workspaces');
     this.route('workspace',{
-       path: '/workspaces/:id',
+       path: '/workspace/:id',
        template: 'workspace',
        onBeforeAction: [
-           function() {
-               Session.set('currentWorkspace',this.params.id);
-	       this.next();
+          function() {
+              Session.set('currentWorkspace',this.params.id);
+              this.next();
            }
-       ] 
+       ]
     });
     this.route('datasets',{
-        path: '/datasets',
+        path: '/datasets/:source/:resolution',
         template: 'datasets',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',null);
-		this.next();
-            }
-        ]
-    });
-    this.route('dataset',{
-        path: '/datasets/:id',
-        template: 'dataset',
-        onBeforeAction: [
-            function() {
-                Session.set('currentDataSet',this.params.id);
+                if (this.params.source == 'Anywhere')
+                    Session.set('source',null)
+                else {
+                    Session.set('source',this.params.source);
+                }
+                if (this.params.resolution == 'AllTypes')
+                    Session.set('currentSpatialLevel', null)
+                else {
+                    Session.set('currentSpatialLevel',this.params.resolution);
+                }
                 this.next();
             }
         ]
     });
-    this.route('dataSetsBySpatialResolution',{
-        path: '/dataSetsBySpatialResolution/:resolution',
-        template: 'datasets',
+    this.route('dataset',{
+        path: '/dataset/display/:id',
+        template: 'dataset',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',this.params.resolution);
+                Session.set('currentDataSet',this.params.id);
+                Session.set('screenMode', 'display');
                 this.next();
             }
         ]
     });
     this.route('createDataset',{
-        path: '/dataset',
+        path: '/dataset/create',
         template: 'dataset',
         onBeforeAction: [
             function() {
-                Session.set('currentDataSet',undefined);
-		this.next();
+                Session.set('screenMode', 'create');
+                createDummyDataSet();
+	            this.next();
             }
         ]
     });
@@ -81,7 +82,29 @@ Router.map(function () {
         template: 'experiments',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',null);
+                Session.set('currentSpatialLevel',null);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Anywhere',{
+        path: '/experiments/Anywhere',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialLevel',null);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace',{
+        path: '/experiments/Workspace',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialLevel',null);
                 this.next();
             }
         ]
@@ -96,12 +119,34 @@ Router.map(function () {
             }
         ]
     });
-    this.route('experimentsBySpatialResolution',{
-        path: '/experimentsBySpatialResolution/:resolution',
+    this.route('experimentsBySpatialLevel',{
+        path: '/experimentsBySpatialLevel/:resolution',
         template: 'experiments',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialResolution',this.params.resolution);
+                Session.set('currentSpatialLevel',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Anywhere/BySpatialLevel',{
+        path: '/experiments/Anywhere/BySpatialLevel/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source',null);
+                Session.set('currentSpatialLevel',this.params.resolution);
+                this.next();
+            }
+        ]
+    });
+    this.route('experiments/Workspace/BySpatialLevel',{
+        path: '/experiments/Workspace/BySpatialLevel/:resolution',
+        template: 'experiments',
+        onBeforeAction: [
+            function() {
+                Session.set('source','workspace');
+                Session.set('currentSpatialLevel',this.params.resolution);
                 this.next();
             }
         ]
@@ -138,23 +183,34 @@ Router.map(function () {
             }
         ]
     });
-    this.route('models');
-    this.route('model',{
-        path: '/model',
-        template: 'model',
+    this.route('models', {
+        path: '/models/:selector',
+        template: 'models',
         onBeforeAction: [
             function() {
-                Session.set('currentModel',undefined);
+                Session.set('selector', this.params.selector);
                 this.next();
             }
         ]
     });
-    this.route('modelsById',{
-        path: '/models/:id',
+    this.route('createModel',{
+        path: '/model/create',
+        template: 'model',
+        onBeforeAction: [
+            function() {
+                Session.set('currentModel',undefined);
+                Session.set('screenMode', 'create');
+                this.next();
+            }
+        ]
+    });
+    this.route('modelById',{
+        path: '/model/display/:id',
         template: 'model',
         onBeforeAction: [
             function() {
                 Session.set('currentModel',this.params.id);
+                Session.set('screenMode', 'display');
                 this.next();
             }
         ]
@@ -175,13 +231,32 @@ Router.map(function () {
     });
 });
 
+function createDummyDataSet() {
+    var dummyDataSet = {
+        name: new Meteor.Collection.ObjectID()._str,
+        type: 'flux tower',
+        spatialLevel: 'SingleSite'
+    };
+    Meteor.call('createDraftDataSet', dummyDataSet, function(error, docId){
+        if(error) {
+            $('.error').html('There was a server error. Are you logged in?');
+            $('.error').show();
+            console.log(error.reason);
+        }
+        else {
+            console.log('Draft data set created: ' + docId);
+            Session.set('currentDataSet', docId);
+        }
+    });
+}
+
 // Router.onBeforeAction(function(){
 //     if (!Meteor.user()) {
 //         this.render('login');
 //         this.stop();
 //     }
 // }, {except: ['home','root','file']});
-// 
+//
 // if( Meteor.isClient ) {
 //     Router.configure({
 //       autoRender: false

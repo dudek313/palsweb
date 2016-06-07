@@ -2,32 +2,8 @@ Template.datasets.rendered = function() {
     window['directives']();
 };
 
-Template.datasets.dataSets = function() {
-    var user = Meteor.user();
-    if( user ) {
-//        var selector = {'workspaces':user.profile.currentWorkspace._id};
-	if (user.profile.currentWorkspace.name == 'public')
-		var selector = {};
-	else
-	        var selector = {'workspaces':user.profile.currentWorkspace._id};
-        var resolution = Template.datasets.currentSpatialResolution();
-        if( resolution ) {
-            selector.spatialLevel = resolution;
-        }
-        return DataSets.find(selector,{sort:{created:-1}});
-    }
-}
-
-Template.datasets.currentSpatialResolution = function() {
-    return Session.get('currentSpatialResolution');
-}
-
-Template.datasets.userEmail = function(userId) {
-    var user = Meteor.users.findOne({'_id':userId});
-    if( user && user.emails && user.emails.length > 0 ) {
-        return Meteor.users.findOne({'_id':userId}).emails[0].address;
-    }
-    else return '';
+getCurrentSpatialLevel = function() {
+    return Session.get('currentSpatialLevel');
 }
 
 Template.datasets.events({
@@ -53,8 +29,10 @@ Template.datasets.events({
         event.stopImmediatePropagation();
         event.preventDefault();
         var id = $(event.target).parent().attr('id');
-        Router.go('/datasets/'+id);
+        Router.go('/dataset/display/'+id);
     }
+
+
 });
 
 Template.datasets.helpers({
@@ -62,5 +40,57 @@ Template.datasets.helpers({
        if( firstString === secondString ) {
            return true;
        }
-   } 
+   },
+   dataSets: function() {
+       var user = Meteor.user();
+       if( user ) {
+   //        var selector = {'workspaces':user.profile.currentWorkspace._id};
+   //      if (user.profile.currentWorkspace.name == 'public')
+   //          var selector = {};
+   //      else
+   //          var selector = {'experiments.workspace':user.profile.currentWorkspace._id};
+         var source = Session.get('source');
+         var selector = {};
+
+         if( source ) {
+             selector = {'experiments.workspace':user.profile.currentWorkspace._id};
+         }
+   //      selector.recordType = 'version';
+  //       selector.$where = 'this.latest == true';
+
+         var resolution = getCurrentSpatialLevel();
+         if( resolution ) {
+             selector.spatialLevel = resolution;
+         }
+
+         return DataSets.find(selector,{sort:{created:-1}});
+     }
+   },
+   currentSpatialLevel: function() {
+      return Session.get('currentSpatialLevel');
+   },
+   source: function() {
+      return Session.get('source');
+   },
+   userEmail: function(userId) {
+       var user = Meteor.users.findOne({'_id':userId});
+       if( user && user.emails && user.emails.length > 0 ) {
+           return Meteor.users.findOne({'_id':userId}).emails[0].address;
+       }
+       else return '';
+   },
+   variableList: function(dataset) {
+      var varList = "";
+      if(dataset.variables) {
+          variables = dataset.variables;
+
+          if(variables.NEE) varList += "NEE  ";
+          if(variables.Qg) varList += "Qg  ";
+          if(variables.Qh) varList += "Qh  ";
+          if(variables.Qle) varList += "Qle  ";
+          if(variables.RNet) varList += "Rnet  ";
+          if(variables.SWnet) varList += "SWnet ";
+      }
+      return varList;
+   }
 });

@@ -1,17 +1,29 @@
 Template.experiments.experiments = function() {
     var user = Meteor.user();
     if( user ) {
-        var selector = {};
-        var resolution = Template.experiments.currentSpatialResolution();
-        if( resolution ) {
-            selector.spatialLevel = resolution;
-        }
-        return Experiments.find(selector,{sort:{created:-1}});
+      var selector = {};
+      var source = Template.experiments.source();
+      // if the source is from the current workspace
+      if( source ) {
+        selector = {'workspaces':user.profile.currentWorkspace._id};
+      }
+      selector.recordType='template';
+      selector.$where = 'this.latest == true';
+
+      var resolution = Template.experiments.currentSpatialLevel();
+      if( resolution ) {
+          selector.spatialLevel = resolution;
+      }
+      return Experiments.find(selector,{sort:{created:-1}});
     }
 }
 
-Template.experiments.currentSpatialResolution = function() {
-    return Session.get('currentSpatialResolution');
+Template.experiments.source = function() {
+    return Session.get('source');
+}
+
+Template.experiments.currentSpatialLevel = function() {
+    return Session.get('currentSpatialLevel');
 }
 
 Template.experiments.events({
@@ -46,5 +58,5 @@ Template.experiments.helpers({
        if( firstString === secondString ) {
            return true;
        }
-   } 
+   }
 });

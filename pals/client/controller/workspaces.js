@@ -1,22 +1,22 @@
-Template.workspaces.myWorkspaces = function() {
-    var user = Meteor.user();
-    if( user ) {
-        var workspaces =  Workspaces.find({'owner':user._id});
-        return workspaces;
+Template.workspaces.helpers({
+    myWorkspaces: function() {
+        var user = Meteor.user();
+        if( user ) {
+            var workspaces =  Workspaces.find({'owner':user._id});
+            return workspaces;
+        }
+    },
+    sharedWorkspaces: function() {
+        var user = Meteor.user();
+        if( user ) {
+            var workspaces =  Workspaces.find({'guests':user._id});
+            return workspaces;
+        }
+    },
+    rootWorkspace: function() {
+        return Workspaces.findOne({'name':'public'});
     }
-};
-
-Template.workspaces.sharedWorkspaces = function() {
-    var user = Meteor.user();
-    if( user ) {
-        var workspaces =  Workspaces.find({'guests':user._id});
-        return workspaces;
-    }
-};
-
-Template.workspaces.rootWorkspace = function() {
-    return Workspaces.findOne({'name':'public'});
-};
+});
 
 Template.workspaces.events({
   'click #add-workspace': function (event) {
@@ -29,8 +29,9 @@ Template.workspaces.events({
               else {
                   var workspace = Workspaces.findOne({'_id':id});
                   user.profile.currentWorkspace = workspace;
-                  Meteor.users.update({'_id':user._id}, 
+                  Meteor.users.update({'_id':user._id},
                       {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
+                  Router.go('/workspace/'+id);
               }
           });
       }
@@ -38,7 +39,11 @@ Template.workspaces.events({
   'click .open-workspace':function (event) {
       var id = $(event.target).attr('id');
       if( id ) {
-          Router.go('/workspaces/'+id);
+          var user = Meteor.user();
+          var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
+          Meteor.users.update({'_id':user._id},
+            {'$set' : {'profile.currentWorkspace':workspace}});
+          Router.go('/workspace/'+id);
       }
   },
   'click .delete-workspace':function (event) {
@@ -55,9 +60,8 @@ Template.workspaces.events({
       if( id ) {
           var user = Meteor.user();
           var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
-          Meteor.users.update({'_id':user._id}, 
+          Meteor.users.update({'_id':user._id},
             {'$set' : {'profile.currentWorkspace':workspace}});
       }
   },
 });
-
