@@ -1,4 +1,4 @@
-var oldDataDir = '/mnt/sharing/migration-data/pals/pals/webappdata'
+var oldDataDir = '/mnt/sharing/pals-nci/webappdata'
 var newDataDir = '/pals/data'
 //DF: var baseDir = '/vagrant/data/pals/webappdata'
 //DF: var palsDataDir = '/pals/data-new'
@@ -82,7 +82,6 @@ function process() {
         *******************************************************/
 
         var future = new Future;
-/*        moHelpers.migrateModels(pgInstance, mongoInstance, users, publicWorkspace, future.resolver()) */
         moHelpers.migrateModels(pgInstance, mongoInstance, users, null, future.resolver())
 	      future.wait()
         console.log('models migrated...')
@@ -94,7 +93,7 @@ function process() {
         *
         *******************************************************/
 
-// (old)       dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance,publicWorkspace)
+
 
         dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance)
         console.log('data sets migrated...')
@@ -105,13 +104,14 @@ function process() {
         * Migrate model outputs
         *
         *******************************************************/
-/*
-        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance, publicWorkspace)
+
+        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
         console.log('model outputs migrated...')
 
-*/
+
       }).run();
 };
+
 
 /*
     mongoInstance.connect(function(err){

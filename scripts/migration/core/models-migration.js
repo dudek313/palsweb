@@ -2,12 +2,6 @@
 var Fiber  = require('fibers')
 var Future = require('fibers/future');
 
-/* Original code
-This migrates all models into the public Workspace.
-However, we intend to get rid of the public Workspace, so instead we have to find out which workspace a model belongs to.
-The way to do that is to match the model.id with experimentable.id and retrieve the experimentable.experiment_id,
-which is the workspace id. Then we store that as the workspace (instead of having a workspaces array).
-*/
  
 exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,callback) {
 //    mongoInstance.dropIndexes('models', callback); /* stops it using model.name as a unique identifier */
@@ -43,7 +37,7 @@ exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,
 
 function loadModels(pgInstance,callback) {
 /*    var loadModelsQuery = "SELECT * FROM model"; */
-    var loadModelsQuery = "SELECT createddate, modelname, ownerusername, version, model.id, commentsm, referencesm, urlm, experimentable.experiment_id FROM model, experimentable WHERE model.id=experimentable.id AND experimentable.experiment_id IS NOT NULL";
+    var loadModelsQuery = "SELECT createddate, modelname, ownerusername, version, model.id, commentsm, referencesm, urlm, experimentable.experiment_id FROM model, experimentable WHERE model.id=experimentable.id AND experimentable.experiment_id IS NOT NULL AND modelname != ''";
 
     pgInstance.sql(loadModelsQuery,function(result,client){
         var models = [];
