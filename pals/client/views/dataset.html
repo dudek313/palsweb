@@ -1,4 +1,11 @@
 <template name="dataset">
+<!--
+  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
+      {{> afQuickField id="name"}}
+      {{> afQuickField name="fileId" type="cfs-file" collection="Files"}}
+      <button type="submit">Upload File</button>
+  {{/autoForm}}
+-->
   {{#if inEditMode}}
     {{#autoForm collection="DraftDataSets" id=formId doc=dataIfNeeded type="normal" validation='blur'}}
       <fieldset>
@@ -67,6 +74,7 @@
                   </tbody>
               </table>
             {{/if}}
+
             <div class="panel-body">
               <label>Upload a new file</label>
               <input type="file" class="file-select" name="file-select"/>
@@ -83,6 +91,7 @@
                     style="width:0%">
                 </div>
               </div>
+
             </div>
           </div>
         </div>

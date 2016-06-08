@@ -19,6 +19,47 @@ GetCollectionByName = function(name) {
     }
 }
 
+Docs = new Meteor.Collection("docs");
+
+Docs.attachSchema(new SimpleSchema({
+  name: {
+    type: String
+  },
+  fileId: {
+    type: String
+/*
+  }
+  path: {
+    type: String,
+    optional: true
+  },
+  size: {
+    type: Number,
+    optional: true
+  },
+  key: {
+    type: String,
+    optional: true
+  },
+  date: {
+    type: Date,
+    optional: true
+  },
+  downloadable: {
+    label: "Downloadable",
+    type: Boolean,
+    optional: true
+  },
+  type: {
+    label: "Type",
+    type: String,
+    optional: true
+*/
+  }
+
+
+}));
+
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });

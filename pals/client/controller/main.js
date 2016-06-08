@@ -1,28 +1,43 @@
 UI._allowJavascriptUrls();
 
+getCurrentWorkspace = function() {
+    var user = Meteor.user();
+    if( user ) {
+        if( !user.profile ) {
+            user.profile = {};
+        }
+        if( !user.profile.currentWorkspace ) {
+            console.log('here')
+            var rootWorkspace = Workspaces.findOne({"name":"public"});
+            user.profile.currentWorkspace = rootWorkspace;
+            Meteor.users.update({'_id':user._id},
+                {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
+        }
+        return user.profile.currentWorkspace;
+    }
+}
+
 Template.main.helpers({
-  currentWorkspace: function() {
-      var user = Meteor.user();
-      if( user ) {
-          if( !user.profile ) {
-              user.profile = {};
+  disabledInBrowseMode: function( ) {
+      if (Meteor.user()) {
+          var currentWorkspace = getCurrentWorkspace();
+          if  (currentWorkspace.name == 'public') {
+              return "disabled";
           }
-          if( !user.profile.currentWorkspace ) {
-              console.log('here')
-              var rootWorkspace = Workspaces.findOne({"name":"public"});
-              user.profile.currentWorkspace = rootWorkspace;
-              Meteor.users.update({'_id':user._id},
-                  {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
-          }
-          return user.profile.currentWorkspace;
+          else return "";
       }
+      else return "disabled";
   },
+  currentWorkspace: function() {
+      return getCurrentWorkspace();
+  },
+  /*
   loggedIn: function() {
       if( Meteor.user() ) return true;
       else return false;
-  },
+  },*/
   isPublicWorkspace: function() {
-      currentWorkspace = Template.main.currentWorkspace();
+      var currentWorkspace = getCurrentWorkspace();
       if( currentWorkspace && (currentWorkspace.name == 'public')) {
           return true;
       }

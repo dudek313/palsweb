@@ -15,69 +15,49 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-      {{#if loggedIn}}
+      <li><a href="/workspaces">Workspaces</a></li>
       <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Models <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles<b class="caret"></b></a>
             <ul class="dropdown-menu">
-                <li><a href="javascript:void(0)" onclick="Router.go('/models/mine');">My Model Profiles</a></li>
-                <li><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">Model Profiles in Current Workspace</a></li>
-                <li><a href="javascript:void(0)" onclick="Router.go('/models/public');">Model Profiles in Public Workspaces</a></li>
-                <li><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model</a></li>
+                <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
+                <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
+                <li><a href="javascript:void(0)" onclick="Router.go('/models/public');">In Available Workspaces</a></li>
+                <li class="divider"></li>
+                <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
             </ul>
       </li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li><a href="javascript:void(0)" onclick="Router.go('/modelOutputs');">Model Outputs</a></li>
-            <li><a href="javascript:void(0)" onclick="Router.go('/myModelOutputs');">My Model Outputs</a></li>
-            <li><a href="javascript:void(0)" onclick="Router.go('/modelOutput');">Upload a Model Output</a></li>
-            <li><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs');">Model Outputs</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/myModelOutputs');">My Model Outputs</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput');">Upload a Model Output</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
         </ul>
       </li>
 
-<!--            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experiments');">All Experiments</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialLevel/SingleSite');">SingleSite</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialLevel/MultipleSite');">MultipleSite</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialLevel/Catchment');">Catchment</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialLevel/Regional');">Regional</a></li>
-                    <li><a href="javascript:void(0)" onclick="Router.go('/experimentsBySpatialLevel/Global');">Global</a></li>
-                    {{#if currentUser.admin}}{{#if isPublicWorkspace}}<li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>{{/if}}{{/if}}
-                </ul>
-            </li>
--->
-
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
                  <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                   <li class="dropdown-submenu">
-                     <a tabindex="-1" href="#">Experiments in Current Workspace</a>
-                     <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Regional');">Regional</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Global');">Global</a></li>
-                     </ul>
-                   </li>
-                   <li class="dropdown-submenu">
-                     <a tabindex="-1" href="#">Experiments in All Workspaces</a>
-                     <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Regional');">Regional</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Global');">Global</a></li>
-                     </ul>
-
-                   </li>
+                   <li class="dropdown-header">In Current Workspace</li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/');">All Types</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/SingleSite');">SingleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/MultipleSite');">MultipleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Catchment');">Catchment</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Regional');">Regional</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/BySpatialLevel/Global');">Global</a></li>
+                   <li class="divider"></li>
+                   <li class="dropdown-header">In All Available Workspaces</li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/');">All Types</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/SingleSite');">SingleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/MultipleSite');">MultipleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Catchment');">Catchment</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Regional');">Regional</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/BySpatialLevel/Global');">Global</a></li>
                    {{#if currentUser.admin}}
-                         <li><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>
-                     {{/if}}
+                        <li class="divider"></li>
+                        <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>
+                    {{/if}}
                  </ul>
             </li>
 
@@ -85,35 +65,28 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets <b class="caret"></b></a>
                  <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                   <li class="dropdown-submenu">
-                     <a tabindex="-1" href="#">Data Sets in Current Workspace</a>
-                     <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/AllTypes');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Regional');">Regional</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialLevel/Global');">Global</a></li>
-                     </ul>
-                   </li>
-                   <li class="dropdown-submenu">
-                     <a tabindex="-1" href="#">Data Sets in All Workspaces</a>
-                     <ul class="dropdown-menu">
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/AllTypes');">All Types</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/SingleSite');">SingleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/MultipleSite');">MultipleSite</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Catchment');">Catchment</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Regional');">Regional</a></li>
-                       <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Global');">Global</a></li>
-                     </ul>
-                   </li>
+                   <li class="dropdown-header">In Current Workspace</li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/AllTypes');">All Types</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/SingleSite');">SingleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/MultipleSite');">MultipleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Catchment');">Catchment</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/Regional');">Regional</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/Workspace/BySpatialLevel/Global');">Global</a></li>
+                   <li class="divider"></li>
+                   <li class="dropdown-header">In All Available Workspaces</li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/AllTypes');">All Types</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/SingleSite');">SingleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/MultipleSite');">MultipleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Catchment');">Catchment</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Regional');">Regional</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/Anywhere/Global');">Global</a></li>
                    {{#if currentUser.admin}}
-                         <li><a href="javascript:void(0)" onclick="Router.go('/dataset/create');">Create Data Set</a></li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:void(0)" onclick="Router.go('/dataset/create');">Create Data Set</a></li>
                      {{/if}}
                  </ul>
             </li>
-        {{/if}}
-    </ul>
+        </ul>
     <ul class="nav navbar-nav navbar-right">
         <li class="double-vertical-menu">
             {{#if loggedIn}}<a class="double-vertical-menu-item" href="javascript:void(0)" onclick="Router.go('/workspaces');">Workspace: {{currentWorkspace.name}}</a>{{/if}}
@@ -124,6 +97,17 @@
   </div><!-- /container -->
 </nav>
 <div class="container main">
+  {{#if loggedIn}}
+    {{#if isPublicWorkspace}}
+      <div class="alert-warning" align="center"><b>You are not currently in any workspace. Feel free to browse the site.
+        <br>To contribute to an experiment you must join an existing workspace or create a new one.</b></div>
+    {{else}}
+    <div class="alert-info" align="center"><br>You are currently in the <b>{{currentWorkspace.name}}</b> workspace.<br><br></div>
+    {{/if}}
+  {{else}}
+    <div class="alert-info" align="center"><b>You are currently not logged in. Feel free to browse the site.
+      <br>To have full use of PALS, please log in or register.</b></div>
+  {{/if}}
 {{> yield}}
 </div>
 </template>

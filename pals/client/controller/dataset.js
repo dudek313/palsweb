@@ -314,6 +314,7 @@ Template.dataset.helpers({
   }
 });
 
+
 /*Template.dataset.files = function() {
     var dataSet = getCurrentDataSet();
     return getFiles(dataSet);
