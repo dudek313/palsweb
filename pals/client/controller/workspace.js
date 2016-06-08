@@ -8,21 +8,26 @@ getCurrentWorkspace = function() {
 };
 
 Template.workspace.helpers({
+  greyIfPublic: function() {
+    return Session.get('isPublic') ? "color:gray" : "color:black";
+  },
+
   workspace: function() {
       return getCurrentWorkspace();
   },
   disabled: function() {
-    var currentWorkspace = getCurrentWorkspace();
-    if (currentWorkspace)
-      return (currentWorkspace.public ? 'disabled' : '');
+    return Session.get('isPublic') ? "disabled" : "";
   },
   checkedIfTrue: function (isTrue) {
       if( isTrue ) return 'checked';
   },
   isPublic: function() {
       var currentWorkspace = getCurrentWorkspace();
-      if (currentWorkspace)
-          return currentWorkspace.public;
+      if (currentWorkspace) {
+          public = currentWorkspace.public
+          Session.set('isPublic', public);
+          return public;
+      }
   },
   created: function() {
       var user = Meteor.user();
@@ -70,6 +75,7 @@ Template.workspace.events({
       Workspaces.update(selector,update,function(error){
           if( error ) alert(error);
       });
+      Session.set('isPublic', checked);
   },
   'click .invite-user': function (event) {
         var user = Meteor.user();

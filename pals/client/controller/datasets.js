@@ -54,7 +54,6 @@ Template.datasets.helpers({
      }
      else {
           var workspaces = getAvailableWorkspaceIds();
-          console.log(workspaces);
           selector = { 'experiments.workspace': {$in:workspaces} }
      }
 

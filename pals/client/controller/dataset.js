@@ -2,6 +2,7 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
+    Session.set('uploadSelected', false);
 };
 
 AutoForm.hooks({
@@ -58,6 +59,10 @@ AutoForm.hooks({
 })
 
 Template.dataset.events = {
+    'click .upload-btn':function(event){
+        event.preventDefault();
+        Session.set('uploadSelected', true);
+    },
     'click .cancel-update':function(event){
         event.preventDefault();
         Session.set('screenMode','display');
@@ -145,6 +150,7 @@ Template.dataset.events = {
                                 $('.error').show();
                                 console.log(error.reason);
                             }
+                            else Session.set('uploadSelected', false);
                     });
                 }
             });
@@ -207,6 +213,9 @@ Template.dataset.variables = function() {
 }
 
 Template.dataset.helpers({
+  uploadSelected: function() {
+    return Session.get('uploadSelected');
+  },
   formId: function() {
     var screenMode = Session.get('screenMode');
     if(screenMode == 'create') return "createDatasetForm"
