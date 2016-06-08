@@ -18,6 +18,13 @@ getCurrentWorkspace = function() {
 }
 
 Template.main.helpers({
+  greyIfLoggedOut: function() {
+      if (Meteor.user()) return ""
+      else {
+        console.log("grey");
+        return "color:gray";
+      }
+  },
   disabledInBrowseMode: function( ) {
       if (Meteor.user()) {
           var currentWorkspace = getCurrentWorkspace();

@@ -8,14 +8,23 @@ Template.workspaces.helpers({
     },
     sharedWorkspaces: function() {
         var user = Meteor.user();
+        var workspaces = Workspaces.find({'public':true}).fetch();
         if( user ) {
-            var workspaces =  Workspaces.find({'guests':user._id});
-            return workspaces;
+            sharedWorkspaces =  Workspaces.find({'guests':user._id}).fetch();
+            Array.prototype.push.apply(workspaces, sharedWorkspaces);
         }
+        return workspaces;
     },
     rootWorkspace: function() {
         return Workspaces.findOne({'name':'public'});
-    }
+    },
+    greyIfLoggedOut: function() {
+        if (Meteor.user()) return ""
+        else {
+          console.log("grey");
+          return "color:gray";
+        }
+    },
 });
 
 Template.workspaces.events({
@@ -56,12 +65,14 @@ Template.workspaces.events({
       }
   },
   'click .open-workspace-shared':function (event) {
-      var id = $(event.target).attr('id');
-      if( id ) {
-          var user = Meteor.user();
-          var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
-          Meteor.users.update({'_id':user._id},
-            {'$set' : {'profile.currentWorkspace':workspace}});
+      var user = Meteor.user();
+      if(user){
+          var id = $(event.target).attr('id');
+          if( id ) {
+              var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
+              Meteor.users.update({'_id':user._id},
+                {'$set' : {'profile.currentWorkspace':workspace}});
+          }
       }
   },
 });
