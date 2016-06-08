@@ -42,29 +42,28 @@ Template.datasets.helpers({
        }
    },
    dataSets: function() {
-       var user = Meteor.user();
-       if( user ) {
-   //        var selector = {'workspaces':user.profile.currentWorkspace._id};
-   //      if (user.profile.currentWorkspace.name == 'public')
-   //          var selector = {};
-   //      else
-   //          var selector = {'experiments.workspace':user.profile.currentWorkspace._id};
-         var source = Session.get('source');
-         var selector = {};
+     var source = Session.get('source');
+     var selector = {};
 
-         if( source ) {
+     if( source ) {
+         var user = Meteor.user();
+         if( user ) {
              selector = {'experiments.workspace':user.profile.currentWorkspace._id};
          }
-   //      selector.recordType = 'version';
-  //       selector.$where = 'this.latest == true';
-
-         var resolution = getCurrentSpatialLevel();
-         if( resolution ) {
-             selector.spatialLevel = resolution;
-         }
-
-         return DataSets.find(selector,{sort:{created:-1}});
+         else console.log('Error: User not logged in');
      }
+     else {
+          var workspaces = getAvailableWorkspaceIds();
+          console.log(workspaces);
+          selector = { 'experiments.workspace': {$in:workspaces} }
+     }
+
+     var resolution = getCurrentSpatialLevel();
+     if( resolution ) {
+         selector.spatialLevel = resolution;
+     }
+     return DataSets.find(selector,{sort:{created:-1}});
+
    },
    currentSpatialLevel: function() {
       return Session.get('currentSpatialLevel');

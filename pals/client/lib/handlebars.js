@@ -17,3 +17,11 @@ Template.registerHelper("disabledInBrowseMode", function( ) {
       }
       else return "disabled";
 });
+
+Template.registerHelper("greyIfLoggedOut", function() {
+    if (Meteor.user()) return ""
+    else {
+      console.log("grey");
+      return "color:gray";
+    }
+});

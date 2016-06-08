@@ -17,14 +17,16 @@ Template.workspaces.helpers({
     },
     rootWorkspace: function() {
         return Workspaces.findOne({'name':'public'});
-    },
+    }
+    /*
     greyIfLoggedOut: function() {
         if (Meteor.user()) return ""
         else {
           console.log("grey");
           return "color:gray";
         }
-    },
+    }
+    */
 });
 
 Template.workspaces.events({
@@ -74,5 +76,5 @@ Template.workspaces.events({
                 {'$set' : {'profile.currentWorkspace':workspace}});
           }
       }
-  },
+  }
 });
