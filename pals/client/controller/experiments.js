@@ -50,6 +50,10 @@ Template.experiments.helpers({
    },
    currentSpatialLevel: function() {
        return Session.get('currentSpatialLevel');
+   },
+   analysesExist: function(analysisId) {
+      return (Analyses.findOne({'_id':analysisId})) ? true : false;
+      
    }
 });
 

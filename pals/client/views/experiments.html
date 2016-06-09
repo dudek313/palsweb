@@ -36,6 +36,7 @@
             <th>Resolution</th>
             <th>Time Step Size</th>
             {{/if}}
+            <th>View Analyses</th>
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
@@ -63,6 +64,9 @@
             <td>{{spatialLevel}}</td>
             <td>{{resolution}}</td>
             <td>{{timeStepSize}}</td>
+            {{/if}}
+            {{#if analysesExist}}<td><button class='btn btn-primary btn-xs' id="{{_id}}">View Analyses</button></td>
+            {{else}}<td>Unavailable</td>
             {{/if}}
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
