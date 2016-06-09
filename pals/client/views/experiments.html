@@ -1,14 +1,15 @@
 <template name="experiments">
 <div class="text-content">
-    <h1>
-    {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-        Experiments
-    </h1>
-    <h3>
-      {{#if source}}In Current Workspace
-      {{else}}Anywhere
-      {{/if}}
-    </h3>
+    {{#if source}}
+      <h1>
+      {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
+          Experiments
+      </h1>
+      <h3>In Current workspace</h3>
+    {{else}}
+      <h1>{{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
+          Experiment Templates</h1>
+    {{/if}}
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>

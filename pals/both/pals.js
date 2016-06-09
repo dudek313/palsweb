@@ -31,17 +31,23 @@ Router.map(function () {
         template: 'datasets',
         onBeforeAction: [
             function() {
-                if (this.params.source == 'Anywhere')
-                    Session.set('source',null)
-                else {
-                    Session.set('source',this.params.source);
-                }
                 if (this.params.resolution == 'AllTypes')
                     Session.set('currentSpatialLevel', null)
                 else {
                     Session.set('currentSpatialLevel',this.params.resolution);
                 }
-                this.next();
+                if (this.params.source == 'Anywhere') {
+                    Session.set('source',null)
+                    this.next();
+                }
+                else {
+                    var user = Meteor.user();
+                    if (user) {
+                        Session.set('source',this.params.source);
+                        this.next();
+                    }
+                }
+
             }
         ]
     });
@@ -78,16 +84,31 @@ Router.map(function () {
         ]
     });
     this.route('experiments',{
-        path: '/experiments',
+        path: '/experiments/:source/:resolution',
         template: 'experiments',
         onBeforeAction: [
             function() {
-                Session.set('currentSpatialLevel',null);
-                this.next();
+                if (this.params.resolution == 'AllTypes')
+                    Session.set('currentSpatialLevel', null)
+                else {
+                    Session.set('currentSpatialLevel',this.params.resolution);
+                }
+                if (this.params.source == 'Anywhere') {
+                    Session.set('source',null)
+                    this.next();
+                }
+                else {
+                    var user = Meteor.user();
+                    if (user) {
+                        Session.set('source',this.params.source);
+                        this.next();
+                    }
+                }
+
             }
         ]
     });
-    this.route('experiments/Anywhere',{
+/*    this.route('experiments/Anywhere',{
         path: '/experiments/Anywhere',
         template: 'experiments',
         onBeforeAction: [
@@ -103,14 +124,17 @@ Router.map(function () {
         template: 'experiments',
         onBeforeAction: [
             function() {
-                Session.set('source','workspace');
-                Session.set('currentSpatialLevel',null);
-                this.next();
+                var user = Meteor.userId();
+                if (currentUser) {
+                    Session.set('source','workspace');
+                    Session.set('currentSpatialLevel',null);
+                    this.next();
+                }
             }
         ]
-    });
+    });*/
     this.route('experimentsById',{
-        path: '/experiments/:id',
+        path: '/experiment/display/:id',
         template: 'experiment',
         onBeforeAction: [
             function() {
@@ -119,7 +143,7 @@ Router.map(function () {
             }
         ]
     });
-    this.route('experimentsBySpatialLevel',{
+/*    this.route('experimentsBySpatialLevel',{
         path: '/experimentsBySpatialLevel/:resolution',
         template: 'experiments',
         onBeforeAction: [
@@ -128,7 +152,7 @@ Router.map(function () {
                 this.next();
             }
         ]
-    });
+    });*/
     this.route('experiments/Anywhere/BySpatialLevel',{
         path: '/experiments/Anywhere/BySpatialLevel/:resolution',
         template: 'experiments',
