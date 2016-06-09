@@ -8,7 +8,7 @@ Template.experiments.helpers({
      var source = Session.get('source');
      var selector = {};
 
-     if( source ) {
+     if( source == 'Workspace' ) {
          var user = Meteor.user();
          if( user ) {
              selector.workspace = user.profile.currentWorkspace._id;
@@ -16,9 +16,15 @@ Template.experiments.helpers({
          }
          else console.log('Error: User not logged in');
      }
-     else {
+     else if (source == 'Templates') {
           selector.recordType='template';
      }
+     else if (source == 'Anywhere') {
+          workspaces = getAvailableWorkspaceIds();
+          selector.workspace = {$in:workspaces};
+          selector.recordType = 'instanceVersion';
+     }
+     else console.log('Error: Source value invalid');
 
      var resolution = Session.get('currentSpatialLevel');
      if( resolution ) {
@@ -53,7 +59,7 @@ Template.experiments.helpers({
    },
    analysesExist: function(analysisId) {
       return (Analyses.findOne({'_id':analysisId})) ? true : false;
-      
+
    }
 });
 

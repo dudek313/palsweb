@@ -1,14 +1,20 @@
 <template name="experiments">
 <div class="text-content">
-    {{#if source}}
+    {{#if areEqual source 'Templates'}}
       <h1>
-      {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-          Experiments
+        {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
+          Experiment Templates To Clone
       </h1>
-      <h3>In Current workspace</h3>
     {{else}}
-      <h1>{{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-          Experiment Templates</h1>
+    <h1>
+      {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
+        Experiments
+    </h1>
+    {{/if}}
+    {{#if areEqual source 'Workspace'}}<h3>In Current Workspace</h3>
+    {{else}}
+      {{#if areEqual source 'Anywhere'}}<h3>In All Available Workspaces</h3>
+      {{/if}}
     {{/if}}
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
@@ -31,12 +37,13 @@
                     {{> globalHeadings}}
                 {{/if}}
             {{else}}
-            <th>Name</th>
-            <th>Spatial Level</th>
-            <th>Resolution</th>
-            <th>Time Step Size</th>
+              <th>Name</th>
+              <th>Spatial Level</th>
+              <th>Resolution</th>
+              <th>Time Step Size</th>
             {{/if}}
-            <th>View Analyses</th>
+            {{#if areEqual source 'Templates'}}
+            {{else}}<th>View Analyses</th>{{/if}}
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
@@ -65,8 +72,11 @@
             <td>{{resolution}}</td>
             <td>{{timeStepSize}}</td>
             {{/if}}
-            {{#if analysesExist}}<td><button class='btn btn-primary btn-xs' id="{{_id}}">View Analyses</button></td>
-            {{else}}<td>Unavailable</td>
+            {{#if areEqual source 'Templates'}}
+            {{else}}
+              {{#if analysesExist}}<td><button class='btn btn-primary btn-xs' id="{{_id}}">View Analyses</button></td>
+              {{else}}<td>Unavailable</td>
+              {{/if}}
             {{/if}}
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>

@@ -43,7 +43,7 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
                  <ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
-                   <li class="dropdown-header">Experiments In Current Workspace</li>
+                   <li class="dropdown-header">In Current Workspace</li>
                    <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/AllTypes');">All Types</a></li>
                    <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/SingleSite');">SingleSite</a></li>
                    <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/MultipleSite');">MultipleSite</a></li>
@@ -51,13 +51,21 @@
                    <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/Regional');">Regional</a></li>
                    <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Workspace/Global');">Global</a></li>
                    <li class="divider"></li>
-                   <li class="dropdown-header">Experiments Templates</li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/AllTypes');">All Types</a></li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/SingleSite');">SingleSite</a></li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/MultipleSite');">MultipleSite</a></li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Catchment');">Catchment</a></li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Regional');">Regional</a></li>
-                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Global');">Global</a></li>
+                   <li class="dropdown-header">In All Available Workspaces</li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/AllTypes');">All Types</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/SingleSite');">SingleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/MultipleSite');">MultipleSite</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Catchment');">Catchment</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Regional');">Regional</a></li>
+                   <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiments/Anywhere/Global');">Global</a></li>
+                   <li class="divider"></li>
+                   <li class="dropdown-header">Experiment Templates To Clone</li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/AllTypes');">All Types</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/SingleSite');">SingleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/MultipleSite');">MultipleSite</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/Catchment');">Catchment</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/Regional');">Regional</a></li>
+                   <li><a href="javascript:void(0)" onclick="Router.go('/experiments/Templates/Global');">Global</a></li>
                    {{#if currentUser.admin}}
                         <li class="divider"></li>
                         <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/experiment');">Create Experiment</a></li>

@@ -94,15 +94,19 @@ Router.map(function () {
                     Session.set('currentSpatialLevel',this.params.resolution);
                 }
                 if (this.params.source == 'Anywhere') {
-                    Session.set('source',null)
+                    Session.set('source','Anywhere')
                     this.next();
                 }
-                else {
+                else if (this.params.source == 'Workspace') {
                     var user = Meteor.user();
                     if (user) {
                         Session.set('source',this.params.source);
                         this.next();
                     }
+                }
+                else if (this.params.source == 'Templates') {
+                    Session.set('source','Templates');
+                    this.next();
                 }
 
             }

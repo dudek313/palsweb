@@ -3,7 +3,19 @@ Template.experiment.rendered = function() {
     templateSharedObjects.progress().hide();
 };
 
-Template.experiment.experiment = function() {
+Template.experiment.helpers({
+    experiment: function() {
+        return getCurrentExperiment();
+    },
+    modelOutpus: function() {
+        return getModelOutputs();
+    }
+
+}
+
+)
+
+getCurrentExperiment = function() {
     currentExperimentId = Session.get('currentExperiment');
     if( currentExperimentId ) {
         var experiment = Experiments.findOne({'_id':currentExperimentId});
@@ -17,7 +29,7 @@ Template.experiment.experiment = function() {
     }
 }
 
-Template.experiment.modelOutputs = function() {
+getModelOutputs = function() {
     currentExperimentId = Session.get('currentExperiment');
     var user = Meteor.user();
     var selector = {'experiment':currentExperimentId};
@@ -42,15 +54,15 @@ Template.experiment.update = function(event) {
 Template.experiment.performUpdate = function(fieldName,value) {
 
     if( value ) {
-    
+
         var user = Meteor.user();
         currentExperimentId = Session.get('currentExperiment');
         var reference = Template.experiment.reference();
-        
+
         if( currentExperimentId ) {
-        
+
             if( value == "n/a" ) value = null;
-        
+
             var selector = {'_id':currentExperimentId};
             var fieldModifier = {};
             fieldModifier[fieldName] = value;
@@ -133,7 +145,7 @@ Template.experiment.events({
     'click .delete-script':function(event) {
         if( Meteor.user().admin ) {
             var key = $(event.target).attr('id');
-        
+
             var currentExperiment = Template.experiment.experiment();
             if( currentExperiment.scripts ) {
                 var currentScript = undefined;
@@ -151,7 +163,7 @@ Template.experiment.events({
                             }
                         }
                     );
-                
+
                     Files.remove({_id:currentScript.fileObjId},function(err){
                        if(err) console.log(err);
                     });
@@ -176,20 +188,20 @@ Template.experiment.events({
     //     reader.readAsBinaryString(file);
     // }
     'change .file-select': function(event, template){
-        
+
         var currentExperimentId = Session.get('currentExperiment');
         if( !currentExperimentId ) {
             alert("Please enter an experiment name before uploading scripts");
             return;
         }
-        
+
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
                     var originalFilename = fileObj.name();
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    
+
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         filename: originalFilename,
