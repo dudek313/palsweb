@@ -25,3 +25,5 @@ cfs:ui
 
 
 npm-container
+cfs:gridfs
+session

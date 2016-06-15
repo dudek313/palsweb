@@ -1,8 +1,8 @@
 <template name="dataset">
-<!--
-  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
+
+<!--  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
       {{> afQuickField id="name"}}
-      {{> afQuickField name="fileId" type="cfs-file" collection="Files"}}
+      {{> afQuickField name="fileId" type="cfs-file" collection="files"}}
       <button type="submit">Upload File</button>
   {{/autoForm}}
 -->
@@ -76,7 +76,7 @@
             {{/if}}
             <div class="panel-body">
 <!--              <label>Upload a new file</label>-->
-              {{#if uploadSelected}}
+              {{#if uploadButtonClicked}}
                 <button class="btn btn-default upload-btn" disabled>Upload A New File</button><br><br>
                 <div class="panel panel-primary">
                   <div class="panel-heading">New File Details</div>

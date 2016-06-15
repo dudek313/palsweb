@@ -36,11 +36,6 @@ Template.datasets.events({
 });
 
 Template.datasets.helpers({
-   areEqual: function(firstString,secondString) {
-       if( firstString === secondString ) {
-           return true;
-       }
-   },
    dataSets: function() {
      var source = Session.get('source');
      var selector = {};

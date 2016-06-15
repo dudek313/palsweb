@@ -142,6 +142,23 @@ Meteor.methods({
           return DataSets.insert(dataSetDoc);
         }
     },
+    'updateExperiment': function(currentDoc, dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return Experiments.update(currentDoc, dataSetDoc);
+        }
+
+    },
+    'insertExperiment': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return Experiments.insert(dataSetDoc);
+        }
+    },
     'updateModel': function(currentDoc, modelDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')

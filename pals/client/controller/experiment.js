@@ -1,6 +1,236 @@
 Template.experiment.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
+    Session.set('uploadButtonClicked', false);
+};
+
+AutoForm.hooks({
+    createExperimentForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            event.preventDefault();
+            insertDoc._version = 1;
+            insertDoc.owner = Meteor.user()._id;
+            insertDoc.scripts = Session.get('tempScripts');
+            insertDoc.recordType = 'template';
+            Meteor.call('insertExperiment', insertDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to create the data set. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    Session.set('tempScripts',null);
+                    Router.go('/experiment/display/' + docId);
+                }
+            });
+
+            this.done();
+            return false;
+        },
+        before: {
+            normal: function(doc) {
+                doc._id = Session.get(currentExperiment);
+            }
+        },
+    },
+    updateExperimentForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            updateDoc.$set.scripts = Session.get('tempScripts');
+            Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to update the data set. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    Session.set('screenMode', 'display');
+                    var currentExperimentId = Session.get('currentExperiment');
+                    Router.go('/experiment/display/' + currentExperimentId);
+                }
+            });
+
+            this.done();
+            return false;
+        }
+    }
+})
+
+Template.experiment.events = {
+    'click .upload-btn':function(event){
+        event.preventDefault();
+        Session.set('uploadButtonClicked', true);
+    },
+    'click .cancel-update':function(event){
+        event.preventDefault();
+        Session.set('screenMode','display');
+    },
+    'click .cancel-create':function(event){
+        event.preventDefault();
+        Router.go('/home')
+    },
+    'click .delete-script':function(event) {
+        event.preventDefault();
+        if( Meteor.user().admin ) {
+            var key = $(event.target).attr('id');
+            var tempScripts = Session.get('tempScripts');
+            var newScripts = [];
+            tempScripts.forEach(function(script) {
+                if (script.key != key)
+                    newScripts.push(script);
+            });
+            Session.set('tempScripts', newScripts);
+
+        }
+    },
+    'click .enable-update':function(event){
+        var currentExperiment = getCurrentExperiment();
+        Session.set('tempScripts', currentExperiment.scripts);
+        Session.set('screenMode', 'update');
+    },
+    'change .file-select':function(event, template){
+        var CurrentExperimentId = Session.get('currentExperiment');
+        FS.Utility.eachFile(event, function(file) {
+            Files.insert(file, function (err, fileObj) {
+                if(err) console.log(err);
+                else {
+                    var originalFilename = fileObj.name();
+                    var name = 'files-' + fileObj._id + '-' + originalFilename;
+                    var fileRecord = {
+                        path: FILE_BUCKET+'/'+name,
+                        filename: originalFilename,
+                        key: name,
+                    };
+                    var tempScripts = Session.get('tempScripts');
+                    tempScripts.push(fileRecord);
+                    Session.set('tempScripts', tempScripts);
+                    Session.set('uploadButtonClicked', false);
+
+                }
+            });
+        });
+    },
+    'click .download-file':function(event, template){
+        event.preventDefault();
+    }
+};
+
+function getCurrentExperiment() {
+    var currentExperimentId = Session.get('currentExperiment');
+    var currentExperiment = Experiments.findOne({'_id':currentExperimentId});
+    return currentExperiment;
+}
+
+
+Template.experiment.updateBtnDisabled = function() {
+    var toDisable = Session.get(disableUpdateBtn);
+    if ( toDisable ) return true
+    else return '';
+}
+
+Template.experiment.variables = function() {
+    return Variables.find();
+}
+
+Template.experiment.helpers({
+  uploadButtonClicked: function() {
+    return Session.get('uploadButtonClicked');
+  },
+  formId: function() {
+    var screenMode = Session.get('screenMode');
+    if(screenMode == 'create') return "createExperimentForm"
+    else if(screenMode == 'update') return "updateExperimentForm"
+    else return null;
+  },
+  dataIfNeeded: function() {
+    var screenMode = Session.get('screenMode');
+    if(screenMode == 'create') return null
+    else if(screenMode == 'update') return getCurrentExperiment()
+    else return null;
+  },
+  isDownloadable: function() {
+      if (this.downloadable)
+          return "Yes"
+      else {
+          return "No"
+      }
+  },
+  experiment: function() {
+      return getCurrentExperiment();
+  },
+  tempScripts: function() {
+      return Session.get('tempScripts');
+  },
+  files: function() {
+      var experiment = getCurrentExperiment();
+      return getFiles(dataSet);
+  },
+  reference: function() {
+      var reference = Reference.findOne();
+      return reference;
+  },
+  inEditMode: function() {
+      var screenMode = Session.get('screenMode');
+      return (screenMode =='update' || screenMode =='create');
+  },
+  inUpdateMode: function() {
+      return (Session.get('screenMode')=='update');
+  },
+  inDisplayMode: function() {
+      return (Session.get('screenMode')=='display');
+  },
+  isPublic: function() {
+      var dataSet = getCurrentExperiment();
+      if( dataSet ) {
+          if( !dataSet.public ) return 'checked'
+          if( dataSet.public === 'true') return 'checked'
+          else return undefined
+      }
+      else return 'checked';
+  },
+  isPublicOrOwner: function() {
+    var dataSet = getCurrentExperiment();
+    if( dataSet ) {
+        if( !dataSet.public ) return true
+        if( dataSet.public === 'true') return true
+        else {
+            var user = Meteor.user();
+            if( user._id === dataSet.owner ) return true;
+            else return false;
+        }
+    }
+    else return true;
+  },
+  inCreateMode: function() {
+    var screenMode = Session.get('screenMode');
+    return (screenMode == 'create')
+  },
+  latestVersion: function() {
+    var currentExperiment = getCurrentExperiment();
+    if(currentExperiment)
+        return currentExperiment.latest
+    else {
+        return false;
+    }
+  },
+  userEmail: function(userId) {
+      var user = Meteor.users.findOne({'_id':userId});
+      if( user && user.emails && user.emails.length > 0 ) {
+          return Meteor.users.findOne({'_id':userId}).emails[0].address;
+      }
+      else return '';
+  },
+  dataSets: function() {
+      var exp = getCurrentExperiment();
+      if( exp && exp.dataSets && exp.dataSets.length > 0) {
+          var dataSets = DataSets.find({_id:{$in:exp.dataSets}});
+          return dataSets;
+      }
+  }
+});
+
+/*Template.experiment.rendered = function() {
+    window['directives']();
+    templateSharedObjects.progress().hide();
 };
 
 Template.experiment.helpers({
@@ -9,11 +239,12 @@ Template.experiment.helpers({
     },
     modelOutpus: function() {
         return getModelOutputs();
+    },
+    reference: function() {
+        return getReference();
     }
 
-}
-
-)
+});
 
 getCurrentExperiment = function() {
     currentExperimentId = Session.get('currentExperiment');
@@ -41,7 +272,7 @@ getModelOutputs = function() {
     }
 }
 
-Template.experiment.reference = function() {
+getReference = function() {
     return Reference.findOne();
 };
 
@@ -247,3 +478,4 @@ Template.experiment.uploadDisabled = function() {
     if( currentExperiment ) return '';
     else return 'disabled="disabled"';
 }
+*/

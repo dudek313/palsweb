@@ -76,5 +76,9 @@ Template.workspaces.events({
                 {'$set' : {'profile.currentWorkspace':workspace}});
           }
       }
+      else {
+          $('.error').html('To enter a workspace, please login or create an account.');
+          $('.error').show();
+      }
   }
 });

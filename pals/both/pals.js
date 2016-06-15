@@ -73,12 +73,13 @@ Router.map(function () {
             }
         ]
     });
-    this.route('experiment',{
+    this.route('createExperiment',{
         path: '/experiment',
         template: 'experiment',
         onBeforeAction: [
             function() {
-                Session.set('currentExperiment',undefined);
+                Session.set('screenMode', 'create');
+                Session.set('tempScripts', []);
                 this.next();
             }
         ]
@@ -93,7 +94,15 @@ Router.map(function () {
                 else {
                     Session.set('currentSpatialLevel',this.params.resolution);
                 }
-                if (this.params.source == 'Anywhere') {
+
+                if ((this.params.source == 'Workspace') && (Meteor.user())
+                    || (this.params.source == 'Templates')
+                    || (this.params.source == 'Anywhere')) {
+                        Session.set('source', this.params.source);
+                        this.next();
+                    }
+
+/*                if (this.params.source == 'Anywhere') {
                     Session.set('source','Anywhere')
                     this.next();
                 }
@@ -108,56 +117,22 @@ Router.map(function () {
                     Session.set('source','Templates');
                     this.next();
                 }
-
+*/
             }
         ]
     });
-/*    this.route('experiments/Anywhere',{
-        path: '/experiments/Anywhere',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('source',null);
-                Session.set('currentSpatialLevel',null);
-                this.next();
-            }
-        ]
-    });
-    this.route('experiments/Workspace',{
-        path: '/experiments/Workspace',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                var user = Meteor.userId();
-                if (currentUser) {
-                    Session.set('source','workspace');
-                    Session.set('currentSpatialLevel',null);
-                    this.next();
-                }
-            }
-        ]
-    });*/
-    this.route('experimentsById',{
+    this.route('displayExperimentById',{
         path: '/experiment/display/:id',
         template: 'experiment',
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
+                Session.set('screenMode','display');
                 this.next();
             }
         ]
     });
-/*    this.route('experimentsBySpatialLevel',{
-        path: '/experimentsBySpatialLevel/:resolution',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialLevel',this.params.resolution);
-                this.next();
-            }
-        ]
-    });*/
-    this.route('experiments/Anywhere/BySpatialLevel',{
+/*    this.route('experiments/Anywhere/BySpatialLevel',{
         path: '/experiments/Anywhere/BySpatialLevel/:resolution',
         template: 'experiments',
         onBeforeAction: [
@@ -178,7 +153,7 @@ Router.map(function () {
                 this.next();
             }
         ]
-    });
+    });*/
     this.route('modelOutput',{
         path: '/modelOutput',
         template: 'modelOutput',

@@ -3,6 +3,7 @@ DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId:
 DraftDataSets = new Meteor.Collection("draftDataSets");
 Reference = new Meteor.Collection("reference");
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
+DraftExperiments = new Meteor.Collection("draftExperiments")
 ModelOutputs = new Meteor.Collection("modelOutputs");
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
@@ -79,11 +80,10 @@ if( !reference ) {
     });
 }
 
-
 Models.attachSchema(new SimpleSchema({
   name: {
     type: String,
-    label: "Name",
+    label: "Name"
   },
   owner: {
     type: String,
@@ -115,6 +115,91 @@ Models.attachSchema(new SimpleSchema({
     label: "Comments",
     optional: true
   }
+}));
+
+Experiments.attachSchema(new SimpleSchema({
+  name: {
+    type: String,
+    label: "Name"
+  },
+  recordType: {
+    type: String,
+    allowedValues: ['template', 'instanceVersion']
+  },
+  created: {
+    type: Date,
+    optional: true
+  },
+  modified: {
+    type: Date,
+    optional: true
+  },
+  country: {
+    type: String,
+    label: "Country",
+    allowedValues: Reference.findOne().country,
+    optional: true
+  },
+  vegType: {
+    type: String,
+    label: "IGBP Vegetation Type",
+    allowedValues: Reference.findOne().vegType,
+    optional: true
+  },
+  otherVegType: {
+    type: String,
+    label: "Other Vegetation Type",
+    optional: true
+  },
+  spatialLevel: {
+    type: String,
+    label: "Spatial Level",
+    allowedValues: Reference.findOne().spatialLevel
+  },
+  timeStepSize: {
+    type: String,
+    label: "Time Step Size",
+    allowedValues: Reference.findOne().timeStepSize,
+    optional: true
+  },
+  shortDescription: {
+    type: String,
+    label: "Short Description",
+    optional: true
+  },
+  longDescription: {
+    type: String,
+    label: "Long Description",
+    optional: true
+  },
+  region: {
+    type: String,
+    label: "Region",
+    optional: true
+  },
+  resolution: {
+    type: String,
+    label: "Resolution",
+    allowedValues: Reference.findOne().resolution,
+    optional: true
+  },
+  _version: {
+    type: Number,
+    optional: true
+  },
+  'scripts.$.path': {
+    type: String,
+    optional: true
+  },
+  'scripts.$.filename': {
+    type: String,
+    optional: true
+  },
+  'scripts.$.key': {
+    type: String,
+    optional: true
+  }
+
 }));
 
 dataSetSchema = new SimpleSchema({
