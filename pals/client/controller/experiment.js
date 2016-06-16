@@ -23,6 +23,7 @@ AutoForm.hooks({
                     Router.go('/experiment/display/' + docId);
                 }
             });
+            updateDataSetFields();
 
             this.done();
             return false;
@@ -35,6 +36,9 @@ AutoForm.hooks({
     },
     updateExperimentForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            console.log('submit pressed');
+
+/*            event.preventDefault();
             updateDoc.$set.scripts = Session.get('tempScripts');
             Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
                 if(error) {
@@ -43,12 +47,13 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
+                    updateDataSetFields();
                     Session.set('screenMode', 'display');
                     var currentExperimentId = Session.get('currentExperiment');
                     Router.go('/experiment/display/' + currentExperimentId);
                 }
             });
-
+*/
             this.done();
             return false;
         }
@@ -131,7 +136,6 @@ Template.experiment.events = {
     },
     'click .remove-dataset':function(event) {
         var dataSetId = $(event.target).attr('id');
-        console.log($(event.target));
         var currentDataSetIds = Session.get('tempDataSets')
         if (currentDataSetIds) {
             var index = currentDataSetIds.indexOf(dataSetId);
@@ -151,6 +155,17 @@ Template.experiment.events = {
     },
 
 };
+
+function updateDataSetFields() {
+    var currentExperimentId = Session.get('currentExperiment');
+    var updateDoc = {$push:{'experiments':currentExperimentId}};
+    var currentDataSetIds = Session.get('tempDataSets');
+    var experiment = getCurrentExperiment();
+    currentDataSetIds.forEach(function(dataSetId){
+        if(experiment.dataSets.indexOf(dataSetId) == -1)
+            Meteor.Call('updateDataSet', {_id:dataSetId}, updateDoc);
+    });
+}
 
 function getCurrentExperiment() {
     var currentExperimentId = Session.get('currentExperiment');
@@ -187,9 +202,11 @@ Template.experiment.helpers({
   },
   formId: function() {
     var screenMode = Session.get('screenMode');
-    if(screenMode == 'create') return "createExperimentForm"
-    else if(screenMode == 'update') return "updateExperimentForm"
-    else return null;
+    var formId = null;
+    if(screenMode == 'create') formId = "createExperimentForm";
+    else if(screenMode == 'update') formId = "updateExperimentForm";
+    console.log(formId);
+    return formId;
   },
   dataIfNeeded: function() {
     var screenMode = Session.get('screenMode');
