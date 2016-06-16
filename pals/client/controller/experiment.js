@@ -85,6 +85,7 @@ Template.experiment.events = {
     'click .enable-update':function(event){
         var currentExperiment = getCurrentExperiment();
         Session.set('tempScripts', currentExperiment.scripts);
+        Session.set('tempDataSets', currentExperiment.dataSets);
         Session.set('screenMode', 'update');
     },
     'change .file-select':function(event, template){
@@ -111,7 +112,44 @@ Template.experiment.events = {
     },
     'click .download-file':function(event, template){
         event.preventDefault();
-    }
+    },
+    'click #add-data-set':function(event) {
+        event.preventDefault();
+        var selected = $('select[name="addDataSet"]').val();
+        if( selected ) {
+            var currentDataSets = Session.get('tempDataSets');
+            if (currentDataSets) {
+                currentDataSets.push(selected);
+                Session.set('tempDataSets', currentDataSets);
+            }
+            else {
+              $('.error').html('Error adding data set, please try again');
+              $('.error').show();
+            }
+
+        }
+    },
+    'click .remove-dataset':function(event) {
+        var dataSetId = $(event.target).attr('id');
+        console.log($(event.target));
+        var currentDataSetIds = Session.get('tempDataSets')
+        if (currentDataSetIds) {
+            var index = currentDataSetIds.indexOf(dataSetId);
+            if (index > -1) {
+                currentDataSetIds.splice(index,1);
+                Session.set('tempDataSets', currentDataSetIds);
+            }
+            else {
+              $('.error').html('Error removing data set, please try again');
+              $('.error').show();
+            }
+        }
+        else {
+          $('.error').html('Error removing data set, please try again');
+          $('.error').show();
+        }
+    },
+
 };
 
 function getCurrentExperiment() {
@@ -120,18 +158,30 @@ function getCurrentExperiment() {
     return currentExperiment;
 }
 
-
-Template.experiment.updateBtnDisabled = function() {
-    var toDisable = Session.get(disableUpdateBtn);
-    if ( toDisable ) return true
-    else return '';
+function getCurrentDataSets() {
+    var exp = getCurrentExperiment();
+    if( exp && exp.dataSets && exp.dataSets.length > 0) {
+        return DataSets.find({_id:{$in:exp.dataSets}}).fetch();
+    }
+    else return [];
 }
 
-Template.experiment.variables = function() {
-    return Variables.find();
+function getCurrentDataSetIds() {
+    var exp = getCurrentExperiment()
+    if (exp)
+        return exp.dataSets;
+    else return [];
 }
 
 Template.experiment.helpers({
+  variables: function() {
+      return Variables.find();
+  },
+  updateBtnDisabled: function() {
+      var toDisable = Session.get(disableUpdateBtn);
+      if ( toDisable ) return true
+      else return '';
+  },
   uploadButtonClicked: function() {
     return Session.get('uploadButtonClicked');
   },
@@ -159,6 +209,16 @@ Template.experiment.helpers({
   },
   tempScripts: function() {
       return Session.get('tempScripts');
+  },
+  tempDataSets: function() {
+      var tempDataSetIds = Session.get('tempDataSets');
+      var tempDataSets = [];
+      if(tempDataSetIds) {
+        tempDataSetIds.forEach(function(dataSetId){
+            tempDataSets.push(DataSets.findOne({_id:dataSetId}));
+        })
+      }
+      return tempDataSets;
   },
   files: function() {
       var experiment = getCurrentExperiment();
@@ -220,11 +280,18 @@ Template.experiment.helpers({
       else return '';
   },
   dataSets: function() {
-      var exp = getCurrentExperiment();
-      if( exp && exp.dataSets && exp.dataSets.length > 0) {
-          var dataSets = DataSets.find({_id:{$in:exp.dataSets}});
-          return dataSets;
+      return getCurrentDataSets();
+  },
+  otherDataSets: function() {
+      var currentDataSetIds = Session.get('tempDataSets');
+      var selector = {};
+      if (currentDataSetIds) {
+          if (currentDataSetIds.length > 0) {
+              selector._id = {$nin:currentDataSetIds};
+          }
+          return DataSets.find(selector,{sort:{name:1}});
       }
+      else console.log('Error: No experiment selected');
   }
 });
 

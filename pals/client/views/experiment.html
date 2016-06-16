@@ -34,12 +34,12 @@
           <table class="table">
             <tr>
               <th>Filename</th>
-              {{#if currentUser.admin}}<th>delete</th>{{/if}}
+              <th>Delete</th>
             </tr>
             {{#each tempScripts}}
             <tr>
               <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
-              {{#if currentUser.admin}}<td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
+              <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
             </tr>
             {{/each}}
           </table>
@@ -55,20 +55,38 @@
           </div>
         </div>
         {{#if currentUser.admin}}
-        <div class="panel panel-primary">
-          <div class="panel-heading">Data Sets</div>
-          <div class="panel-body">
+          <div class="panel panel-primary">
+            <div class="panel-heading">Data Sets</div>
+            <div class="panel-body">
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th>Name</th>
+                      <th>Remove</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {{#each tempDataSets}}
+                  <tr>
+                      <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
+                      <td><button class='remove-dataset btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                  </tr>
+                  {{/each}}
+                  </tbody>
+              </table>
 
-            <div class="form-group">
-                <select name="DataSet" class="form-control">
-                    {{#each dataSets}}
-                    <option value="{{_id}}">{{name}}</option>
-                    {{/each}}
-                </select>
+              <div class="form-group">
+                  <select name="addDataSet" class="form-control">
+                      <option value=null>(Select One)</option>
+                      {{#each otherDataSets}}
+                      <option value="{{_id}}">{{name}}</option>
+                      {{/each}}
+                  </select>
+              </div>
+
+              <button class='btn btn-default bottom-margin' id="add-data-set" {{uploadDisabled}}>Add data set</button>
             </div>
-            <button class='btn btn-default bottom-margin' id="driving-data-set" {{uploadDisabled}}>Add data set</button>
           </div>
-      </div>
         {{/if}}
       </fieldset>
       {{#if inCreateMode}}
