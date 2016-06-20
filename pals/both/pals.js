@@ -74,12 +74,13 @@ Router.map(function () {
         ]
     });
     this.route('createExperiment',{
-        path: '/experiment',
+        path: '/experiment/create',
         template: 'experiment',
         onBeforeAction: [
             function() {
                 Session.set('screenMode', 'create');
                 Session.set('tempScripts', []);
+                Session.set('tempDataSets', []);
                 this.next();
             }
         ]

@@ -7,12 +7,23 @@ Template.experiment.rendered = function() {
 
 AutoForm.hooks({
     createExperimentForm: {
+        /* this will only be used for creating experiment templates */
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             event.preventDefault();
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             insertDoc.scripts = Session.get('tempScripts');
             insertDoc.recordType = 'template';
+            var currentDataSets = Session.get('tempDataSets');
+            insertDoc.dataSets = [];
+            currentDataSets.forEach(function(dataSet) {
+                var dataSetDetails = {
+                    _id : dataSet._id,
+                    _version : null
+                };
+                insertDoc.dataSets.push(dataSetDetails);
+            })
+
             Meteor.call('insertExperiment', insertDoc, function(error, docId){
                 if(error) {
                     $('.error').html('Failed to create the data set. Please try again.');
@@ -20,7 +31,8 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-                    Session.set('tempScripts',null);
+                    Session.set('tempScripts', []);
+                    Session.set('tempDataSets', []);
                     Router.go('/experiment/display/' + docId);
                 }
             });
@@ -42,9 +54,20 @@ AutoForm.hooks({
                 var currentDataSets = Session.get('tempDataSets');
                 updateDoc.$set.dataSets = [];
                 currentDataSets.forEach(function(dataSet) {
+                    if (recordType == 'template') {
+                        version = null;
+                    }
+                    else if (recordType == 'instanceVersion') {
+                        version = dataSet._version;
+                    }
+                    else {
+                      $('.error').html('Failed to update the data set. Please try again.');
+                      $('.error').show();
+                    }
+
                     var dataSetDetails = {
                         _id : dataSet._id,
-                        _version : null
+                        _version : version
                     };
                     updateDoc.$set.dataSets.push(dataSetDetails);
                 })
@@ -55,6 +78,8 @@ AutoForm.hooks({
                         console.log(error.reason);
                     }
                     else {
+                        Session.set('tempScripts', []);
+                        Session.set('tempDataSets', []);
                         Session.set('screenMode', 'display');
 //                        var currentExperimentId = Session.get('currentExperiment');
 //                        Router.go('/experiment/display/' + currentExperimentId);
@@ -135,7 +160,6 @@ Template.experiment.events = {
                 dataSetDetails = {_id: selected, _version: currentVersion};
                 currentDataSets.push(dataSetDetails);
                 Session.set('tempDataSets', currentDataSets);
-                if (!currentVersion) console.log('No version number provided');
             }
             else {
               $('.error').html('Error adding data set, please try again');
@@ -240,10 +264,22 @@ Template.experiment.helpers({
     else if(screenMode == 'update') formId = "updateExperimentForm";
     return formId;
   },
+  dataSets: function() {
+    var exp = getCurrentExperiment();
+    if( exp && exp.dataSets && exp.dataSets.length > 0) {
+      exp.dataSets.forEach(function(dataSet){
+        dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+      });
+      return exp.dataSets;
+
+    }
+    else return [];
+
+  },
   dataIfNeeded: function() {
     var screenMode = Session.get('screenMode');
     if(screenMode == 'create') return null
-    else if(screenMode == 'update') return getCurrentExperiment()
+    else if(screenMode == 'update') return getCurrentExperiment();
     else return null;
   },
   isDownloadable: function() {
@@ -311,6 +347,32 @@ Template.experiment.helpers({
         return false;
     }
   },
+  otherDataSets: function() {
+    var currentDataSets = Session.get('tempDataSets');
+    if (currentDataSets) {
+      var currentDataSetIds = [];
+      currentDataSets.forEach(function(dataSet){
+        currentDataSetIds.push(dataSet._id);
+      });
+      selector = {_id:{$nin:currentDataSetIds}};
+
+      return DataSets.find(selector,{sort:{name:1}});
+    }
+    else console.log('Error: No experiment selected');
+  },
+  recordType: function() {
+    return getRecordType();
+  },
+  tempDataSets: function() {
+    var tempDataSets = Session.get('tempDataSets');
+    if( tempDataSets && tempDataSets.length > 0) {
+      tempDataSets.forEach(function(dataSet){
+        dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+      });
+      return tempDataSets;
+    }
+    else return [];
+  },
   userEmail: function(userId) {
       var user = Meteor.users.findOne({'_id':userId});
       if( user && user.emails && user.emails.length > 0 ) {
@@ -318,46 +380,18 @@ Template.experiment.helpers({
       }
       else return '';
   },
-  dataSets: function() {
-      var exp = getCurrentExperiment();
-      if( exp && exp.dataSets && exp.dataSets.length > 0) {
-          exp.dataSets.forEach(function(dataSet){
-              dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
-          });
-          console.log('Exp.dataSets');
-          console.log(exp.dataSets);
-          return exp.dataSets;
-
-      }
-      else return [];
-
-  },
-  tempDataSets: function() {
-      var tempDataSets = Session.get('tempDataSets');
-      if( tempDataSets && tempDataSets.length > 0) {
-          tempDataSets.forEach(function(dataSet){
-              dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
-          });
-          console.log('tempDataSets');
-          console.log(tempDataSets);
-          return tempDataSets;
-      }
-      else return [];
-  },
-  otherDataSets: function() {
-      var currentDataSets = Session.get('tempDataSets');
-      if (currentDataSets) {
-          var currentDataSetIds = [];
-          currentDataSets.forEach(function(dataSet){
-              currentDataSetIds.push(dataSet._id);
-          });
-          selector = {_id:{$nin:currentDataSetIds}};
-
-          return DataSets.find(selector,{sort:{name:1}});
-      }
-      else console.log('Error: No experiment selected');
+  modelOutputs: function() {
+      return getModelOutputs();
   }
 });
+
+getModelOutputs = function() {
+    currentExperimentId = Session.get('currentExperiment');
+    var selector = {'experiment':currentExperimentId};
+    if( currentExperimentId ) {
+        return  ModelOutputs.find(selector,{sort:{created:-1}});
+    }
+}
 
 /*Template.experiment.rendered = function() {
     window['directives']();
