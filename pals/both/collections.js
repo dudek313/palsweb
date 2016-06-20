@@ -81,6 +81,10 @@ if( !reference ) {
 }
 
 Models.attachSchema(new SimpleSchema({
+  _id: {
+    type: String,
+    optional: true
+  },
   name: {
     type: String,
     label: "Name"
@@ -118,13 +122,18 @@ Models.attachSchema(new SimpleSchema({
 }));
 
 Experiments.attachSchema(new SimpleSchema({
+  _id: {
+    type: String,
+    optional: true
+  },
   name: {
     type: String,
     label: "Name"
   },
   recordType: {
     type: String,
-    allowedValues: ['template', 'instanceVersion']
+    allowedValues: ['template', 'instanceVersion'],
+    optional: true
   },
   created: {
     type: Date,
@@ -198,11 +207,22 @@ Experiments.attachSchema(new SimpleSchema({
   'scripts.$.key': {
     type: String,
     optional: true
+  },
+  'dataSets.$._id': {
+    type: String,
+    optional: true
+  },
+  'dataSets.$._version': {
+    type: Number,
+    optional: true
   }
-
 }));
 
 dataSetSchema = new SimpleSchema({
+  _id: {
+    type: String,
+    optional: true
+  },
   name: {
     type: String,
     label: "Name",
@@ -214,6 +234,14 @@ dataSetSchema = new SimpleSchema({
     type: String,
     label: "Type",
     allowedValues: Reference.findOne().dataSetType
+  },
+  createdAt: {
+    type: Date,
+    optional: true
+  },
+  modifiedAt: {
+    type: Date,
+    optional: true
   },
   spatialLevel: {
     type: String,

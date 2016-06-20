@@ -2,6 +2,7 @@ Template.experiment.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
     Session.set('uploadButtonClicked', false);
+    SimpleSchema.debug = true;
 };
 
 AutoForm.hooks({
@@ -23,7 +24,6 @@ AutoForm.hooks({
                     Router.go('/experiment/display/' + docId);
                 }
             });
-            updateDataSetFields();
 
             this.done();
             return false;
@@ -36,24 +36,31 @@ AutoForm.hooks({
     },
     updateExperimentForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            console.log('submit pressed');
-
-/*            event.preventDefault();
-            updateDoc.$set.scripts = Session.get('tempScripts');
-            Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
-                if(error) {
-                    $('.error').html('Failed to update the data set. Please try again.');
-                    $('.error').show();
-                    console.log(error.reason);
-                }
-                else {
-                    updateDataSetFields();
-                    Session.set('screenMode', 'display');
-                    var currentExperimentId = Session.get('currentExperiment');
-                    Router.go('/experiment/display/' + currentExperimentId);
-                }
-            });
-*/
+            var recordType = getRecordType();
+            if (recordType == 'template') {
+                updateDoc.$set.scripts = Session.get('tempScripts');
+                var currentDataSets = Session.get('tempDataSets');
+                updateDoc.$set.dataSets = [];
+                currentDataSets.forEach(function(dataSet) {
+                    var dataSetDetails = {
+                        _id : dataSet._id,
+                        _version : null
+                    };
+                    updateDoc.$set.dataSets.push(dataSetDetails);
+                })
+                Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
+                    if(error) {
+                        $('.error').html('Failed to update the data set. Please try again.');
+                        $('.error').show();
+                        console.log(error.reason);
+                    }
+                    else {
+                        Session.set('screenMode', 'display');
+//                        var currentExperimentId = Session.get('currentExperiment');
+//                        Router.go('/experiment/display/' + currentExperimentId);
+                    }
+                });
+            }
             this.done();
             return false;
         }
@@ -121,11 +128,14 @@ Template.experiment.events = {
     'click #add-data-set':function(event) {
         event.preventDefault();
         var selected = $('select[name="addDataSet"]').val();
-        if( selected ) {
+        if( selected && selected != "(Select One)" ) {
             var currentDataSets = Session.get('tempDataSets');
             if (currentDataSets) {
-                currentDataSets.push(selected);
+                var currentVersion = getDataSetVersion(selected);
+                dataSetDetails = {_id: selected, _version: currentVersion};
+                currentDataSets.push(dataSetDetails);
                 Session.set('tempDataSets', currentDataSets);
+                if (!currentVersion) console.log('No version number provided');
             }
             else {
               $('.error').html('Error adding data set, please try again');
@@ -135,13 +145,18 @@ Template.experiment.events = {
         }
     },
     'click .remove-dataset':function(event) {
+        event.preventDefault();
         var dataSetId = $(event.target).attr('id');
-        var currentDataSetIds = Session.get('tempDataSets')
+        var currentDataSets = Session.get('tempDataSets');
+        var currentDataSetIds = [];
+        currentDataSets.forEach(function(dataSet){
+            currentDataSetIds.push(dataSet._id);
+        });
         if (currentDataSetIds) {
             var index = currentDataSetIds.indexOf(dataSetId);
             if (index > -1) {
-                currentDataSetIds.splice(index,1);
-                Session.set('tempDataSets', currentDataSetIds);
+                currentDataSets.splice(index,1);
+                Session.set('tempDataSets', currentDataSets);
             }
             else {
               $('.error').html('Error removing data set, please try again');
@@ -156,16 +171,41 @@ Template.experiment.events = {
 
 };
 
-function updateDataSetFields() {
+function getDataSetVersion(dataSetId) {
+    if (dataSetId) {
+        dataSet = DataSets.findOne({_id:dataSetId});
+        if (dataSet) return dataSet._version;
+        else return null;
+    }
+    else return null;
+}
+
+function getRecordType() {
+    var experiment = getCurrentExperiment();
+    if (experiment)
+        return experiment.recordType;
+    else {
+        return null;
+    }
+}
+/*function updateDataSetFields() {
     var currentExperimentId = Session.get('currentExperiment');
-    var updateDoc = {$push:{'experiments':currentExperimentId}};
+    var updateDoc = {$push:{'experiments':{id:currentExperimentId, workspace:null}}};
     var currentDataSetIds = Session.get('tempDataSets');
     var experiment = getCurrentExperiment();
     currentDataSetIds.forEach(function(dataSetId){
-        if(experiment.dataSets.indexOf(dataSetId) == -1)
-            Meteor.Call('updateDataSet', {_id:dataSetId}, updateDoc);
+        var currentDoc = {_id:dataSetId};
+        if(experiment.dataSets.indexOf(dataSetId) == -1) {
+            Meteor.call('updateDataSet', currentDoc, updateDoc, function(error,docId){
+                if(error) {
+                    $('.error').html('Failed to update data set with id '+ dataSetId +'. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+            });
+        }
     });
-}
+}*/
 
 function getCurrentExperiment() {
     var currentExperimentId = Session.get('currentExperiment');
@@ -173,21 +213,14 @@ function getCurrentExperiment() {
     return currentExperiment;
 }
 
-function getCurrentDataSets() {
-    var exp = getCurrentExperiment();
-    if( exp && exp.dataSets && exp.dataSets.length > 0) {
-        return DataSets.find({_id:{$in:exp.dataSets}}).fetch();
-    }
-    else return [];
-}
-
+/*
 function getCurrentDataSetIds() {
     var exp = getCurrentExperiment()
     if (exp)
         return exp.dataSets;
     else return [];
 }
-
+*/
 Template.experiment.helpers({
   variables: function() {
       return Variables.find();
@@ -205,7 +238,6 @@ Template.experiment.helpers({
     var formId = null;
     if(screenMode == 'create') formId = "createExperimentForm";
     else if(screenMode == 'update') formId = "updateExperimentForm";
-    console.log(formId);
     return formId;
   },
   dataIfNeeded: function() {
@@ -226,16 +258,6 @@ Template.experiment.helpers({
   },
   tempScripts: function() {
       return Session.get('tempScripts');
-  },
-  tempDataSets: function() {
-      var tempDataSetIds = Session.get('tempDataSets');
-      var tempDataSets = [];
-      if(tempDataSetIds) {
-        tempDataSetIds.forEach(function(dataSetId){
-            tempDataSets.push(DataSets.findOne({_id:dataSetId}));
-        })
-      }
-      return tempDataSets;
   },
   files: function() {
       var experiment = getCurrentExperiment();
@@ -297,15 +319,40 @@ Template.experiment.helpers({
       else return '';
   },
   dataSets: function() {
-      return getCurrentDataSets();
+      var exp = getCurrentExperiment();
+      if( exp && exp.dataSets && exp.dataSets.length > 0) {
+          exp.dataSets.forEach(function(dataSet){
+              dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+          });
+          console.log('Exp.dataSets');
+          console.log(exp.dataSets);
+          return exp.dataSets;
+
+      }
+      else return [];
+
+  },
+  tempDataSets: function() {
+      var tempDataSets = Session.get('tempDataSets');
+      if( tempDataSets && tempDataSets.length > 0) {
+          tempDataSets.forEach(function(dataSet){
+              dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+          });
+          console.log('tempDataSets');
+          console.log(tempDataSets);
+          return tempDataSets;
+      }
+      else return [];
   },
   otherDataSets: function() {
-      var currentDataSetIds = Session.get('tempDataSets');
-      var selector = {};
-      if (currentDataSetIds) {
-          if (currentDataSetIds.length > 0) {
-              selector._id = {$nin:currentDataSetIds};
-          }
+      var currentDataSets = Session.get('tempDataSets');
+      if (currentDataSets) {
+          var currentDataSetIds = [];
+          currentDataSets.forEach(function(dataSet){
+              currentDataSetIds.push(dataSet._id);
+          });
+          selector = {_id:{$nin:currentDataSetIds}};
+
           return DataSets.find(selector,{sort:{name:1}});
       }
       else console.log('Error: No experiment selected');

@@ -142,12 +142,12 @@ Meteor.methods({
           return DataSets.insert(dataSetDoc);
         }
     },
-    'updateExperiment': function(currentDoc, dataSetDoc) {
+    'updateExperiment': function(currentDoc, updateDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
-            return Experiments.update(currentDoc, dataSetDoc);
+            return Experiments.update(currentDoc, updateDoc);
         }
 
     },
