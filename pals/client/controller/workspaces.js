@@ -71,7 +71,7 @@ Template.workspaces.events({
       if(user){
           var id = $(event.target).attr('id');
           if( id ) {
-              var workspace = Workspaces.findOne({'_id':id,'guests':user._id});
+              var workspace = Workspaces.findOne({'_id':id});
               Meteor.users.update({'_id':user._id},
                 {'$set' : {'profile.currentWorkspace':workspace}});
           }
