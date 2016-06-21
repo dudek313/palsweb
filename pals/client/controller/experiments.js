@@ -32,25 +32,12 @@ Template.experiments.helpers({
      }
      return Experiments.find(selector,{sort:{created:-1}});
    },
-   /*experiments: function() {
-       var user = Meteor.user();
-       if( user ) {
-         var selector = {};
-         var source = Session.get('source');
-         // if the source is from the current workspace
-         if( source ) {
-           selector = {'workspaces':user.profile.currentWorkspace._id};
-         }
-         selector.recordType='template';
-         //selector.$where = 'this.latest == true';
-
-         var resolution = Session.get('currentSpatialLevel');
-         if( resolution ) {
-             selector.spatialLevel = resolution;
-         }
-         return Experiments.find(selector,{sort:{created:-1}});
-       }
-   },*/
+   notCloned: function(experimentId) {
+     var selector = {templateId:experimentId};
+     selector.recordType = 'instanceVersion';
+     selector.workspace = Meteor.user().profile.currentWorkspace._id;
+     return (Experiments.find(selector).fetch().length > 0) ? false : true;
+   },
    source: function() {
        return Session.get('source');
    },
@@ -72,11 +59,11 @@ Template.experiments.events({
         if( confirm("Are you sure?")) {
             var id = $(event.target).attr('id');
             if( id ) {
-                console.log(id);
-                Experiments.remove({'_id':id},function(error){
+                Meteor.call('deleteExperiment', {'_id':id}, function(error){
                     if(error) {
                         $('.error').html('Failed to delete the experiment, please try again');
                         $('.error').show();
+                        console.log(error.reason);
                     }
                 });
             }
@@ -88,5 +75,57 @@ Template.experiments.events({
         event.preventDefault();
         var id = $(event.target).parent().attr('id');
         Router.go('/experiment/display/'+id);
+    },
+    'click .clone-exp' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        var id = $(event.target).attr('id');
+        console.log(id);
+        if (id) {
+            var thisExperiment = Experiments.findOne({_id: id});
+            var newExpInstance = jQuery.extend({}, thisExperiment);
+            delete newExpInstance._id;
+            newExpInstance.recordType = 'instanceVersion';
+            newExpInstance.templateId = id;
+            newExpInstance.workspace = Meteor.user().profile.currentWorkspace._id;
+            newExpInstance.templateVersion = newExpInstance._version;
+            if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
+                newExpInstance.dataSets.forEach(function(dataset){
+                    dataset._version = getDataSetVersion(dataset._id);
+                });
+            }
+            else console.log("Experiment doesn't have datasets");
+            Meteor.call('insertExperiment', newExpInstance, function(error,docId){
+                if (error) {
+                    $('.error').html('Failed to clone the experiment, please try again');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else console.log('Created experiment: ' + docId);
+            });
+        }
     }
 });
+
+
+/*helpers
+experiments: function() {
+    var user = Meteor.user();
+    if( user ) {
+      var selector = {};
+      var source = Session.get('source');
+      // if the source is from the current workspace
+      if( source ) {
+        selector = {'workspaces':user.profile.currentWorkspace._id};
+      }
+      selector.recordType='template';
+      //selector.$where = 'this.latest == true';
+
+      var resolution = Session.get('currentSpatialLevel');
+      if( resolution ) {
+          selector.spatialLevel = resolution;
+      }
+      return Experiments.find(selector,{sort:{created:-1}});
+    }
+},*/

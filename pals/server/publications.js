@@ -33,7 +33,7 @@ Meteor.publish('directory',function(){
 });
 
 
-DataSets._ensureIndex('_id', {unique: 1});
+//DataSets._ensureIndex('_id', {unique: 1});
 
 
 Meteor.publish('dataSets',function(){
@@ -109,7 +109,7 @@ Experiments.allow({
     }
 });
 
-Experiments._ensureIndex('_id', {unique: 1});
+//Experiments._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('modelOutputs',function(){
     return ModelOutputs.find();
@@ -128,7 +128,7 @@ ModelOutputs.allow({
     }
 });
 
-ModelOutputs._ensureIndex('name', {unique: 1});
+//ModelOutputs._ensureIndex('name', {unique: 1});
 
 Meteor.publish('analyses',function(){
     return Analyses.find();
@@ -140,7 +140,7 @@ Meteor.publish('models',function(){
 
 // Old code assumed unique model name. Only needs to be unique for workspace.
 //Models._ensureIndex('name', {unique: 1});
-Models._ensureIndex('_id', {unique: 1});
+//Models._ensureIndex('_id', {unique: 1});
 
 
 Models.allow({
@@ -159,7 +159,7 @@ Meteor.publish('variables',function(){
     return Variables.find();
 });
 
-Variables._ensureIndex('name', {unique: 1});
+//Variables._ensureIndex('name', {unique: 1});
 
 Files.allow({
     insert: function(userId, doc) {

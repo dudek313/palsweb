@@ -41,3 +41,12 @@ Template.registerHelper("areEqual", function(firstString,secondString) {
         return true;
     }
 });
+
+getDataSetVersion = function(dataSetId) {
+    if (dataSetId) {
+        dataSet = DataSets.findOne({_id:dataSetId});
+        if (dataSet) return dataSet._version;
+        else return null;
+    }
+    else return null;
+}

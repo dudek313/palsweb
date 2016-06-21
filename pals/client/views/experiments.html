@@ -3,8 +3,9 @@
     {{#if areEqual source 'Templates'}}
       <h1>
         {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-          Experiment Templates To Clone
+          Experiment Templates
       </h1>
+       <h2>To Clone Into Current Workspace</h2>
     {{else}}
     <h1>
       {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
@@ -42,7 +43,7 @@
               <th>Resolution</th>
               <th>Time Step Size</th>
             {{/if}}
-            {{#if areEqual source 'Templates'}}
+            {{#if areEqual source 'Templates'}}<th>Clone</th>
             {{else}}<th>View Analyses</th>{{/if}}
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
@@ -73,8 +74,11 @@
             <td>{{timeStepSize}}</td>
             {{/if}}
             {{#if areEqual source 'Templates'}}
+              {{#if notCloned _id}}<td><button class='btn btn-primary btn-xs clone-exp' id="{{_id}}">Clone</button></td>
+              {{else}}<td>Cloned</td>
+              {{/if}}
             {{else}}
-              {{#if analysesExist}}<td><button class='btn btn-primary btn-xs' id="{{_id}}">View Analyses</button></td>
+              {{#if analysesExist}}<td><button class='btn btn-primary btn-xs view-analysis' id="{{_id}}">View Analyses</button></td>
               {{else}}<td>Unavailable</td>
               {{/if}}
             {{/if}}

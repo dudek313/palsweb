@@ -49,43 +49,42 @@ AutoForm.hooks({
     updateExperimentForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             var recordType = getRecordType();
-            if (recordType == 'template') {
-                updateDoc.$set.scripts = Session.get('tempScripts');
-                var currentDataSets = Session.get('tempDataSets');
-                updateDoc.$set.dataSets = [];
-                currentDataSets.forEach(function(dataSet) {
-                    if (recordType == 'template') {
-                        version = null;
-                    }
-                    else if (recordType == 'instanceVersion') {
-                        version = dataSet._version;
-                    }
-                    else {
-                      $('.error').html('Failed to update the data set. Please try again.');
-                      $('.error').show();
-                    }
+            updateDoc.$set.scripts = Session.get('tempScripts');
+            var currentDataSets = Session.get('tempDataSets');
+            updateDoc.$set.dataSets = [];
+            currentDataSets.forEach(function(dataSet) {
+                if (recordType == 'template') {
+                    version = null;
+                }
+                else if (recordType == 'instanceVersion') {
+                    version = dataSet._version;
+                }
+                else {
+                  $('.error').html('Failed to update the data set. Please try again.');
+                  $('.error').show();
+                }
 
-                    var dataSetDetails = {
-                        _id : dataSet._id,
-                        _version : version
-                    };
-                    updateDoc.$set.dataSets.push(dataSetDetails);
-                })
-                Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
-                    if(error) {
-                        $('.error').html('Failed to update the data set. Please try again.');
-                        $('.error').show();
-                        console.log(error.reason);
-                    }
-                    else {
-                        Session.set('tempScripts', []);
-                        Session.set('tempDataSets', []);
-                        Session.set('screenMode', 'display');
+                var dataSetDetails = {
+                    _id : dataSet._id,
+                    _version : version
+                };
+                updateDoc.$set.dataSets.push(dataSetDetails);
+            })
+            Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to update the data set. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    Session.set('tempScripts', []);
+                    Session.set('tempDataSets', []);
+                    Session.set('screenMode', 'display');
 //                        var currentExperimentId = Session.get('currentExperiment');
 //                        Router.go('/experiment/display/' + currentExperimentId);
-                    }
-                });
-            }
+                }
+            });
+
             this.done();
             return false;
         }
@@ -195,14 +194,6 @@ Template.experiment.events = {
 
 };
 
-function getDataSetVersion(dataSetId) {
-    if (dataSetId) {
-        dataSet = DataSets.findOne({_id:dataSetId});
-        if (dataSet) return dataSet._version;
-        else return null;
-    }
-    else return null;
-}
 
 function getRecordType() {
     var experiment = getCurrentExperiment();

@@ -215,6 +215,18 @@ Experiments.attachSchema(new SimpleSchema({
   'dataSets.$._version': {
     type: Number,
     optional: true
+  },
+  templateId: {
+    type: String,
+    optional: true
+  },
+  templateVersion: {
+    type: Number,
+    optional: true
+  },
+  workspace: {
+    type: String,
+    optional: true
   }
 }));
 

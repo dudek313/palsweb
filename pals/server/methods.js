@@ -159,6 +159,14 @@ Meteor.methods({
           return Experiments.insert(dataSetDoc);
         }
     },
+    'deleteExperiment': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return Experiments.remove(dataSetDoc);
+        }
+    },
     'updateModel': function(currentDoc, modelDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')
