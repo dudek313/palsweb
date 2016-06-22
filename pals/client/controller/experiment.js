@@ -56,7 +56,7 @@ AutoForm.hooks({
                 if (recordType == 'template') {
                     version = null;
                 }
-                else if (recordType == 'instanceVersion') {
+                else if (recordType == 'instance') {
                     version = dataSet._version;
                 }
                 else {

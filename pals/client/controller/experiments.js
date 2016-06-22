@@ -12,7 +12,7 @@ Template.experiments.helpers({
          var user = Meteor.user();
          if( user ) {
              selector.workspace = user.profile.currentWorkspace._id;
-             selector.recordType = 'instanceVersion';
+             selector.recordType = 'instance';
          }
          else console.log('Error: User not logged in');
      }
@@ -22,7 +22,7 @@ Template.experiments.helpers({
      else if (source == 'Anywhere') {
           workspaces = getAvailableWorkspaceIds();
           selector.workspace = {$in:workspaces};
-          selector.recordType = 'instanceVersion';
+          selector.recordType = 'instance';
      }
      else console.log('Error: Source value invalid');
 
@@ -34,7 +34,7 @@ Template.experiments.helpers({
    },
    notCloned: function(experimentId) {
      var selector = {templateId:experimentId};
-     selector.recordType = 'instanceVersion';
+     selector.recordType = 'instance';
      selector.workspace = Meteor.user().profile.currentWorkspace._id;
      return (Experiments.find(selector).fetch().length > 0) ? false : true;
    },
@@ -86,7 +86,7 @@ Template.experiments.events({
             var thisExperiment = Experiments.findOne({_id: id});
             var newExpInstance = jQuery.extend({}, thisExperiment);
             delete newExpInstance._id;
-            newExpInstance.recordType = 'instanceVersion';
+            newExpInstance.recordType = 'instance';
             newExpInstance.templateId = id;
             newExpInstance.workspace = Meteor.user().profile.currentWorkspace._id;
             newExpInstance.templateVersion = newExpInstance._version;

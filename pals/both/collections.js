@@ -132,7 +132,7 @@ Experiments.attachSchema(new SimpleSchema({
   },
   recordType: {
     type: String,
-    allowedValues: ['template', 'instanceVersion'],
+    allowedValues: ['template', 'instance'],
     optional: true
   },
   created: {

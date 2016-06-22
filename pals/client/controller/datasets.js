@@ -35,6 +35,28 @@ Template.datasets.events({
 
 });
 
+
+getExperimentDataSetIds = function(experiment) {
+    var dataSets = experiment.dataSets;
+    var dataSetIds = []
+    dataSets.forEach(function(dataSet) {
+        dataSetIds.push(dataSet._id);
+    });
+    return dataSetIds;
+}
+
+getMultipleExperimentDataSetIds = function(experiments) {
+    var dataSetIds = [];
+    experiments.forEach(function(experiment) {
+        currentExpDataSetIds = getExperimentDataSetIds(experiment);
+        currentExpDataSetIds.forEach(function(dataSetId) {
+            if (dataSetIds.indexOf(dataSetId) == -1)
+                dataSetIds.push(dataSetId);
+        });
+    });
+    return dataSetIds;
+}
+
 Template.datasets.helpers({
    dataSets: function() {
      var source = Session.get('source');
@@ -43,20 +65,24 @@ Template.datasets.helpers({
      if( source ) {
          var user = Meteor.user();
          if( user ) {
-             selector = {'experiments.workspace':user.profile.currentWorkspace._id};
+           selector.workspace = user.profile.currentWorkspace._id;
          }
          else console.log('Error: User not logged in');
      }
      else {
-          var workspaces = getAvailableWorkspaceIds();
-          selector = { 'experiments.workspace': {$in:workspaces} }
+          var availableWorkspaces = getAvailableWorkspaceIds();
+          selector.workspace = {$in:availableWorkspaces};
+//          selector = { 'experiments.workspace': {$in:workspaces} }
      }
 
      var resolution = getCurrentSpatialLevel();
      if( resolution ) {
-         selector.spatialLevel = resolution;
+       selector.spatialLevel = resolution;
      }
-     return DataSets.find(selector,{sort:{created:-1}});
+     var experiments = Experiments.find(selector);
+     var dataSetIds = getMultipleExperimentDataSetIds(experiments);
+
+     return DataSets.find({_id:{$in:dataSetIds}});
 
    },
    currentSpatialLevel: function() {
