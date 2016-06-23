@@ -123,23 +123,38 @@ function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
                 stateSelection : row.mo_stateselection,
                 accessLevel : row.mo_accesslevel,
                 status : row.a_status,
-                versions : [fileData],
-                experiment : row.our_exp_id.toString()
+                file : fileData
+//                experiment : (parseInt(row.our_exp_id)+60000).toString()
             }
-            if( row.e_id ) {
+/*            if( row.e_id ) {
                 modelOutput.workspaces = [row.e_id.toString()];
             }
             else {
                 modelOutput.workspaces = [];
             }
 //            console.log(modelOutput);
-            mongoInstance.insert('modelOutputs',modelOutput,function(err){
+*/
+            console.log('Experiment name: ' + row.exp_name);
+            mongoInstance.findOne('experiments',{name:row.exp_name, recordType:'instance'},function(err, doc){
                 if(err) {
                     console.log(err);
-                    console.log('Trying with different name');
-                    modelOutput.name = modelOutput.name + '.1';
+                }
+                else {
+                    if (doc) {
+                        modelOutput.experiment = doc._id;
+                    }
+                    else {
+                        modelOutput.experiment = null;
+                    }
                     mongoInstance.insert('modelOutputs',modelOutput,function(err){
-                        if( err ) console.log(err);
+                      if(err) {
+                        console.log(err);
+                        console.log('Trying with different name');
+                        modelOutput.name = modelOutput.name + '.1';
+                        mongoInstance.insert('modelOutputs',modelOutput,function(err){
+                          if( err ) console.log(err);
+                        });
+                      }
                     });
                 }
             });
@@ -153,4 +168,3 @@ function copyFile(source, target, cb) {
     fs.copySync(source,target);
     cb();
 }
-

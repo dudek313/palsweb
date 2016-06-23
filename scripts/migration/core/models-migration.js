@@ -2,7 +2,7 @@
 var Fiber  = require('fibers')
 var Future = require('fibers/future');
 
- 
+
 exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,callback) {
 //    mongoInstance.dropIndexes('models', callback); /* stops it using model.name as a unique identifier */
     console.log('Loading and copying models');
@@ -19,13 +19,13 @@ exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,
                     _id : model.id.toString(),
                     name : model.modelname,
                     owner : user._id,
-/*                    workspaces : [publicWorkspace._id] */
 //	I am adding the following. Not sure why they weren't included.
-		    version: model.version,
-		    comments: model.commentsm,
-		    references: model.referencesm,
-		    url: model.urlm,
-                    workspaces : [model.experiment_id.toString()]
+		                version: model.version,
+                    created: model.createddate,
+		                comments: model.commentsm,
+		                references: model.referencesm,
+		                url: model.urlm
+//                    workspaces : [model.experiment_id.toString()]
                 }
                 mongoModels.push(mongoModel);
             }
@@ -118,6 +118,3 @@ function findAndSaveModelUniqueName(mongoInstance,model,callback) {
         }
     });
 }
-
-
-

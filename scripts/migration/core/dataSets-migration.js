@@ -7,6 +7,7 @@ var Future = require('fibers/future');
 //var fs = require('fs-extra');
 var fs = Future.wrap(require('fs-extra'));
 var uuid = require('node-uuid')
+var mooHelpers = require('./modelOutputs-migration.js')
 
 //exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
 exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance) {
@@ -69,12 +70,13 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
                       var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
 
                       var future = new Future;
-                      processDataFile(metFilename, 'met', true, newDataDir, filenameHead, row, users, workspaces, function(metFileData){
-                          processDataFile(fluxFilename, 'flux', false, newDataDir, filenameHead, row, users, workspaces, function(fluxFileData) {
+                      processDataFile(metFilename, 'driving', true, newDataDir, filenameHead, row, users, workspaces, function(metFileData){
+                          processDataFile(fluxFilename, 'evaluation', false, newDataDir, filenameHead, row, users, workspaces, function(fluxFileData) {
                               copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
                           });
                       });
                   });
+
                   client.end();
               });
             }
@@ -101,10 +103,10 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                       name : filenameHead + '_' + filetype + '.nc',
                       size : stats['size'],
                       key : newFilename,
-                      created : row.dsv_uploaddate,
+                      createdAt : row.dsv_uploaddate,
                       type : filetype,
                       downloadable : forDownload,
-                      version : 1
+                      _version : 1
                   }
                   console.log(fileData);
                   user = users[row.ds_username];
@@ -141,9 +143,7 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         _id : row.ds_id.toString(),
         created : row.dsv_uploaddate,
         name : row.a_name,
-        version : 1,
-        latest : true,
-        source_id : row.ds_id.toString(),
+        _version : 1,
         spatialLevel : 'SingleSite',
         owner : user._id,
         comments : row.ds_comments,
@@ -165,15 +165,15 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         versionDescription : row.dsv_description,
         startdate : row.dsv_startdate,
         enddate : row.dsv_enddate,
-        files: [metFileData, fluxFileData],
-	experiments : [{id : row.ds_id.toString(), workspace : null}]
+        files: [metFileData, fluxFileData]
+	/*experiments : [{id : row.ds_id.toString(), workspace : null}]*/
     }
-
+/*
     if( row.e_id ) {
 	experimentInstanceId = row.ds_id + 60000;
         dataSet.experiments.push({id : experimentInstanceId.toString(), workspace : row.e_id.toString()});
     }
-
+*/
     mongoInstance.insert('dataSets',dataSet,function(err){
         if(err) {
             console.log(err);
@@ -203,8 +203,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             filename : 'SingleSiteExperiment.R',
             key : 'SingleSiteExperimnet.R',
         }],
-        dataSets : [dataSet._id],
-        workspaces : [],
+        dataSets : [{_id: dataSet._id, _version: null}],
         owner : dataSet.owner,
         country : dataSet.country,
         vegType : dataSet.vegType,
@@ -216,13 +215,15 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
 // if this data set came from within a workspace (other than the public one) create an experiment instance to associate it with
     console.log('experiment ID: ' + row.e_id);
     if( row.e_id !== null ) {
-        var instanceId = parseInt(experimentTemplate._id) + 60000;
+        var instanceId = uuid.v4();
         var experimentInstance = {
-            _id : instanceId.toString(),
+            _id : instanceId,
             name : dataSet.name,
-            recordType : 'instanceVersion',
-            version : 1,
-	    latest : true,
+            recordType : 'instance',
+            _version : 1,
+            templateId : experimentTemplate._id,
+            templateVersion: 1,
+            latest : true,
             created : dataSet.created,
             modified : dataSet.created,
             spatialLevel : 'SingleSite',
@@ -231,7 +232,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
                 filename : 'SingleSiteExperiment.R',
                 key : 'SingleSiteExperimnet.R',
             }],
-            dataSets : [dataSet._id],
+            dataSets : [{_id: dataSet._id, _version:1}],
             owner : dataSet.owner,
             country : dataSet.country,
             vegType : dataSet.vegType,
@@ -241,7 +242,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             versionDescription : 'Imported version'
         }
 
-        experimentTemplate.workspaces = [row.e_id.toString()];
+//        experimentTemplate.workspaces = [row.e_id.toString()];
 
         mongoInstance.insert('experiments',experimentInstance,function(err){
             if(err) console.log(err)
