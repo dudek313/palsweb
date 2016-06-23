@@ -33,9 +33,10 @@
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs');">Model Outputs</a></li>
-            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/myModelOutputs');">My Model Outputs</a></li>
-            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput');">Upload a Model Output</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/mine');">Owned By Me</a></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/workspace');">In Current Workspace</a></li>
+            <li class="divider"></li>
+            <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput/upload');">Upload Model Output</a></li>
             <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
         </ul>
       </li>

@@ -8,12 +8,14 @@ Template.workspaces.helpers({
     },
     sharedWorkspaces: function() {
         var user = Meteor.user();
-        var workspaces = Workspaces.find({'public':true}).fetch();
+        var selector = {'public':true};
         if( user ) {
-            sharedWorkspaces =  Workspaces.find({'guests':user._id}).fetch();
-            Array.prototype.push.apply(workspaces, sharedWorkspaces);
+            if (!user.admin)
+                selector = {$or: [selector, {'guests':user._id}]};
+            else selector = {};
         }
-        return workspaces;
+
+        return Workspaces.find(selector).fetch();
     },
     rootWorkspace: function() {
         return Workspaces.findOne({'name':'public'});

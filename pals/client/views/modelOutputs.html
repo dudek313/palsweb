@@ -14,8 +14,8 @@
         {{#each modelOutputs}}
         <tr>
             <td onclick="Router.go('/modelOutputs/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/experiments/{{experiment._id}}')">{{experiment.name}}</td>
-            <td>{{owner.email}}</td>
+            <td onclick="Router.go('/experiments/{{experiment}}')">{{experimentName}}</td>
+            <td>{{ownerEmail}}</td>
          </tr>
         {{/each}}
         </tbody>

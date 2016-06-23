@@ -103,22 +103,6 @@ Router.map(function () {
                         this.next();
                     }
 
-/*                if (this.params.source == 'Anywhere') {
-                    Session.set('source','Anywhere')
-                    this.next();
-                }
-                else if (this.params.source == 'Workspace') {
-                    var user = Meteor.user();
-                    if (user) {
-                        Session.set('source',this.params.source);
-                        this.next();
-                    }
-                }
-                else if (this.params.source == 'Templates') {
-                    Session.set('source','Templates');
-                    this.next();
-                }
-*/
             }
         ]
     });
@@ -133,30 +117,8 @@ Router.map(function () {
             }
         ]
     });
-/*    this.route('experiments/Anywhere/BySpatialLevel',{
-        path: '/experiments/Anywhere/BySpatialLevel/:resolution',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('source',null);
-                Session.set('currentSpatialLevel',this.params.resolution);
-                this.next();
-            }
-        ]
-    });
-    this.route('experiments/Workspace/BySpatialLevel',{
-        path: '/experiments/Workspace/BySpatialLevel/:resolution',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('source','workspace');
-                Session.set('currentSpatialLevel',this.params.resolution);
-                this.next();
-            }
-        ]
-    });*/
-    this.route('modelOutput',{
-        path: '/modelOutput',
+    this.route('uploadModelOutput',{
+        path: '/uploadModelOutput',
         template: 'modelOutput',
         onBeforeAction: [
             function() {
@@ -165,15 +127,24 @@ Router.map(function () {
             }
         ]
     });
-    this.route('myModelOutputs');
-    this.route('modelOutputs');
+//    this.route('myModelOutputs');
+    this.route('modelOutputs',{
+        path: '/modelOutputs/:source',
+        template: 'modelOutputs',
+        onBeforeAction: [
+            function() {
+                Session.set('source', this.params.source);
+                this.next();
+            }
+        ]
+    });
     this.route('modelOutputsById',{
-        path: '/modelOutputs/:id',
+        path: '/modelOutput/:id',
         template: 'modelOutput',
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',this.params.id);
-		this.next();
+		            this.next();
             }
         ]
     });
