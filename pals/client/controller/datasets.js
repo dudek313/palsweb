@@ -69,12 +69,12 @@ Template.datasets.helpers({
          }
          else console.log('Error: User not logged in');
      }
-     else {
+/*     else {
           var availableWorkspaces = getAvailableWorkspaceIds();
           selector.workspace = {$in:availableWorkspaces};
 //          selector = { 'experiments.workspace': {$in:workspaces} }
      }
-
+*/
      var resolution = getCurrentSpatialLevel();
      if( resolution ) {
        selector.spatialLevel = resolution;

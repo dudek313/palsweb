@@ -24,7 +24,6 @@ Template.experiments.helpers({
           selector.workspace = {$in:workspaces};
           selector.recordType = 'instance';
      }
-     else console.log('Error: Source value invalid');
 
      var resolution = Session.get('currentSpatialLevel');
      if( resolution ) {

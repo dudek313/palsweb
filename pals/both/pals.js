@@ -120,33 +120,42 @@ Router.map(function () {
     this.route('uploadModelOutput',{
         path: '/uploadModelOutput',
         template: 'modelOutput',
+        data: function() { return null }
+/*
         onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',undefined);
                 this.next();
             }
         ]
+*/
     });
 //    this.route('myModelOutputs');
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',
         template: 'modelOutputs',
+        data: function() {
+            return this.params.source;
+        }
+/*      },
         onBeforeAction: [
             function() {
                 Session.set('source', this.params.source);
                 this.next();
             }
         ]
+*/
     });
     this.route('modelOutputsById',{
-        path: '/modelOutput/:id',
+        path: '/modelOutput/display/:id',
         template: 'modelOutput',
-        onBeforeAction: [
+        data: function() { return ModelOutputs.findOne({_id : this.params.id}) }
+/*        onBeforeAction: [
             function() {
                 Session.set('currentModelOutput',this.params.id);
 		            this.next();
             }
-        ]
+        ]*/
     });
     this.route('analysis',{
         path: '/analysis/:id',

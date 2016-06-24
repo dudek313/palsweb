@@ -3,8 +3,12 @@ Template.modelOutput.rendered = function() {
     templateSharedObjects.progress().hide();
 };
 
+getCurrentModelOutput = function() {
+    return Router.current().params.id;
+}
+
 Template.modelOutput.modelOutput = function() {
-    var currentModelOutputId = Session.get('currentModelOutput');
+    var currentModelOutputId = getCurrentModelOutput();
     var currentModelOutput = ModelOutputs.findOne({'_id':currentModelOutputId});
     if( currentModelOutput && currentModelOutput.experiment ) {
         currentModelOutput.experiment = Experiments.findOne({_id:currentModelOutput.experiment});
@@ -28,15 +32,15 @@ Template.modelOutput.reference = function() {
 
 Template.modelOutput.performUpdate = function(fieldName,value) {
     if( value ) {
-    
+
         var user = Meteor.user();
-        currentModelOutputId = Session.get('currentModelOutput');
+        currentModelOutputId = getCurrentModelOutput();
         var reference = Template.modelOutput.reference();
-        
+
         if( currentModelOutputId ) {
-        
+
             if( value == 'n/a' ) value = null;
-        
+
             var selector = {'_id':currentModelOutputId};
             var fieldModifier = {};
             fieldModifier[fieldName] = value;
@@ -98,7 +102,7 @@ Template.modelOutput.events({
         if( confirm("Are you sure?")) {
             if( Template.modelOutput.owner() ) {
                 var key = $(event.target).attr('id');
-        
+
                 var currentModelOutput = Template.modelOutput.modelOutput();
                 if( currentModelOutput.versions ) {
                     var currentVersion = undefined;
@@ -116,7 +120,7 @@ Template.modelOutput.events({
                                 }
                             }
                         );
-                
+
                         Files.remove({_id:currentVersion.fileObjId},function(err){
                            if(err) console.log(err);
                         });
@@ -128,7 +132,7 @@ Template.modelOutput.events({
     'click .start-analysis':function(event) {
         if( Template.modelOutput.owner() ) {
             var key = $(event.target).attr('id');
-            var currentModelOutputId = Session.get('currentModelOutput');
+            var currentModelOutputId = getCurrentModelOutput();
             Meteor.call('startAnalysis',key,currentModelOutputId,function(error,result){
                 if( error ) alert(error);
                 console.log(result);
@@ -149,7 +153,7 @@ Template.modelOutput.events({
     // 'change .file-select': function(event, template){
     //     var file = event.target.files[0];
     //     var reader = new FileReader();
-    //     var currentModelOutputId = Session.get('currentModelOutput');
+    //     var currentModelOutputId = getCurrentModelOutput();
     //     if( !currentModelOutputId ) {
     //         alert("Please enter a model output name before uploading files");
     //         return;
@@ -163,20 +167,20 @@ Template.modelOutput.events({
     //     reader.readAsBinaryString(file);
     // },
     'change .file-select': function(event, template){
-        
-        var currentModelOutputId = Session.get('currentModelOutput');
+
+        var currentModelOutputId = getCurrentModelOutput();
         if( !currentModelOutputId ) {
             alert("Please enter a model output name before uploading files");
             return;
         }
-        
+
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
                     var originalFilename = fileObj.name();
                     var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    
+
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         filename: originalFilename,

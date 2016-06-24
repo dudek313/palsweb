@@ -1,6 +1,10 @@
 <template name="modelOutputs">
 <div class="text-content">
-    <h1>Model Outputs</h1>
+    {{#if areEqual source 'mine'}}
+      <h1>My Model Outputs</h1>
+    {{else}}
+      <h1>Model Outputs In Current Workspace</h1>
+    {{/if}}
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>
@@ -8,14 +12,18 @@
             <th>Name</th>
             <th>Experiment</th>
             <th>Owner</th>
+            {{#if areEqual source 'mine'}}Delete{{/if}}
         </tr>
         </thead>
         <tbody>
         {{#each modelOutputs}}
         <tr>
-            <td onclick="Router.go('/modelOutputs/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/experiments/{{experiment}}')">{{experimentName}}</td>
+            <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
+            <td onclick="Router.go('/experiment/display/{{experiment}}')">{{experimentName}}</td>
             <td>{{ownerEmail}}</td>
+            {{#if areEqual source 'mine'}}
+              <td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>
+            {{/if}}
          </tr>
         {{/each}}
         </tbody>

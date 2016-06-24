@@ -1,14 +1,11 @@
 <template name="datasets">
 <div class="text-content">
     <h1>
+        {{#if source}}{{else}}All{{/if}}
         {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
         Data Sets
+        {{#if source}}In Current Workspace{{/if}}
     </h1>
-    <h3>
-      {{#if source}}In Current Workspace
-      {{else}}In All Available Workspaces
-      {{/if}}
-    </h3>
 <!--      <form action="source">
         <b>Source:</b> &nbsp;&nbsp;
         <input type = "radio" name = "source" value="anywhere">&nbsp;Anywhere &nbsp;&nbsp;&nbsp;
