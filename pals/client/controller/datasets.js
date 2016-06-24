@@ -2,9 +2,6 @@ Template.datasets.rendered = function() {
     window['directives']();
 };
 
-getCurrentSpatialLevel = function() {
-    return Session.get('currentSpatialLevel');
-}
 
 Template.datasets.events({
     'click .delete' : function(event) {
@@ -57,9 +54,20 @@ getMultipleExperimentDataSetIds = function(experiments) {
     return dataSetIds;
 }
 
+getSource = function() {
+    var source = Router.current().params.source;
+    return (source == 'Anywhere') ? null : source;
+}
+
+getCurrentSpatialLevel = function() {
+    var spatialLevel = Router.current().params.resolution;
+    return (spatialLevel == 'AllTypes') ? null : spatialLevel;
+}
+
+
 Template.datasets.helpers({
    dataSets: function() {
-     var source = Session.get('source');
+     var source = getSource();
      var selector = {};
 
      if( source ) {
@@ -86,10 +94,10 @@ Template.datasets.helpers({
 
    },
    currentSpatialLevel: function() {
-      return Session.get('currentSpatialLevel');
+      return getCurrentSpatialLevel();
    },
    source: function() {
-      return Session.get('source');
+      return getSource();
    },
    userEmail: function(userId) {
        var user = Meteor.users.findOne({'_id':userId});
