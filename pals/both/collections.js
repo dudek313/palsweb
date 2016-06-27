@@ -8,6 +8,7 @@ ModelOutputs = new Meteor.Collection("modelOutputs");
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
 Variables = new Meteor.Collection("variables");
+TempFiles = new Meteor.Collection("tempFiles");
 
 GetCollectionByName = function(name) {
     switch(name) {

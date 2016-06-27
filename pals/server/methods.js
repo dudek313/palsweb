@@ -108,6 +108,22 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
+    'addTempFile': function(key) {
+        if (!Meteor.user()) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return TempFiles.insert(key);
+        }
+    },
+    'removeTempFile': function(key) {
+        if (!Meteor.user()) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return TempFiles.remove(key);
+        }
+    },
     'createDraftDataSet': function(dataSetDoc) {
         if( !Meteor.user().admin ) {
             throw new Meteor.Error('not-authorized')

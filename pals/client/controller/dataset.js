@@ -17,11 +17,19 @@ AutoForm.hooks({
                 if(error) {
                     $('.error').html('Failed to create the data set. Please try again.');
                     $('.error').show();
+
                     console.log(error.reason);
                 }
                 else {
                     console.log(docId);
                     DraftDataSets.remove({_id:currentDraftDataSet._id});
+                    insertDoc.files.forEach(function(file){
+                        Meteor.call('removeTempFile', {_id:file.key}, function(error){
+                            if (error) {
+                                console.log('Temp file status not removed for file with key: ' + file.key);
+                            }
+                        });
+                    });
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -47,6 +55,13 @@ AutoForm.hooks({
                 }
                 else {
 //                    Session.set('screenMode', 'display');
+                    updateDoc.$set.files.forEach(function(file){
+                        Meteor.call('removeTempFile', {_id:file.key}, function(error){
+                            if (error)
+                              console.log('Temp file status not removed for file with key: ' + file.key);
+                        });
+                    });
+
                     var currentDataSetId = getCurrentDataSetId();
                     Router.go('/dataset/display/' + currentDataSetId);
                 }
@@ -128,23 +143,35 @@ Template.dataset.events = {
     'change .file-select':function(event, template){
         var currentDataSetId = getCurrentDataSetId();
         FS.Utility.eachFile(event, function(file) {
+            var filename = file.name;
+            while(DraftDataSets.findOne({_id: getCurrentDataSetId(),
+              'files.name': filename})) {
+                filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename + "1");
+            }
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
-                    var originalFilename = fileObj.name();
-                    var name = 'files-' + fileObj._id + '-' + originalFilename;
+//                    var originalFilename = filename;
+                    var name = 'files-' + fileObj._id + '-' + filename;
+//                    var name = 'files-' + fileObj._id + '-' + originalFilename;
                     var isDownloadable = document.getElementById('downloadable').checked;
                     var fileType = $("input[type='radio'][name='fileType']:checked").val();
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
-                        name: originalFilename,
+                        name: filename,
+//                        name: originalFilename,
                         size: fileObj.size(),
                         key: name,
-//                        fileObjId: fileObj._id,
+  //                        fileObjId: fileObj._id,
                         created: new Date(),
                         downloadable: isDownloadable,
-                        type: fileType
+                        type: fileType,
                     };
+                    // flag file as temp until the update is confirmed
+                    Meteor.call('addTempFile', {_id:name}, function(error) {
+                        if (error)
+                            console.log('Temp file status not recorded.');
+                    });
                     Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
                         {'$push':{'files':fileRecord}},function(error){
                             if( error ) {
@@ -156,6 +183,7 @@ Template.dataset.events = {
                     });
                 }
             });
+
         });
     },
     'click .download-file':function(event, template){
@@ -214,10 +242,6 @@ function getDraftFiles(draftDataSet) {
     if ( toDisable ) return true
     else return '';
 }*/
-
-Template.dataset.variables = function() {
-    return Variables.find();
-}
 
 getScreenMode = function() {
     return Router.current().params.screenMode;
