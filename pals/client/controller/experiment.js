@@ -33,7 +33,7 @@ AutoForm.hooks({
                 else {
                     Session.set('tempScripts', []);
                     Session.set('tempDataSets', []);
-                    Router.go('/experiment/display/' + docId);
+                    Router.go('/home');
                 }
             });
 
@@ -79,7 +79,8 @@ AutoForm.hooks({
                 else {
                     Session.set('tempScripts', []);
                     Session.set('tempDataSets', []);
-                    Session.set('screenMode', 'display');
+                    Router.go('/experiment/display/' + currentDoc._id);
+//                    Session.set('screenMode', 'display');
 //                        var currentExperimentId = Session.get('currentExperiment');
 //                        Router.go('/experiment/display/' + currentExperimentId);
                 }
@@ -98,7 +99,8 @@ Template.experiment.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
-        Session.set('screenMode','display');
+        Router.go('/experiment/display/' + getCurrentExperiment()._id)
+//        Session.set('screenMode','display');
     },
     'click .cancel-create':function(event){
         event.preventDefault();
@@ -122,7 +124,8 @@ Template.experiment.events = {
         var currentExperiment = getCurrentExperiment();
         Session.set('tempScripts', currentExperiment.scripts);
         Session.set('tempDataSets', currentExperiment.dataSets);
-        Session.set('screenMode', 'update');
+        Router.go('/experiment/update/' + currentExperiment._id);
+//        Session.set('screenMode', 'update');
     },
     'change .file-select':function(event, template){
         var CurrentExperimentId = Session.get('currentExperiment');
@@ -223,9 +226,10 @@ function getRecordType() {
 }*/
 
 function getCurrentExperiment() {
-    var currentExperimentId = Session.get('currentExperiment');
+/*    var currentExperimentId = Session.get('currentExperiment');
     var currentExperiment = Experiments.findOne({'_id':currentExperimentId});
-    return currentExperiment;
+    return currentExperiment;*/
+    return Router.current().data();
 }
 
 /*
@@ -249,7 +253,7 @@ Template.experiment.helpers({
     return Session.get('uploadButtonClicked');
   },
   formId: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     var formId = null;
     if(screenMode == 'create') formId = "createExperimentForm";
     else if(screenMode == 'update') formId = "updateExperimentForm";
@@ -268,7 +272,7 @@ Template.experiment.helpers({
 
   },
   dataIfNeeded: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return null
     else if(screenMode == 'update') return getCurrentExperiment();
     else return null;
@@ -295,14 +299,14 @@ Template.experiment.helpers({
       return reference;
   },
   inEditMode: function() {
-      var screenMode = Session.get('screenMode');
+      var screenMode = getScreenMode();
       return (screenMode =='update' || screenMode =='create');
   },
   inUpdateMode: function() {
-      return (Session.get('screenMode')=='update');
+      return (getScreenMode()=='update');
   },
   inDisplayMode: function() {
-      return (Session.get('screenMode')=='display');
+      return (getScreenMode()=='display');
   },
   isPublic: function() {
       var dataSet = getCurrentExperiment();
@@ -327,7 +331,7 @@ Template.experiment.helpers({
     else return true;
   },
   inCreateMode: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     return (screenMode == 'create')
   },
   latestVersion: function() {

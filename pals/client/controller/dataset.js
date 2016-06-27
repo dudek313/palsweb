@@ -243,9 +243,6 @@ function getDraftFiles(draftDataSet) {
     else return '';
 }*/
 
-getScreenMode = function() {
-    return Router.current().params.screenMode;
-}
 
 Template.dataset.helpers({
   uploadButtonClicked: function() {

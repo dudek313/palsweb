@@ -51,6 +51,10 @@ getDataSetVersion = function(dataSetId) {
     else return null;
 }
 
+getScreenMode = function() {
+    return Router.current().params.screenMode;
+}
+
 getCurrentSpatialLevel = function() {
     return Router.current().params.resolution;
 }

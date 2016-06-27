@@ -68,18 +68,18 @@ Router.map(function () {
         template: 'dataset',
         onBeforeAction: [
             function() {
-                Session.set('screenMode', 'create');
+//                Session.set('screenMode', 'create');
                 createDummyDataSet();
-	            this.next();
+  	            this.next();
             }
         ]
     });
     this.route('createExperiment',{
-        path: '/experiment/create',
+        path: '/experiment/:screenMode',
         template: 'experiment',
         onBeforeAction: [
             function() {
-                Session.set('screenMode', 'create');
+//                Session.set('screenMode', 'create');
                 Session.set('tempScripts', []);
                 Session.set('tempDataSets', []);
                 this.next();
@@ -108,8 +108,9 @@ Router.map(function () {
         ]
     });
     this.route('displayExperimentById',{
-        path: '/experiment/display/:id',
+        path: '/experiment/:screenMode/:id',
         template: 'experiment',
+        data: function() { return Experiments.findOne({_id:this.params.id}) },
         onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
@@ -134,11 +135,11 @@ Router.map(function () {
 //    this.route('myModelOutputs');
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',
-        template: 'modelOutputs',
-        data: function() {
+        template: 'modelOutputs'
+/*        data: function() {
             return this.params.source;
-        }
-/*      },
+
+      },
         onBeforeAction: [
             function() {
                 Session.set('source', this.params.source);
