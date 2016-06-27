@@ -18,19 +18,18 @@ Template.modelOutputs.helpers({
               }
           }
           else if (source == 'mine')  // Find my model outputs
-              modelOutputs = ModelOutputs.find({owner:user._id});
+              modelOutputs = ModelOutputs.find({owner:user._id}).fetch();
 
           // Find experiment name and owner's email for each model output
           modelOutputs.forEach(function(modelOutput){
               experiment = Experiments.findOne({_id:modelOutput.experiment});
               if (experiment) {
                   modelOutput.experimentName = experiment.name;
-                  moOwner = Meteor.users.findOne({_id:modelOutput.owner});
-                  if (moOwner)
-                      modelOutput.ownerEmail = moOwner.emails[0].address;
               }
+              moOwner = Meteor.users.findOne({_id:modelOutput.owner});
+              if (moOwner)
+              modelOutput.ownerEmail = moOwner.emails[0].address;
           });
-
       }
       return modelOutputs;
   },
