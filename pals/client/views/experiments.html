@@ -1,77 +1,72 @@
 <template name="experiments">
 <div class="text-content">
-    {{#if areEqual source 'Templates'}}
-      <h1>
-        {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-          Experiment Templates
-      </h1>
-       <h2>To Clone Into Current Workspace</h2>
+  <h1>
+    {{#if areEqual source 'templates'}}
+      {{currentSpatialLevel}} Experiment Templates For Cloning Into Current Workspace
     {{else}}
-    <h1>
-      {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-        Experiments
-    </h1>
+      {{currentSpatialLevel}} Experiments
     {{/if}}
-    {{#if areEqual source 'workspace'}}<h3>In Current Workspace</h3>
+    {{#if areEqual source 'workspace'}}In Current Workspace
     {{else}}
-      {{#if areEqual source 'anywhere'}}<h3>In All Available Workspaces</h3>
+      {{#if areEqual source 'anywhere'}}In All Available Workspaces
       {{/if}}
     {{/if}}
+  </h1>
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>
         <tr>
-            {{#if currentSpatialLevel}}
-                {{#if areEqual currentSpatialLevel 'SingleSite'}}
-                    {{> singleSiteHeadings}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
-                    {{> multipleSiteHeadings}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Catchment'}}
-                    {{> catchmentHeadings}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Regional'}}
-                    {{> regionalHeadings}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Global'}}
-                    {{> globalHeadings}}
-                {{/if}}
-            {{else}}
-              <th>Name</th>
-              <th>Spatial Level</th>
-              <th>Resolution</th>
-              <th>Time Step Size</th>
+          {{#if areEqual currentSpatialLevel 'All'}}
+            <th>Name</th>
+            <th>Spatial Level</th>
+            <th>Resolution</th>
+            <th>Time Step Size</th>
+          {{else}}
+            {{#if areEqual currentSpatialLevel 'SingleSite'}}
+                {{> singleSiteHeadings}}
             {{/if}}
-            {{#if areEqual source 'Templates'}}<th>Clone</th>
-            {{else}}<th>View Analyses</th>{{/if}}
-            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+            {{#if areEqual currentSpatialLevel 'MultipleSite'}}
+                {{> multipleSiteHeadings}}
+            {{/if}}
+            {{#if areEqual currentSpatialLevel 'Catchment'}}
+                {{> catchmentHeadings}}
+            {{/if}}
+            {{#if areEqual currentSpatialLevel 'Regional'}}
+                {{> regionalHeadings}}
+            {{/if}}
+            {{#if areEqual currentSpatialLevel 'Global'}}
+                {{> globalHeadings}}
+            {{/if}}
+          {{/if}}
+          {{#if areEqual source 'Templates'}}<th>Clone</th>
+          {{else}}<th>View Analyses</th>{{/if}}
+          {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
         {{#each experiments}}
         <tr id="{{_id}}">
-            {{#if currentSpatialLevel}}
-                {{#if areEqual currentSpatialLevel 'SingleSite'}}
-                    {{> singleSiteRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
-                    {{> multipleSiteRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Catchment'}}
-                    {{> catchmentRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Regional'}}
-                    {{> regionalRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Global'}}
-                    {{> globalRow}}
-                {{/if}}
+            {{#if areEqual currentSpatialLevel 'All'}}
+              <td>{{name}}</td>
+              <td>{{spatialLevel}}</td>
+              <td>{{resolution}}</td>
+              <td>{{timeStepSize}}</td>
             {{else}}
-            <td>{{name}}</td>
-            <td>{{spatialLevel}}</td>
-            <td>{{resolution}}</td>
-            <td>{{timeStepSize}}</td>
+              {{#if areEqual currentSpatialLevel 'SingleSite'}}
+                  {{> singleSiteRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'MultipleSite'}}
+                  {{> multipleSiteRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Catchment'}}
+                  {{> catchmentRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Regional'}}
+                  {{> regionalRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Global'}}
+                  {{> globalRow}}
+              {{/if}}
             {{/if}}
             {{#if areEqual source 'Templates'}}
               {{#if notCloned _id}}<td><button class='btn btn-primary btn-xs clone-exp' id="{{_id}}">Clone</button></td>

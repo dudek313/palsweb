@@ -5,7 +5,7 @@ Template.experiments.helpers({
        }
    },
    experiments: function() {
-     var source = Session.get('source');
+     var source = getSource();
      var selector = {};
 
      if( source == 'workspace' ) {
@@ -16,7 +16,7 @@ Template.experiments.helpers({
          }
          else console.log('Error: User not logged in');
      }
-     else if (source == 'Templates') {
+     else if (source == 'templates') {
           selector.recordType='template';
      }
      else if (source == 'anywhere') {
@@ -25,8 +25,8 @@ Template.experiments.helpers({
           selector.recordType = 'instance';
      }
 
-     var resolution = Session.get('currentSpatialLevel');
-     if( resolution ) {
+     var resolution = getCurrentSpatialLevel();
+     if( resolution != 'All' ) {
          selector.spatialLevel = resolution;
      }
      return Experiments.find(selector,{sort:{created:-1}});
@@ -38,10 +38,10 @@ Template.experiments.helpers({
      return (Experiments.find(selector).fetch().length > 0) ? false : true;
    },
    source: function() {
-       return Session.get('source');
+       return getSource();
    },
    currentSpatialLevel: function() {
-       return Session.get('currentSpatialLevel');
+       return getCurrentSpatialLevel();
    },
    analysesExist: function(analysisId) {
       return (Analyses.findOne({'_id':analysisId})) ? true : false;

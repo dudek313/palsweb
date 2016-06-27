@@ -88,8 +88,8 @@ Router.map(function () {
     });
     this.route('experiments',{
         path: '/experiments/:source/:resolution',
-        template: 'experiments',
-        onBeforeAction: [
+        template: 'experiments'
+/*        onBeforeAction: [
             function() {
                 if (this.params.resolution == 'All')
                     Session.set('currentSpatialLevel', null)
@@ -105,19 +105,19 @@ Router.map(function () {
                     }
 
             }
-        ]
+        ]*/
     });
     this.route('displayExperimentById',{
         path: '/experiment/:screenMode/:id',
         template: 'experiment',
-        data: function() { return Experiments.findOne({_id:this.params.id}) },
-        onBeforeAction: [
+        data: function() { return Experiments.findOne({_id:this.params.id}) }
+/*        onBeforeAction: [
             function() {
                 Session.set('currentExperiment',this.params.id);
                 Session.set('screenMode','display');
                 this.next();
             }
-        ]
+        ]*/
     });
     this.route('uploadModelOutput',{
         path: '/uploadModelOutput',
