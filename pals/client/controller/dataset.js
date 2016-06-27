@@ -65,7 +65,7 @@ Template.dataset.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
-        Router.go('/dataset/display/' + dataSetId)
+        Router.go('/dataset/display/' + getCurrentDataSetId());
 //        Session.set('screenMode','display');
     },
     'click .cancel-create':function(event){
@@ -120,7 +120,7 @@ Template.dataset.events = {
                 console.log(error);
             }
             else {
-                Router.go('dataset/update/' + dataSetId);
+                Router.go('/dataset/update/' + dataSetId);
 //                Session.set('screenMode', 'update');
             }
         });
