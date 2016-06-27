@@ -11,7 +11,6 @@ Template.datasets.events({
         if( confirm("Are you sure?")) {
             var id = $(event.target).attr('id');
             if( id ) {
-                console.log(id);
                 DataSets.remove({'_id':id},function(error){
                     if(error) {
                         $('.error').html('Failed to delete the data set, please try again');
@@ -54,28 +53,16 @@ getMultipleExperimentDataSetIds = function(experiments) {
     return dataSetIds;
 }
 
-getSource = function() {
-    var source = Router.current().params.source;
-    return (source == 'Anywhere') ? null : source;
-}
-
-getCurrentSpatialLevel = function() {
-    var spatialLevel = Router.current().params.resolution;
-    return (spatialLevel == 'AllTypes') ? null : spatialLevel;
-}
-
-
 Template.datasets.helpers({
    dataSets: function() {
      var source = getSource();
      var selector = {};
 
-     if( source ) {
+     if( source == 'workspace' ) {
          var user = Meteor.user();
          if( user ) {
            selector.workspace = user.profile.currentWorkspace._id;
          }
-         else console.log('Error: User not logged in');
      }
 /*     else {
           var availableWorkspaces = getAvailableWorkspaceIds();
@@ -84,7 +71,7 @@ Template.datasets.helpers({
      }
 */
      var resolution = getCurrentSpatialLevel();
-     if( resolution ) {
+     if( resolution != 'All' ) {
        selector.spatialLevel = resolution;
      }
      var experiments = Experiments.find(selector);

@@ -8,7 +8,7 @@ Template.experiments.helpers({
      var source = Session.get('source');
      var selector = {};
 
-     if( source == 'Workspace' ) {
+     if( source == 'workspace' ) {
          var user = Meteor.user();
          if( user ) {
              selector.workspace = user.profile.currentWorkspace._id;
@@ -19,7 +19,7 @@ Template.experiments.helpers({
      else if (source == 'Templates') {
           selector.recordType='template';
      }
-     else if (source == 'Anywhere') {
+     else if (source == 'anywhere') {
           workspaces = getAvailableWorkspaceIds();
           selector.workspace = {$in:workspaces};
           selector.recordType = 'instance';

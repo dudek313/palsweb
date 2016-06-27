@@ -2,7 +2,7 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-    Session.set('uploadButtonClicked', false);
+//    Session.set('uploadButtonClicked', false);
 };
 
 AutoForm.hooks({
@@ -46,8 +46,8 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-                    Session.set('screenMode', 'display');
-                    var currentDataSetId = Session.get('currentDataSet');
+//                    Session.set('screenMode', 'display');
+                    var currentDataSetId = getCurrentDataSetId();
                     Router.go('/dataset/display/' + currentDataSetId);
                 }
             });
@@ -65,7 +65,8 @@ Template.dataset.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
-        Session.set('screenMode','display');
+        Router.go('/dataset/display/' + dataSetId)
+//        Session.set('screenMode','display');
     },
     'click .cancel-create':function(event){
         event.preventDefault();
@@ -106,7 +107,7 @@ Template.dataset.events = {
 
     },
     'click .enable-update':function(event){
-        var dataSetId = Session.get('currentDataSet');
+        var dataSetId = getCurrentDataSetId();
         var draftExists = DraftDataSets.findOne({_id: dataSetId});
         if( draftExists ) {
             DraftDataSets.remove({_id:dataSetId});
@@ -119,12 +120,13 @@ Template.dataset.events = {
                 console.log(error);
             }
             else {
-                Session.set('screenMode', 'update');
+                Router.go('dataset/update/' + dataSetId);
+//                Session.set('screenMode', 'update');
             }
         });
     },
     'change .file-select':function(event, template){
-        var currentDataSetId = Session.get('currentDataSet');
+        var currentDataSetId = getCurrentDataSetId();
         FS.Utility.eachFile(event, function(file) {
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
@@ -161,23 +163,27 @@ Template.dataset.events = {
     }
 };
 
+function getCurrentDataSetId() {
+    return Router.current().params.id;
+}
+
 function getCurrentDataSet() {
-    var currentDataSetId = Session.get('currentDataSet');
+    var currentDataSetId = getCurrentDataSetId();
     var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
     return currentDataSet;
 }
 
 function getCurrentDraftDataSet() {
-    var currentDataSetId = Session.get('currentDataSet');
+    var currentDataSetId = getCurrentDataSetId();
     var currentDraftDataSet = DraftDataSets.findOne({'_id':currentDataSetId});
     return currentDraftDataSet;
 }
 
-function cloneDataSet() {
+/*function cloneDataSet() {
     var cloneDS = jQuery.extend({}, getCurrentDataSet());
     cloneDS.version = 0;
     return cloneDS;
-}
+}*/
 
 function getFiles(dataSet) {
     if( dataSet && dataSet.files && dataSet.files.length > 0 ) {
@@ -201,15 +207,19 @@ function getDraftFiles(draftDataSet) {
     }
 }
 
-Template.dataset.updateBtnDisabled = function() {
+/*Template.dataset.updateBtnDisabled = function() {
     var toDisable = Session.get(disableUpdateBtn);
     console.log(toDisable);
     if ( toDisable ) return true
     else return '';
-}
+}*/
 
 Template.dataset.variables = function() {
     return Variables.find();
+}
+
+getScreenMode = function() {
+    return Router.current().params.screenMode;
 }
 
 Template.dataset.helpers({
@@ -217,13 +227,13 @@ Template.dataset.helpers({
     return Session.get('uploadButtonClicked');
   },
   formId: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return "createDatasetForm"
     else if(screenMode == 'update') return "updateDatasetForm"
     else return null;
   },
   dataIfNeeded: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return null
     else if(screenMode == 'update') return getCurrentDataSet()
     else return null;
@@ -261,14 +271,14 @@ Template.dataset.helpers({
       return reference;
   },
   inEditMode: function() {
-      var screenMode = Session.get('screenMode');
+      var screenMode = getScreenMode();
       return (screenMode =='update' || screenMode =='create');
   },
   inUpdateMode: function() {
-      return (Session.get('screenMode')=='update');
+      return (getScreenMode()=='update');
   },
   inDisplayMode: function() {
-      return (Session.get('screenMode')=='display');
+      return (getScreenMode()=='display');
   },
   isPublic: function() {
       var dataSet = getCurrentDataSet();
@@ -293,7 +303,7 @@ Template.dataset.helpers({
     else return true;
   },
   inCreateMode: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     return (screenMode == 'create')
   },
   latestVersion: function() {

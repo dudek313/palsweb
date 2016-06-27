@@ -50,3 +50,11 @@ getDataSetVersion = function(dataSetId) {
     }
     else return null;
 }
+
+getCurrentSpatialLevel = function() {
+    return Router.current().params.resolution;
+}
+
+getSource = function() {
+    return Router.current().params.source;
+}

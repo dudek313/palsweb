@@ -1,14 +1,12 @@
 <template name="datasets">
 <div class="text-content">
     <h1>
-        {{#if source}}{{else}}All{{/if}}
-        {{#if currentSpatialLevel}}{{currentSpatialLevel}}{{/if}}
-        Data Sets
-        {{#if source}}In Current Workspace{{/if}}
+        {{currentSpatialLevel}} Data Sets
+        {{#if areEqual source 'workspace'}}In Current Workspace{{/if}}
     </h1>
 <!--      <form action="source">
         <b>Source:</b> &nbsp;&nbsp;
-        <input type = "radio" name = "source" value="anywhere">&nbsp;Anywhere &nbsp;&nbsp;&nbsp;
+        <input type = "radio" name = "source" value="anywhere">&nbsp;anywhere &nbsp;&nbsp;&nbsp;
         <input type = "radio" name = "source" value="workspace" checked="checked">&nbsp;Within Current Workspace
       </form>
     <br>
@@ -17,7 +15,14 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            {{#if currentSpatialLevel}}
+            {{#if areEqual currentSpatialLevel 'All'}}
+                <th>Name</th>
+                <th>Spatial Level</th>
+                <th>Resolution</th>
+                <th>Time Step Size</th>
+                <th>Variables</th>
+                <th>Created By</th>
+            {{else}}
                 {{#if areEqual currentSpatialLevel 'SingleSite'}}
                     {{> singleSiteHeadings}}
                 {{/if}}
@@ -33,13 +38,6 @@
                 {{#if areEqual currentSpatialLevel 'Global'}}
                     {{> globalHeadings}}
                 {{/if}}
-            {{else}}
-            <th>Name</th>
-            <th>Spatial Level</th>
-            <th>Resolution</th>
-            <th>Time Step Size</th>
-            <th>Variables</th>
-            <th>Created By</th>
             {{/if}}
             {{#if currentUser.admin}}<th>Delete</th>{{/if}}
         </tr>
@@ -47,30 +45,29 @@
         <tbody>
         {{#each dataSets}}
         <tr id="{{_id}}">
-            {{#if currentSpatialLevel}}
-                {{#if areEqual currentSpatialLevel 'SingleSite'}}
-                    {{> singleSiteRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
-                    {{> multipleSiteRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Catchment'}}
-                    {{> catchmentRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Regional'}}
-                    {{> regionalRow}}
-                {{/if}}
-                {{#if areEqual currentSpatialLevel 'Global'}}
-                    {{> globalRow}}
-                {{/if}}
-            {{else}}
-            <td>{{name}}</td>
-            <td>{{spatialLevel}}</td>
-            <td>{{resolution}}</td>
-            <td>{{timeStepSize}}</td>
-            <td>{{variableList this}}</td>
-            <td>{{userEmail owner}}</td>
-
+          {{#if areEqual currentSpatialLevel 'All'}}
+              <td>{{name}}</td>
+              <td>{{spatialLevel}}</td>
+              <td>{{resolution}}</td>
+              <td>{{timeStepSize}}</td>
+              <td>{{variableList this}}</td>
+              <td>{{userEmail owner}}</td>
+          {{else}}
+              {{#if areEqual currentSpatialLevel 'SingleSite'}}
+                  {{> singleSiteRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'MultipleSite'}}
+                  {{> multipleSiteRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Catchment'}}
+                  {{> catchmentRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Regional'}}
+                  {{> regionalRow}}
+              {{/if}}
+              {{#if areEqual currentSpatialLevel 'Global'}}
+                  {{> globalRow}}
+              {{/if}}
             {{/if}}
             {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>

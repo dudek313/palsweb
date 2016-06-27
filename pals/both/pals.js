@@ -28,15 +28,15 @@ Router.map(function () {
     });
     this.route('datasets',{
         path: '/datasets/:source/:resolution',
-        template: 'datasets',
-        onBeforeAction: [
+        template: 'datasets'
+/*        onBeforeAction: [
             function() {
-                if (this.params.resolution == 'AllTypes')
+                if (this.params.resolution == 'All')
                     Session.set('currentSpatialLevel', null)
                 else {
                     Session.set('currentSpatialLevel',this.params.resolution);
                 }
-                if (this.params.source == 'Anywhere') {
+                if (this.params.source == 'anywhere') {
                     Session.set('source',null)
                     this.next();
                 }
@@ -49,10 +49,10 @@ Router.map(function () {
                 }
 
             }
-        ]
+        ]*/
     });
     this.route('dataset',{
-        path: '/dataset/display/:id',
+        path: '/dataset/:screenMode/:id',
         template: 'dataset',
         onBeforeAction: [
             function() {
@@ -63,7 +63,7 @@ Router.map(function () {
         ]
     });
     this.route('createDataset',{
-        path: '/dataset/create',
+        path: '/dataset/:screenMode',
         template: 'dataset',
         onBeforeAction: [
             function() {
@@ -90,15 +90,15 @@ Router.map(function () {
         template: 'experiments',
         onBeforeAction: [
             function() {
-                if (this.params.resolution == 'AllTypes')
+                if (this.params.resolution == 'All')
                     Session.set('currentSpatialLevel', null)
                 else {
                     Session.set('currentSpatialLevel',this.params.resolution);
                 }
 
-                if ((this.params.source == 'Workspace') && (Meteor.user())
+                if ((this.params.source == 'workspace') && (Meteor.user())
                     || (this.params.source == 'Templates')
-                    || (this.params.source == 'Anywhere')) {
+                    || (this.params.source == 'anywhere')) {
                         Session.set('source', this.params.source);
                         this.next();
                     }

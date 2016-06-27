@@ -42,10 +42,6 @@ Template.modelOutputs.helpers({
 
 });
 
-getSource = function() {
-    return Router.current().params.source;
-}
-
 Template.modelOutputs.events({
     'click .delete' : function(event) {
         var id = $(event.target).attr('id');
