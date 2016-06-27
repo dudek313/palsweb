@@ -7,14 +7,14 @@
   {{/autoForm}}
 -->
   {{#if inEditMode}}
-    {{#autoForm collection="DraftDataSets" id=formId doc=dataIfNeeded type="normal" validation='blur'}}
+    {{#autoForm collection="DraftDataSets" id=formId doc=this type="normal" validation='blur'}}
       <fieldset>
         {{#if inCreateMode}}
           <legend>Create New Data Set</legend>
         {{else}} <!-- if in update mode -->
           <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
             <br>Data set won't be updated until "Save Changes" is clicked below.</b></div>
-          <h1>Data Set: {{dataSet.name}}</h1>
+          <h1>Data Set: {{name}}</h1>
           <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
           <br>
         {{/if}}
@@ -122,124 +122,124 @@
   {{else}}
 
       <form role="form">
-        <h1>Data Set: {{dataSet.name}}</h1>
+        <h1>Data Set: {{name}}</h1>
         <div class="alert alert-danger error"></div>
         {{#if currentUser.admin}}<a class="btn btn-primary enable-update pull-right">Edit Data Set</a>{{/if}}
         <br>
         <div class="form-group">
             <label>Name</label>
-            <div class="display">{{dataSet.name}}</div>
+            <div class="display">{{name}}</div>
         </div>
         <div class="form-group">
-          {{#if dataSet.owner}}
+          {{#if owner}}
           <label>Created By</label>
-          <div class="display">{{userEmail dataSet.owner}}</div>
+          <div class="display">{{userEmail owner}}</div>
           {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.type}}
+            {{#if type}}
                 <label>Type</label>
-                <div class="display">{{dataSet.type}}</div>
+                <div class="display">{{type}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.spatialLevel}}
+            {{#if spatialLevel}}
                 <label>Spatial Level</label>
-                <div class="display">{{dataSet.spatialLevel}}</div>
+                <div class="display">{{spatialLevel}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.country}}
+            {{#if country}}
                 <label>Country</label>
-                <div class="display">{{dataSet.country}}</div>
+                <div class="display">{{country}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.vegType}}
+            {{#if vegType}}
                 <label>IGBP Vegetation Type</label>
-                <div class="display">{{dataSet.vegType}}</div>
+                <div class="display">{{vegType}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-                {{#if dataSet.soilType}}
+                {{#if soilType}}
                     <label>Soil Type</label>
-                    <div class="display">{{dataSet.soilType}}</div>
+                    <div class="display">{{soilType}}</div>
                 {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.url}}
+            {{#if url}}
                 <label>Site Description URL</label>
-                <div class="display">{{dataSet.url}}</div>
+                <div class="display">{{url}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.lat}}
+            {{#if lat}}
                 <label>Latitude (decimal)</label>
-                <div class="display">{{dataSet.lat}}</div>
+                <div class="display">{{lat}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.lon}}
+            {{#if lon}}
                 <label>Longitude (decimal)</label>
-                <div class="display">{{dataSet.lon}}</div>
+                <div class="display">{{lon}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.elevation}}
+            {{#if elevation}}
                 <label>Elevation (m)</label>
-                <div class="display">{{dataSet.elevation}}</div>
+                <div class="display">{{elevation}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.maxVegHeight}}
+            {{#if maxVegHeight}}
                 <label>Max Vegetation Height (m)</label>
-                <div class="display">{{dataSet.maxVegHeight}}</div>
+                <div class="display">{{maxVegHeight}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.utcOffset}}
+            {{#if utcOffset}}
                 <label>UTC Offset (hours)</label>
-                <div class="display">{{dataSet.utcOffset}}</div>
+                <div class="display">{{utcOffset}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.siteContact}}
+            {{#if siteContact}}
                 <label>Site Contact</label>
-                <div class="display">{{dataSet.siteContact}}</div>
+                <div class="display">{{siteContact}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.references}}
+            {{#if references}}
                 <label>References</label>
-                <div class="display">{{{breaklines dataSet.references}}}</div>
+                <div class="display">{{{breaklines references}}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.comments}}
+            {{#if comments}}
                 <label>Comments</label>
-                <div class="display">{{{breaklines dataSet.comments}}}</div>
+                <div class="display">{{{breaklines comments}}}</div>
             {{/if}}
         </div>
         <div class="form-group">
             <label>Variables</label><br>
             {{#if noVariablesRecorded}}None recorded<br>{{/if}}
-            {{#if dataSet.variables.NEE}}NEE {{/if}}
-            {{#if dataSet.variables.Qg}}Qg {{/if}}
-            {{#if dataSet.variables.Qh}}Qh {{/if}}
-            {{#if dataSet.variables.Qle}}Qle {{/if}}
-            {{#if dataSet.variables.Rnet}}Rnet {{/if}}
-            {{#if dataSet.variables.SWnet}}SWnet{{/if}}
+            {{#if variables.NEE}}NEE {{/if}}
+            {{#if variables.Qg}}Qg {{/if}}
+            {{#if variables.Qh}}Qh {{/if}}
+            {{#if variables.Qle}}Qle {{/if}}
+            {{#if variables.Rnet}}Rnet {{/if}}
+            {{#if variables.SWnet}}SWnet{{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.region}}
+            {{#if region}}
                 <label>Region</label>
-                <div class="display">{{dataSet.region}}</div>
+                <div class="display">{{region}}</div>
             {{/if}}
         </div>
         <div class="form-group">
-            {{#if dataSet.resolution}}
+            {{#if resolution}}
                 <label>Resolution</label>
-                <div class="display">{{dataSet.resolution}}</div>
+                <div class="display">{{resolution}}</div>
             {{/if}}
         </div>
       </form>

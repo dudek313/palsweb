@@ -168,9 +168,10 @@ function getCurrentDataSetId() {
 }
 
 function getCurrentDataSet() {
-    var currentDataSetId = getCurrentDataSetId();
+    return Router.current().data();
+/*    var currentDataSetId = getCurrentDataSetId();
     var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
-    return currentDataSet;
+    return currentDataSet;*/
 }
 
 function getCurrentDraftDataSet() {

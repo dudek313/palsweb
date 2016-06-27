@@ -54,13 +54,14 @@ Router.map(function () {
     this.route('dataset',{
         path: '/dataset/:screenMode/:id',
         template: 'dataset',
-        onBeforeAction: [
+        data: function() { return DataSets.findOne({_id:this.params.id}); }
+/*        onBeforeAction: [
             function() {
                 Session.set('currentDataSet',this.params.id);
                 Session.set('screenMode', 'display');
                 this.next();
             }
-        ]
+        ]*/
     });
     this.route('createDataset',{
         path: '/dataset/:screenMode',
