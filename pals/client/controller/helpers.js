@@ -42,6 +42,10 @@ Template.registerHelper("areEqual", function(firstString,secondString) {
     }
 });
 
+Template.registerHelper("screenMode", function() {
+    return getScreenMode();
+});
+
 getDataSetVersion = function(dataSetId) {
     if (dataSetId) {
         dataSet = DataSets.findOne({_id:dataSetId});

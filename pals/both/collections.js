@@ -4,7 +4,7 @@ DraftDataSets = new Meteor.Collection("draftDataSets");
 Reference = new Meteor.Collection("reference");
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
 DraftExperiments = new Meteor.Collection("draftExperiments")
-ModelOutputs = new Meteor.Collection("modelOutputs");
+ModelOutputs = new Meteor.Collection("modelOutputs").vermongo({timestamps: true, userId: 'modifierId'});
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
 Variables = new Meteor.Collection("variables");
@@ -80,6 +80,80 @@ if( !reference ) {
         'resolution' : ['0.01 deg','0.5 deg','1 deg','2 deg','Other']
     });
 }
+
+ModelOutputs.attachSchema(new SimpleSchema({
+  _id: {
+    type: String,
+    optional: true
+  },
+  name: {
+    type: String,
+    label: "Name"
+  },
+  owner: {
+    type: String,
+    label: "Owner",
+    optional: true
+  },
+  experiment: {
+    type: String,
+    label: "Experiment",
+    optional: true
+  },
+  model: {
+    type: String,
+    label: "Model",
+    optional: true
+  },
+  created: {
+    type: Date,
+    label: "Created",
+    optional: true
+  },
+  parameterSelection: {
+    type: String,
+    label: "Parameter Selection",
+    optional: true
+  },
+  stateSelection: {
+    type: String,
+    label: "State Selection",
+    optional: true
+  },
+  accessLevel: {
+    type: String,
+    label: "Access Level",
+    optional: true
+  },
+  'files.$.path': {
+    type: String,
+    optional: true
+  },
+  'files.$.name': {
+    type: String,
+    optional: true
+  },
+  'files.$.size': {
+    type: Number,
+    optional: true
+  },
+  'files.$.key': {
+    type: String,
+    optional: true
+  },
+  'files.$.created': {
+    type: String,
+    optional: true
+  },
+  comments: {
+    type: String,
+    optional: true
+  },
+  status: {
+    type: String,
+    optional: true
+  }
+}));
 
 Models.attachSchema(new SimpleSchema({
   _id: {

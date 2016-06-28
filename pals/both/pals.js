@@ -107,7 +107,7 @@ Router.map(function () {
             }
         ]*/
     });
-    this.route('displayExperimentById',{
+    this.route('displayOrUpdateExperiment',{
         path: '/experiment/:screenMode/:id',
         template: 'experiment',
         data: function() { return Experiments.findOne({_id:this.params.id}) }
