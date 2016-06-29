@@ -214,7 +214,27 @@
               </div>
             </div>
 
-            <div class="panel panel-primary">
+            {{#if areEqual recordType 'instance'}}
+              <div class="panel panel-primary">
+              <div class="panel-heading">Model Outputs</div>
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th>Name</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {{#each modelOutputs}}
+                  <tr>
+                      <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
+                  </tr>
+                  {{/each}}
+                  </tbody>
+              </table>
+              </div>
+             {{/if}}
+
+<!--            <div class="panel panel-primary">
               <div class="panel-heading">Model Outputs</div>
               <div class="panel-body">
                 <table class="table table-hover">
@@ -246,7 +266,7 @@
                 <button class='btn btn-default bottom-margin' id="add-modelOutput" {{uploadDisabled}}>Add Model Output</button>
               </div>
             </div>
-
+-->
           </fieldset>
           {{#if areEqual screenMode 'create'}}
             <div class="col-md-12">

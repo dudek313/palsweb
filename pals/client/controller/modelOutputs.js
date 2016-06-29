@@ -7,27 +7,13 @@ Template.modelOutputs.helpers({
 
           var source = getSource();
           if (source == 'workspace') {  // Find model outputs in current workspace
-              // find all experiments in current workspace
               experiments = Experiments.find({workspace:user.profile.currentWorkspace._id, recordType:'instance'},{sort:{name:1}});
 
-              // for each experiment, find all associated model outputs
-              var myModelOutput;
+              var currentModelOutputs;
               if (experiments) {
                   experiments.forEach(function(currentExperiment){
-                      currentExperiment.modelOutputs.forEach(function(moId){
-                          if (indexOf(moId, modelOutputIds) == -1) {
-                              myModelOutput = Meteor.call('findOneModelOutput', {_id:mo._id}, function(err, docId){
-                                  if (err) {
-                                    $('.error').html('There was a server error. Are you logged in?');
-                                    $('.error').show();
-                                    console.log(error.reason);
-                                  }
-                                  else {
-                                    modelOutputs.push(myModelOutput);
-                                  }
-                              });
-                          }
-                      });
+                      currentModelOutputs = ModelOutputs.find({experiments:currentExperiment._id},{sort:{name:1}}).fetch();
+                      Array.prototype.push.apply(modelOutputs, currentModelOutputs);
                   });
               }
           }
@@ -35,15 +21,16 @@ Template.modelOutputs.helpers({
               modelOutputs = ModelOutputs.find({owner:user._id}).fetch();
 
           // Find experiment name and owner's email for each model output
-          modelOutputs.forEach(function(mo){
-              experiment = Experiments.findOne({modelOutput:mo._id});
+          modelOutputs.forEach(function(modelOutput){
+              experiment = Experiments.findOne({_id:modelOutput.experiments[0]});
               if (experiment) {
                   modelOutput.experimentName = experiment.name;
               }
               moOwner = Meteor.users.findOne({_id:modelOutput.owner});
               if (moOwner)
-              modelOutput.ownerEmail = moOwner.emails[0].address;
+                modelOutput.ownerEmail = moOwner.emails[0].address;
           });
+
       }
       return modelOutputs;
   },

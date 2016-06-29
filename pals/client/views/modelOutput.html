@@ -3,129 +3,60 @@
     <div class="col-md-8">
       {{#if areEqual screenMode 'display'}}
         <form role="form">
-          <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
-          {{#if areEqual experiment.recordType 'template'}}
-            <h1>Experiment Template: {{experiment.name}}</h1>
-          {{else}}
-            <h1>Experiment: {{experiment.name}}</h1>
-          {{/if}}
-          <div class="alert alert-danger error"></div>
+          <h1>Model Output: {{name}}</h1>
           <div class="form-group">
-             <label>Experiment Name</label>
-             <div class="display">{{experiment.name}}</div>
-           </div>
-           <div class="form-group">
-             {{#if experiment.country}}
-                 <label>Country</label>
-                 <div class="display">{{experiment.country}}</div>
-             {{/if}}
-           </div>
-           <div class="form-group">
-             {{#if experiment.vegType}}
-                 <label>IGBP Vegetation Type</label>
-                 <div class="display">{{experiment.vegType}}</div>
-             {{/if}}
-           </div>
-           {{#if experiment.otherVegType}}
-             <div class="display">{{experiment.vegType}}</div>
-           {{/if}}
-           <div class="form-group">
-               <label>Spatial Level</label>
-               <div class="display">{{experiment.spatialLevel}}</div>
-           </div>
-           <div class="form-group">
-               <label>Time Step Size</label>
-               <div class="display">{{experiment.timeStepSize}}</div>
-           </div>
-           <div class="form-group">
-             {{#if experiment.shortDescription}}
-               <label>Short Description</label>
-               <div class="display">{{experiment.shortDescription}}</div>
-             {{/if}}
-           </div>
-           <div class="form-group">
-             {{#if experiment.longDescription}}
-                 <label>Long Description</label>
-                 <div class="display">{{{breaklines experiment.longDescription}}}</div>
-             {{/if}}
-           </div>
-           <div class="form-group">
-             {{#if experiment.region}}
-                 <label>Region</label>
-                 <div class="display">{{experiment.region}}</div>
-             {{/if}}
-           </div>
-           <div class="form-group">
-             {{#if experiment.resolution}}
-                 <label>Resolution</label>
-                 <div class="display">{{experiment.resolution}}</div>
-             {{/if}}
-           </div>
-         </form>
+              <label>Name</label>
+              <div class="display">{{name}}</div>
+          </div>
+          <div class="form-group">
+             <label>Experiment</label>
+             <div class="display">{{experimentName}}</div>
+         </div>
+         <div class="form-group">
+             <label>Model</label>
+             <div class="display">{{modelName}}</div>
+         </div>
+         <div class="form-group">
+             <label>State Selection</label>
+             <div class="display">{{stateSelection}}</div>
+         </div>
+         <div class="form-group">
+             <label>Parameter Selection</label>
+             <div class="display">{{parameterSelection}}</div>
+         </div>
+         <div class="form-group">
+             <label>Comments</label>
+             <div class="display">{{{breaklines comments}}}</div>
+         </div>
+         {{#if analyses}}
          <br/>
-<!--         <div class="col-md-9"> -->
-         <div class="panel panel-success">
-         <div class="panel-heading">Scripts</div>
-          <div class="panel-body">
-           <table class="table">
-             <tr>
-               <th>Filename</th>
-             </tr>
-             {{#each experiment.scripts}}
-               <tr>
-                 <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
-               </tr>
-             {{/each}}
+         <h3>Analyses</h3>
+         <table class="table">
+              <tr>
+                  <th>id</th>
+                  <th>MO Version</th>
+                  <th>Status</th>
+                  <th>Error Message</th>
+                  <th>View Results</th>
+                  <th>Delete</th>
+              </tr>
+              {{#each analyses}}
+              <tr>
+                  <td>{{_id}}</td>
+                  <td>{{modelOutputVersion.filename}}</td>
+                  <td>{{status}}</td>
+                  <td>{{error}}</td>
+                  <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                  <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+              </tr>
+              {{/each}}
           </table>
-         </div>
-        </div>
-      <form role="form">
-           <div class="panel panel-primary">
-           <div class="panel-heading">Data Sets</div>
-           <div class="panel-body">
+          {{/if}}
 
-           <table class="table table-hover">
-               <thead>
-               <tr>
-                   <th>Name</th>
-               </tr>
-               </thead>
-               <tbody>
-               {{#each dataSets}}
-               <tr>
-                   <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
-               </tr>
-               {{/each}}
-               </tbody>
-           </table>
-           </div>
-         </div>
-       </form>
-       {{#if areEqual recordType 'instance'}}
-         <div class="panel panel-primary">
-         <div class="panel-heading">Model Outputs</div>
-         <table class="table table-hover">
-             <thead>
-             <tr>
-                 <th>Name</th>
-             </tr>
-             </thead>
-             <tbody>
-             {{#each modelOutputs}}
-             <tr>
-                 <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
-             </tr>
-             {{/each}}
-             </tbody>
-         </table>
-         </div>
-        {{/if}}
-<!--        </div> -->
-        <div class="col-md-12">
-         <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
-       </div>
+        </form>
 
       {{else}}
+
         {{#autoForm collection="Experiments" id=formId doc=this type="normal" validation='blur'}}
           <fieldset>
             {{#if areEqual screenMode 'create'}}

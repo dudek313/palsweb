@@ -23,6 +23,7 @@ AutoForm.hooks({
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             insertDoc.scripts = Session.get('tempScripts');
+//            insertDoc.modelOutputs = Session.get('tempModelOutputs');
             insertDoc.recordType = 'template';
             var currentDataSets = Session.get('tempDataSets');
             // for each data set added, need to format as id and version number
@@ -35,26 +36,16 @@ AutoForm.hooks({
                 };
                 insertDoc.dataSets.push(dataSetDetails);
             })
-            // update model output collection
-            updateModelOutputs(function (error){
-                if (error) {
-                  $('.error').html('Failed to create the experiment. Please try again.');
-                  $('.error').show();
-                  console.log(error.reason);
+            // insert experiment document to the mongodb collection
+            Meteor.call('insertExperiment', insertDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to create the experiment. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
                 }
                 else {
-                  // add new experiment to mongodb collection
-                  Meteor.call('insertExperiment', insertDoc, function(error, docId){
-                    if(error) {
-                      $('.error').html('Failed to create the experiment. Please try again.');
-                      $('.error').show();
-                      console.log(error.reason);
-                    }
-                    else {
-                      // if successful, display the created experiment
-                      Router.go('/experiment/display/' + docId);
-                    }
-                  });
+                    // if successful, display the created experiment
+                    Router.go('/experiment/display/' + docId);
                 }
             });
 
@@ -65,6 +56,7 @@ AutoForm.hooks({
     updateExperimentForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             updateDoc.$set.scripts = Session.get('tempScripts');
+//            updateDoc.$set.modelOutputs = Session.get('tempModelOutputs');
             var currentDataSets = Session.get('tempDataSets');
             updateDoc.$set.dataSets = [];
             var recordType = getRecordType();
@@ -103,18 +95,6 @@ AutoForm.hooks({
     }
 })
 
-function updateModelOutputs() {
-    var modelOutputChanges = Session.get('modelOutputChanges');
-    var insertError = false;
-    modelOutputChanges.forEach(function(moChange){
-        Meteor.call('updateModelOutput', moChange.currentDoc, moChange.updateDoc, function(err){
-            if (err) insertError = true;
-        });
-    });
-    if (insertError)
-        throw new Meteor.error('Model output update unsuccessful');
-}
-
 Template.experiment.events = {
     // when user clicks cancel during update experiment, returns them to display mode
     'click .cancel-update':function(event){
@@ -150,6 +130,7 @@ Template.experiment.events = {
         var currentExperiment = getCurrentExperiment();
         Session.set('tempScripts', currentExperiment.scripts);
         Session.set('tempDataSets', currentExperiment.dataSets);
+//        Session.set('tempModelOutputs', currentExperiment.modelOutputs);
         Router.go('/experiment/update/' + currentExperiment._id);
     },
     // uploads script files after selection
@@ -277,7 +258,7 @@ Template.experiment.helpers({
   },
   // identifies model outputs not yet associated with this experiment
   // that can now be associated with it
-  otherModelOutputs: function() {
+/*  otherModelOutputs: function() {
     var currentModelOutputs = Session.get('tempModelOutputs');
     if (currentModelOutputs) {
       var currentModelOutputIds = [];
@@ -288,7 +269,7 @@ Template.experiment.helpers({
 
       return ModelOutputs.find(selector,{sort:{name:1}});
     }
-  },
+  },*/
   // determines the record type of the current experiment
   recordType: function() {
     return getRecordType();
@@ -307,7 +288,7 @@ Template.experiment.helpers({
   },
   // returns an array with the names of the model outputs currently
   // associated with the current experiment in create or update mode
-  tempModelOutputs: function() {
+/*  tempModelOutputs: function() {
     var tempModelOutputs = Session.get('tempModelOutputs');
     if( tempModelOutputs && tempModelOutputs.length > 0) {
       tempModelOutputs.forEach(function(modelOutput){
@@ -316,7 +297,7 @@ Template.experiment.helpers({
       return tempModelOutputs;
     }
     else return [];
-  },
+  },*/
   // returns the model outputs associated with the current experiment
   modelOutputs: function() {
       return getModelOutputs();
@@ -324,11 +305,11 @@ Template.experiment.helpers({
 });
 
 // returns the model outputs associated with the current experiment
-getModelOutputs = function() {
+function getModelOutputs() {
     currentExperimentId = getCurrentExperiment()._id;
     if( currentExperimentId ) {
-        var selector = {'experiment':currentExperimentId};
-        return  ModelOutputs.find(selector,{sort:{created:-1}});
+        var selector = {'experiments':currentExperimentId};
+        return  ModelOutputs.find(selector,{sort:{created:-1}}).fetch();
     }
 }
 

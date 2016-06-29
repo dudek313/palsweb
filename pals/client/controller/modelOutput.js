@@ -166,20 +166,8 @@ Template.modelOutput.helpers({
     }
     else return [];
   },
-  // returns the model outputs associated with the current experiment
-  modelOutputs: function() {
-      return getModelOutputs();
-  }
 });
 
-// returns the model outputs associated with the current experiment
-getModelOutputs = function() {
-    currentExperimentId = getCurrentModelOutput()._id;
-    if( currentExperimentId ) {
-        var selector = {'experiment':currentExperimentId};
-        return  ModelOutputs.find(selector,{sort:{created:-1}});
-    }
-}
 
 
 /*Template.modelOutput.rendered = function() {
