@@ -86,6 +86,10 @@ ModelOutputs.attachSchema(new SimpleSchema({
     type: String,
     optional: true
   },
+  _version: {
+    type: Number,
+    optional: true
+  },
   name: {
     type: String,
     label: "Name"
@@ -129,19 +133,19 @@ ModelOutputs.attachSchema(new SimpleSchema({
     type: String,
     optional: true
   },
-  'files.$.name': {
+  'file.name': {
     type: String,
     optional: true
   },
-  'files.$.size': {
+  'file.size': {
     type: Number,
     optional: true
   },
-  'files.$.key': {
+  'file.key': {
     type: String,
     optional: true
   },
-  'files.$.created': {
+  'file.created': {
     type: String,
     optional: true
   },

@@ -108,7 +108,32 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
-    'addTempFile': function(key) {
+  'findOneModelOutput': function(selector) {
+      if( !Meteor.user() ) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+        return ModelOutputs.findOne(selector);
+      }
+  },
+  'insertModelOutput': function(modelOutputDoc) {
+      if( !Meteor.user() ) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+        return ModelOutputs.insert(modelOutputDoc);
+      }
+  },
+  'updateModelOutput': function(currentDoc, updateDoc) {
+      userId = Meteor.userId();
+      if( userId && (userId == currentDoc.owner)) {
+          return ModelOutputs.update(currentDoc, updateDoc);
+      }
+      else {
+          throw new Meteor.Error('not-authorized');
+      }
+  },
+  'addTempFile': function(key) {
         if (!Meteor.user()) {
             throw new Meteor.Error('not-authorized')
         }

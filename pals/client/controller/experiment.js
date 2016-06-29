@@ -10,7 +10,8 @@ AutoForm.hooks({
 /*      this will only be called when creating experiment templates,
         not active experiments.
         insertDoc contains the values of the fields filled in on the form.
-        This function adds extra fields not included in the form.
+        This function also adds extra fields not included in the form,
+        e.g. _version, owner and recordType.
 
         tempScripts and tempDataSets contain the data about the sets of
         scripts and data sets that have been selected, and these need
@@ -34,16 +35,26 @@ AutoForm.hooks({
                 };
                 insertDoc.dataSets.push(dataSetDetails);
             })
-            // insert experiment document to the mongodb collection
-            Meteor.call('insertExperiment', insertDoc, function(error, docId){
-                if(error) {
-                    $('.error').html('Failed to create the experiment. Please try again.');
-                    $('.error').show();
-                    console.log(error.reason);
+            // update model output collection
+            updateModelOutputs(function (error){
+                if (error) {
+                  $('.error').html('Failed to create the experiment. Please try again.');
+                  $('.error').show();
+                  console.log(error.reason);
                 }
                 else {
-                    // if successful, display the created experiment
-                    Router.go('/experiment/display/' + docId);
+                  // add new experiment to mongodb collection
+                  Meteor.call('insertExperiment', insertDoc, function(error, docId){
+                    if(error) {
+                      $('.error').html('Failed to create the experiment. Please try again.');
+                      $('.error').show();
+                      console.log(error.reason);
+                    }
+                    else {
+                      // if successful, display the created experiment
+                      Router.go('/experiment/display/' + docId);
+                    }
+                  });
                 }
             });
 
@@ -92,15 +103,31 @@ AutoForm.hooks({
     }
 })
 
+function updateModelOutputs() {
+    var modelOutputChanges = Session.get('modelOutputChanges');
+    var insertError = false;
+    modelOutputChanges.forEach(function(moChange){
+        Meteor.call('updateModelOutput', moChange.currentDoc, moChange.updateDoc, function(err){
+            if (err) insertError = true;
+        });
+    });
+    if (insertError)
+        throw new Meteor.error('Model output update unsuccessful');
+}
+
 Template.experiment.events = {
+    // when user clicks cancel during update experiment, returns them to display mode
     'click .cancel-update':function(event){
         event.preventDefault();
         Router.go('/experiment/display/' + getCurrentExperiment()._id)
     },
+    // when user clicks cancel while creating experiment, returns them to home page
     'click .cancel-create':function(event){
         event.preventDefault();
         Router.go('/home')
     },
+    // when user clicks on delete script button,
+    //removes script from the tempScripts session variable
     'click .delete-script':function(event) {
         event.preventDefault();
         if( Meteor.user().admin ) {
@@ -115,12 +142,17 @@ Template.experiment.events = {
 
         }
     },
+    // when user clicks on update experiment button,
+    // changes from display mode to update mode
     'click .enable-update':function(event){
+        // store current experiment scripts and data sets in session variables
+        // to be updated without making the changes permanent
         var currentExperiment = getCurrentExperiment();
         Session.set('tempScripts', currentExperiment.scripts);
         Session.set('tempDataSets', currentExperiment.dataSets);
         Router.go('/experiment/update/' + currentExperiment._id);
     },
+    // uploads script files after selection
     'change .file-select':function(event, template){
 //        var CurrentExperimentId = getCurrentExperiment()._id;
         FS.Utility.eachFile(event, function(file) {
@@ -137,15 +169,17 @@ Template.experiment.events = {
                     var tempScripts = Session.get('tempScripts');
                     tempScripts.push(fileRecord);
                     Session.set('tempScripts', tempScripts);
-//                    Session.set('uploadButtonClicked', false);
-
                 }
             });
         });
     },
+/*
     'click .download-file':function(event, template){
         event.preventDefault();
-    },
+    },*/
+    // when a user selects a data set to add (in update mode), this function
+    // adds the id and latest version number of the data set to the
+    // tempDataSets session variable, causing it to display on the update screen
     'click #add-data-set':function(event) {
         event.preventDefault();
         var selected = $('select[name="addDataSet"]').val();
@@ -164,31 +198,25 @@ Template.experiment.events = {
 
         }
     },
+    // removes a selected dataset from the tempDataSets session variable,
+    // thereby removing it from display on the update page
     'click .remove-dataset':function(event) {
         event.preventDefault();
-        var dataSetId = $(event.target).attr('id');
+        var selectedDataSetId = $(event.target).attr('id');
         var currentDataSets = Session.get('tempDataSets');
-        var currentDataSetIds = [];
-        currentDataSets.forEach(function(dataSet){
-            currentDataSetIds.push(dataSet._id);
-        });
-        if (currentDataSetIds) {
-            var index = currentDataSetIds.indexOf(dataSetId);
-            if (index > -1) {
-                currentDataSets.splice(index,1);
-                Session.set('tempDataSets', currentDataSets);
-            }
-            else {
-              $('.error').html('Error removing data set, please try again');
-              $('.error').show();
-            }
+        var newDataSetIds = [];
+        if (currentDataSets && currentDataSets.length > 0) {
+            currentDataSets.forEach(function(currentDataSet) {
+                if (currentDataSet._id != selectedDataSetId)
+                    newDataSetIds.push(currentDataSet);
+            });
+            Session.set('tempDataSets', newDataSetIds);
         }
         else {
-          $('.error').html('Error removing data set, please try again');
-          $('.error').show();
+            $('.error').html('Error removing data set, please try again');
+            $('.error').show();
         }
     },
-
 };
 
 
@@ -229,10 +257,6 @@ Template.experiment.helpers({
     }
     else return [];
   },
-  // returns the current experiment document from the mongodb
-  experiment: function() {
-      return getCurrentExperiment();
-  },
   // returns the details of the scripts currently uploaded
   tempScripts: function() {
       return Session.get('tempScripts');
@@ -251,6 +275,20 @@ Template.experiment.helpers({
       return DataSets.find(selector,{sort:{name:1}});
     }
   },
+  // identifies model outputs not yet associated with this experiment
+  // that can now be associated with it
+  otherModelOutputs: function() {
+    var currentModelOutputs = Session.get('tempModelOutputs');
+    if (currentModelOutputs) {
+      var currentModelOutputIds = [];
+      currentModelOutputs.forEach(function(modelOutput){
+        currentModelOutputIds.push(modelOutput._id);
+      });
+      selector = {_id:{$nin:currentModelOutputIds}};
+
+      return ModelOutputs.find(selector,{sort:{name:1}});
+    }
+  },
   // determines the record type of the current experiment
   recordType: function() {
     return getRecordType();
@@ -264,6 +302,18 @@ Template.experiment.helpers({
         dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
       });
       return tempDataSets;
+    }
+    else return [];
+  },
+  // returns an array with the names of the model outputs currently
+  // associated with the current experiment in create or update mode
+  tempModelOutputs: function() {
+    var tempModelOutputs = Session.get('tempModelOutputs');
+    if( tempModelOutputs && tempModelOutputs.length > 0) {
+      tempModelOutputs.forEach(function(modelOutput){
+        modelOutput.name = ModelOutputs.findOne({_id: modelOutput._id}).name;
+      });
+      return tempModelOutputs;
     }
     else return [];
   },
@@ -291,6 +341,11 @@ getModelOutputs = function() {
 
 
 old helpers
+// returns the current experiment document from the mongodb
+experiment: function() {
+    return getCurrentExperiment();
+},
+
 userEmail: function(userId) {
     var user = Meteor.users.findOne({'_id':userId});
     if( user && user.emails && user.emails.length > 0 ) {

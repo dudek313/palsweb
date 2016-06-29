@@ -1,4 +1,188 @@
-Template.modelOutput.rendered = function() {
+/*Template.modelOutput.rendered = function() {
+    window['directives']();
+    templateSharedObjects.progress().hide();
+    SimpleSchema.debug = true;
+};*/
+
+AutoForm.hooks({
+    uploadModelOutput: {
+/*      this will be called when submitting the form for uploading
+        model outputs.
+        insertDoc contains the values of the fields filled in on the form.
+        The function also adds extra fields not included in the form, such
+        as _version and owner.
+*/
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            event.preventDefault();
+            insertDoc._version = 1;
+            insertDoc.owner = Meteor.user()._id;
+            // tempFile contains the data about the uploaded file which needs
+            // to be added to the model output document at submission time.
+            insertDoc.file = Session.get('tempFile');
+            // insert model output document to the mongodb collection
+            Meteor.call('insertModelOutput', insertDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to upload the model output. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    // if successful, display the created experiment
+                    Router.go('/modelOutput/display/' + docId);
+                }
+            });
+
+            this.done();
+            return false;
+        }
+    },
+    updateModelOutputForm: {
+        // this will be called upon submitting the form in update mode.
+        // updateDoc contains the selector which will be used to update
+        // fields in the document in the ModelOutputs collection
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+          // tempFile contains the data about the uploaded file which needs
+          // to be added to the model output document at submission time.
+            updateDoc.$set.owner = Meteor
+            updateDoc.$set.file = Session.get('tempFile');
+            // update Model Outputs collection
+            Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                    $('.error').html('Failed to update the data set. Please try again.');
+                    $('.error').show();
+                    console.log(error.reason);
+                }
+                else {
+                    // if successful, display the updated model output document
+                    Router.go('/modelOutput/display/' + currentDoc._id);
+                }
+            });
+
+            this.done();
+            return false;
+        }
+    }
+})
+
+Template.modelOutput.events = {
+    // returns to display mode if user pressed cancel during updating
+    'click .cancel-update':function(event){
+        event.preventDefault();
+        Router.go('/modelOutpus/display/' + getCurrentModelOutput()._id)
+    },
+    // returns to home page if user pressed cancel while creating model output
+    'click .cancel-create':function(event){
+        event.preventDefault();
+        Router.go('/home')
+    },
+    // if user clicks update button while in display mode, moves to update mode
+    'click .enable-update':function(event){
+        var currentModelOutput = getCurrentModelOutput();
+        Session.set('tempFiles', currentModelOutput.scripts);
+        Router.go('/modelOutput/update/' + currentModelOutput._id);
+    },
+    // if user selects a new model output file to upload
+    // Uses collection-fs package, which has been deprecated, but is still widely used
+    'change .file-select':function(event, template){
+        FS.Utility.eachFile(event, function(file) {
+            Files.insert(file, function (err, fileObj) {
+                if(err) console.log(err);
+                else {
+                    var originalFilename = fileObj.name();
+                    var name = 'files-' + fileObj._id + '-' + originalFilename;
+                    var fileRecord = {
+                        path: FILE_BUCKET+'/'+name,
+                        size: fileObj.size(),
+                        filename: originalFilename,
+                        key: name,
+                        created: new Date()
+                    };
+                    Session.set('tempFile', fileRecord);
+                }
+            });
+        });
+    },
+// Not sure if this is needed ?
+    'click .download-file':function(event, template){
+        event.preventDefault();
+    }
+};
+
+// returns the current experiment record from the mongodb collection
+function getCurrentModelOutput() {
+    return Router.current().data();
+}
+
+Template.modelOutput.helpers({
+  // determines whether the current form is a create form or an update form
+  formId: function() {
+    var screenMode = getScreenMode();
+    var formId = null;
+    if(screenMode == 'create') formId = "uploadModelOutput";
+    else if(screenMode == 'update') formId = "updateModelOutput";
+    return formId;
+  },
+  // returns the model output file to display
+  file: function() {
+    var modelOutput = getCurrentModelOutput();
+    if (modelOutput)
+        return modelOutput.file;
+  },
+  // returns the current model output record from the mongodb
+  modelOutput: function() {
+      return getCurrentModelOutput();
+  },
+  // returns the details of the scripts currently uploaded
+  tempScripts: function() {
+      return Session.get('tempScripts');
+  },
+  // identifies data sets not yet associated with this experiment
+  // that can now be associated with it
+  otherDataSets: function() {
+    var currentDataSets = Session.get('tempDataSets');
+    if (currentDataSets) {
+      var currentDataSetIds = [];
+      currentDataSets.forEach(function(dataSet){
+        currentDataSetIds.push(dataSet._id);
+      });
+      selector = {_id:{$nin:currentDataSetIds}};
+
+      return DataSets.find(selector,{sort:{name:1}});
+    }
+  },
+  // determines the record type of the current experiment
+  recordType: function() {
+    return getRecordType();
+  },
+  // returns an array with the names of the data sets currently
+  // associated with the current experiment in create or update mode
+  tempDataSets: function() {
+    var tempDataSets = Session.get('tempDataSets');
+    if( tempDataSets && tempDataSets.length > 0) {
+      tempDataSets.forEach(function(dataSet){
+        dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+      });
+      return tempDataSets;
+    }
+    else return [];
+  },
+  // returns the model outputs associated with the current experiment
+  modelOutputs: function() {
+      return getModelOutputs();
+  }
+});
+
+// returns the model outputs associated with the current experiment
+getModelOutputs = function() {
+    currentExperimentId = getCurrentModelOutput()._id;
+    if( currentExperimentId ) {
+        var selector = {'experiment':currentExperimentId};
+        return  ModelOutputs.find(selector,{sort:{created:-1}});
+    }
+}
+
+
+/*Template.modelOutput.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
 };
@@ -87,14 +271,14 @@ Template.modelOutput.events({
     'blur select':function(event) {
         Template.modelOutput.update(event);
     },
-/*
+
     'click .display':function(event) {
         if( Template.modelOutput.owner() ) {
             $(event.target).next('.modifier').show();
             $(event.target).hide();
         }
     },
-*/
+
     'change select':function(event) {
         Template.modelOutput.update(event);
     },
@@ -253,3 +437,4 @@ Template.modelOutput.uploadDisabled = function() {
     if( currentMO ) return '';
     else return 'disabled="disabled"';
 }
+*/

@@ -7,13 +7,27 @@ Template.modelOutputs.helpers({
 
           var source = getSource();
           if (source == 'workspace') {  // Find model outputs in current workspace
+              // find all experiments in current workspace
               experiments = Experiments.find({workspace:user.profile.currentWorkspace._id, recordType:'instance'},{sort:{name:1}});
 
-              var currentModelOutputs;
+              // for each experiment, find all associated model outputs
+              var myModelOutput;
               if (experiments) {
                   experiments.forEach(function(currentExperiment){
-                      currentModelOutputs = ModelOutputs.find({experiment:currentExperiment._id},{sort:{name:1}}).fetch();
-                      Array.prototype.push.apply(modelOutputs, currentModelOutputs);
+                      currentExperiment.modelOutputs.forEach(function(moId){
+                          if (indexOf(moId, modelOutputIds) == -1) {
+                              myModelOutput = Meteor.call('findOneModelOutput', {_id:mo._id}, function(err, docId){
+                                  if (err) {
+                                    $('.error').html('There was a server error. Are you logged in?');
+                                    $('.error').show();
+                                    console.log(error.reason);
+                                  }
+                                  else {
+                                    modelOutputs.push(myModelOutput);
+                                  }
+                              });
+                          }
+                      });
                   });
               }
           }
@@ -21,8 +35,8 @@ Template.modelOutputs.helpers({
               modelOutputs = ModelOutputs.find({owner:user._id}).fetch();
 
           // Find experiment name and owner's email for each model output
-          modelOutputs.forEach(function(modelOutput){
-              experiment = Experiments.findOne({_id:modelOutput.experiment});
+          modelOutputs.forEach(function(mo){
+              experiment = Experiments.findOne({modelOutput:mo._id});
               if (experiment) {
                   modelOutput.experimentName = experiment.name;
               }

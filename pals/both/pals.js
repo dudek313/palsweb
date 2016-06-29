@@ -82,6 +82,7 @@ Router.map(function () {
 //                Session.set('screenMode', 'create');
                 Session.set('tempScripts', []);
                 Session.set('tempDataSets', []);
+                Session.set('tempModelOutputs', []);
                 this.next();
             }
         ]
@@ -148,8 +149,8 @@ Router.map(function () {
         ]
 */
     });
-    this.route('modelOutputsById',{
-        path: '/modelOutput/display/:id',
+    this.route('displayOrUpdateModelOutput',{
+        path: '/modelOutput/:screenMode/:id',
         template: 'modelOutput',
         data: function() { return ModelOutputs.findOne({_id : this.params.id}) }
 /*        onBeforeAction: [
