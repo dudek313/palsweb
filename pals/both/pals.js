@@ -29,46 +29,17 @@ Router.map(function () {
     this.route('datasets',{
         path: '/datasets/:source/:resolution',
         template: 'datasets'
-/*        onBeforeAction: [
-            function() {
-                if (this.params.resolution == 'All')
-                    Session.set('currentSpatialLevel', null)
-                else {
-                    Session.set('currentSpatialLevel',this.params.resolution);
-                }
-                if (this.params.source == 'anywhere') {
-                    Session.set('source',null)
-                    this.next();
-                }
-                else {
-                    var user = Meteor.user();
-                    if (user) {
-                        Session.set('source',this.params.source);
-                        this.next();
-                    }
-                }
-
-            }
-        ]*/
     });
     this.route('dataset',{
         path: '/dataset/:screenMode/:id',
         template: 'dataset',
         data: function() { return DataSets.findOne({_id:this.params.id}); }
-/*        onBeforeAction: [
-            function() {
-                Session.set('currentDataSet',this.params.id);
-                Session.set('screenMode', 'display');
-                this.next();
-            }
-        ]*/
     });
     this.route('createDataset',{
         path: '/dataset/:screenMode',
         template: 'dataset',
         onBeforeAction: [
             function() {
-//                Session.set('screenMode', 'create');
                 createDummyDataSet();
   	            this.next();
             }
@@ -77,12 +48,11 @@ Router.map(function () {
     this.route('createExperiment',{
         path: '/experiment/:screenMode',
         template: 'experiment',
+        data: function() { return null },
         onBeforeAction: [
             function() {
-//                Session.set('screenMode', 'create');
                 Session.set('tempScripts', []);
                 Session.set('tempDataSets', []);
-                Session.set('tempModelOutputs', []);
                 this.next();
             }
         ]
@@ -90,75 +60,25 @@ Router.map(function () {
     this.route('experiments',{
         path: '/experiments/:source/:resolution',
         template: 'experiments'
-/*        onBeforeAction: [
-            function() {
-                if (this.params.resolution == 'All')
-                    Session.set('currentSpatialLevel', null)
-                else {
-                    Session.set('currentSpatialLevel',this.params.resolution);
-                }
-
-                if ((this.params.source == 'workspace') && (Meteor.user())
-                    || (this.params.source == 'Templates')
-                    || (this.params.source == 'anywhere')) {
-                        Session.set('source', this.params.source);
-                        this.next();
-                    }
-
-            }
-        ]*/
     });
     this.route('displayOrUpdateExperiment',{
         path: '/experiment/:screenMode/:id',
         template: 'experiment',
         data: function() { return Experiments.findOne({_id:this.params.id}) }
-/*        onBeforeAction: [
-            function() {
-                Session.set('currentExperiment',this.params.id);
-                Session.set('screenMode','display');
-                this.next();
-            }
-        ]*/
     });
-    this.route('uploadModelOutput',{
-        path: '/uploadModelOutput',
+    this.route('createModelOutput',{
+        path: '/modelOutput/:screenMode',
         template: 'modelOutput',
         data: function() { return null }
-/*
-        onBeforeAction: [
-            function() {
-                Session.set('currentModelOutput',undefined);
-                this.next();
-            }
-        ]
-*/
     });
-//    this.route('myModelOutputs');
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',
         template: 'modelOutputs'
-/*        data: function() {
-            return this.params.source;
-
-      },
-        onBeforeAction: [
-            function() {
-                Session.set('source', this.params.source);
-                this.next();
-            }
-        ]
-*/
     });
     this.route('displayOrUpdateModelOutput',{
         path: '/modelOutput/:screenMode/:id',
         template: 'modelOutput',
         data: function() { return ModelOutputs.findOne({_id : this.params.id}) }
-/*        onBeforeAction: [
-            function() {
-                Session.set('currentModelOutput',this.params.id);
-		            this.next();
-            }
-        ]*/
     });
     this.route('analysis',{
         path: '/analysis/:id',
@@ -249,3 +169,139 @@ function createDummyDataSet() {
 //       autoRender: false
 //     });
 // }
+/*
+this.route('datasets',{
+    path: '/datasets/:source/:resolution',
+    template: 'datasets'
+/*        onBeforeAction: [
+        function() {
+            if (this.params.resolution == 'All')
+                Session.set('currentSpatialLevel', null)
+            else {
+                Session.set('currentSpatialLevel',this.params.resolution);
+            }
+            if (this.params.source == 'anywhere') {
+                Session.set('source',null)
+                this.next();
+            }
+            else {
+                var user = Meteor.user();
+                if (user) {
+                    Session.set('source',this.params.source);
+                    this.next();
+                }
+            }
+
+        }
+    ]
+});
+this.route('dataset',{
+    path: '/dataset/:screenMode/:id',
+    template: 'dataset',
+    data: function() { return DataSets.findOne({_id:this.params.id}); }
+/*        onBeforeAction: [
+        function() {
+            Session.set('currentDataSet',this.params.id);
+            Session.set('screenMode', 'display');
+            this.next();
+        }
+    ]
+});
+this.route('createDataset',{
+    path: '/dataset/:screenMode',
+    template: 'dataset',
+    onBeforeAction: [
+        function() {
+//                Session.set('screenMode', 'create');
+            createDummyDataSet();
+            this.next();
+        }
+    ]
+});
+this.route('createExperiment',{
+    path: '/experiment/:screenMode',
+    template: 'experiment',
+    onBeforeAction: [
+        function() {
+//                Session.set('screenMode', 'create');
+            Session.set('tempScripts', []);
+            Session.set('tempDataSets', []);
+//                Session.set('tempModelOutputs', []);
+            this.next();
+        }
+    ]
+});
+this.route('experiments',{
+    path: '/experiments/:source/:resolution',
+    template: 'experiments'
+/*        onBeforeAction: [
+        function() {
+            if (this.params.resolution == 'All')
+                Session.set('currentSpatialLevel', null)
+            else {
+                Session.set('currentSpatialLevel',this.params.resolution);
+            }
+
+            if ((this.params.source == 'workspace') && (Meteor.user())
+                || (this.params.source == 'Templates')
+                || (this.params.source == 'anywhere')) {
+                    Session.set('source', this.params.source);
+                    this.next();
+                }
+
+        }
+    ]
+});
+this.route('displayOrUpdateExperiment',{
+    path: '/experiment/:screenMode/:id',
+    template: 'experiment',
+    data: function() { return Experiments.findOne({_id:this.params.id}) }
+/*        onBeforeAction: [
+        function() {
+            Session.set('currentExperiment',this.params.id);
+            Session.set('screenMode','display');
+            this.next();
+        }
+    ]
+});
+this.route('ModelOutput',{
+    path: '/uploadModelOutput',
+    template: 'modelOutput',
+    data: function() { return null }
+/*
+    onBeforeAction: [
+        function() {
+            Session.set('currentModelOutput',undefined);
+            this.next();
+        }
+    ]
+
+});
+//    this.route('myModelOutputs');
+this.route('modelOutputs',{
+    path: '/modelOutputs/:source',
+    template: 'modelOutputs'
+/*        data: function() {
+        return this.params.source;
+
+  },
+    onBeforeAction: [
+        function() {
+            Session.set('source', this.params.source);
+            this.next();
+        }
+    ]
+
+});
+this.route('displayOrUpdateModelOutput',{
+    path: '/modelOutput/:screenMode/:id',
+    template: 'modelOutput',
+    data: function() { return ModelOutputs.findOne({_id : this.params.id}) }
+/*        onBeforeAction: [
+        function() {
+            Session.set('currentModelOutput',this.params.id);
+            this.next();
+        }
+    ]
+});
+*/

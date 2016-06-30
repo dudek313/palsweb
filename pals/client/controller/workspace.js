@@ -1,11 +1,3 @@
-getCurrentWorkspace = function() {
-    var user = Meteor.user();
-    if( user ) {
-        var id = Session.get('currentWorkspace');
-        var workspace =  Workspaces.findOne({'_id':id});
-        return workspace;
-    }
-};
 
 Template.workspace.helpers({
   greyIfPublic: function() {

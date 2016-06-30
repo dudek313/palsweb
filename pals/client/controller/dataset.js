@@ -146,7 +146,7 @@ Template.dataset.events = {
             var filename = file.name;
             while(DraftDataSets.findOne({_id: getCurrentDataSetId(),
               'files.name': filename})) {
-                filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename + "1");
+                filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
             }
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);

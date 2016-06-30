@@ -1,6 +1,6 @@
 UI._allowJavascriptUrls();
 
-getCurrentWorkspace = function() {
+/*getCurrentWorkspace = function() {
     var user = Meteor.user();
     if( user ) {
         if( !user.profile ) {
@@ -14,7 +14,7 @@ getCurrentWorkspace = function() {
         }
         return user.profile.currentWorkspace;
     }
-}
+}*/
 
 Template.main.helpers({
   currentWorkspace: function() {

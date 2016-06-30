@@ -164,7 +164,7 @@ Template.experiment.events = {
     'click #add-data-set':function(event) {
         event.preventDefault();
         var selected = $('select[name="addDataSet"]').val();
-        if( selected && selected != "(Select One)" ) {
+        if( selected ) {
             var currentDataSets = Session.get('tempDataSets');
             if (currentDataSets) {
                 var currentVersion = getDataSetVersion(selected);

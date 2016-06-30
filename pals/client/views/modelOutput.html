@@ -1,16 +1,17 @@
 <template name="modelOutput">
-  <div class="row">
-    <div class="col-md-8">
-      {{#if areEqual screenMode 'display'}}
+  {{#if areEqual screenMode 'display'}}
+    <div class="row">
+      <div class="col-md-9">
         <form role="form">
           <h1>Model Output: {{name}}</h1>
+          <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
           <div class="form-group">
               <label>Name</label>
               <div class="display">{{name}}</div>
           </div>
           <div class="form-group">
              <label>Experiment</label>
-             <div class="display">{{experimentName}}</div>
+             <div class="display">{{experiment.name}}</div>
          </div>
          <div class="form-group">
              <label>Model</label>
@@ -24,10 +25,12 @@
              <label>Parameter Selection</label>
              <div class="display">{{parameterSelection}}</div>
          </div>
-         <div class="form-group">
-             <label>Comments</label>
-             <div class="display">{{{breaklines comments}}}</div>
-         </div>
+         {{#if comments}}
+           <div class="form-group">
+               <label>Comments</label>
+               <div class="display">{{{breaklines comments}}}</div>
+           </div>
+         {{/if}}
          {{#if analyses}}
          <br/>
          <h3>Analyses</h3>
@@ -54,27 +57,107 @@
           {{/if}}
 
         </form>
+      </div>
+    </div>
 
-      {{else}}
+  {{else}}
 
-        {{#autoForm collection="Experiments" id=formId doc=this type="normal" validation='blur'}}
+    <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+      <br>Model output details won't be updated until "Save Changes" is clicked below.</b></div>
+    <div class="row">
+      <div class="col-md-9">
+        {{#autoForm collection="ModelOutputs" id=formId doc=this type="normal" validation='blur'}}
           <fieldset>
             {{#if areEqual screenMode 'create'}}
-              <h1>Create New Experiment</h1>
+              <h1>Create New Model Output</h1>
             {{else}} <!-- if in update mode -->
-              <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
-                <br>Experiment details won't be updated until "Save Changes" is clicked below.</b></div>
-              <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Experiment Details</a>
-              {{#if areEqual experiment.recordType 'template'}}
-                <h1>Experiment Template: {{experiment.name}}</h1>
-              {{else}}
-                <h1>Experiment: {{experiment.name}}</h1>
-              {{/if}}
+              <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Model Output Details</a>
+              <h1>Model Output: {{name}}</h1>
               <br>
             {{/if}}
             <div class="alert alert-danger error"></div>
-            {{> afQuickField name='name'}}
-            {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
+            <div class="panel panel-primary">
+              <div class="panel-heading">Details</div>
+              <div class="panel-body">
+
+                {{> afQuickField name='name'}}
+                {{> afQuickField name='experiment' type='select' firstOption="(Select One)" options='allowed'}}
+
+<!--                <div class="form-group">
+                   <label>Experiment</label>
+                   <select name="experiment" class="form-control">
+                     <option value=''>(Select One)</option>
+                     {{#each experiments}}
+                       <option value='{{_id}}' {{selected this._id experiment._id}}>{{name}}</option>
+                     {{/each}}
+                   </select>
+                 </div>
+-->
+                <div class="form-group">
+                   <label>Model</label>
+                   <select name="model" class="form-control">
+                     <option value=''>(Select One)</option>
+                     {{#each models}}
+                       <option value='{{_id}}' {{selected this._id model._id}}>{{name}}</option>
+                     {{/each}}
+                   </select>
+                 </div>
+
+                 <div class="form-group">
+                   <label>State Selection</label>
+                   <select name="stateSelection" class="form-control">
+                     <option value=''>(Select One)</option>
+                     {{#each reference.stateSelection}}
+                       <option value='{{_id}}' {{selected this stateSelection}}>{{this}}</option>
+                     {{/each}}
+                   </select>
+                 </div>
+
+                 <div class="form-group">
+                   <label>Parameter Selection</label>
+                   <select name="parameterSelection" class="form-control">
+                     <option value=''>(Select One)</option>
+                     {{#each reference.parameterSelection}}
+                       <option value='{{_id}}' {{selected this parameterSelection}}>{{this}}</option>
+                     {{/each}}
+                   </select>
+                 </div>
+
+                 <div class="form-group">
+                     <label>Please add any comments that would aid reproducing this simulation: </label>
+                     <textarea class="modifier form-control" type="text" name="comments">{{comments}}</textarea>
+                 </div>
+
+                 {{#if areEqual screenMode 'update'}}
+                   {{#if analyses}}
+                     <br/>
+                     <h3>Analyses</h3>
+                     <table class="table">
+                          <tr>
+                              <th>id</th>
+                              <th>MO Version</th>
+                              <th>Status</th>
+                              <th>Error Message</th>
+                              <th>View Results</th>
+                              <th>Delete</th>
+                          </tr>
+                          {{#each analyses}}
+                          <tr>
+                              <td>{{_id}}</td>
+                              <td>{{modelOutputVersion.filename}}</td>
+                              <td>{{status}}</td>
+                              <td>{{error}}</td>
+                              <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                              <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                          </tr>
+                          {{/each}}
+                      </table>
+                    {{/if}}
+                  {{/if}}
+
+             </div>
+           </div>
+<!--            {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
             {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
             {{#if afFieldValueIs name='vegType' value='Other'}}
               {{> afQuickField name='otherVegType'}}
@@ -85,6 +168,7 @@
             {{> afQuickField name='longDescription' rows=3}}
             {{> afQuickField name='region'}}
             {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
+-->
             <div class="panel panel-success">
               <div class="panel-heading">Scripts</div>
               <div class="panel-body">
@@ -162,11 +246,23 @@
           {{/if}}
         {{/autoForm}}
 
-      {{/if}}
+      </div>
     </div>
-  </div>
+  {{/if}}
 </template>
+
+
 <!--<template name="modelOutput">
+                     {{#if areEqual screenMode 'create'}}
+                        <option selected disabled>(Select One)</option>
+                     {{else}}
+                        <option disabled>(Select One)</option>
+                     {{/if}}
+
+
+
+
+
 <div class="model-output">
 <div class="row">
 <div class="col-md-8">

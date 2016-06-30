@@ -19,7 +19,10 @@
         {{#each modelOutputs}}
         <tr>
             <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/experiment/display/{{experiment}}')">{{experimentName}}</td>
+            {{#if experiments.[0]}}
+              <td onclick="Router.go('/experiment/display/{{experiments.[0]}}')">{{experimentName}}</td>
+            {{else}}<td></td>
+            {{/if}}
             <td>{{ownerEmail}}</td>
             {{#if areEqual source 'mine'}}
               <td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>

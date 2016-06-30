@@ -5,7 +5,7 @@
 };*/
 
 AutoForm.hooks({
-    uploadModelOutput: {
+    createModelOutput: {
 /*      this will be called when submitting the form for uploading
         model outputs.
         insertDoc contains the values of the fields filled in on the form.
@@ -118,7 +118,7 @@ Template.modelOutput.helpers({
   formId: function() {
     var screenMode = getScreenMode();
     var formId = null;
-    if(screenMode == 'create') formId = "uploadModelOutput";
+    if(screenMode == 'create') formId = "createModelOutput";
     else if(screenMode == 'update') formId = "updateModelOutput";
     return formId;
   },
@@ -128,9 +128,33 @@ Template.modelOutput.helpers({
     if (modelOutput)
         return modelOutput.file;
   },
-  // returns the current model output record from the mongodb
-  modelOutput: function() {
-      return getCurrentModelOutput();
+  experiment: function() {
+    var modelOutput = getCurrentModelOutput();
+    if (modelOutput && modelOutput.experiments) {
+        var expId = modelOutput.experiments[0];
+        if (expId) {
+            exp = Experiments.findOne({_id:expId});
+            if (exp)
+                return exp;
+        }
+    }
+  },
+  experiments: function() {
+    return Experiments.find({},{sort:{name:1}}).fetch();
+  },
+  models: function() {
+    return Models.find({},{sort:{name:1}}).fetch();
+  },
+  modelName: function() {
+    var modelOutput = getCurrentModelOutput();
+    if (modelOutput) {
+        var modelId = modelOutput.model;
+        if (modelId) {
+            model = Models.findOne({_id:modelId});
+            if (model)
+                return model.name;
+        }
+    }
   },
   // returns the details of the scripts currently uploaded
   tempScripts: function() {
