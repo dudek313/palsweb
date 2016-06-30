@@ -69,7 +69,13 @@ Router.map(function () {
     this.route('createModelOutput',{
         path: '/modelOutput/:screenMode',
         template: 'modelOutput',
-        data: function() { return null }
+        data: function() { return null },
+        onBeforeAction: [
+            function() {
+                Session.set('tempFile',undefined);
+                this.next();
+            }
+        ]
     });
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',

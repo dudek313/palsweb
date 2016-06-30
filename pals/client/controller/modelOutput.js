@@ -78,8 +78,10 @@ Template.modelOutput.events = {
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){
         var currentModelOutput = getCurrentModelOutput();
-        Session.set('tempFiles', currentModelOutput.scripts);
-        Router.go('/modelOutput/update/' + currentModelOutput._id);
+        if (currentModelOutput) {
+            Session.set('tempFile', currentModelOutput.file);
+            Router.go('/modelOutput/update/' + currentModelOutput._id);
+        }
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
@@ -102,6 +104,19 @@ Template.modelOutput.events = {
             });
         });
     },
+    'click .delete-file':function(event) {
+        event.preventDefault();
+        if( confirm("Are you sure?")) {
+            var currentModelOutput = getCurrentModelOutput();
+            if (currentModelOutput) {
+                var owner = currentModelOutput.owner;
+                if (owner == Meteor.userId()) {
+                    Session.set('tempFile', null);
+                }
+            }
+        }
+    },
+
 // Not sure if this is needed ?
     'click .download-file':function(event, template){
         event.preventDefault();
@@ -128,6 +143,10 @@ Template.modelOutput.helpers({
     if (modelOutput)
         return modelOutput.file;
   },
+  tempFile: function() {
+    var tempFile = Session.get('tempFile');
+    return tempFile;
+  },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();
     if (modelOutput && modelOutput.experiments) {
@@ -151,14 +170,13 @@ Template.modelOutput.helpers({
           });
       }
     }
-    console.log(expIds);
     return expIds;
   },
   experiments: function() {
     return Experiments.find({},{sort:{name:1}}).fetch();
   },
-  models: function() {
-    return Models.find({},{sort:{name:1}}).fetch();
+  myModels: function() {
+    return Models.find({owner:Meteor.userId()},{sort:{name:1}}).fetch();
   },
   modelName: function() {
     var modelOutput = getCurrentModelOutput();
@@ -170,41 +188,7 @@ Template.modelOutput.helpers({
                 return model.name;
         }
     }
-  },
-  // returns the details of the scripts currently uploaded
-  tempScripts: function() {
-      return Session.get('tempScripts');
-  },
-  // identifies data sets not yet associated with this experiment
-  // that can now be associated with it
-  otherDataSets: function() {
-    var currentDataSets = Session.get('tempDataSets');
-    if (currentDataSets) {
-      var currentDataSetIds = [];
-      currentDataSets.forEach(function(dataSet){
-        currentDataSetIds.push(dataSet._id);
-      });
-      selector = {_id:{$nin:currentDataSetIds}};
-
-      return DataSets.find(selector,{sort:{name:1}});
-    }
-  },
-  // determines the record type of the current experiment
-  recordType: function() {
-    return getRecordType();
-  },
-  // returns an array with the names of the data sets currently
-  // associated with the current experiment in create or update mode
-  tempDataSets: function() {
-    var tempDataSets = Session.get('tempDataSets');
-    if( tempDataSets && tempDataSets.length > 0) {
-      tempDataSets.forEach(function(dataSet){
-        dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
-      });
-      return tempDataSets;
-    }
-    else return [];
-  },
+  }
 });
 
 

@@ -117,11 +117,13 @@ ModelOutputs.attachSchema(new SimpleSchema({
   parameterSelection: {
     type: String,
     label: "Parameter Selection",
+    allowedValues: Reference.findOne().parameterSelection,
     optional: true
   },
   stateSelection: {
     type: String,
     label: "State Selection",
+    allowedValues: Reference.findOne().stateSelection,
     optional: true
   },
   accessLevel: {
