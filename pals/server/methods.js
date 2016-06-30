@@ -108,6 +108,14 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
+  'findWorkspace': function(selector) {
+      if ( !Meteor.user()) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+          return Workspaces.findOne(selector);
+      }
+  },
   'findOneModelOutput': function(selector) {
       if( !Meteor.user() ) {
           throw new Meteor.Error('not-authorized')

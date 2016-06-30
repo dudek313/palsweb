@@ -60,6 +60,36 @@ getDataSetVersion = function(dataSetId) {
     else return null;
 }
 
+getCurrentWorkspaceId = function() {
+    var user = Meteor.user();
+    if( user ) {
+        if( !user.profile ) {
+            user.profile = {};
+        }
+        if( !user.profile.currentWorkspace ) {
+            console.log('here')
+            var rootWorkspace = Workspaces.findOne({"name":"public"});
+            user.profile.currentWorkspace = rootWorkspace._id;
+            Meteor.users.update({'_id':user._id},
+                {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
+        }
+        return user.profile.currentWorkspace;
+    }
+}
+
+getCurrentWorkspace = function() {
+        var workspaceId = getCurrentWorkspaceId();
+        if (workspaceId) {
+              var workspace = Meteor.call('findWorkspace', {_id: workspaceId}, function(error, doc) {
+                  if (error) {
+                      $('.error').html('Server error');
+                      $('.error').show();
+                  }
+                  else return workspace;
+              });
+        }
+}
+
 getScreenMode = function() {
     return Router.current().params.screenMode;
 }

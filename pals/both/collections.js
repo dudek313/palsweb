@@ -102,8 +102,6 @@ ModelOutputs.attachSchema(new SimpleSchema({
   experiment: {
     type: String,
     label: "Experiment",
-    allowedValues: Experiments.find({recordType: 'instance',
-      workspace:getCurrentWorkspace()}).fetch(),
     optional: true
   },
   model: {

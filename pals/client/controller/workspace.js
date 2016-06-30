@@ -26,9 +26,9 @@ Template.workspace.helpers({
       if( user ) {
           this.id = Session.get('currentWorkspace');
           var query = {'_id':this.id,'owner':user._id};
-          this.workspace = getCurrentWorkspace();
+          this.workspaceId = getCurrentWorkspaceId();
           Meteor.users.update({'_id':user._id},
-              {'$set' : {'profile.currentWorkspace':this.workspace}});
+              {'$set' : {'profile.currentWorkspace':this.workspaceId}});
       }
   },
 

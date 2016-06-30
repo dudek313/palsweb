@@ -139,6 +139,20 @@ Template.modelOutput.helpers({
         }
     }
   },
+  expsInWorkspace: function() {
+    var currentWorkspaceId = getCurrentWorkspaceId();
+    var exps;
+    var expIds = [];
+    if (currentWorkspaceId) {
+      exps = Experiments.find({recordType: 'instance', workspace: currentWorkspaceId}).fetch();
+      if (exps) {
+          exps.forEach(function(exp) {
+              expIds.push(exp._id);
+          });
+      }
+    }
+    return expIds;
+  },
   experiments: function() {
     return Experiments.find({},{sort:{name:1}}).fetch();
   },

@@ -41,7 +41,7 @@ Template.workspaces.events({
               if( error ) alert(error);
               else {
                   var workspace = Workspaces.findOne({'_id':id});
-                  user.profile.currentWorkspace = workspace;
+                  user.profile.currentWorkspace = workspace._id;
                   Meteor.users.update({'_id':user._id},
                       {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
                   Router.go('/workspace/'+id);
@@ -55,7 +55,7 @@ Template.workspaces.events({
           var user = Meteor.user();
           var workspace = Workspaces.findOne({'_id':id});
           Meteor.users.update({'_id':user._id},
-            {'$set' : {'profile.currentWorkspace':workspace}});
+            {'$set' : {'profile.currentWorkspace':workspace._id}});
           Router.go('/workspace/'+id);
       }
   },
