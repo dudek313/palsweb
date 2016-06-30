@@ -26,10 +26,12 @@ Template.registerHelper("loggedIn", function() {
 Template.registerHelper("disabledInBrowseMode", function( ) {
       if (Meteor.user()) {
           var currentWorkspace = getCurrentWorkspace();
-          if  (currentWorkspace.name == 'public') {
-              return "disabled";
+          if (currentWorkspace) {
+              if  (currentWorkspace.name == 'public') {
+                  return "disabled";
+              }
+              else return "";
           }
-          else return "";
       }
       else return "disabled";
 });
@@ -60,6 +62,18 @@ getDataSetVersion = function(dataSetId) {
     else return null;
 }
 
+getScreenMode = function() {
+    return Router.current().params.screenMode;
+}
+
+getCurrentSpatialLevel = function() {
+    return Router.current().params.resolution;
+}
+
+getSource = function() {
+    return Router.current().params.source;
+}
+
 getCurrentWorkspaceId = function() {
     var user = Meteor.user();
     if( user ) {
@@ -78,26 +92,32 @@ getCurrentWorkspaceId = function() {
 }
 
 getCurrentWorkspace = function() {
-        var workspaceId = getCurrentWorkspaceId();
-        if (workspaceId) {
-              var workspace = Meteor.call('findWorkspace', {_id: workspaceId}, function(error, doc) {
-                  if (error) {
-                      $('.error').html('Server error');
-                      $('.error').show();
-                  }
-                  else return workspace;
-              });
-        }
+    var workspaceId = getCurrentWorkspaceId();
+    if (workspaceId) {
+      var ws = Workspaces.findOne({_id: workspaceId});
+      return ws
+    }
+    else return null;
 }
 
-getScreenMode = function() {
-    return Router.current().params.screenMode;
-}
+/*
+// tried to write this with Meteor methods, but apparently it's too slow
+//  to retrieve the data for page rendering
 
-getCurrentSpatialLevel = function() {
-    return Router.current().params.resolution;
+getCurrentWorkspace = function() {
+    var workspaceId = getCurrentWorkspaceId();
+    if (workspaceId) {
+          Meteor.call('findWorkspace', {_id: workspaceId}, function(error, workspace) {
+              if (error) {
+                  $('.error').html('Server error');
+                  $('.error').show();
+                  return null;
+              }
+              else {
+                  return workspace;
+              }
+          });
+    }
+    else return null;
 }
-
-getSource = function() {
-    return Router.current().params.source;
-}
+*/

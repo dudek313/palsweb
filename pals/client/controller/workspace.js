@@ -5,7 +5,9 @@ Template.workspace.helpers({
   },
 
   workspace: function() {
-      return getCurrentWorkspace();
+      var ws = getCurrentWorkspace();
+      console.log('workspace page');console.log(ws);
+      return ws;
   },
   disabled: function() {
     return Session.get('isPublic') ? "disabled" : "";
