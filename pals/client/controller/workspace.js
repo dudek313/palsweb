@@ -6,7 +6,6 @@ Template.workspace.helpers({
 
   workspace: function() {
       var ws = getCurrentWorkspace();
-      console.log('workspace page');console.log(ws);
       return ws;
   },
   disabled: function() {

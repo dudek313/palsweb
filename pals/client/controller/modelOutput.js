@@ -147,10 +147,11 @@ Template.modelOutput.helpers({
       exps = Experiments.find({recordType: 'instance', workspace: currentWorkspaceId}).fetch();
       if (exps) {
           exps.forEach(function(exp) {
-              expIds.push(exp._id);
+              expIds.push({label: exp.name, value: exp._id});
           });
       }
     }
+    console.log(expIds);
     return expIds;
   },
   experiments: function() {

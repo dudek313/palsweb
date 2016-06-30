@@ -81,7 +81,6 @@ getCurrentWorkspaceId = function() {
             user.profile = {};
         }
         if( !user.profile.currentWorkspace ) {
-            console.log('here')
             var rootWorkspace = Workspaces.findOne({"name":"public"});
             user.profile.currentWorkspace = rootWorkspace._id;
             Meteor.users.update({'_id':user._id},
