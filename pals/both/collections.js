@@ -99,15 +99,13 @@ ModelOutputs.attachSchema(new SimpleSchema({
     label: "Owner",
     optional: true
   },
-  experiment: {
-    type: String,
-    label: "Experiment",
+  'experiments': {
+    type: [String],
     optional: true
   },
   model: {
     type: String,
-    label: "Model",
-    optional: true
+    label: "Model"
   },
   created: {
     type: Date,

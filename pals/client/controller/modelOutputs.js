@@ -22,13 +22,16 @@ Template.modelOutputs.helpers({
 
           // Find experiment name and owner's email for each model output
           modelOutputs.forEach(function(modelOutput){
-              experiment = Experiments.findOne({_id:modelOutput.experiments[0]});
-              if (experiment) {
-                  modelOutput.experimentName = experiment.name;
+              if (modelOutput && modelOutput.experiments && modelOutput.experiments.length > 0) {
+                  experiment = Experiments.findOne({_id:modelOutput.experiments[0]});
+                  if (experiment) {
+                      modelOutput.experimentName = experiment.name;
+                  }
               }
               moOwner = Meteor.users.findOne({_id:modelOutput.owner});
               if (moOwner)
-                modelOutput.ownerEmail = moOwner.emails[0].address;
+              modelOutput.ownerEmail = moOwner.emails[0].address;
+
           });
 
       }

@@ -84,7 +84,14 @@ Router.map(function () {
     this.route('displayOrUpdateModelOutput',{
         path: '/modelOutput/:screenMode/:id',
         template: 'modelOutput',
-        data: function() { return ModelOutputs.findOne({_id : this.params.id}) }
+        data: function() {
+            var mo = ModelOutputs.findOne({_id : this.params.id});
+            if (mo && mo.experiments && mo.experiments.length > 0) {
+                expName = Experiments.findOne({_id: mo.experiments[0]}).name;
+                mo.experimentName = expName;
+            }
+            return mo;
+        }
     });
     this.route('analysis',{
         path: '/analysis/:id',

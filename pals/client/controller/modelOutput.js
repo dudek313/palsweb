@@ -1,8 +1,8 @@
-/*Template.modelOutput.rendered = function() {
+Template.modelOutput.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
     SimpleSchema.debug = true;
-};*/
+};
 
 AutoForm.hooks({
     createModelOutput: {
@@ -19,6 +19,8 @@ AutoForm.hooks({
             // tempFile contains the data about the uploaded file which needs
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
+            insertDoc.experiments = [getExperimentId()];
+
             // insert model output document to the mongodb collection
             Meteor.call('insertModelOutput', insertDoc, function(error, docId){
                 if(error) {
@@ -36,15 +38,16 @@ AutoForm.hooks({
             return false;
         }
     },
-    updateModelOutputForm: {
+    updateModelOutput: {
         // this will be called upon submitting the form in update mode.
         // updateDoc contains the selector which will be used to update
         // fields in the document in the ModelOutputs collection
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
           // tempFile contains the data about the uploaded file which needs
           // to be added to the model output document at submission time.
-            updateDoc.$set.owner = Meteor
+            updateDoc.$set.owner = Meteor.user()._id;
             updateDoc.$set.file = Session.get('tempFile');
+            updateDoc.$set.experiments = [getExperimentId()];
             // update Model Outputs collection
             Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
                 if(error) {
@@ -107,13 +110,7 @@ Template.modelOutput.events = {
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {
-            var currentModelOutput = getCurrentModelOutput();
-            if (currentModelOutput) {
-                var owner = currentModelOutput.owner;
-                if (owner == Meteor.userId()) {
-                    Session.set('tempFile', null);
-                }
-            }
+            Session.set('tempFile', null);
         }
     },
 
@@ -127,6 +124,14 @@ Template.modelOutput.events = {
 function getCurrentModelOutput() {
     return Router.current().data();
 }
+
+function getExperimentId() {
+    expElement = document.getElementById("experimentId");
+    if (expElement) {
+        return expElement.options[expElement.selectedIndex].value;
+    }
+}
+
 
 Template.modelOutput.helpers({
   // determines whether the current form is a create form or an update form
@@ -158,25 +163,36 @@ Template.modelOutput.helpers({
         }
     }
   },
-  expsInWorkspace: function() {
+  expOptions: function() {
     var currentWorkspaceId = getCurrentWorkspaceId();
     var exps;
-    var expIds = [];
+    var expOptions = [];
     if (currentWorkspaceId) {
       exps = Experiments.find({recordType: 'instance', workspace: currentWorkspaceId}).fetch();
       if (exps) {
           exps.forEach(function(exp) {
-              expIds.push({label: exp.name, value: exp._id});
+              expOptions.push({label: exp.name, value: exp._id});
           });
       }
     }
-    return expIds;
+    return expOptions;
   },
-  experiments: function() {
-    return Experiments.find({},{sort:{name:1}}).fetch();
+  expsInWorkspace: function() {
+    var currentWorkspaceId = getCurrentWorkspaceId();
+    if (currentWorkspaceId) {
+        var exps = Experiments.find({recordType: 'instance', workspace: currentWorkspaceId}).fetch();
+    }
+    return exps;
   },
   myModels: function() {
-    return Models.find({owner:Meteor.userId()},{sort:{name:1}}).fetch();
+    var myModels = Models.find({owner:Meteor.userId()},{sort:{name:1}}).fetch();
+    var modelOptions = [];
+    if (myModels && myModels.length > 0) {
+        myModels.forEach(function(model) {
+            modelOptions.push({label: model.name, value: model._id});
+        });
+    }
+    return modelOptions;
   },
   modelName: function() {
     var modelOutput = getCurrentModelOutput();

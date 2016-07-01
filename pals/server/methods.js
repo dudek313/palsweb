@@ -134,8 +134,10 @@ Meteor.methods({
   },
   'updateModelOutput': function(currentDoc, updateDoc) {
       userId = Meteor.userId();
-      if( userId && (userId == currentDoc.owner)) {
-          return ModelOutputs.update(currentDoc, updateDoc);
+      if( userId ) {
+          mo = ModelOutputs.update(currentDoc, updateDoc);
+          console.log(mo);
+          return mo;
       }
       else {
           throw new Meteor.Error('not-authorized');
