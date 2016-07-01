@@ -92,7 +92,8 @@ ModelOutputs.attachSchema(new SimpleSchema({
   },
   name: {
     type: String,
-    label: "Name"
+    label: "Name",
+    optional: true
   },
   owner: {
     type: String,
@@ -105,7 +106,8 @@ ModelOutputs.attachSchema(new SimpleSchema({
   },
   model: {
     type: String,
-    label: "Model"
+    label: "Model",
+    optional: true
   },
   created: {
     type: Date,

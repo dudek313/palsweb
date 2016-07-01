@@ -198,7 +198,10 @@ Meteor.methods({
             throw new Meteor.Error('not-authorized')
         }
         else {
-            return Experiments.update(currentDoc, updateDoc);
+              var exp = Experiments.update(currentDoc, updateDoc);
+              console.log(exp);
+              return exp;
+//            return Experiments.update(currentDoc, updateDoc);
         }
 
     },

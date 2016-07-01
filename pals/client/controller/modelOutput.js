@@ -48,6 +48,7 @@ AutoForm.hooks({
             updateDoc.$set.owner = Meteor.user()._id;
             updateDoc.$set.file = Session.get('tempFile');
             updateDoc.$set.experiments = [getExperimentId()];
+            console.log('updateDoc'); console.log(updateDoc.$set);
             // update Model Outputs collection
             Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
                 if(error) {
@@ -57,6 +58,7 @@ AutoForm.hooks({
                 }
                 else {
                     // if successful, display the updated model output document
+                    console.log('update docId'); console.log(docId);
                     Router.go('/modelOutput/display/' + currentDoc._id);
                 }
             });

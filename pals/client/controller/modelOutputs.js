@@ -7,7 +7,7 @@ Template.modelOutputs.helpers({
 
           var source = getSource();
           if (source == 'workspace') {  // Find model outputs in current workspace
-              experiments = Experiments.find({workspace:user.profile.currentWorkspace._id, recordType:'instance'},{sort:{name:1}});
+              experiments = Experiments.find({workspace:user.profile.currentWorkspace, recordType:'instance'},{sort:{name:1}});
 
               var currentModelOutputs;
               if (experiments) {
