@@ -147,8 +147,10 @@ Template.modelOutput.helpers({
   // returns the model output file to display
   file: function() {
     var modelOutput = getCurrentModelOutput();
-    if (modelOutput)
+    if (modelOutput) {
+        console.log(modelOutput.file);
         return modelOutput.file;
+    }
   },
   tempFile: function() {
     var tempFile = Session.get('tempFile');

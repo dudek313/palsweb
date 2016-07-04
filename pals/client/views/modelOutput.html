@@ -4,7 +4,9 @@
       <div class="col-md-9">
         <form role="form">
           <h1>Model Output: {{name}}</h1>
-          <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
+          {{#if currentUser.admin}}
+            <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
+`         {{/if}}
           <div class="form-group">
               <label>Name</label>
               <div class="display">{{name}}</div>
@@ -37,14 +39,14 @@
             <div class="panel-heading">File</div>
             <div class="panel-body">
             {{#if file}}
-            <table class="table">
-              <tr>
-                <th>Filename</th>
-              </tr>
-              <tr>
-                <td onclick="window.location.href='/file/{{file.key}}/{{encode "text/plain"}}'">{{file.filename}}</td>
-              </tr>
-            </table>
+              <table class="table">
+                <tr>
+                  <th>Filename</th>
+                </tr>
+                <tr>
+                  <td onclick="window.location.href='/file/{{file.key}}/{{encode "text/plain"}}'">{{file.filename}}</td>
+                </tr>
+              </table>
             {{else}}
               <tr>no file uploaded</tr>
             {{/if}}

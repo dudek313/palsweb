@@ -135,7 +135,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
     type: String,
     optional: true
   },
-  'file.name': {
+  'file.filename': {
     type: String,
     optional: true
   },
