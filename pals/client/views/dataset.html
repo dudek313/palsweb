@@ -1,24 +1,315 @@
 <template name="dataset">
-<div class="row">
-<div class="col-md-8">
-<form role="form">
-   <h1>Data Set: {{dataSet.name}}</h1>
-   <div class="alert alert-danger error"></div>
+
+<!--  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
+      {{> afQuickField id="name"}}
+      {{> afQuickField name="fileId" type="cfs-file" collection="files"}}
+      <button type="submit">Upload File</button>
+  {{/autoForm}}
+-->
+  {{#if inEditMode}}
+    {{#autoForm collection="DraftDataSets" id=formId doc=this type="normal" validation='blur'}}
+      <fieldset>
+        {{#if inCreateMode}}
+          <legend>Create New Data Set</legend>
+        {{else}} <!-- if in update mode -->
+          <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+            <br>Data set won't be updated until "Save Changes" is clicked below.</b></div>
+          <h1>Data Set: {{name}}</h1>
+          <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
+          <br>
+        {{/if}}
+        <div class="alert alert-danger error"></div>
+        {{> afQuickField name='name'}}
+        {{> afQuickField name='type' type='select' firstOption="(Select One)" options='allowed'}}
+        {{> afQuickField name='spatialLevel' type='select' firstOption="(Select One)" options='allowed'}}
+        {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
+        {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
+        {{#if afFieldValueIs name='vegType' value='Other'}}
+          {{> afQuickField name='otherVegType'}}
+        {{/if}}
+        {{> afQuickField name='soilType'}}
+        {{> afQuickField name='url'}}
+        {{> afQuickField name='lat'}}
+        {{> afQuickField name='lon'}}
+        {{> afQuickField name='elevation'}}
+        {{> afQuickField name='maxVegHeight'}}
+        {{> afQuickField name='utcOffset'}}
+        {{> afQuickField name='siteContact'}}
+        {{> afQuickField name='references' rows=6}}
+        {{> afQuickField name='comments' rows=6}}
+        <b>Variables</b>
+        {{> afQuickField name='variables.NEE' type='boolean-checkbox'}}
+        {{> afQuickField name='variables.Qg' type='boolean-checkbox'}}
+        {{> afQuickField name='variables.Qh' type='boolean-checkbox'}}
+        {{> afQuickField name='variables.Qle' type='boolean-checkbox'}}
+        {{> afQuickField name='variables.Rnet' type='boolean-checkbox'}}
+        {{> afQuickField name='variables.SWnet' type='boolean-checkbox'}}
+        {{> afQuickField name='region'}}
+        {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
+        <div class="col-md-9">
+          <div class="panel panel-primary">
+            <div class="panel-heading">Files</div>
+            {{#if draftHasFiles}}
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th>File</th>
+                      <th>Type</th>
+                      <th>Public</th>
+                      <th>Download</th>
+                      {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {{#each draftFiles}}
+                  <tr>
+                      <td>{{name}}</td>
+                      <td>{{type}}</td>
+                      <td>{{isDownloadable}}</td>
+                      <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
+                            onclick="window.location.href='/file/{{key}}/{{name}}'">Download</button></td>
+                      <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                  </tr>
+                  {{/each}}
+                  </tbody>
+              </table>
+            {{/if}}
+            <div class="panel-body">
+<!--              <label>Upload a new file</label>-->
+              {{#if uploadButtonClicked}}
+                <button class="btn btn-default upload-btn" disabled>Upload A New File</button><br><br>
+                <div class="panel panel-primary">
+                  <div class="panel-heading">New File Details</div>
+                  <div class="panel-body">
+                    <b>Downloadable: </b><input type="checkbox" id="downloadable"><br><br>
+                    <div class="form-group">
+                      <label>Type:</label>
+                      <input type="radio" name="fileType" value="driving" checked>Driving
+                      <input type="radio" name="fileType" value="evaluation">Evaluation
+                      <input type="radio" name="fileType" value="other">Other
+                    </div>
+                    <input type="file" class="file-select" name="file-select">
+                    <div class="progress progress-striped active">
+                      <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                          style="width:0%">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {{else}}
+                  <button class="btn btn-default upload-btn">Upload A New File</button>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      {{#if inCreateMode}}
+        <div class="col-md-12">
+          <button type="submit" class="create-btn btn btn-primary">Save</button>
+          <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
+        </div>
+      {{else}}
+        <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+          <br>Data set won't be updated until "Save Changes" is clicked below.</b>
+        </div>
+        <br>
+        <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
+      {{/if}}
+    {{/autoForm}}
+
+  {{else}}
+
+      <form role="form">
+        <h1>Data Set: {{name}}</h1>
+        <div class="alert alert-danger error"></div>
+        {{#if currentUser.admin}}<a class="btn btn-primary enable-update pull-right">Edit Data Set</a>{{/if}}
+        <br>
+        <div class="form-group">
+            <label>Name</label>
+            <div class="display">{{name}}</div>
+        </div>
+        <div class="form-group">
+          {{#if owner}}
+          <label>Created By</label>
+          <div class="display">{{userEmail owner}}</div>
+          {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if type}}
+                <label>Type</label>
+                <div class="display">{{type}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if spatialLevel}}
+                <label>Spatial Level</label>
+                <div class="display">{{spatialLevel}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if country}}
+                <label>Country</label>
+                <div class="display">{{country}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if vegType}}
+                <label>IGBP Vegetation Type</label>
+                <div class="display">{{vegType}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+                {{#if soilType}}
+                    <label>Soil Type</label>
+                    <div class="display">{{soilType}}</div>
+                {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if url}}
+                <label>Site Description URL</label>
+                <div class="display">{{url}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if lat}}
+                <label>Latitude (decimal)</label>
+                <div class="display">{{lat}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if lon}}
+                <label>Longitude (decimal)</label>
+                <div class="display">{{lon}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if elevation}}
+                <label>Elevation (m)</label>
+                <div class="display">{{elevation}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if maxVegHeight}}
+                <label>Max Vegetation Height (m)</label>
+                <div class="display">{{maxVegHeight}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if utcOffset}}
+                <label>UTC Offset (hours)</label>
+                <div class="display">{{utcOffset}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if siteContact}}
+                <label>Site Contact</label>
+                <div class="display">{{siteContact}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if references}}
+                <label>References</label>
+                <div class="display">{{{breaklines references}}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if comments}}
+                <label>Comments</label>
+                <div class="display">{{{breaklines comments}}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            <label>Variables</label><br>
+            {{#if noVariablesRecorded}}None recorded<br>{{/if}}
+            {{#if variables.NEE}}NEE {{/if}}
+            {{#if variables.Qg}}Qg {{/if}}
+            {{#if variables.Qh}}Qh {{/if}}
+            {{#if variables.Qle}}Qle {{/if}}
+            {{#if variables.Rnet}}Rnet {{/if}}
+            {{#if variables.SWnet}}SWnet{{/if}}
+        </div>
+        <div class="form-group">
+            {{#if region}}
+                <label>Region</label>
+                <div class="display">{{region}}</div>
+            {{/if}}
+        </div>
+        <div class="form-group">
+            {{#if resolution}}
+                <label>Resolution</label>
+                <div class="display">{{resolution}}</div>
+            {{/if}}
+        </div>
+      </form>
+      <div class="col-md-9">
+       <div class="panel panel-primary">
+         <div class="panel-heading">Files</div>
+         {{#if hasFiles}}
+         <table class="table table-hover">
+             <thead>
+             <tr>
+                 <th>File</th>
+                 <th>Type</th>
+                 <th>Public</th>
+                 <th>Download</th>
+             </tr>
+             </thead>
+             <tbody>
+             {{#each files}}
+             <tr>
+                <td>{{name}}</td>
+                <td>{{type}}</td>
+                <td>{{isDownloadable}}</td>
+                {{#if downloadable}}
+                    <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
+                            onclick="window.location.href='/file/{{key}}/{{name}}'">Download</button></td>
+                {{else}}
+                    <td></td>
+                {{/if}}
+              </tr>
+             {{/each}}
+             </tbody>
+         </table>
+         {{/if}}
+         <div class="panel-body">
+         </div>
+       </div>
+      </div>
+        {{#if currentUser.admin}}
+            <div class="col-md-12">
+                <a class="btn btn-primary enable-update pull-right">Edit Data Set</a>
+            </div>
+        {{/if}}
+
+  {{/if}}
+</template>
+
+<!--
+<template name="dataset">
+  <div class="row">
+    <div class="col-md-8">
+      <form role="form">
+        <h1>Data Set: {{dataSet.name}}</h1>
+        <div class="alert alert-danger error"></div>
+        {{#if inDisplayMode}}{{#if currentUser.admin}}{{#if latestVersion}}<a class="btn btn-primary enable-update pull-right" disabled={{updateBtnDisabled}}>Update Data Set</a>{{/if}}{{/if}}{{/if}}
+        <br>
    <div class="form-group">
        <label>Data Set Name</label>
-       {{#if currentUser.admin}}
-           <input class="modifier form-control" type="text" name="name" value="{{dataSet.name}}">
+       {{#if inEditMode}}
+          <input class="modifier form-control" type="text" value="{{cloneDataSet.name}}">
        {{else}}
            <div class="display">{{dataSet.name}}</div>
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
        <label>Data Set Type</label>
-       <select name="type" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.dataSetType}}
-           <option value='{{this}}' {{selected this dataSet.type}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.type}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -29,11 +320,11 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
        <label>Spatial Level</label>
-       <select name="spatialLevel" class="form-control trigger">
+       <select class="form-control trigger">
            {{#each reference.spatialLevel}}
-           <option value='{{this}}' {{selected this dataSet.spatialLevel}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.spatialLevel}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -44,12 +335,12 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
        <label>Country</label>
-       <select name="country" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.country}}
-           <option value='{{this}}' {{selected this dataSet.country}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.country}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -60,12 +351,12 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
        <label>IGBP Vegetation Type</label>
-       <select name="vegType" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.vegType}}
-           <option value='{{this}}' {{selected this dataSet.vegType}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.vegType}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -75,16 +366,16 @@
        {{/if}}
        {{/if}}
    </div>
-   {{#if currentUser.admin}}
+   {{#if inEditMode}}
    <div class="form-group">
        <label>or enter a different Vegetation Type</label>
-       <input class="modifier form-control" type="text" name="vegType" value="{{#if dataSet.vegType}}{{dataSet.vegType}}{{/if}}">
+       <input class="modifier form-control" type="text" value="{{#if cloneDataSet.vegType}}{{cloneDataSet.vegType}}{{/if}}">
    </div>
    {{/if}}
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Soil Type</label>
-           <input class="modifier form-control" type="text" name="soilType" value="{{dataSet.soilType}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.soilType}}">
        {{else}}
            {{#if dataSet.soilType}}
                <label>Soil Type</label>
@@ -93,20 +384,20 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Site Description URL</label>
-           <input class="modifier form-control" type="url" name="url" value="{{dataSet.url}}">
+           <input class="modifier form-control" type="url" value="{{cloneDataSet.url}}">
        {{else}}
        {{#if dataSet.url}}
            <label>Site Description URL</label>
-           <div class="display">{{dataSet.url}}</div>    
+           <div class="display">{{dataSet.url}}</div>
        {{/if}}
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Latitude (decimal)</label>
-           <input class="modifier form-control" type="text" name="lat" value="{{dataSet.lat}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.lat}}">
        {{else}}
        {{#if dataSet.lat}}
            <label>Latitude (decimal)</label>
@@ -115,9 +406,9 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Longitude (decimal)</label>
-           <input class="modifier form-control" type="text" name="lon" value="{{dataSet.lon}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.lon}}">
        {{else}}
        {{#if dataSet.lon}}
            <label>Longitude (decimal)</label>
@@ -126,9 +417,9 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Elevation (m)</label>
-           <input class="modifier form-control" type="text" name="elevation" value="{{dataSet.elevation}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.elevation}}">
        {{else}}
        {{#if dataSet.elevation}}
            <label>Elevation (m)</label>
@@ -137,20 +428,20 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
           <label>Max Vegetation Height (m)</label>
-          <input class="modifier form-control" type="text" name="maxVegHeight" value="{{dataSet.maxVegHeight}}">
+          <input class="modifier form-control" type="text" value="{{cloneDataSet.maxVegHeight}}">
        {{else}}
        {{#if dataSet.maxVegHeight}}
            <label>Max Vegetation Height (m)</label>
            <div class="display">{{dataSet.maxVegHeight}}</div>
        {{/if}}
        {{/if}}
-   </div> 
+   </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>UTC Offset (hours)</label>
-           <input class="modifier form-control" type="text" name="utcOffset" value="{{dataSet.utcOffset}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.utcOffset}}">
        {{else}}
        {{#if dataSet.utcOffset}}
            <label>UTC Offset (hours)</label>
@@ -159,9 +450,9 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Site Contact</label>
-           <input class="modifier form-control" type="text" name="siteContact" value="{{dataSet.siteContact}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.siteContact}}">
        {{else}}
        {{#if dataSet.siteContact}}
            <label>Site Contact</label>
@@ -170,9 +461,9 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>References</label>
-           <textarea class="modifier form-control" type="text" name="references">{{dataSet.references}}</textarea>
+           <textarea class="modifier form-control" type="text" >{{cloneDataSet.references}}</textarea>
        {{else}}
        {{#if dataSet.references}}
            <label>References</label>
@@ -181,9 +472,9 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Comments</label>
-           <textarea class="modifier form-control" type="text" name="comments">{{dataSet.comments}}</textarea>
+           <textarea class="modifier form-control" type="text" >{{cloneDataSet.comments}}</textarea>
        {{else}}
        {{#if dataSet.comments}}
            <label>Comments</label>
@@ -191,10 +482,10 @@
        {{/if}}
        {{/if}}
    </div>
-   {{#if currentUser.admin}}
+   {{#if inEditMode}}
    <div class="form-group">
            <label>Variables</label>
-           <select name="variable" class="form-control">
+           <select class="form-control">
                {{#each variables}}
                    <option value='{{this._id}}'>{{this.name}}</option>
                {{/each}}
@@ -202,22 +493,22 @@
    </div>
    <a class="btn btn-success add-variable">Add Variable</a>
    <h3>
-   {{#each dataSet.variables}}
+   {{#each cloneDataSet.variables}}
        <span class="label label-danger">{{this.name}} <a class="delete-button remove-variable" title="remove" id="{{this._id}}"><i class="fa fa-times-circle-o"></i></a></span>
    {{/each}}
    </h3>
    {{else}}
        <label>Variables</label>
        <h4>
-       {{#each dataSet.variables}}
+       {{#each cloneDataSet.variables}}
            <span class="label label-danger">{{this.name}}</span>
        {{/each}}
        </h4>
    {{/if}}
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
            <label>Region</label>
-           <input class="modifier form-control" type="text" name="region" value="{{dataSet.region}}">
+           <input class="modifier form-control" type="text" value="{{cloneDataSet.region}}">
        {{else}}
        {{#if dataSet.region}}
            <label>Region</label>
@@ -226,12 +517,12 @@
        {{/if}}
    </div>
    <div class="form-group">
-       {{#if currentUser.admin}}
+       {{#if inEditMode}}
        <label>Resolution</label>
-       <select name="resolution" class="form-control trigger">
+       <select class="form-control trigger">
            <option value="n/a"></option>
            {{#each reference.resolution}}
-           <option value='{{this}}' {{selected this dataSet.resolution}}>{{this}}</option>
+           <option value='{{this}}' {{selected this cloneDataSet.resolution}}>{{this}}</option>
            {{/each}}
        </select>
        {{else}}
@@ -241,7 +532,7 @@
        {{/if}}
        {{/if}}
    </div>
-   {{#if currentUser.admin}}
+   {{#if inEditMode}}
    <div class="checkbox">
        <label>
          <input type="checkbox" name="public" {{isPublic}}> Make this Data Set public
@@ -249,22 +540,11 @@
    </div>
    {{/if}}
 </form>
-</div><!--left-column-->
-<div class="col-md-4">
-    <div class="panel panel-primary">
-    <div class="panel-heading">Versions</div>
-    <div class="panel-body">
-    {{#if currentUser.admin}}
-        <label>Upload a new version</label>
-        <input type="file" class="file-select" name="file-select"/>
-        <div class="progress progress-striped active">
-          <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-              style="width:0%">
-          </div>
-        </div>
-    {{/if}}
-    </div>
-    {{#if hasVersions}}
+</div>
+<div class="col-md-6">
+  <div class="panel panel-primary">
+    <div class="panel-heading">Files</div>
+    {{#if hasFiles}}
     <table class="table table-hover">
         <thead>
         <tr>
@@ -273,20 +553,36 @@
         </tr>
         </thead>
         <tbody>
-        {{#each versions}}
+        {{#each files}}
         <tr>
             {{#if isPublicOrOwner}}
-            <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{filename}}</td>
+            <td onclick="window.location.href='/file/{{key}}/{{encode 'application/x-netcdf'}}'">{{name}}</td>
             {{else}}
-            <td>{{filename}}</td>
+            <td>{{name}}</td>
             {{/if}}
-            {{#if currentUser.admin}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
+            {{#if inEditMode}}<td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
         </tr>
         {{/each}}
         </tbody>
     </table>
     {{/if}}
+    <div class="panel-body">
+    {{#if inEditMode}}
+        <label>Upload a new file</label>
+        <input type="file" class="file-select" name="file-select"/>
+        <div class="progress progress-striped active">
+          <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+              style="width:0%">
+          </div>
+        </div>
+    {{/if}}
     </div>
+  </div>
+  {{#if inEditMode}}
+    <a class="btn btn-success save-update">Save As New Version</a>
+    <a class="btn btn-default cancel-update">Cancel</a>
+  {{/if}}
 </div>
-</div><!--row-->
+</div>
 </template>
+-->

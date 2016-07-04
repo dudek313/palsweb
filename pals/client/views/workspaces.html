@@ -1,18 +1,20 @@
 <template name="workspaces">
+<div class="alert alert-danger error"></div>
 <div class="text-content">
 <h1>Workspaces</h1>
 <form role="form">
-    <div class="form-group">
+    <div class="form-group" style={{greyIfLoggedOut}}>
+        <h3>Create New Workspace</h3>
         <label>Workspace Name</label>
-        <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200">
+        <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200" {{disabledInBrowseMode}}>
     </div>
-    <button class="btn btn-default" id="add-workspace">Add New Workspace</button>
+    <button class="btn btn-default" id="add-workspace" {{disabledInBrowseMode}}>Add New Workspace</button>
 </form>
-<hr/>
-<a href="javascript:void(0)" class="open-workspace" id="{{rootWorkspace._id}}">Public Workspace</a>
+<hr style={{greyIfLoggedOut}}/>
+<a href="javascript:void(0)" class="open-workspace" id="{{rootWorkspace._id}}">Public Workspace (provided for testing purposes)</a>
 
-<section class="workspace-list">
-<h2>My Workspaces</h2>
+<section class="workspace-list" style={{greyIfLoggedOut}}>
+<h3>My Workspaces</h3>
 <table class="table table-hover">
     <thead>
     <tr>
@@ -25,14 +27,15 @@
     <tr>
         <td class="open-workspace" id="{{_id}}">{{name}}</td>
         <td><button class="delete-workspace btn btn-danger btn-xs" id="{{_id}}">Delete</button></td>
-    </tr>   
+    </tr>
 {{/each}}
     </tbody>
 </table>
 </section>
-
+<br>
+<hr/>
 <section class="workspace-list">
-<h2>Workspaces Shared With Me</h2>
+<h3>Workspaces Shared With Me</h3>
 <table class="table table-hover">
     <thead>
     <tr>
@@ -43,7 +46,7 @@
 {{#each sharedWorkspaces}}
     <tr>
         <td class="open-workspace-shared" id="{{_id}}">{{name}}</td>
-    </tr>   
+    </tr>
 {{/each}}
     </tbody>
 </table>

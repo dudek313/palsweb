@@ -2,22 +2,27 @@
     <th>Name</th>
     <th>Vegetation Type</th>
     <th>Country</th>
+    <th>Years</th>
     <th>Time Step Size</th>
 </template>
 <template name="singleSiteRow">
     <td>{{name}}</td>
     <td>{{vegType}}</td>
     <td>{{country}}</td>
+    <td>{{years}}</td>
     <td>{{timeStepSize}}</td>
 </template>
 
 <template name="multipleSiteHeadings">
     <th>Name</th>
-    <th>Short Description</th>
+    <th>Resolution</th>
+    <th>Time Step Size</th>
 </template>
+
 <template name="multipleSiteRow">
     <td>{{name}}</td>
-    <td>{{shortDescription}}</td>
+    <td>{{resolution}}</td>
+    <td>{{timeStepSize}}</td>
 </template>
 
 <template name="catchmentHeadings">
