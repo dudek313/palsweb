@@ -19,6 +19,7 @@ AutoForm.hooks({
             // tempFile contains the data about the uploaded file which needs
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
+            insertDoc.benchmarks = Session.get('tempBenchmarks');
             insertDoc.experiments = [getExperimentId()];
 
             // insert model output document to the mongodb collection
@@ -49,6 +50,8 @@ AutoForm.hooks({
             tempFile = Session.get('tempFile');
             if (tempFile)
                 updateDoc.$set.file = Session.get('tempFile');
+            if (tempBenchmarks)
+                updateDoc.$set.benchmarks = Session.get('tempBenchmarks');
             updateDoc.$set.experiments = [getExperimentId()];
             // update Model Outputs collection
             Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
@@ -83,10 +86,13 @@ Template.modelOutput.events = {
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){
         var currentModelOutput = getCurrentModelOutput();
-        if (currentModelOutput) {
+        if (currentModelOutput && currentModelOutput.file) {
             Session.set('tempFile', currentModelOutput.file);
-            Router.go('/modelOutput/update/' + currentModelOutput._id);
         }
+        if (currentModelOutput.benchmarks) {
+            Session.set('tempBenchmarks', currentModelOutput.benchmarks);
+        }
+        Router.go('/modelOutput/update/' + currentModelOutput._id);
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
@@ -119,6 +125,44 @@ Template.modelOutput.events = {
 // Not sure if this is needed ?
     'click .download-file':function(event, template){
         event.preventDefault();
+    },
+    'click #addBenchmark': function(event) {
+        event.preventDefault();
+        var currentBenchmarks = Session.get('tempBenchmarks');
+        if (currentBenchmarks.length <= 3) {
+            var selected = $('select[name="addBenchmark"]').val();
+            if( selected ) {
+                var currentBenchmarks = Session.get('tempBenchmarks');
+                if (!currentBenchmarks) currentBenchmarks = [];
+                currentBenchmarks.push(selected);
+                Session.set('tempBenchmarks', currentBenchmarks);
+            }
+            else {
+              $('.error').html('Error adding data set, please try again');
+              $('.error').show();
+            }
+        }
+        else {
+            $('.error').html('This model output already has 3 benchmarks. Please remove at least one if you wish to add more.');
+            $('.error').show();
+        }
+    },
+    'click .removeBenchmark': function(event) {
+        event.preventDefault();
+        var selectedMOId = $(event.target).attr('id');
+        var currentBenchmarkIds = Session.get('tempBenchmarks');
+        var newBenchmarkIds = [];
+        if (currentBenchmarkIds && currentBenchmarkIds.length > 0) {
+            currentBenchmarkIds.forEach(function(benchmarkId) {
+                if (benchmarkId != selectedMOId)
+                    newBenchmarkIds.push(benchmarkId);
+            });
+            Session.set('tempBenchmarks', newBenchmarkIds);
+        }
+        else {
+            $('.error').html('Error removing data set, please try again');
+            $('.error').show();
+        }
     }
 };
 
@@ -136,6 +180,21 @@ function getExperimentId() {
 
 
 Template.modelOutput.helpers({
+  // returns the model outputs to display for selection as benchmark.
+  // excludes the current model output from the list, as well as those already
+  // selected as benchmarks
+  otherModelOutputs: function() {
+    var usedMOIds = Session.get('tempBenchmarks');
+    if (!usedMOIds) usedMOIds = [];
+
+    var currentMO = getCurrentModelOutput();
+    if (currentMO) {
+        usedMOIds.push(currentMO._id);
+        var exp = currentMO.experiments[0];
+        selector = {_id:{$nin:usedMOIds}, experiments:exp};
+        return ModelOutputs.find(selector,{sort:{name:1}});
+    }
+  },
   // determines whether the current form is a create form or an update form
   formId: function() {
     var screenMode = getScreenMode();
@@ -155,6 +214,19 @@ Template.modelOutput.helpers({
   tempFile: function() {
     var tempFile = Session.get('tempFile');
     return tempFile;
+  },
+  tempBenchmarks: function() {
+    var tempBenchmarkIds = Session.get('tempBenchmarks');
+    var tempBenchmarks = [];
+    if (tempBenchmarkIds && tempBenchmarkIds.length > 0) {
+        tempBenchmarkIds.forEach(function(benchmarkId) {
+            modelOutput = ModelOutputs.findOne({_id: benchmarkId});
+            if (modelOutput)
+                tempBenchmarks.push(modelOutput);
+        });
+    }
+
+    return tempBenchmarks;
   },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();

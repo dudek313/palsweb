@@ -74,6 +74,17 @@ getSource = function() {
     return Router.current().params.source;
 }
 
+getIdsFromObjectArray = function(objArray) {
+    idArray = [];
+    if (objArray && objArray.length > 0) {
+        objArray.forEach(function(obj) {
+            if (obj && obj._id)
+                idArray.push(obj._id);
+        });
+    }
+    return idArray;
+};
+
 getCurrentWorkspaceId = function() {
     var user = Meteor.user();
     if( user ) {

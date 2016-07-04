@@ -158,6 +158,10 @@ ModelOutputs.attachSchema(new SimpleSchema({
   status: {
     type: String,
     optional: true
+  },
+  benchmarks: {
+    type: [String],
+    optional: true
   }
 }));
 

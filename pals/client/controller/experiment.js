@@ -246,15 +246,15 @@ Template.experiment.helpers({
   // that can now be associated with it
   otherDataSets: function() {
     var currentDataSets = Session.get('tempDataSets');
+    var currentDataSetIds = [];
     if (currentDataSets) {
-      var currentDataSetIds = [];
       currentDataSets.forEach(function(dataSet){
         currentDataSetIds.push(dataSet._id);
       });
-      selector = {_id:{$nin:currentDataSetIds}};
-
-      return DataSets.find(selector,{sort:{name:1}});
     }
+    selector = {_id:{$nin:currentDataSetIds}};
+
+    return DataSets.find(selector,{sort:{name:1}});
   },
   // identifies model outputs not yet associated with this experiment
   // that can now be associated with it

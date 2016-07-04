@@ -73,6 +73,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 Session.set('tempFile',undefined);
+                Session.set('tempBenchmarks', []);
                 this.next();
             }
         ]

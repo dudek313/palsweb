@@ -48,36 +48,54 @@
                 </tr>
               </table>
             {{else}}
-              <tr>no file uploaded</tr>
+              <tr>No file uploaded.</tr>
             {{/if}}
             </div>
           </div>
 
-         {{#if analyses}}
-         <br/>
-         <h3>Analyses</h3>
-         <table class="table">
+          <div class="panel panel-success">
+            <div class="panel-heading">Benchmarks</div>
+            <div class="panel-body">
+            {{#if benchmarks}}
+              <table class="table">
+                <tr>
+                  <th>Model Name</th>
+                </tr>
+                {{#each benchmark in benchmarks}}
+                  <tr>
+                    <td onclick="/modelOutput/display/{{benchmark._id}}">{{benchmark.name}}</td>
+                  </tr>
+                {{/each}}
+              </table>
+            {{else}}
+              <tr>No benchmarks specified.</tr>
+            {{/if}}
+            </div>
+          </div>
+
+          <h3>Analyses</h3>
+          {{#if analyses}}
+            <table class="table">
               <tr>
-                  <th>id</th>
-                  <th>MO Version</th>
-                  <th>Status</th>
-                  <th>Error Message</th>
-                  <th>View Results</th>
-                  <th>Delete</th>
+                <th>id</th>
+                <th>MO Version</th>
+                <th>Status</th>
+                <th>Error Message</th>
+                <th>View Results</th>
               </tr>
               {{#each analyses}}
               <tr>
-                  <td>{{_id}}</td>
-                  <td>{{modelOutputVersion.filename}}</td>
-                  <td>{{status}}</td>
-                  <td>{{error}}</td>
-                  <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
-                  <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                <td>{{_id}}</td>
+                <td>{{modelOutputVersion.filename}}</td>
+                <td>{{status}}</td>
+                <td>{{error}}</td>
+                <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
               </tr>
-              {{/each}}
-          </table>
+            {{/each}}
+            </table>
+          {{else}}
+            No analyses performed
           {{/if}}
-
         </form>
       </div>
     </div>
@@ -124,40 +142,72 @@
                 {{> afQuickField name='stateSelection' type='select' firstOption="(Select One)" options="allowed"}}
                 {{> afQuickField name='parameterSelection' type='select' firstOption="(Select One)" options="allowed"}}
 
-                 <div class="form-group">
-                     <label>Please add any comments that would aid reproducing this simulation: </label>
-                     <textarea class="modifier form-control" type="text" name="comments">{{comments}}</textarea>
-                 </div>
+                <div class="form-group">
+                  <label>Please add any comments that would aid reproducing this simulation: </label>
+                  <textarea class="modifier form-control" type="text" name="comments">{{comments}}</textarea>
+                </div>
+              </div>
+            </div>
 
-                 {{#if areEqual screenMode 'update'}}
-                   {{#if analyses}}
-                     <br/>
-                     <h3>Analyses</h3>
-                     <table class="table">
-                          <tr>
-                              <th>id</th>
-                              <th>MO Version</th>
-                              <th>Status</th>
-                              <th>Error Message</th>
-                              <th>View Results</th>
-                              <th>Delete</th>
-                          </tr>
-                          {{#each analyses}}
-                          <tr>
-                              <td>{{_id}}</td>
-                              <td>{{modelOutputVersion.filename}}</td>
-                              <td>{{status}}</td>
-                              <td>{{error}}</td>
-                              <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
-                              <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
-                          </tr>
-                          {{/each}}
-                      </table>
-                    {{/if}}
-                  {{/if}}
+            <div class="panel panel-success">
+              <div class="panel-heading">Benchmarks (up to 3)</div>
+              <div class="panel-body">
 
-             </div>
-           </div>
+                {{#if tempBenchmarks}}
+                  <table class="table">
+                    <tr>
+                      <th>Model Name</th>
+                      <th>Remove</th>
+                    </tr>
+                    {{#each benchmark in tempBenchmarks}}
+                      <tr>
+                        <td onclick="/modelOutput/display/{{benchmark._id}}">{{benchmark.name}}</td>
+                        <td><button class='remove-benchmark btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                      </tr>
+                    {{/each}}
+                  </table>
+
+                {{else}}
+                  <tr>No benchmarks specified.</tr>
+                {{/if}}
+                <div class="form-group">
+                  <select name="addBenchmark" class="form-control">
+                    <option selected disabled>(Select One)</option>
+                    {{#each otherModelOutputs}}
+                      <option value="{{_id}}">{{name}}</option>
+                    {{/each}}
+                  </select>
+                </div>
+                <button class='btn btn-default bottom-margin' id="addBenchmark">Add Benchmark</button>
+
+              </div>
+            </div>
+
+            {{#if areEqual screenMode 'update'}}
+              {{#if analyses}}
+                <h3>Analyses</h3>
+                <table class="table">
+                  <tr>
+                    <th>id</th>
+                    <th>MO Version</th>
+                    <th>Status</th>
+                    <th>Error Message</th>
+                    <th>View Results</th>
+                    <th>Delete</th>
+                  </tr>
+                  {{#each analyses}}
+                    <tr>
+                      <td>{{_id}}</td>
+                      <td>{{modelOutputVersion.filename}}</td>
+                      <td>{{status}}</td>
+                      <td>{{error}}</td>
+                      <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                      <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                    </tr>
+                  {{/each}}
+                </table>
+              {{/if}}
+            {{/if}}
 
             <div class="panel panel-success">
               <div class="panel-heading">File</div>
