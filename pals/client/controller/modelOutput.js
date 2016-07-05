@@ -19,7 +19,7 @@ AutoForm.hooks({
             // tempFile contains the data about the uploaded file which needs
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
-            insertDoc.benchmarks = Session.get('tempBenchmarks');
+            insertDoc.benchmarks = getTempBenchmarks();
             insertDoc.experiments = [getExperimentId()];
 
             // insert model output document to the mongodb collection
@@ -50,8 +50,9 @@ AutoForm.hooks({
             tempFile = Session.get('tempFile');
             if (tempFile)
                 updateDoc.$set.file = Session.get('tempFile');
+            tempBenchmarks = getTempBenchmarks();
             if (tempBenchmarks)
-                updateDoc.$set.benchmarks = Session.get('tempBenchmarks');
+                updateDoc.$set.benchmarks = tempBenchmarks;
             updateDoc.$set.experiments = [getExperimentId()];
             // update Model Outputs collection
             Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
@@ -128,12 +129,11 @@ Template.modelOutput.events = {
     },
     'click #addBenchmark': function(event) {
         event.preventDefault();
-        var currentBenchmarks = Session.get('tempBenchmarks');
-        if (currentBenchmarks.length <= 3) {
+        var currentBenchmarks = getTempBenchmarks();
+        if (currentBenchmarks.length < 3) {
             var selected = $('select[name="addBenchmark"]').val();
             if( selected ) {
-                var currentBenchmarks = Session.get('tempBenchmarks');
-                if (!currentBenchmarks) currentBenchmarks = [];
+                var currentBenchmarks = getTempBenchmarks();
                 currentBenchmarks.push(selected);
                 Session.set('tempBenchmarks', currentBenchmarks);
             }
@@ -143,14 +143,13 @@ Template.modelOutput.events = {
             }
         }
         else {
-            $('.error').html('This model output already has 3 benchmarks. Please remove at least one if you wish to add more.');
-            $('.error').show();
+            alert('This model output already has 3 benchmarks. Please remove at least one if you wish to add more.');
         }
     },
-    'click .removeBenchmark': function(event) {
+    'click .remove-benchmark': function(event) {
         event.preventDefault();
         var selectedMOId = $(event.target).attr('id');
-        var currentBenchmarkIds = Session.get('tempBenchmarks');
+        var currentBenchmarkIds = getTempBenchmarks();
         var newBenchmarkIds = [];
         if (currentBenchmarkIds && currentBenchmarkIds.length > 0) {
             currentBenchmarkIds.forEach(function(benchmarkId) {
@@ -166,6 +165,11 @@ Template.modelOutput.events = {
     }
 };
 
+function getTempBenchmarks() {
+    tempBM = Session.get('tempBenchmarks');
+    if (!tempBM) tempBM = [];
+    return tempBM;
+}
 // returns the current experiment record from the mongodb collection
 function getCurrentModelOutput() {
     return Router.current().data();
@@ -178,14 +182,12 @@ function getExperimentId() {
     }
 }
 
-
 Template.modelOutput.helpers({
   // returns the model outputs to display for selection as benchmark.
   // excludes the current model output from the list, as well as those already
   // selected as benchmarks
   otherModelOutputs: function() {
-    var usedMOIds = Session.get('tempBenchmarks');
-    if (!usedMOIds) usedMOIds = [];
+    var usedMOIds = getTempBenchmarks();
 
     var currentMO = getCurrentModelOutput();
     if (currentMO) {
@@ -207,7 +209,6 @@ Template.modelOutput.helpers({
   file: function() {
     var modelOutput = getCurrentModelOutput();
     if (modelOutput) {
-        console.log(modelOutput.file);
         return modelOutput.file;
     }
   },
@@ -215,18 +216,14 @@ Template.modelOutput.helpers({
     var tempFile = Session.get('tempFile');
     return tempFile;
   },
+  benchmarks: function() {
+      var modelOutput = getCurrentModelOutput();
+      if (modelOutput && modelOutput.benchmarks)
+          return convertIdsToObjectArray(modelOutput.benchmarks, ModelOutputs);
+  },
   tempBenchmarks: function() {
-    var tempBenchmarkIds = Session.get('tempBenchmarks');
-    var tempBenchmarks = [];
-    if (tempBenchmarkIds && tempBenchmarkIds.length > 0) {
-        tempBenchmarkIds.forEach(function(benchmarkId) {
-            modelOutput = ModelOutputs.findOne({_id: benchmarkId});
-            if (modelOutput)
-                tempBenchmarks.push(modelOutput);
-        });
-    }
-
-    return tempBenchmarks;
+    var tempBenchmarkIds = getTempBenchmarks();
+    return convertIdsToObjectArray(tempBenchmarkIds, ModelOutputs);
   },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();
@@ -272,20 +269,6 @@ Template.modelOutput.helpers({
       var selector = {workspace: {$in:workspaces}, recordType: 'instance'};
       return Experiments.find(selector,{sort:{created:-1}}).fetch();
 
-/*    var selector = {recordType : 'instance'};
-    if (getSource() == 'workspace') {
-        var currentWorkspaceId = getCurrentWorkspaceId();
-        if (currentWorkspaceId)
-            selector.workspace = currentWorkspaceId;
-        else {
-            console.log('Error: Not currently in a workspace.');
-            return;
-        }
-    }
-    else // source is 'mine'
-        selector.owner = Meteor.userId();
-
-    return Experiments.find(selector).fetch();*/
   },
   // returns the list of models to be displayed in the model dropdown menu field
   // on the create and update pages. For admin users, all models will be displayed.

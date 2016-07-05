@@ -59,7 +59,7 @@
             {{#if benchmarks}}
               <table class="table">
                 <tr>
-                  <th>Model Name</th>
+                  <th>Model Output Name</th>
                 </tr>
                 {{#each benchmark in benchmarks}}
                   <tr>
@@ -156,19 +156,19 @@
                 {{#if tempBenchmarks}}
                   <table class="table">
                     <tr>
-                      <th>Model Name</th>
+                      <th>Model Output Name</th>
                       <th>Remove</th>
                     </tr>
                     {{#each benchmark in tempBenchmarks}}
                       <tr>
                         <td onclick="/modelOutput/display/{{benchmark._id}}">{{benchmark.name}}</td>
-                        <td><button class='remove-benchmark btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                        <td><button class='remove-benchmark btn btn-danger btn-xs' id='{{benchmark._id}}'>Remove</button></td>
                       </tr>
                     {{/each}}
                   </table>
 
                 {{else}}
-                  <tr>No benchmarks specified.</tr>
+                  <tr>No benchmarks specified.</tr> <br>
                 {{/if}}
                 <div class="form-group">
                   <select name="addBenchmark" class="form-control">
