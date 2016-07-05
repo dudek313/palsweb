@@ -219,11 +219,11 @@ Template.modelOutput.helpers({
   benchmarks: function() {
       var modelOutput = getCurrentModelOutput();
       if (modelOutput && modelOutput.benchmarks)
-          return convertIdsToObjectArray(modelOutput.benchmarks, ModelOutputs);
+          return getRecordsFromIds(modelOutput.benchmarks, ModelOutputs);
   },
   tempBenchmarks: function() {
     var tempBenchmarkIds = getTempBenchmarks();
-    return convertIdsToObjectArray(tempBenchmarkIds, ModelOutputs);
+    return getRecordsFromIds(tempBenchmarkIds, ModelOutputs);
   },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();

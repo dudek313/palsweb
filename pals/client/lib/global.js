@@ -25,8 +25,11 @@ getAvailableWorkspaceIds = function() {
     return workspaceIds;*/
 }
 
-convertIdsToObjectArray = function(idArray, collection) {
-    var objArray = [];
+
+getRecordsFromIds = function(idArray, collection) {
+    return collection.find({_id:{$in:idArray}}, {sort:{name:1}});
+}
+/*    var objArray = [];
     if (idArray && idArray.length > 0) {
         idArray.forEach(function(eachId) {
             record = collection.findOne({_id: eachId});
@@ -38,7 +41,7 @@ convertIdsToObjectArray = function(idArray, collection) {
         });
     }
     return objArray;
-}
+}*/
 
 convertObjectsToIdArray = function(objArray) {
     var idArray = [];

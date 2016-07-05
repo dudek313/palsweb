@@ -246,12 +246,13 @@ Template.experiment.helpers({
   // that can now be associated with it
   otherDataSets: function() {
     var currentDataSets = Session.get('tempDataSets');
-    var currentDataSetIds = [];
+    var currentDataSetIds = convertObjectsToIdArray(currentDataSets);
+/*    var currentDataSetIds = [];
     if (currentDataSets) {
       currentDataSets.forEach(function(dataSet){
         currentDataSetIds.push(dataSet._id);
       });
-    }
+    }*/
     selector = {_id:{$nin:currentDataSetIds}};
 
     return DataSets.find(selector,{sort:{name:1}});

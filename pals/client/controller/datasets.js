@@ -44,7 +44,9 @@ getExperimentDataSetIds = function(experiment) {
 getMultipleExperimentDataSetIds = function(experiments) {
     var dataSetIds = [];
     experiments.forEach(function(experiment) {
-        currentExpDataSetIds = getExperimentDataSetIds(experiment);
+        var dataSets = experiment.dataSets;
+        currentExpDataSetIds = convertObjectsToIdArray(dataSets);
+//        currentExpDataSetIds = getExperimentDataSetIds(experiment);
         currentExpDataSetIds.forEach(function(dataSetId) {
             if (dataSetIds.indexOf(dataSetId) == -1)
                 dataSetIds.push(dataSetId);
@@ -77,7 +79,8 @@ Template.datasets.helpers({
      var experiments = Experiments.find(selector);
      var dataSetIds = getMultipleExperimentDataSetIds(experiments);
 
-     return DataSets.find({_id:{$in:dataSetIds}});
+     return getRecordsFromIds(dataSetIds, DataSets);
+//     return DataSets.find({_id:{$in:dataSetIds}}, {sort: {name:1}});
 
    },
    currentSpatialLevel: function() {
