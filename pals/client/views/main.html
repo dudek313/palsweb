@@ -109,17 +109,21 @@
   </div><!-- /container -->
 </nav>
 <div class="container main">
-  {{#if loggedIn}}
-    {{#if isPublicWorkspace}}
-      <div class="alert-warning" align="center"><b>You are not currently in any workspace. Feel free to browse the site.
-        <br>To contribute to an experiment you must join an existing workspace or create a new one.</b></div>
+
+    {{#if loggedIn}}
+      {{#if isPublicWorkspace}}
+        <div class="no-workspace-header"><b>You are not currently in any workspace. Feel free to browse the site.
+          <br>To contribute to an experiment you must join an existing workspace or create a new one.</b></div>
+      {{else}}
+        <div class="workspace-header" >You are currently in the <b>{{currentWorkspace.name}}</b> workspace.</div>
+      {{/if}}
     {{else}}
-    <div class="alert-info" align="center"><br>You are currently in the <b>{{currentWorkspace.name}}</b> workspace.<br><br></div>
+      <div class="no-workspace-header"><b>You are currently not logged in. Feel free to browse the site.
+        <br>To have full use of PALS, please log in or register.</b></div>
     {{/if}}
-  {{else}}
-    <div class="alert-info" align="center"><b>You are currently not logged in. Feel free to browse the site.
-      <br>To have full use of PALS, please log in or register.</b></div>
-  {{/if}}
-{{> yield}}
+
+  <div class="content">
+    {{> yield}}
+  </div>
 </div>
 </template>

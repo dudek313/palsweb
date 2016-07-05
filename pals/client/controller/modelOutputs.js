@@ -6,7 +6,9 @@ Template.modelOutputs.helpers({
       if( user ) {
 
           var source = getSource();
-          if (source == 'workspace') {  // Find model outputs in current workspace
+
+          // Finds model outputs in current workspace
+          if (source == 'workspace') {
               experiments = Experiments.find({workspace:user.profile.currentWorkspace, recordType:'instance'},{sort:{name:1}});
 
               var currentModelOutputs;
@@ -17,10 +19,12 @@ Template.modelOutputs.helpers({
                   });
               }
           }
-          else if (source == 'mine')  // Find my model outputs
+
+          // Finds my model outputs
+          else if (source == 'mine')
               modelOutputs = ModelOutputs.find({owner:user._id}, {sort:{name:1}}).fetch();
 
-          // Find experiment name and owner's email for each model output
+          // Adds experiment name and owner's email for each model output
           modelOutputs.forEach(function(modelOutput){
               if (modelOutput && modelOutput.experiments && modelOutput.experiments.length > 0) {
                   experiment = Experiments.findOne({_id:modelOutput.experiments[0]});
@@ -46,6 +50,7 @@ Template.modelOutputs.helpers({
 });
 
 Template.modelOutputs.events({
+    // deletes a model output from the model output list
     'click .delete' : function(event) {
         var id = $(event.target).attr('id');
         if( id ) {

@@ -53,62 +53,6 @@ Template.registerHelper("screenMode", function() {
     return getScreenMode();
 });
 
-getDataSetVersion = function(dataSetId) {
-    if (dataSetId) {
-        dataSet = DataSets.findOne({_id:dataSetId});
-        if (dataSet) return dataSet._version;
-        else return null;
-    }
-    else return null;
-}
-
-getScreenMode = function() {
-    return Router.current().params.screenMode;
-}
-
-getCurrentSpatialLevel = function() {
-    return Router.current().params.resolution;
-}
-
-getSource = function() {
-    return Router.current().params.source;
-}
-
-getIdsFromObjectArray = function(objArray) {
-    idArray = [];
-    if (objArray && objArray.length > 0) {
-        objArray.forEach(function(obj) {
-            if (obj && obj._id)
-                idArray.push(obj._id);
-        });
-    }
-    return idArray;
-};
-
-getCurrentWorkspaceId = function() {
-    var user = Meteor.user();
-    if( user ) {
-        if( !user.profile ) {
-            user.profile = {};
-        }
-        if( !user.profile.currentWorkspace ) {
-            var rootWorkspace = Workspaces.findOne({"name":"public"});
-            user.profile.currentWorkspace = rootWorkspace._id;
-            Meteor.users.update({'_id':user._id},
-                {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
-        }
-        return user.profile.currentWorkspace;
-    }
-}
-
-getCurrentWorkspace = function() {
-    var workspaceId = getCurrentWorkspaceId();
-    if (workspaceId) {
-      var ws = Workspaces.findOne({_id: workspaceId});
-      return ws
-    }
-    else return null;
-}
 
 /*
 // tried to write this with Meteor methods, but apparently it's too slow

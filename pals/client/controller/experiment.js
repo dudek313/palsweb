@@ -246,31 +246,10 @@ Template.experiment.helpers({
   // that can now be associated with it
   otherDataSets: function() {
     var currentDataSets = Session.get('tempDataSets');
-    var currentDataSetIds = convertObjectsToIdArray(currentDataSets);
-/*    var currentDataSetIds = [];
-    if (currentDataSets) {
-      currentDataSets.forEach(function(dataSet){
-        currentDataSetIds.push(dataSet._id);
-      });
-    }*/
+    var currentDataSetIds = getIdsFromObjects(currentDataSets);
     selector = {_id:{$nin:currentDataSetIds}};
-
     return DataSets.find(selector,{sort:{name:1}});
   },
-  // identifies model outputs not yet associated with this experiment
-  // that can now be associated with it
-/*  otherModelOutputs: function() {
-    var currentModelOutputs = Session.get('tempModelOutputs');
-    if (currentModelOutputs) {
-      var currentModelOutputIds = [];
-      currentModelOutputs.forEach(function(modelOutput){
-        currentModelOutputIds.push(modelOutput._id);
-      });
-      selector = {_id:{$nin:currentModelOutputIds}};
-
-      return ModelOutputs.find(selector,{sort:{name:1}});
-    }
-  },*/
   // determines the record type of the current experiment
   recordType: function() {
     return getRecordType();

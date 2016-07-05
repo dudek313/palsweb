@@ -45,7 +45,7 @@ getMultipleExperimentDataSetIds = function(experiments) {
     var dataSetIds = [];
     experiments.forEach(function(experiment) {
         var dataSets = experiment.dataSets;
-        currentExpDataSetIds = convertObjectsToIdArray(dataSets);
+        currentExpDataSetIds = getIdsFromObjects(dataSets);
 //        currentExpDataSetIds = getExperimentDataSetIds(experiment);
         currentExpDataSetIds.forEach(function(dataSetId) {
             if (dataSetIds.indexOf(dataSetId) == -1)

@@ -170,6 +170,7 @@
                 {{else}}
                   <tr>No benchmarks specified.</tr> <br>
                 {{/if}}
+
                 <div class="form-group">
                   <select name="addBenchmark" class="form-control">
                     <option selected disabled>(Select One)</option>
@@ -212,6 +213,7 @@
             <div class="panel panel-success">
               <div class="panel-heading">File</div>
               <div class="panel-body">
+
               {{#if tempFile}}
                 <table class="table">
                   <tr>
@@ -223,6 +225,7 @@
                     <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                   </tr>
                 </table>
+
               {{else}}
                  <label>Upload a model output file</label>
                  <input type="file" class="file-select" name="file-select"/>
@@ -232,6 +235,7 @@
                    </div>
                  </div>
                {{/if}}
+
               </div>
             </div>
           </fieldset>
