@@ -13,20 +13,12 @@ accounts-ui
 accounts-password
 standard-app-packages
 jquery
-<<<<<<< HEAD
 meteorhacks:npm
-
-
 npm-container
 aldeed:collection2
 aldeed:autoform
 alanning:roles
 ecmascript
-=======
-aldeed:collection2
-aldeed:autoform
-alanning:roles
->>>>>>> 5af393297aed4e65db7a59b565802c658826e93a
 es5-shim
 mickaelfm:vermongo
 cfs:autoform
