@@ -15,19 +15,18 @@ Template.models.events({
     }
 });
 
-getModelOutputsInWorkspace = function(workspace) {
+getModelOutputsInWorkspace = function(ws) {
     var user = Meteor.user();
-    if (workspace)
-        var modelOutputs = ModelOutputs.find({'workspaces':user.profile.currentWorkspace._id}).fetch();
+    if (ws)
+        var expSelector = {workspace:ws};
     else {
-        // get model outputs from all public workspaces
-        var publicWorkspaces = Workspaces.find({'public':true}).fetch();
-        var publicWorkspaceIds = [];
-        publicWorkspaces.forEach(function(publicWorkspace) {
-            publicWorkspaceIds.push(publicWorkspace._id);
-        });
-        var modelOutputs = ModelOutputs.find({'workspaces': {$in: publicWorkspaceIds}}).fetch();
+        // get model outputs from all available workspaces
+        var availableWorkspaceIds = getAvailableWorkspaceIds();
+        var expSelector = {workspace:{$in:availableWorkspaceIds}};
     }
+    var exps = Experiments.find(expSelector).fetch();
+    var expIds = getIdsFromObjects(exps);
+    var modelOutputs = ModelOutputs.find({experiments: {$in: expIds}}).fetch();
     return modelOutputs;
 }
 
@@ -52,13 +51,13 @@ getModelsFromModelOutputs = function(modelOutputs) {
 
 Template.models.helpers({
     pageTitle: function() {
-        var selector = Session.get('selector');
-        if (selector == 'mine')
+        var source = getSource();
+        if (source == 'mine')
             return "My Model Profiles";
-        else if (selector == 'workspace')
+        else if (source == 'workspace')
             return "Model Profiles in the Current Workspace";
-        else if (selector == 'public')
-            return "Model Profiles in Public Workspaces";
+        else if (source == 'anywhere')
+            return "Model Profiles in All Available Workspaces";
         else {
           $('.error').html('An error occurred in displaying the page. Please try again.');
           $('.error').show();
@@ -67,15 +66,13 @@ Template.models.helpers({
     models: function() {
         var user = Meteor.user();
         if( user ) {
-            var selector = Session.get('selector');
-            if (selector == 'mine')
+            var source = getSource();
+            if (source == 'mine')
                 var models = Models.find({'owner':user._id}).fetch();
-            else if (selector == 'workspace' || selector == 'public') {
+            else if (source == 'workspace' || source == 'anywhere') {
+
                // select relevant modelOutputs and associated models
-                var workspace = null;
-                if (selector == 'workspace') {
-                    workspace = user.profile.currentWorkspace._id;
-                }
+                var workspace = ((source == 'workspace') ? user.profile.currentWorkspace : null);
                 var modelOutputs = getModelOutputsInWorkspace(workspace);
                 var models = getModelsFromModelOutputs(modelOutputs);
             }

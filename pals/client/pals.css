@@ -1,10 +1,10 @@
 .main {
 /*    margin-top: 60px;*/
-    margin-bottom: 40px;
+/*    margin-bottom: 40px;*/
 }
 
 .workspace-header {
-    background:LightSteelBlue;
+    background:DodgerBlue;
     position: fixed;
     text-align: center;
     top: 50px;
@@ -14,7 +14,7 @@
 }
 
 .no-workspace-header {
-    background:LightSteelBlue;
+    background:DodgerBlue;
     position: fixed;
     text-align: center;
     top: 50px;
@@ -22,10 +22,16 @@
     z-index: 2;
 }
 .content {
-    margin:100px auto;
+    max-width:95%;
+    margin: 100px auto;
     width:100%;
     z-index: 1;
     position: relative;
+}
+
+.detail-form {
+    max-width:800px;
+    margin: 0px auto;
 }
 
 .login-buttons {

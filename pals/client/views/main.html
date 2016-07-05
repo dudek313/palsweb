@@ -21,7 +21,7 @@
             <ul class="dropdown-menu">
                 <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
                 <li class={{disabledInBrowseMode}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
-                <li><a href="javascript:void(0)" onclick="Router.go('/models/public');">In All Available Workspaces</a></li>
+                <li><a href="javascript:void(0)" onclick="Router.go('/models/anywhere');">In All Available Workspaces</a></li>
                 <li class="divider"></li>
                 {{#if currentUser}}
                 <li><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
@@ -108,7 +108,7 @@
   </div><!-- /.navbar-collapse -->
   </div><!-- /container -->
 </nav>
-<div class="container main">
+<div class="main">
 
     {{#if loggedIn}}
       {{#if isPublicWorkspace}}
@@ -121,8 +121,7 @@
       <div class="no-workspace-header"><b>You are currently not logged in. Feel free to browse the site.
         <br>To have full use of PALS, please log in or register.</b></div>
     {{/if}}
-
-  <div class="content">
+  <div class="container content">
     {{> yield}}
   </div>
 </div>

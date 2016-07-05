@@ -105,14 +105,8 @@ Router.map(function () {
         ]
     });
     this.route('models', {
-        path: '/models/:selector',
-        template: 'models',
-        onBeforeAction: [
-            function() {
-                Session.set('selector', this.params.selector);
-                this.next();
-            }
-        ]
+        path: '/models/:source',
+        template: 'models'
     });
     this.route('createModel',{
         path: '/model/create',

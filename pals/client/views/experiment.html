@@ -1,6 +1,7 @@
 <template name="experiment">
-  <div class="row">
-    <div class="col-md-9">
+<!--  <div class="row">
+    <div class="col-md-9"> -->
+<div class="detail-form">
       {{#if areEqual screenMode 'display'}}
         <form role="form">
           <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
@@ -9,6 +10,8 @@
           {{else}}
             <h1>Experiment: {{name}}</h1>
           {{/if}}
+
+
 <!--          <div class="alert alert-danger error"></div>-->
           <div class="panel panel-primary">
             <div class="panel-heading">Details</div>
@@ -259,7 +262,7 @@
         {{/autoForm}}
 
       {{/if}}
-    </div>
+<!--    </div>-->
   </div>
 </template>
 
