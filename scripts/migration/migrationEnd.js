@@ -65,8 +65,8 @@ function process() {
         *
         *******************************************************/
 
-        wsHelpers.migrateWorkspaces(mongoInstance, pgInstance, users, pgWorkspaces);
-        console.log('workspaces migrated...')
+//        wsHelpers.migrateWorkspaces(mongoInstance, pgInstance, users, pgWorkspaces);
+  //      console.log('workspaces migrated...')
 
 /*	Intending to get rid of public workspace
         var future = new Future;
@@ -75,16 +75,6 @@ function process() {
         console.log('public workspace loaded...' + publicWorkspace)
 
 
-        /*******************************************************
-        *
-        * Migrate models
-        *
-        *******************************************************/
-
-        var future = new Future;
-        moHelpers.migrateModels(pgInstance, mongoInstance, users, null, future.resolver())
-	      future.wait()
-        console.log('models migrated...')
 
 
         /*******************************************************
@@ -94,8 +84,8 @@ function process() {
         *******************************************************/
 
 
-        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance);
-        console.log('data sets migrated...')
+//        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance);
+  //      console.log('data sets migrated...')
 
 
         /*******************************************************
@@ -104,8 +94,8 @@ function process() {
         *
         *******************************************************/
 
-        //mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
-        //console.log('model outputs migrated...')
+        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
+        console.log('model outputs migrated...')
 
 
       }).run();
