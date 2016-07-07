@@ -25,7 +25,7 @@ addDataSets = function(files,dataSets,type) {
     if( !dataSets || dataSets.length <= 0 ) {
         throw new Meteor.Error(500, 'The chosen experiment does not have any data sets of type: '+type);
     }
-	
+
 	console.log('Number of data sets: ' + dataSets.length);
 
     for( var i=0; i < dataSets.length; ++i ) {
@@ -86,7 +86,7 @@ loadAllModelOutputsForExperimentExceptOne = function(experimentId,modelOutputId)
         if(modelOutput._id != modelOutputId) {
             version = extractLatestVersion(modelOutput);
             if( version ) versions.push(version);
-        } 
+        }
     });
     return versions;
 }
@@ -108,10 +108,167 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
+  'findWorkspace': function(selector) {
+      if ( !Meteor.user()) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+          return Workspaces.findOne(selector);
+      }
+  },
+  'findOneModelOutput': function(selector) {
+      if( !Meteor.user() ) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+        return ModelOutputs.findOne(selector);
+      }
+  },
+  'insertModelOutput': function(modelOutputDoc) {
+      if( !Meteor.user() ) {
+          throw new Meteor.Error('not-authorized')
+      }
+      else {
+        return ModelOutputs.insert(modelOutputDoc);
+      }
+  },
+  'updateModelOutput': function(currentDoc, updateDoc) {
+      userId = Meteor.userId();
+      if( userId ) {
+          mo = ModelOutputs.update(currentDoc, updateDoc);
+          return mo;
+      }
+      else {
+          throw new Meteor.Error('not-authorized');
+      }
+  },
+  'addTempFile': function(key) {
+        if (!Meteor.user()) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return TempFiles.insert(key);
+        }
+    },
+    'removeTempFile': function(key) {
+        if (!Meteor.user()) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return TempFiles.remove(key);
+        }
+    },
+    'createDraftDataSet': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return DraftDataSets.insert(dataSetDoc);
+        }
+    },
+    'updateDraftDataSet': function(currentDoc, updateDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return DraftDataSets.update(currentDoc, updateDoc);
+        }
+
+    },
+    'updateDataSet': function(currentDoc, dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return DataSets.update(currentDoc, dataSetDoc);
+        }
+
+    },
+    'insertDataSet': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return DataSets.insert(dataSetDoc);
+        }
+    },
+    'updateExperiment': function(currentDoc, updateDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+              var exp = Experiments.update(currentDoc, updateDoc);
+              console.log(exp);
+              return exp;
+//            return Experiments.update(currentDoc, updateDoc);
+        }
+
+    },
+    'insertExperiment': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return Experiments.insert(dataSetDoc);
+        }
+    },
+    'deleteExperiment': function(dataSetDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return Experiments.remove(dataSetDoc);
+        }
+    },
+    'updateModel': function(currentDoc, modelDoc) {
+        if( !Meteor.user().admin ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return Models.update(currentDoc, modelDoc);
+        }
+
+    },
+    'insertModel': function(modelDoc) {
+        if( !Meteor.user() ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          var docId = Models.insert(modelDoc);
+          var group = 'model: ' + docId;
+          Roles.addUsersToRoles(modelDoc.owner, 'edit', group);
+
+          return docId;
+        }
+    },
+    'dataSets.insert': function(dataset, callback) {
+        DataSets.insert(dataset, function(error,doc) {
+            if( error ) {
+                console.log('Error saving the new dataSet');
+            }
+            else {
+                console.log('Method.insert: ' + doc);
+//                return doc;
+                callback(false,doc);
+            }
+        });
+
+    },
+    'dataSets.update': function(selector, update) {
+        DataSets.update(selector, update, function(error, doc) {
+            if( error ) {
+                console.log('Error updating dataSet record');
+            }
+            else {
+                console.log('Update successful of ' + selector._id);
+            }
+        });
+    },
+
     startAnalysis: function (key,modelOutputId) {
-     
+
         console.log('starting analysis for model output: ' + modelOutputId);
-    
+
         var user = Meteor.user();
         var currentModelOutput = ModelOutputs.findOne({'_id':modelOutputId});
         if( currentModelOutput && currentModelOutput.experiment ) {
@@ -126,16 +283,16 @@ Meteor.methods({
             });
         }
         if( currentVersion ) {
-        
+
             var files = new Array();
             currentVersion.type = 'ModelOutput';
             currentVersion.name = currentModelOutput.name;
             files.push(currentVersion);
-            
+
             if( !currentModelOutput.experiment ) throw new Meteor.Error(500, 'Please select an experiment first');
-            
+
             addDataSets(files, currentModelOutput.experiment.dataSets,'DataSet');
-            
+
             if( !currentModelOutput.experiment.scripts || currentModelOutput.experiment.scripts.length <=0 ) {
                 throw new Meteor.Error(500,'The chosen experiment does not have a script');
             }
@@ -144,9 +301,9 @@ Meteor.methods({
                 script.type = 'Script';
                 files.push(script);
             }
-            
+
             experimentModelOutputs = loadAllModelOutputsForExperimentExceptOne(currentModelOutput.experiment._id,currentModelOutput._id);
-        
+
             var analysis = {
                'owner' : user._id,
                'created' : new Date(),
@@ -158,11 +315,11 @@ Meteor.methods({
                'files' : files,
                'experimentModelOutputs' : experimentModelOutputs
            };
-           
+
            saveAnalysis(analysis,analysisComplete);
            return analysis;
        }
-       return null; 
+       return null;
     },
     deleteAnalysis: function(id) {
         console.log('deleting analysis: ' + id);

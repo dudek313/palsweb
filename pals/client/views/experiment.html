@@ -1,5 +1,309 @@
 <template name="experiment">
-<div class="experiment">
+<!--  <div class="row">
+    <div class="col-md-9"> -->
+  <div class="detail-form">
+      {{#if areEqual screenMode 'display'}}
+        <form role="form">
+          <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
+          {{#if areEqual experiment.recordType 'template'}}
+            <h1>Experiment Template: {{name}}</h1>
+          {{else}}
+            <h1>Experiment: {{name}}</h1>
+          {{/if}}
+
+
+<!--          <div class="alert alert-danger error"></div>-->
+          <div class="panel panel-primary">
+            <div class="panel-heading">Details</div>
+            <div class="panel-body">
+              <div class="form-group">
+                <label>Name</label>
+                <div class="display">{{name}}</div>
+              </div>
+              <div class="form-group">
+                {{#if country}}
+                    <label>Country</label>
+                    <div class="display">{{country}}</div>
+                {{/if}}
+              </div>
+              <div class="form-group">
+                {{#if vegType}}
+                  <label>IGBP Vegetation Type</label>
+                  <div class="display">{{vegType}}</div>
+                {{/if}}
+              </div>
+              {{#if otherVegType}}
+                <div class="display">{{vegType}}</div>
+              {{/if}}
+              <div class="form-group">
+                  <label>Spatial Level</label>
+                  <div class="display">{{spatialLevel}}</div>
+              </div>
+              <div class="form-group">
+                  <label>Time Step Size</label>
+                  <div class="display">{{timeStepSize}}</div>
+              </div>
+              <div class="form-group">
+                {{#if shortDescription}}
+                  <label>Short Description</label>
+                  <div class="display">{{shortDescription}}</div>
+                {{/if}}
+              </div>
+              <div class="form-group">
+                {{#if longDescription}}
+                    <label>Long Description</label>
+                    <div class="display">{{{breaklines experiment.longDescription}}}</div>
+                {{/if}}
+              </div>
+              <div class="form-group">
+                {{#if region}}
+                    <label>Region</label>
+                    <div class="display">{{region}}</div>
+                {{/if}}
+              </div>
+              <div class="form-group">
+                {{#if resolution}}
+                    <label>Resolution</label>
+                    <div class="display">{{resolution}}</div>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="panel panel-success">
+          <div class="panel-heading">Scripts</div>
+          <div class="panel-body">
+            <table class="table">
+              <tr>
+                <th>Filename</th>
+              </tr>
+              {{#each scripts}}
+                <tr>
+                  <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                </tr>
+              {{/each}}
+            </table>
+         </div>
+        </div>
+
+        <form role="form">
+          <div class="panel panel-primary">
+            <div class="panel-heading">Data Sets</div>
+            <div class="panel-body">
+
+               <table class="table table-hover">
+                 <thead>
+                 <tr>
+                     <th>Name</th>
+                 </tr>
+                 </thead>
+                 <tbody>
+                 {{#each dataSets}}
+                 <tr>
+                     <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
+                 </tr>
+                 {{/each}}
+                 </tbody>
+               </table>
+            </div>
+          </div>
+        </form>
+        {{#if areEqual recordType 'instance'}}
+          <div class="panel panel-primary">
+          <div class="panel-heading">Model Outputs</div>
+          <table class="table table-hover">
+              <thead>
+              <tr>
+                  <th>Name</th>
+              </tr>
+              </thead>
+              <tbody>
+              {{#each modelOutputs}}
+              <tr>
+                  <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
+              </tr>
+              {{/each}}
+              </tbody>
+          </table>
+          </div>
+        {{/if}}
+<!--        </div> -->
+        <div class="col-md-12">
+          <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
+        </div>
+
+      {{else}}
+        {{#autoForm collection="Experiments" id=formId doc=this type="normal" validation='blur'}}
+          <fieldset>
+            {{#if areEqual screenMode 'create'}}
+              <h1>Create New Experiment</h1>
+            {{else}} <!-- if in update mode -->
+              <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+                <br>Experiment details won't be updated until "Save Changes" is clicked below.</b></div>
+              <div class="alert alert-danger error"></div>
+<!--              <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Experiment Details</a> -->
+              {{#if areEqual experiment.recordType 'template'}}
+                <h1>Experiment Template: {{name}}</h1>
+              {{else}}
+                <h1>Experiment: {{name}}</h1>
+              {{/if}}
+            {{/if}}
+            <div class="panel panel-primary">
+              <div class="panel-heading">Details</div>
+              <div class="panel-body">
+                {{> afQuickField name='name'}}
+                {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
+                {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
+                {{#if afFieldValueIs name='vegType' value='Other'}}
+                  {{> afQuickField name='otherVegType'}}
+                {{/if}}
+                {{> afQuickField name='spatialLevel' type='select' firstOption="(Select One)" options='allowed'}}
+                {{> afQuickField name='timeStepSize' type='select' firstOption="(Select One)" options='allowed'}}
+                {{> afQuickField name='shortDescription'}}
+                {{> afQuickField name='longDescription' rows=3}}
+                {{> afQuickField name='region'}}
+                {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
+              </div>
+            </div>
+            <div class="panel panel-success">
+              <div class="panel-heading">Scripts</div>
+              <div class="panel-body">
+                <table class="table">
+                  <tr>
+                    <th>Filename</th>
+                    <th>Delete</th>
+                  </tr>
+                  {{#each tempScripts}}
+                  <tr>
+                    <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                    <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                  </tr>
+                  {{/each}}
+                </table>
+                {{#if currentUser.admin}}
+                <label>Upload a new script</label>
+                <input type="file" class="file-select" name="file-select"/>
+                <div class="progress progress-striped active">
+                  <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                  style="width:0%">
+                </div>
+              </div>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="panel panel-primary">
+            <div class="panel-heading">Data Sets</div>
+            <div class="panel-body">
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th>Name</th>
+                      <th>Remove</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {{#each tempDataSets}}
+                  <tr>
+                      <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
+                      <td><button class='remove-dataset btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                  </tr>
+                  {{/each}}
+                  </tbody>
+              </table>
+
+              <div class="form-group">
+                  <select name="addDataSet" class="form-control">
+                      <option selected disabled>(Select One)</option>
+                      {{#each otherDataSets}}
+                        <option value="{{_id}}">{{name}}</option>
+                      {{/each}}
+                  </select>
+              </div>
+
+              <button class='btn btn-default bottom-margin' id="add-data-set" {{uploadDisabled}}>Add data set</button>
+            </div>
+          </div>
+
+          {{#if areEqual recordType 'instance'}}
+            <div class="panel panel-primary">
+            <div class="panel-heading">Model Outputs</div>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each modelOutputs}}
+                <tr>
+                    <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
+                </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            </div>
+          {{/if}}
+          </fieldset>
+          {{#if areEqual screenMode 'create'}}
+            <div class="col-md-12">
+              <button type="submit" class="create-btn btn btn-primary">Save</button>
+              <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
+            </div>
+          {{else}}
+            <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+              <br>Experiment details won't be updated until "Save Changes" is clicked below.</b>
+            </div>
+            <br>
+<!--            <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Experiment Details</a> -->
+            <button type="submit" class="btn btn-primary save-update">Save Changes</button>
+            <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
+          {{/if}}
+        {{/autoForm}}
+
+      {{/if}}
+<!--    </div>-->
+  </div>
+</template>
+
+<!--            <div class="panel panel-primary">
+              <div class="panel-heading">Model Outputs</div>
+              <div class="panel-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Remove</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each tempModelOutputs}}
+                    <tr>
+                        <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
+                        <td><button class='remove-modelOutput btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                    </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+
+                <div class="form-group">
+                    <select name="addDataSet" class="form-control">
+                        <option >(Select One)</option>
+                        {{#each otherModelOutputs}}
+                        <option value="{{_id}}">{{name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <button class='btn btn-default bottom-margin' id="add-modelOutput" {{uploadDisabled}}>Add Model Output</button>
+              </div>
+            </div>
+-->
+
+
+<!-- -->
+<!--
+<template name="experiment<div class="experiment">      <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
 <div class="row">
 <div class="col-md-8">
 <form role="form">
@@ -175,7 +479,7 @@
     {{/if}}
     </div>
     <table class="table table-hover">
-        <thead> 
+        <thead>
         <tr>
             <th>Name</th>
             {{#if currentUser.admin}}<th>remove</th>{{/if}}
@@ -195,7 +499,7 @@
     <div class="panel panel-primary">
     <div class="panel-heading">Model Outputs</div>
     <table class="table table-hover">
-        <thead> 
+        <thead>
         <tr>
             <th>Name</th>
         </tr>
@@ -211,5 +515,6 @@
     </div>
 </div>
 </div>
-</div><!--experiment-->
+</div>
 </template>
+-->

@@ -7,3 +7,4 @@ Meteor.subscribe('modelOutputs');
 Meteor.subscribe('analyses');
 Meteor.subscribe('models');
 Meteor.subscribe('variables');
+Meteor.subscribe('draftDataSets');

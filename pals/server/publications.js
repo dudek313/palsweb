@@ -10,6 +10,12 @@ Meteor.users.update({'emails.address':'eduthie@gmail.com'},{'$set':
 Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
     {'admin':true}});
 
+var gabId = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})._id
+Roles.addUsersToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
+
+var dannyId = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'})._id
+Roles.addUsersToRoles(dannyId, 'edit', 'datasets');
+
 Meteor.users.allow({
     update: function (userId, doc, fields, modifier) {
         return (userId && doc._id === userId);
@@ -18,7 +24,7 @@ Meteor.users.allow({
 
 Workspaces.allow({
     insert: function(userId, doc) {
-        return ( userId && doc.owner === userId );
+        return ( userId && doc.owner == userId );
     },
     update: function(userId, doc, fieldNames, modifier) {
         return ( userId && doc.owner === userId );
@@ -33,10 +39,15 @@ Meteor.publish('directory',function(){
 });
 
 
-DataSets._ensureIndex('name', {unique: 1});
+//DataSets._ensureIndex('_id', {unique: 1});
+
 
 Meteor.publish('dataSets',function(){
     return DataSets.find();
+});
+
+Meteor.publish('draftDataSets',function(){
+    return DraftDataSets.find();
 });
 
 DataSets.allow({
@@ -46,11 +57,26 @@ DataSets.allow({
     },
     update: function(userId, doc, fieldNames, modifier) {
         var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
+        return ( userId && user.admin );
     },
     remove: function(userId, doc) {
         var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
+        return ( userId && user.admin );
+    }
+});
+
+DraftDataSets.allow({
+    insert: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    },
+    update: function(userId, doc, fieldNames, modifier) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
+    },
+    remove: function(userId, doc) {
+        var user = Meteor.user();
+        return ( userId && user.admin );
     }
 });
 
@@ -89,7 +115,7 @@ Experiments.allow({
     }
 });
 
-Experiments._ensureIndex('name', {unique: 1});
+//Experiments._ensureIndex('_id', {unique: 1});
 
 Meteor.publish('modelOutputs',function(){
     return ModelOutputs.find();
@@ -108,7 +134,7 @@ ModelOutputs.allow({
     }
 });
 
-ModelOutputs._ensureIndex('name', {unique: 1});
+//ModelOutputs._ensureIndex('name', {unique: 1});
 
 Meteor.publish('analyses',function(){
     return Analyses.find();
@@ -120,7 +146,7 @@ Meteor.publish('models',function(){
 
 // Old code assumed unique model name. Only needs to be unique for workspace.
 //Models._ensureIndex('name', {unique: 1});
-Models._ensureIndex('_id', {unique: 1});
+//Models._ensureIndex('_id', {unique: 1});
 
 
 Models.allow({
@@ -128,7 +154,8 @@ Models.allow({
         return ( userId && doc.owner === userId );
     },
     update: function(userId, doc, fieldNames, modifier) {
-        return ( userId && doc.owner === userId );
+        var group = "Model: " + doc._id;
+        return Roles.userIsInRole(userId, 'edit', group);
     },
     remove: function(userId, doc) {
         return ( userId && doc.owner === userId );
@@ -139,7 +166,7 @@ Meteor.publish('variables',function(){
     return Variables.find();
 });
 
-Variables._ensureIndex('name', {unique: 1});
+//Variables._ensureIndex('name', {unique: 1});
 
 Files.allow({
     insert: function(userId, doc) {
@@ -150,5 +177,9 @@ Files.allow({
     },
     remove: function(userId, doc) {
         return (userId);
-    }
+    },
+    download: function() {
+        return true;
+    },
+    fetch: null
 });
