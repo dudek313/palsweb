@@ -55,10 +55,9 @@ Template.registerHelper("screenMode", function() {
 
 Template.registerHelper('authorisedToEdit', function(objType, id) {
     var userId = Meteor.userId();
-    var group = objType;
-    if (id != 'all')
-        var group = group + ": " + id;
-    var authorised = Roles.userIsInRole(userId, 'edit', group);
+    var group = objType + "s";
+    var groupWithId = group + ": " + id;
+    var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
     return authorised;
 });
 
