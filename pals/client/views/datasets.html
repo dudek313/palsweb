@@ -32,7 +32,7 @@
                     {{> globalHeadings}}
                 {{/if}}
             {{/if}}
-            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+            {{#if authorisedToEdit 'dataset'}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
@@ -62,7 +62,7 @@
                   {{> globalRow}}
               {{/if}}
             {{/if}}
-            {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+            {{#if authorisedToEdit 'dataset'}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}
         </tbody>

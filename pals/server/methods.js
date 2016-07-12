@@ -108,22 +108,6 @@ extractLatestVersion = function(modelOutput) {
 }
 
 Meteor.methods({
-  'findWorkspace': function(selector) {
-      if ( !Meteor.user()) {
-          throw new Meteor.Error('not-authorized')
-      }
-      else {
-          return Workspaces.findOne(selector);
-      }
-  },
-  'findOneModelOutput': function(selector) {
-      if( !Meteor.user() ) {
-          throw new Meteor.Error('not-authorized')
-      }
-      else {
-        return ModelOutputs.findOne(selector);
-      }
-  },
   'insertModelOutput': function(modelOutputDoc) {
       if( !Meteor.user() ) {
           throw new Meteor.Error('not-authorized')
@@ -133,8 +117,9 @@ Meteor.methods({
       }
   },
   'updateModelOutput': function(currentDoc, updateDoc) {
-      userId = Meteor.userId();
-      if( userId ) {
+      var userId = Meteor.userId();
+      var group = 'modelOutput: ' + currentDoc._id;
+      if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = ModelOutputs.update(currentDoc, updateDoc);
           return mo;
       }
@@ -142,41 +127,9 @@ Meteor.methods({
           throw new Meteor.Error('not-authorized');
       }
   },
-  'addTempFile': function(key) {
-        if (!Meteor.user()) {
-            throw new Meteor.Error('not-authorized')
-        }
-        else {
-            return TempFiles.insert(key);
-        }
-    },
-    'removeTempFile': function(key) {
-        if (!Meteor.user()) {
-            throw new Meteor.Error('not-authorized')
-        }
-        else {
-            return TempFiles.remove(key);
-        }
-    },
-    'createDraftDataSet': function(dataSetDoc) {
-        if( !Meteor.user().admin ) {
-            throw new Meteor.Error('not-authorized')
-        }
-        else {
-          return DraftDataSets.insert(dataSetDoc);
-        }
-    },
-    'updateDraftDataSet': function(currentDoc, updateDoc) {
-        if( !Meteor.user().admin ) {
-            throw new Meteor.Error('not-authorized')
-        }
-        else {
-            return DraftDataSets.update(currentDoc, updateDoc);
-        }
-
-    },
-    'updateDataSet': function(currentDoc, dataSetDoc) {
-        if( !Meteor.user().admin ) {
+  'updateDataSet': function(currentDoc, dataSetDoc) {
+        var userId = Meteor.userId();
+        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -185,7 +138,8 @@ Meteor.methods({
 
     },
     'insertDataSet': function(dataSetDoc) {
-        if( !Meteor.user().admin ) {
+        var userId = Meteor.userId();
+        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -193,27 +147,37 @@ Meteor.methods({
         }
     },
     'updateExperiment': function(currentDoc, updateDoc) {
-        if( !Meteor.user().admin ) {
+        var userId = Meteor.userId();
+        if( !Roles.userIsInRole(userId, 'edit', 'experiment: ' + currentDoc._id) ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
               var exp = Experiments.update(currentDoc, updateDoc);
-              console.log(exp);
               return exp;
-//            return Experiments.update(currentDoc, updateDoc);
         }
 
     },
     'insertExperiment': function(dataSetDoc) {
-        if( !Meteor.user().admin ) {
-            throw new Meteor.Error('not-authorized')
+        var userId = Meteor.userId();
+        var docId;
+        if (userId && dataSetDoc.recordType == 'instance') {
+            docId = Experiments.insert(dataSetDoc);
+            var group = 'experiment: ' + docId;
+            Roles.addUsersToRoles(dataSetDoc.owner, 'edit', group);
+            return docId;
+        }
+        else if( dataSetDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
+            docId = Experiments.insert(dataSetDoc);
+            return docId
         }
         else {
-          return Experiments.insert(dataSetDoc);
+            throw new Meteor.Error('not-authorized')
         }
     },
     'deleteExperiment': function(dataSetDoc) {
-        if( !Meteor.user().admin ) {
+        var userId = Meteor.userId();
+        var group = 'experiment: ' + dataSetDoc._id;
+        if( !Roles.userIsInRole(userId, 'edit', group) ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -221,7 +185,9 @@ Meteor.methods({
         }
     },
     'updateModel': function(currentDoc, modelDoc) {
-        if( !Meteor.user().admin ) {
+        var userId = Meteor.userId();
+        var group = 'model: ' + currentDoc._id;
+        if( !Roles.userIsInRole(userId, 'edit', group)) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -240,29 +206,6 @@ Meteor.methods({
 
           return docId;
         }
-    },
-    'dataSets.insert': function(dataset, callback) {
-        DataSets.insert(dataset, function(error,doc) {
-            if( error ) {
-                console.log('Error saving the new dataSet');
-            }
-            else {
-                console.log('Method.insert: ' + doc);
-//                return doc;
-                callback(false,doc);
-            }
-        });
-
-    },
-    'dataSets.update': function(selector, update) {
-        DataSets.update(selector, update, function(error, doc) {
-            if( error ) {
-                console.log('Error updating dataSet record');
-            }
-            else {
-                console.log('Update successful of ' + selector._id);
-            }
-        });
     },
 
     startAnalysis: function (key,modelOutputId) {

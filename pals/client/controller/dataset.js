@@ -10,9 +10,9 @@ AutoForm.hooks({
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             event.preventDefault();
             insertDoc._version = 1;
-            var currentDraftDataSet = getCurrentDraftDataSet();
             insertDoc.owner = Meteor.user()._id;
-            insertDoc.files = getDraftFiles(currentDraftDataSet);
+            insertDoc.files = Session.get('tempFiles');
+            // insert data set document to the mongodb collection
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
                     $('.error').html('Failed to create the data set. Please try again.');
@@ -21,15 +21,7 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-                    console.log(docId);
-                    DraftDataSets.remove({_id:currentDraftDataSet._id});
-                    insertDoc.files.forEach(function(file){
-                        Meteor.call('removeTempFile', {_id:file.key}, function(error){
-                            if (error) {
-                                console.log('Temp file status not removed for file with key: ' + file.key);
-                            }
-                        });
-                    });
+                    // if successful, display the created data sets
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -37,16 +29,10 @@ AutoForm.hooks({
             this.done();
             return false;
         },
-        before: {
-            normal: function(doc) {
-                doc._id = Session.get(currentDataSet);
-            }
-        },
     },
     updateDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            var currentDraftDataSet = getCurrentDraftDataSet();
-            updateDoc.$set.files = getDraftFiles(currentDraftDataSet);
+            updateDoc.$set.files = Session.get('tempFiles');
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
                     $('.error').html('Failed to update the data set. Please try again.');
@@ -54,15 +40,7 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-//                    Session.set('screenMode', 'display');
-                    updateDoc.$set.files.forEach(function(file){
-                        Meteor.call('removeTempFile', {_id:file.key}, function(error){
-                            if (error)
-                              console.log('Temp file status not removed for file with key: ' + file.key);
-                        });
-                    });
-
-                    var currentDataSetId = getCurrentDataSetId();
+                    var currentDataSetId = getCurrentObjectId();
                     Router.go('/dataset/display/' + currentDataSetId);
                 }
             });
@@ -80,7 +58,7 @@ Template.dataset.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
-        Router.go('/dataset/display/' + getCurrentDataSetId());
+        Router.go('/dataset/display/' + getCurrentObjectId());
 //        Session.set('screenMode','display');
     },
     'click .cancel-create':function(event){
@@ -89,65 +67,31 @@ Template.dataset.events = {
     },
     'click .delete-file':function(event) {
         event.preventDefault();
-        if( Meteor.user().admin ) {
-            var key = $(event.target).attr('id');
-            var currentDraftDataSet = getCurrentDraftDataSet();
-            if( currentDraftDataSet.files ) {
-                var currentFile = undefined;
-                currentDraftDataSet.files.forEach(function(file) {
-                    if( file.key == key ) {
-                        currentFile = file;
-                    }
-                });
-                if( currentFile ) {
-                    Meteor.call('updateDraftDataSet', {'_id':currentDraftDataSet._id},
-                        {$pull : {'files':{ 'key':key }}}, function(error) {
-                            if( error ) {
-                                $('.error').html('Failed to delete file, please try again');
-                                $('.error').show();
-                                console.log(error.reason);
-                            }
-                        }
-                    );
-//    We don't actually want to remove files from the system when we remove them from the data set
-//    We need to create a dashboard for the data admin to be able to delete files from the system.
-//                    Files.remove({_id:currentFile.fileObjId},function(err){
-//                       if(err) console.log(err);
-//                    });
-                }
-            }
+        var selectedFileId = $(event.target).attr('id');
+        var currentFiles = Session.get('tempFiles');
+        var newFiles = [];
+        if (currentFiles && currentFiles.length > 0) {
+            currentFiles.forEach(function(file) {
+                if (file.key != selectedFileId)
+                    newFiles.push(file);
+            });
+            Session.set('tempFiles', newFiles);
         }
-    },
-    'change #downloadable': function() {
-
+        else {
+            $('.error').html('Error removing data set, please try again');
+            $('.error').show();
+        }
     },
     'click .enable-update':function(event){
-        var dataSetId = getCurrentDataSetId();
-        var draftExists = DraftDataSets.findOne({_id: dataSetId});
-        if( draftExists ) {
-            DraftDataSets.remove({_id:dataSetId});
-        }
-        var currentDataSet = getCurrentDataSet();
-        Meteor.call('createDraftDataSet', currentDataSet, function(error, docId){
-            if(error) {
-                $('.error').html('Unable to update data set. Please try again.');
-                $('.error').show();
-                console.log(error);
-            }
-            else {
-                Router.go('/dataset/update/' + dataSetId);
-//                Session.set('screenMode', 'update');
-            }
-        });
+        event.preventDefault();
+        var dataSetId = getCurrentObjectId();
+        Router.go('/dataset/update/' + dataSetId);
     },
     'change .file-select':function(event, template){
-        var currentDataSetId = getCurrentDataSetId();
         FS.Utility.eachFile(event, function(file) {
-            var filename = file.name;
-            while(DraftDataSets.findOne({_id: getCurrentDataSetId(),
-              'files.name': filename})) {
+            while(filenameAlreadyExists(filename = file.name)) {
                 filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
-            }
+            };
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
@@ -159,7 +103,6 @@ Template.dataset.events = {
                     var fileRecord = {
                         path: FILE_BUCKET+'/'+name,
                         name: filename,
-//                        name: originalFilename,
                         size: fileObj.size(),
                         key: name,
   //                        fileObjId: fileObj._id,
@@ -167,52 +110,25 @@ Template.dataset.events = {
                         downloadable: isDownloadable,
                         type: fileType,
                     };
-                    // flag file as temp until the update is confirmed
-                    Meteor.call('addTempFile', {_id:name}, function(error) {
-                        if (error)
-                            console.log('Temp file status not recorded.');
-                    });
-                    Meteor.call('updateDraftDataSet',{'_id':currentDataSetId},
-                        {'$push':{'files':fileRecord}},function(error){
-                            if( error ) {
-                                $('.error').html('Failed to add uploaded file, please try again');
-                                $('.error').show();
-                                console.log(error.reason);
-                            }
-                            else Session.set('uploadButtonClicked', false);
-                    });
+                    var tempFiles = Session.get('tempFiles');
+                    tempFiles.push(fileRecord);
+                    Session.set('tempFiles', tempFiles);
                 }
             });
 
         });
-    },
-    'click .download-file':function(event, template){
-        event.preventDefault();
     }
 };
 
-function getCurrentDataSetId() {
-    return Router.current().params.id;
+function filenameAlreadyExists(filename) {
+    var tempFiles = Session.get('tempFiles');
+    var tempFileNames = getAttributeArrayFromObjects(tempFiles, "name");
+    return (tempFileNames.indexOf(filename) != -1)
 }
 
 function getCurrentDataSet() {
     return Router.current().data();
-/*    var currentDataSetId = getCurrentDataSetId();
-    var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
-    return currentDataSet;*/
 }
-
-function getCurrentDraftDataSet() {
-    var currentDataSetId = getCurrentDataSetId();
-    var currentDraftDataSet = DraftDataSets.findOne({'_id':currentDataSetId});
-    return currentDraftDataSet;
-}
-
-/*function cloneDataSet() {
-    var cloneDS = jQuery.extend({}, getCurrentDataSet());
-    cloneDS.version = 0;
-    return cloneDS;
-}*/
 
 function getFiles(dataSet) {
     if( dataSet && dataSet.files && dataSet.files.length > 0 ) {
@@ -224,25 +140,6 @@ function getFiles(dataSet) {
         return files;
     }
 }
-
-function getDraftFiles(draftDataSet) {
-    if( draftDataSet && draftDataSet.files && draftDataSet.files.length > 0 ) {
-        var files = new Array();
-        for( var i=0; i < draftDataSet.files.length; ++i ) {
-            var file = draftDataSet.files[i];
-            files.push(file);
-        }
-        return files;
-    }
-}
-
-/*Template.dataset.updateBtnDisabled = function() {
-    var toDisable = Session.get(disableUpdateBtn);
-    console.log(toDisable);
-    if ( toDisable ) return true
-    else return '';
-}*/
-
 
 Template.dataset.helpers({
   uploadButtonClicked: function() {
@@ -275,8 +172,7 @@ Template.dataset.helpers({
       return getFiles(dataSet);
   },
   draftFiles: function() {
-      var draftDataSet = getCurrentDraftDataSet();
-      return getDraftFiles(draftDataSet);
+      return Session.get('tempFiles');
   },
   hasFiles: function() {
       var dataSet = getCurrentDataSet();
@@ -284,23 +180,9 @@ Template.dataset.helpers({
       else return false;
   },
   draftHasFiles: function() {
-      var draftDataSet = getCurrentDraftDataSet();
-      if( draftDataSet && draftDataSet.files && draftDataSet.files.length > 0 ) return true;
+      var tempFiles = Session.get('tempFiles');
+      if( tempFiles && tempFiles.length > 0 ) return true;
       else return false;
-  },
-  reference: function() {
-      var reference = Reference.findOne();
-      return reference;
-  },
-  inEditMode: function() {
-      var screenMode = getScreenMode();
-      return (screenMode =='update' || screenMode =='create');
-  },
-  inUpdateMode: function() {
-      return (getScreenMode()=='update');
-  },
-  inDisplayMode: function() {
-      return (getScreenMode()=='display');
   },
   isPublic: function() {
       var dataSet = getCurrentDataSet();
@@ -354,54 +236,3 @@ Template.dataset.helpers({
       else return '';
   }
 });
-
-
-/*Template.dataset.files = function() {
-    var dataSet = getCurrentDataSet();
-    return getFiles(dataSet);
-}
-Template.dataset.reference = function() {
-    var reference = Reference.findOne();
-    return reference;
-};
-Template.dataset.hasFiles = function() {
-    var dataSet = getCurrentDataSet();
-    if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
-    else return false;
-};
-*/
-
-/*
-    'click .add-variable':function(event){
-        if( Meteor.user().admin ) {
-            var variableId = $('select[name="variable"]').val();
-            var user = Meteor.user();
-            currentDataSetId = Session.get('currentDataSet');
-            variable = Variables.findOne({'_id':variableId});
-            if( currentDataSetId && variable) {
-                var selector = {'_id':currentDataSetId};
-                var modifier = {'$addToSet': {variables:variable}};
-                DataSets.update(selector,modifier,function(error){
-                    if( error ) {
-                        $('.error').html('There was an error adding the variable, please try again');
-                        $('.error').show();
-                    }
-                });
-            }
-        }
-    },
-    'click a.remove-variable':function(event){
-        if( Meteor.user().admin ) {
-            var variableId = $(event.target).parent().attr('id');
-            currentDataSetId = Session.get('currentDataSet');
-            console.log('removing variable: ' + variableId);
-            DataSets.update({'_id':currentDataSetId},
-                {$pull : {'variables':{ '_id':variableId }}}, function(error) {
-                    if( error ) {
-                        $('.error').html('Failed to remove variable, please try again');
-                        $('.error').show();
-                    }
-                }
-            );
-        }
-    },*/

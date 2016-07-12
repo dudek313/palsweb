@@ -10,11 +10,14 @@ Meteor.users.update({'emails.address':'eduthie@gmail.com'},{'$set':
 Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
     {'admin':true}});
 
-var gabId = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})._id
+var gabId = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})._id;
 Roles.addUsersToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
+Roles.addUsersToRoles(gabId, 'access', 'all workspaces');
 
-var dannyId = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'})._id
+var dannyId = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'})._id;
 Roles.addUsersToRoles(dannyId, 'edit', 'datasets');
+Roles.addUsersToRoles(dannyId, 'edit', 'models');
+Roles.addUsersToRoles(dannyId, 'edit', 'experiments');
 
 Meteor.users.allow({
     update: function (userId, doc, fields, modifier) {

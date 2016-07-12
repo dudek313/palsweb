@@ -41,8 +41,7 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
-                    Session.set('screenMode', 'display');
-                    var currentModelId = Session.get('currentModel');
+                    var currentModelId = getCurrentObjectId();
                     Router.go('/model/display/' + currentModelId);
                 }
             });
@@ -54,7 +53,7 @@ AutoForm.hooks({
 })
 
 function getCurrentModel() {
-    var currentModelId = Session.get('currentModel');
+    var currentModelId = getCurrentObjectId();
     var currentModel = Models.findOne({'_id':currentModelId});
     return currentModel;
 }
@@ -62,46 +61,36 @@ function getCurrentModel() {
 Template.model.events = {
     'click .cancel-update':function(event){
         event.preventDefault();
-        Session.set('screenMode','display');
+        Router.go('/display/' + getCurrentObjectId());
     },
     'click .cancel-create':function(event){
         event.preventDefault();
         Router.go('/home')
     },
     'click .enable-update':function(event){
-        Session.set('screenMode', 'update');
+        Router.go('/update/' + getCurrentObjectId());
     }
 };
 
 Template.model.helpers({
   formId: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return "createModelForm"
     else if(screenMode == 'update') return "updateModelForm"
     else return null;
   },
   dataIfNeeded: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return null
     else if(screenMode == 'update') return getCurrentModel()
     else return null;
   },
-  inCreateMode: function() {
-      return (Session.get('screenMode')=='create');
-  },
-  inUpdateMode: function() {
-      return (Session.get('screenMode')=='update');
-  },
-  inEditMode: function() {
-      var screenMode = Session.get('screenMode');
-      return (screenMode =='update' || screenMode =='create');
-  },
   formType: function() {
-    var screenMode = Session.get('screenMode');
+    var screenMode = getScreenMode();
     if(screenMode == 'create') return "insert"
     else if(screenMode == 'update') return "update"
     else return null;
-  },
+  }, 
   owner: function() {
       var user = Meteor.user();
       var model = getCurrentModel();

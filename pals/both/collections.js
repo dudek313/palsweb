@@ -8,7 +8,6 @@ ModelOutputs = new Meteor.Collection("modelOutputs").vermongo({timestamps: true,
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
 Variables = new Meteor.Collection("variables");
-TempFiles = new Meteor.Collection("tempFiles");
 
 AdminConfig = {
   name: 'My App',
@@ -21,7 +20,6 @@ AdminConfig = {
     ModelOutputs:{},
     Analyses:{},
     Models:{},
-    TempFiles:{}
   }
 };
 
@@ -235,6 +233,10 @@ Experiments.attachSchema(new SimpleSchema({
     allowedValues: ['template', 'instance'],
     optional: true
   },
+  owner: {
+    type: String,
+    optional: true
+  },
   created: {
     type: Date,
     optional: true
@@ -294,6 +296,10 @@ Experiments.attachSchema(new SimpleSchema({
   },
   _version: {
     type: Number,
+    optional: true
+  },
+  versionDescription: {
+    type: String,
     optional: true
   },
   'scripts.$.path': {

@@ -27,9 +27,10 @@ getModelOutputsInWorkspace = function(ws) {
     var exps = Experiments.find(expSelector).fetch();
     var expIds = getIdsFromObjects(exps);
     var modelOutputs = ModelOutputs.find({experiments: {$in: expIds}}).fetch();
+    console.log(modelOutputs);
     return modelOutputs;
 }
- 
+
 getModelsFromModelOutputs = function(modelOutputs) {
     var models = [];
     var model_ids = [];
@@ -64,42 +65,42 @@ Template.models.helpers({
         }
     },
     models: function() {
-        var user = Meteor.user();
-        if( user ) {
-            var source = getSource();
-            if (source == 'mine')
-                var models = Models.find({'owner':user._id}).fetch();
-            else if (source == 'workspace' || source == 'anywhere') {
+        var userId = Meteor.userId();
 
-               // select relevant modelOutputs and associated models
-                var workspace = ((source == 'workspace') ? user.profile.currentWorkspace : null);
-                var modelOutputs = getModelOutputsInWorkspace(workspace);
-                var models = getModelsFromModelOutputs(modelOutputs);
-            }
-            else {
-                $('.error').html('Unable to display models');
-                $('.error').show();
-            }
-            // set model.owner to the owner's email
-            if( models ) {
-                models.forEach(function(model){
-                    if( model ) {
-                        if( model.owner ) {
-                            model.owner = Meteor.users.findOne({'_id':model.owner},{'_id':1,'name':1});
-                            if( model.owner && model.owner.emails && model.owner.emails.length > 0) {
-                                model.owner.email = model.owner.emails[0].address;
-                            }
+        var source = getSource();
+        if (source == 'mine')
+            var models = Models.find({'owner':userId}).fetch();
+        else if (source == 'workspace' || source == 'anywhere') {
+
+           // select relevant modelOutputs and associated models
+            var workspace = ((source == 'workspace') ? user.profile.currentWorkspace : null);
+            var modelOutputs = getModelOutputsInWorkspace(workspace);
+            var models = getModelsFromModelOutputs(modelOutputs);
+        }
+        else {
+            $('.error').html('Unable to display models');
+            $('.error').show();
+        }
+        // set model.owner to the owner's email
+        if( models ) {
+            models.forEach(function(model){
+                if( model ) {
+                    if( model.owner ) {
+                        model.owner = Meteor.users.findOne({'_id':model.owner},{'_id':1,'name':1});
+                        if( model.owner && model.owner.emails && model.owner.emails.length > 0) {
+                            model.owner.email = model.owner.emails[0].address;
                         }
                     }
-                });
-            }
-
-            return models.sort(function(a,b) {
-                x = a.name.toLowerCase();
-                y = b.name.toLowerCase();
-                return x < y ? -1 : x > y ? 1 : 0;
+                }
             });
-
         }
+
+        return models.sort(function(a,b) {
+            x = a.name.toLowerCase();
+            y = b.name.toLowerCase();
+            return x < y ? -1 : x > y ? 1 : 0;
+        });
+
+
     }
 })

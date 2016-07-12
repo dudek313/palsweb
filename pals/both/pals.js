@@ -3,18 +3,17 @@
 FILE_BUCKET = '/pals/data';
 
 Router.configure({
-    layoutTemplate: 'main'
+    layoutTemplate: 'main',
+    notFoundTemplate: 'notFound'
 });
+
+Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
 
 Router.map(function () {
     this.route('root',{
         path: '/',
         template: 'home'
     });
-/*    this.route('admin',{
-        path: '/admin',
-        template: 'admin'
-    });*/
     this.route('home',{
         path: '/home',
         template: 'home'
@@ -37,15 +36,26 @@ Router.map(function () {
     this.route('dataset',{
         path: '/dataset/:screenMode/:id',
         template: 'dataset',
-        data: function() { return DataSets.findOne({_id:this.params.id}); }
+        data: function() { return DataSets.findOne({_id:this.params.id}); },
+        onBeforeAction: [
+            function() {
+                if (this.params.screenMode == 'update') {
+                    ds = DataSets.findOne({_id:this.params.id});
+                    if (ds) {
+                        Session.set('tempFiles', ds.files);
+                    }
+                }
+                this.next();
+            }
+        ]
     });
     this.route('createDataset',{
         path: '/dataset/:screenMode',
         template: 'dataset',
         onBeforeAction: [
             function() {
-                createDummyDataSet();
-  	            this.next();
+                Session.set('tempFiles', []);
+                this.next();
             }
         ]
     });
@@ -68,7 +78,19 @@ Router.map(function () {
     this.route('displayOrUpdateExperiment',{
         path: '/experiment/:screenMode/:id',
         template: 'experiment',
-        data: function() { return Experiments.findOne({_id:this.params.id}) }
+        data: function() { return Experiments.findOne({_id:this.params.id}) },
+        onBeforeAction: [
+            function() {
+                if (this.params.screenMode == 'update') {
+                    exp = Experiments.findOne({_id:this.params.id});
+                    if (exp) {
+                        Session.set('tempScripts', exp.scripts);
+                        Session.set('tempDataSets', exp.dataSets);
+                    }
+                }
+                this.next();
+            }
+        ]
     });
     this.route('createModelOutput',{
         path: '/modelOutput/:screenMode',
@@ -113,27 +135,13 @@ Router.map(function () {
         template: 'models'
     });
     this.route('createModel',{
-        path: '/model/create',
-        template: 'model',
-        onBeforeAction: [
-            function() {
-                Session.set('currentModel',undefined);
-                Session.set('screenMode', 'create');
-                this.next();
-            }
-        ]
+        path: '/model/:screenMode',
+        template: 'model'
     });
     this.route('modelById',{
-        path: '/model/display/:id',
+        path: '/model/:screenMode/:id',
         template: 'model',
-        data: function() { return Models.findOne({_id : this.params.id}) },
-        onBeforeAction: [
-            function() {
-                Session.set('currentModel',this.params.id);
-                Session.set('screenMode', 'display');
-                this.next();
-            }
-        ]
+        data: function() { return Models.findOne({_id : this.params.id}) }
     });
     this.route('analyses');
     this.route('file',{

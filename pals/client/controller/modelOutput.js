@@ -274,13 +274,8 @@ Template.modelOutput.helpers({
   // on the create and update pages. For admin users, all models will be displayed.
   // For regular registered users, only their own models will be displayed.
   myModels: function() {
-    var user = Meteor.user();
-    if (user && user.admin)
-        var selector = {}
-    else // regular registered user
-        selector = {owner:Meteor.userId()};
-
-    var myModels = Models.find(selector,{sort:{name:1}}).fetch();
+    var userId = Meteor.userId();
+    var myModels = Models.find({owner:userId},{sort:{name:1}}).fetch();
     var modelOptions = [];
     if (myModels && myModels.length > 0) {
         myModels.forEach(function(model) {

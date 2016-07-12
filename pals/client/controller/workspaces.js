@@ -7,11 +7,11 @@ Template.workspaces.helpers({
         }
     },
     sharedWorkspaces: function() {
-        var user = Meteor.user();
+        var userId = Meteor.userId();
         var selector = {'public':true};
-        if( user ) {
-            if (!user.admin)
-                selector = {$or: [selector, {'guests':user._id}]};
+        if( userId ) {
+            if (!Roles.userIsInRole(userId, 'access', 'all workspaces'))
+                selector = {$or: [selector, {'guests':userId}]};
             else selector = {};
         }
 
