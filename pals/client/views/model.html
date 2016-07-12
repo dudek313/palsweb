@@ -1,12 +1,12 @@
 <template name="model">
   <div class="detail-form">
   <div class="alert alert-danger error"></div>
- 
+
   {{#if authorized 'model' _id}}
     {{#if inEditMode}}  <!-- in create or update mode -->
       {{#autoForm collection="Models" id=formId doc=dataIfNeeded type='normal' validation='blur'}}
         <fieldset>
-          {{#if inCreateMode}}
+          {{#if areEqual screenMode 'create'}}
             <legend>Create New Model Profile</legend>
           {{else}} <!-- if in update mode -->
             <h1>Model: {{model.name}}</h1>
@@ -19,7 +19,7 @@
 
               {{> afQuickField name='name'}}
               <label>Owner</label>
-              {{#if inCreateMode}}<div class="display">{{userEmail currentUser._id}}</div>
+              {{#if areEqual screenMode 'create'}}<div class="display">{{userEmail currentUser._id}}</div>
               {{else}} <div class="display">{{userEmail model.owner}}</div>
               {{/if}}
               <br/>
@@ -32,7 +32,7 @@
 
         </fieldset>
 
-        {{#if inCreateMode}}
+        {{#if areEqual screenMode 'create'}}
           <div class="col-md-12">
             <button type="submit" class="create-btn btn btn-success">Save</button>
             <button type="reset" class="create-btn btn btn-default cancel-create">Cancel</button>

@@ -4,10 +4,12 @@
       <div class="row">
         <div class="col-md-9">
           <form role="form">
-            <h1>Model Output: {{name}}</h1>
             {{#if authorisedToEdit 'modelOutput' _id}}
+              <a class="btn btn-primary run-analysis pull-right RbtnMargin">Run Analysis</a>
               <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
-  `         {{/if}}
+              <br><br>
+            {{/if}}
+            <h1>Model Output: {{name}}</h1>
             <div class="form-group">
                 <label>Name</label>
                 <div class="display">{{name}}</div>

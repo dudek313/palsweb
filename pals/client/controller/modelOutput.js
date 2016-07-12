@@ -162,6 +162,19 @@ Template.modelOutput.events = {
             $('.error').html('Error removing data set, please try again');
             $('.error').show();
         }
+    },
+    'click .run-analysis':function(event) {
+        var userId = Meteor.userId();
+        var currentModelOutputId = getCurrentObjectId();
+        var group = 'modelOutput: ' + currentModelOutputId;
+        if( Roles.userIsInRole(userId, 'edit', group) ) {
+//            var key = $(event.target).attr('id');
+
+            Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
+                if( error ) alert(error);
+                console.log(result);
+            });
+        }
     }
 };
 
@@ -430,16 +443,7 @@ Template.modelOutput.events({
             }
         }
     },
-    'click .start-analysis':function(event) {
-        if( Template.modelOutput.owner() ) {
-            var key = $(event.target).attr('id');
-            var currentModelOutputId = getCurrentModelOutput();
-            Meteor.call('startAnalysis',key,currentModelOutputId,function(error,result){
-                if( error ) alert(error);
-                console.log(result);
-            });
-        }
-    },
+
     'click .delete-analysis':function(event) {
         console.log('deleting analysis');
         if( confirm("Are you sure?")) {

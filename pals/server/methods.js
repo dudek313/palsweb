@@ -32,11 +32,13 @@ addDataSets = function(files,dataSets,type) {
         var dataSetId = dataSets[i];
         var dataSet = DataSets.findOne({'_id':dataSetId});
         console.log('processing data set: ' + dataSetId);
-        var version = getLatestVersion(dataSet);
-        version.name = dataSet.name;
-        if( version ) {
-            files.push(version);
-        }
+//        var version = getLatestVersion(dataSet);
+//        version.name = dataSet.name;
+//        if( version ) {
+//            files.push(version);
+//        }
+        if (dataSet && dataSet.files && dataSet.files.length > 0)
+            files.push(dataSet.files[0]);
     }
 }
 
@@ -80,11 +82,12 @@ createFileRecord = function(fileName,fileSize,fileData) {
  * A list of model output file records are returned.
  **/
 loadAllModelOutputsForExperimentExceptOne = function(experimentId,modelOutputId) {
-    var modelOutputs = ModelOutputs.find({'experiment':experimentId},{sort:{created:-1}});
+    var modelOutputs = ModelOutputs.find({'experiments':experimentId},{sort:{created:-1}});
     var versions = [];
     modelOutputs.forEach(function(modelOutput){
         if(modelOutput._id != modelOutputId) {
-            version = extractLatestVersion(modelOutput);
+//            version = extractLatestVersion(modelOutput);
+            version = modelOutput.file;
             if( version ) versions.push(version);
         }
     });
@@ -208,16 +211,24 @@ Meteor.methods({
         }
     },
 
-    startAnalysis: function (key,modelOutputId) {
+    startAnalysis: function (modelOutputId) {
 
         console.log('starting analysis for model output: ' + modelOutputId);
 
         var user = Meteor.user();
         var currentModelOutput = ModelOutputs.findOne({'_id':modelOutputId});
-        if( currentModelOutput && currentModelOutput.experiment ) {
-            currentModelOutput.experiment = Experiments.findOne({_id:currentModelOutput.experiment});
+        if( !currentModelOutput )
+            throw new Meteor.Error(500,'Error: Unable to load model output.');
+
+        if( !currentModelOutput.experiments || currentModelOutput.experiments.length == 0 ) {
+            throw new Meteor.Error(500,'Error: No experiment associated with model output');
         }
-        if( currentModelOutput.versions ) {
+
+        var experiment = Experiments.findOne({_id:currentModelOutput.experiments[0]});
+        if (!experiment)
+            throw new Meteor.Error(500,'Error: Unable to load experiment.');
+
+/*        if( currentModelOutput.versions ) {
             var currentVersion = undefined;
             currentModelOutput.versions.forEach(function(version) {
                 if( version.key == key ) {
@@ -225,38 +236,40 @@ Meteor.methods({
                 }
             });
         }
-        if( currentVersion ) {
-
+        if( currentVersion ) {*/
+        else {
             var files = new Array();
-            currentVersion.type = 'ModelOutput';
-            currentVersion.name = currentModelOutput.name;
-            files.push(currentVersion);
+            var moFile = currentModelOutput.file;
+            moFile.type = 'ModelOutput';
+            moFile.name = currentModelOutput.name;
+            files.push(moFile);
 
-            if( !currentModelOutput.experiment ) throw new Meteor.Error(500, 'Please select an experiment first');
+            // Does this make sense? Isn't 'files' a local variable?
+            addDataSets(files, experiment.dataSets,'DataSet');
 
-            addDataSets(files, currentModelOutput.experiment.dataSets,'DataSet');
-
-            if( !currentModelOutput.experiment.scripts || currentModelOutput.experiment.scripts.length <=0 ) {
+            if( !experiment.scripts || experiment.scripts.length <=0 ) {
                 throw new Meteor.Error(500,'The chosen experiment does not have a script');
             }
             else {
-                var script = currentModelOutput.experiment.scripts[currentModelOutput.experiment.scripts.length-1];
+                // using [0] just to test it out
+                var script = experiment.scripts[0];
                 script.type = 'Script';
                 files.push(script);
             }
 
-            experimentModelOutputs = loadAllModelOutputsForExperimentExceptOne(currentModelOutput.experiment._id,currentModelOutput._id);
+            experimentModelOutputs = loadAllModelOutputsForExperimentExceptOne(experiment._id,currentModelOutput._id);
 
             var analysis = {
                'owner' : user._id,
                'created' : new Date(),
-               'workspaces' : [user.profile.currentWorkspace._id],
+               'workspaces' : [user.profile.currentWorkspace],
                'modelOutput' : currentModelOutput._id,
-               'modelOutputVersion' : currentVersion,
-               'experiment' : currentModelOutput.experiment._id,
+               'modelOutputVersion' : '',
+//               'modelOutputVersion' : currentVersion,
+               'experiment' : experiment._id,
                'status' : 'started',
-               'files' : files,
-               'experimentModelOutputs' : experimentModelOutputs
+               'files' : files//,
+               //'experimentModelOutputs' : experimentModelOutputs
            };
 
            saveAnalysis(analysis,analysisComplete);

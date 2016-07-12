@@ -10,7 +10,7 @@
     {{#if inEditMode}}
       {{#autoForm collection="DraftDataSets" id=formId doc=this type="normal" validation='blur'}}
         <fieldset>
-          {{#if inCreateMode}}
+          {{#if areEqual screenMode 'create'}}
             <legend>Create New Data Set</legend>
           {{else}} <!-- if in update mode -->
             <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
@@ -111,7 +111,7 @@
           </div>
 
       </fieldset>
-      {{#if inCreateMode}}
+      {{#if areEqual screenMode 'create'}}
         <div class="col-md-12">
           <button type="submit" class="create-btn btn btn-primary">Save</button>
           <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>

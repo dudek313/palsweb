@@ -7,14 +7,6 @@ Handlebars.registerHelper('breaklines',
     }
 );
 
-Handlebars.registerHelper("inUpdateMode", function() {
-      return (getScreenMode()=='update');
-});
-
-Handlebars.registerHelper("inDisplayMode", function() {
-      return (getScreenMode()=='display');
-});
-
 Handlebars.registerHelper("reference", function() {
     var reference = Reference.findOne();
     return reference;

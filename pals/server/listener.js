@@ -19,7 +19,7 @@ function processNext() {
 	    if( value ) {
 			console.log('Received message');
 	    	handleMessage(JSON.parse(value));
-	    }	
+	    }
 		setTimeout(processNext, 1000);
 	});
 }
@@ -38,12 +38,12 @@ function handleMessage(message) {
     }
     var modifier = {'$set':change};
     Fiber(function(){
-    Analyses.update(selector,modifier,Meteor.bindEnvironment(function(error) { 
-        if( error ) {
-            console.log('There was an error setting the value: ' + JSON.stringify(change));
-            console.log(error);
-        }
-    },function(e){console.log(e)}));
+	    Analyses.update(selector,modifier,Meteor.bindEnvironment(function(error) {
+	        if( error ) {
+	            console.log('There was an error setting the value: ' + JSON.stringify(change));
+	            console.log(error);
+	        }
+	    },function(e){console.log(e)}));
     }).run();
 }
 

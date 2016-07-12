@@ -29,6 +29,10 @@
     position: relative;
 }
 
+.RbtnMargin {
+    margin-left: 5px;
+}
+
 .logged-out {
     color: lightgray;
 }

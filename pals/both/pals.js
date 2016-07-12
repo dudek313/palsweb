@@ -7,7 +7,7 @@ Router.configure({
     notFoundTemplate: 'notFound'
 });
 
-Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
+//Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
 
 Router.map(function () {
     this.route('root',{
