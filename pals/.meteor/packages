@@ -14,10 +14,7 @@ accounts-password
 standard-app-packages
 jquery
 meteorhacks:npm
-<<<<<<< HEAD
-=======
 npm-container
->>>>>>> 4782ee0c4cf34eccc7ce66734316d985deeb961c
 aldeed:collection2
 aldeed:autoform
 alanning:roles
@@ -26,9 +23,3 @@ es5-shim
 mickaelfm:vermongo
 cfs:autoform
 cfs:ui
-<<<<<<< HEAD
-
-
-npm-container
-=======
->>>>>>> 4782ee0c4cf34eccc7ce66734316d985deeb961c
