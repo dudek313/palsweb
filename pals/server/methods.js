@@ -9,111 +9,10 @@ var client = redis.createClient(REDIS_PORT,REDIS_HOST);
 var fileBucket = FILE_BUCKET;
 var fs = Npm.require('fs');
 
-getLatestVersion = function(dataSet,type) {
-    if( dataSet.versions && dataSet.versions.length > 0 ) {
-        for( var i = dataSet.versions.length-1; i >=0; --i ) {
-             var version = dataSet.versions[i];
-			 version.type = "DataSet";
-             return version;
-        }
-    }
-    return null;
-}
-
-addDataSets = function(files,dataSets,type) {
-
-    if( !dataSets || dataSets.length <= 0 ) {
-        throw new Meteor.Error(500, 'The chosen experiment does not have any data sets of type: '+type);
-    }
-
-	console.log('Number of data sets: ' + dataSets.length);
-
-    for( var i=0; i < dataSets.length; ++i ) {
-        var dataSetId = dataSets[i];
-        var dataSet = DataSets.findOne({'_id':dataSetId});
-        console.log('processing data set: ' + dataSetId);
-//        var version = getLatestVersion(dataSet);
-//        version.name = dataSet.name;
-//        if( version ) {
-//            files.push(version);
-//        }
-        if (dataSet && dataSet.files && dataSet.files.length > 0)
-            files.push(dataSet.files[0]);
-    }
-}
-
-saveAnalysis = function(analysis,callback) {
-    Analyses.insert(analysis,function(error,id) {
-        if( error ) {
-            console.log('Error saving analysis for model output: '+analysis.modelOutput);
-        }
-        else {
-            console.log('analysis saved');
-            analysis._id = id;
-            callback(analysis);
-        }
-    });
-}
-
-analysisComplete = function(analysis) {
-    console.log('Sending message to redis');
-    client.rpush(queue,JSON.stringify(analysis));
-}
-
-deleteFile = function(file) {
-    fs.unlink(file.filename,function(){})
-}
-
-createFileRecord = function(fileName,fileSize,fileData) {
-    var fileToken = Meteor.uuid();
-    fs.writeFile(fileBucket+'/'+fileToken, fileData, 'binary');
-    var fileRecord = {
-        path: fileBucket+'/'+fileToken,
-        filename: fileName,
-        size: fileSize,
-        key: fileToken,
-        created: new Date()
-    };
-    return fileRecord;
-}
-
-/**
- * Loads all the current versions of the model outputs which are associated with the given experiment.
- * A list of model output file records are returned.
- **/
-loadAllModelOutputsForExperimentExceptOne = function(experimentId,modelOutputId) {
-    var modelOutputs = ModelOutputs.find({'experiments':experimentId},{sort:{created:-1}});
-    var versions = [];
-    modelOutputs.forEach(function(modelOutput){
-        if(modelOutput._id != modelOutputId) {
-//            version = extractLatestVersion(modelOutput);
-            version = modelOutput.file;
-            if( version ) versions.push(version);
-        }
-    });
-    return versions;
-}
-
-/**
- * Returns the version of the given model output with the most recent created date.
- **/
-extractLatestVersion = function(modelOutput) {
-    mostRecentVersion = undefined;
-    modelOutput.versions.forEach(function(version){
-        if(mostRecentVersion) {
-            if( version.created > mostRecentVersion.created ) {
-                mostRecentVersion = version;
-            }
-        }
-        else mostRecentVersion = version;
-    });
-    return mostRecentVersion;
-}
-
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
       if( !Meteor.user() ) {
-          throw new Meteor.Error('not-authorized')
+          throw new Meteor.Error('not-authorized');
       }
       else {
         return ModelOutputs.insert(modelOutputDoc);
@@ -211,6 +110,27 @@ Meteor.methods({
         }
     },
 
+    deleteAnalysis: function(id) {
+        console.log('deleting analysis: ' + id);
+        var analysis = Analyses.findOne({_id:id});
+        if( analysis ) {
+             if( analysis.results ) {
+                 for( var i=0; i < analysis.results.length; ++i ) {
+                     deleteFile(analysis.results[i]);
+                 }
+             }
+             Analyses.remove({'_id':id},function(error){
+                  if( error ) console.log(error);
+             });
+        }
+        return null;
+    },
+    removeFileByUrl: function(url) {
+        fs.unlink(url,function(){
+            console.log('deleted file ' + url);
+        })
+    },
+
     startAnalysis: function (modelOutputId) {
 
         console.log('starting analysis for model output: ' + modelOutputId);
@@ -276,25 +196,119 @@ Meteor.methods({
            return analysis;
        }
        return null;
-    },
-    deleteAnalysis: function(id) {
-        console.log('deleting analysis: ' + id);
-        var analysis = Analyses.findOne({_id:id});
-        if( analysis ) {
-             if( analysis.results ) {
-                 for( var i=0; i < analysis.results.length; ++i ) {
-                     deleteFile(analysis.results[i]);
-                 }
-             }
-             Analyses.remove({'_id':id},function(error){
-                  if( error ) console.log(error);
-             });
-        }
-        return null;
-    },
-    removeFileByUrl: function(url) {
-        fs.unlink(url,function(){
-            console.log('deleted file ' + url);
-        })
     }
+
 });
+
+getLatestVersion = function(dataSet,type) {
+    if( dataSet.versions && dataSet.versions.length > 0 ) {
+        for( var i = dataSet.versions.length-1; i >=0; --i ) {
+             var version = dataSet.versions[i];
+			 version.type = "DataSet";
+             return version;
+        }
+    }
+    return null;
+}
+
+addDataSets = function(files,dataSets,type) {
+
+    if( !dataSets || dataSets.length <= 0 ) {
+        throw new Meteor.Error(500, 'The chosen experiment does not have any data sets of type: '+type);
+    }
+
+	console.log('Number of data sets: ' + dataSets.length);
+
+    for( var i=0; i < dataSets.length; ++i ) {
+        var dsDetails = dataSets[i];
+        if(dsDetails && dsDetails._id) {
+            var dataSet = DataSets.findOne({'_id':dsDetails._id});
+            console.log('processing data set: ' + dsDetails._id);
+    //        var version = getLatestVersion(dataSet);
+    //        version.name = dataSet.name;
+    //        if( version ) {
+    //            files.push(version);
+    //        }
+            console.log('Files in data set: ' + dataSet.files.length);
+            if (dataSet && dataSet.files && dataSet.files.length > 0)
+                dataSet.files.forEach(function(file) {
+                    files.push(file);
+                    console.log('processing file: ' + file.name);
+                });
+            else {
+                throw new Meteor.Error('Data set details invalid');
+            }
+
+        }
+        else
+            throw new Meteor.Error('Data set details invalid');
+    }
+}
+
+saveAnalysis = function(analysis,callback) {
+    Analyses.insert(analysis,function(error,id) {
+        if( error ) {
+            console.log('Error saving analysis for model output: '+analysis.modelOutput);
+        }
+        else {
+            console.log('analysis saved');
+            analysis._id = id;
+            callback(analysis);
+        }
+    });
+}
+
+analysisComplete = function(analysis) {
+    console.log('Sending message to redis');
+    client.rpush(queue,JSON.stringify(analysis));
+}
+
+deleteFile = function(file) {
+    fs.unlink(file.filename,function(){})
+}
+
+createFileRecord = function(fileName,fileSize,fileData) {
+    var fileToken = Meteor.uuid();
+    fs.writeFile(fileBucket+'/'+fileToken, fileData, 'binary');
+    var fileRecord = {
+        path: fileBucket+'/'+fileToken,
+        filename: fileName,
+        size: fileSize,
+        key: fileToken,
+        created: new Date()
+    };
+    return fileRecord;
+}
+
+/**
+ * Loads all the current versions of the model outputs which are associated with the given experiment.
+ * A list of model output file records are returned.
+ **/
+loadAllModelOutputsForExperimentExceptOne = function(experimentId,modelOutputId) {
+    var modelOutputs = ModelOutputs.find({'experiments':experimentId},{sort:{created:-1}});
+    var versions = [];
+    modelOutputs.forEach(function(modelOutput){
+        if(modelOutput._id != modelOutputId) {
+//            version = extractLatestVersion(modelOutput);
+            version = modelOutput.file;
+            if( version ) versions.push(version);
+        }
+    });
+    return versions;
+}
+
+/**
+ * Returns the version of the given model output with the most recent created date.
+ **/
+extractLatestVersion = function(modelOutput) {
+    mostRecentVersion = undefined;
+    modelOutput.versions.forEach(function(version){
+        if(mostRecentVersion) {
+            if( version.created > mostRecentVersion.created ) {
+                mostRecentVersion = version;
+            }
+        }
+        else mostRecentVersion = version;
+    });
+    return mostRecentVersion;
+}
