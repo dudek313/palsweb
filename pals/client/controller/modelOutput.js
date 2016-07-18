@@ -73,8 +73,12 @@ AutoForm.hooks({
 
             event.preventDefault();
 
-//            var analysesToDelete = Session.get('analysesToDelete');
-            //if (!analysesToDelete || analysesToDelete.length < 1 || confirmed) {
+            var analysesToDelete = Session.get('analysesToDelete');
+            if (analysesToDelete && analysesToDelete.length > 0)
+              confirmed = confirm('Are you sure you want to delete the specified analysis/es?\n(To undo the change, click Cancel at the bottom of the update page)');
+
+            if (!analysesToDelete || analysesToDelete.length < 1 || confirmed) {
+
                 updateDoc.$set.owner = Meteor.user()._id;
 
                 tempFile = Session.get('tempFile');
@@ -100,7 +104,6 @@ AutoForm.hooks({
                 });
 
                 // remove deleted analysis files from Analyses collection
-                var analysesToDelete = Session.get('analysesToDelete');
                 analysesToDelete.forEach(function(analysisId) {
                     Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
                         if (error) {
@@ -111,7 +114,7 @@ AutoForm.hooks({
                     });
                 });
 
-//            }
+            }
             this.done();
             return false;
         }
@@ -303,7 +306,8 @@ Template.modelOutput.helpers({
   },
   tempBenchmarks: function() {
     var tempBenchmarkIds = getTempBenchmarks();
-    return getRecordsFromIds(tempBenchmarkIds, ModelOutputs);
+    if (tempBenchmarkIds)
+        return getRecordsFromIds(tempBenchmarkIds, ModelOutputs);
   },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();
@@ -378,13 +382,15 @@ Template.modelOutput.helpers({
   analyses: function() {
     var modelOutputId = getCurrentObjectId();
     if( modelOutputId ) {
-      return Analyses.find({'modelOutput':modelOutputId});
+      var an = Analyses.find({'modelOutput':modelOutputId}).fetch()
+      return an;
     }
     else return;
     },
   tempAnalyses: function() {
     var analysisIds = Session.get('tempAnalyses');
-    return getRecordsFromIds(analysisIds, Analyses);
+    if (analysisIds)
+        return getRecordsFromIds(analysisIds, Analyses);
   }
 });
 

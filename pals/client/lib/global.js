@@ -22,7 +22,11 @@ getAvailableWorkspaceIds = function() {
 
 
 getRecordsFromIds = function(idArray, collection) {
-    return collection.find({_id:{$in:idArray}}, {sort:{name:1}});
+    if (idArray)
+        return collection.find({_id:{$in:idArray}}, {sort:{name:1}}).fetch();
+    else {
+        return [];
+    }
 }
 
 getIdsFromObjects = function(objArray) {
