@@ -100,6 +100,7 @@ Router.map(function () {
             function() {
                 Session.set('tempFile',undefined);
                 Session.set('tempBenchmarks', []);
+                Session.set('tempAnalyses', []);
                 this.next();
             }
         ]
@@ -111,14 +112,23 @@ Router.map(function () {
     this.route('displayOrUpdateModelOutput',{
         path: '/modelOutput/:screenMode/:id',
         template: 'modelOutput',
-        data: function() { return ModelOutputs.findOne({_id : this.params.id}); }
-/*            var mo = ModelOutputs.findOne({_id : this.params.id});
-            if (mo && mo.experiments && mo.experiments.length > 0) {
-                expName = Experiments.findOne({_id: mo.experiments[0]}).name;
-                mo.experimentName = expName;
+        data: function() { return ModelOutputs.findOne({_id : this.params.id}); },
+        onBeforeAction: [
+            function() {
+                if (this.params.screenMode == 'update') {
+                    var mo = ModelOutputs.findOne({_id:this.params.id});
+                    if (mo) {
+                        Session.set('tempFile', mo.file);
+                        Session.set('tempBenchmarks', mo.benchmarks);
+                        var analyses = Analyses.find({modelOutput:mo._id}).fetch();
+                        var analysisIds = getIdsFromObjects(analyses);
+                        Session.set('tempAnalyses', analysisIds);
+                        Session.set('analysesToDelete', []);
+                    }
+                }
+                this.next();
             }
-            return mo;
-        }*/
+        ]
     });
     this.route('analysis',{
         path: '/analysis/:id',
@@ -159,7 +169,7 @@ Router.map(function () {
     });
 });
 
-function createDummyDataSet() {
+/*function createDummyDataSet() {
     var dummyDataSet = {
         name: new Meteor.Collection.ObjectID()._str,
         type: 'flux tower',
@@ -177,7 +187,7 @@ function createDummyDataSet() {
         }
     });
 }
-
+*/
 // Router.onBeforeAction(function(){
 //     if (!Meteor.user()) {
 //         this.render('login');

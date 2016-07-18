@@ -83,32 +83,40 @@
             </div>
           </div>
 
-          <h3>Analyses</h3>
-          {{#if analyses}}
-            <table class="table">
-              <tr>
-                <th>id</th>
-                <th>MO Version</th>
-                <th>Status</th>
-                <th>Error Message</th>
-                <th>View Results</th>
-              </tr>
-              {{#each analyses}}
-              <tr>
-                <td>{{_id}}</td>
-                <td>{{modelOutputVersion.filename}}</td>
-                <td>{{status}}</td>
-                <td>{{error}}</td>
-                <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
-              </tr>
-            {{/each}}
-            </table>
-          {{else}}
-            No analyses performed
-          {{/if}}
+          <div class="panel panel-primary">
+            <div class="panel-heading">Analyses</div>
+            <div class="panel-body">
+
+              {{#if analyses}}
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>id</th>
+                      <th>MO Version</th>
+                      <th>Status</th>
+                      <th>Error Message</th>
+                      <th>View Results</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each analyses}}
+                      <tr>
+                        <td>{{_id}}</td>
+                        <td>{{modelOutputVersion.filename}}</td>
+                        <td>{{status}}</td>
+                        <td><div style="height:20px; word-wrap:break-word; overflow:hidden">{{error}}</div></td>
+                        <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              {{else}}
+                No analyses performed
+              {{/if}}
+            </div>
+          </div>
+
         </form>
-
-
 
       {{else}}  <!-- If screen mode is "create" or "update" -->
         {{#if inEditMode}}
@@ -158,6 +166,35 @@
               </div>
 
               <div class="panel panel-success">
+                <div class="panel-heading">File</div>
+                <div class="panel-body">
+
+                {{#if tempFile}}
+                  <table class="table">
+                    <tr>
+                      <th>Filename</th>
+                      <th>Delete</th>
+                    </tr>
+                    <tr>
+                      <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
+                      <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                    </tr>
+                  </table>
+
+                {{else}}
+                   <label>Upload a model output file</label>
+                   <input type="file" class="file-select" name="file-select"/>
+                   <div class="progress progress-striped active">
+                     <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                         style="width:0%">
+                     </div>
+                   </div>
+                 {{/if}}
+
+                </div>
+              </div>
+
+              <div class="panel panel-success">
                 <div class="panel-heading">Benchmarks (up to 3)</div>
                 <div class="panel-body">
 
@@ -193,59 +230,35 @@
               </div>
 
               {{#if areEqual screenMode 'update'}}
-                {{#if analyses}}
+                {{#if tempAnalyses}}
                   <h3>Analyses</h3>
                   <table class="table">
-                    <tr>
-                      <th>id</th>
-                      <th>MO Version</th>
-                      <th>Status</th>
-                      <th>Error Message</th>
-                      <th>View Results</th>
-                      <th>Delete</th>
-                    </tr>
-                    {{#each analyses}}
+                    <thead>
                       <tr>
-                        <td>{{_id}}</td>
-                        <td>{{modelOutputVersion.filename}}</td>
-                        <td>{{status}}</td>
-                        <td>{{error}}</td>
-                        <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
-                        <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                        <th>id</th>
+                        <th>MO Version</th>
+                        <th>Status</th>
+                        <th>Error Message</th>
+                        <th>View Results</th>
+                        <th>Delete</th>
                       </tr>
-                    {{/each}}
+                    </thead>
+                    <tbody>
+                      {{#each tempAnalyses}}
+                        <tr>
+                          <td>{{_id}}</td>
+                          <td>{{modelOutputVersion.filename}}</td>
+                          <td>{{status}}</td>
+                          <td><div style="height:20px; word-wrap:break-word; overflow:hidden">{{error}}</div></td>
+                          <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                          <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                        </tr>
+                      {{/each}}
+                    </tbody>
                   </table>
                 {{/if}}
               {{/if}}
 
-              <div class="panel panel-success">
-                <div class="panel-heading">File</div>
-                <div class="panel-body">
-
-                {{#if tempFile}}
-                  <table class="table">
-                    <tr>
-                      <th>Filename</th>
-                      <th>Delete</th>
-                    </tr>
-                    <tr>
-                      <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
-                      <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
-                    </tr>
-                  </table>
-
-                {{else}}
-                   <label>Upload a model output file</label>
-                   <input type="file" class="file-select" name="file-select"/>
-                   <div class="progress progress-striped active">
-                     <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                         style="width:0%">
-                     </div>
-                   </div>
-                 {{/if}}
-
-                </div>
-              </div>
             </fieldset>
             <div class="col-md-12">
               {{#if areEqual screenMode 'create'}}

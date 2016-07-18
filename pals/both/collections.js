@@ -144,7 +144,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
     label: "Access Level",
     optional: true
   },
-  'files.$.path': {
+  'file.path': {
     type: String,
     optional: true
   },

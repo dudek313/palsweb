@@ -116,7 +116,8 @@ Meteor.methods({
         if( analysis ) {
              if( analysis.results ) {
                  for( var i=0; i < analysis.results.length; ++i ) {
-                     deleteFile(analysis.results[i]);
+                     console.log('Deleting file: ' + analysis.results[i].path)
+                     deleteFile(analysis.results[i].path);
                  }
              }
              Analyses.remove({'_id':id},function(error){
@@ -232,6 +233,8 @@ addDataSets = function(files,dataSets,type) {
             console.log('Files in data set: ' + dataSet.files.length);
             if (dataSet && dataSet.files && dataSet.files.length > 0)
                 dataSet.files.forEach(function(file) {
+                    if (file.type == 'evaluation')
+                        file.type = 'DataSet';
                     files.push(file);
                     console.log('processing file: ' + file.name);
                 });
@@ -263,8 +266,15 @@ analysisComplete = function(analysis) {
     client.rpush(queue,JSON.stringify(analysis));
 }
 
-deleteFile = function(file) {
-    fs.unlink(file.filename,function(){})
+deleteFile = function(path) {
+    fs.unlink(path,function(error, doc){
+        if(error) {
+            console.log('Unable to delete file: ' + path);
+        }
+        else {
+            console.log('File deleted');
+        }
+    });
 }
 
 createFileRecord = function(fileName,fileSize,fileData) {

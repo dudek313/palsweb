@@ -47,12 +47,15 @@ AutoForm.hooks({
           // tempFile contains the data about the uploaded file which needs
           // to be added to the model output document at submission time.
             updateDoc.$set.owner = Meteor.user()._id;
+
             tempFile = Session.get('tempFile');
             if (tempFile)
                 updateDoc.$set.file = Session.get('tempFile');
+
             tempBenchmarks = getTempBenchmarks();
             if (tempBenchmarks)
                 updateDoc.$set.benchmarks = tempBenchmarks;
+
             updateDoc.$set.experiments = [getExperimentId()];
             // update Model Outputs collection
             Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
@@ -67,6 +70,18 @@ AutoForm.hooks({
                 }
             });
 
+            // remove deleted analysis files from Analyses collection
+            var analysesToDelete = Session.get('analysesToDelete');
+            analysesToDelete.forEach(function(analysisId) {
+                Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
+                    if (error) {
+                        $('.error').html('Failed to delete analysis (Id: ' + analysisId + ').');
+                        $('.error').show();
+                        console.log(error.reason);
+                    }
+                });
+            });
+
             this.done();
             return false;
         }
@@ -77,7 +92,7 @@ Template.modelOutput.events = {
     // returns to display mode if user pressed cancel during updating
     'click .cancel-update':function(event){
         event.preventDefault();
-        Router.go('/modelOutput/display/' + getCurrentModelOutput()._id)
+        Router.go('/modelOutput/display/' + getCurrentObjectId());
     },
     // returns to home page if user pressed cancel while creating model output
     'click .cancel-create':function(event){
@@ -86,14 +101,15 @@ Template.modelOutput.events = {
     },
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){
-        var currentModelOutput = getCurrentModelOutput();
+        var currentModelOutputId = getCurrentObjectId();
+/*        var currentModelOutput = getCurrentModelOutput();
         if (currentModelOutput && currentModelOutput.file) {
             Session.set('tempFile', currentModelOutput.file);
         }
         if (currentModelOutput.benchmarks) {
             Session.set('tempBenchmarks', currentModelOutput.benchmarks);
-        }
-        Router.go('/modelOutput/update/' + currentModelOutput._id);
+        }*/
+        Router.go('/modelOutput/update/' + currentModelOutputId);
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
@@ -159,7 +175,7 @@ Template.modelOutput.events = {
             Session.set('tempBenchmarks', newBenchmarkIds);
         }
         else {
-            $('.error').html('Error removing data set, please try again');
+            $('.error').html('Error removing benchmark, please try again');
             $('.error').show();
         }
     },
@@ -175,7 +191,28 @@ Template.modelOutput.events = {
                 console.log(result);
             });
         }
-    }
+    },
+    'click .delete-analysis':function(event) {
+        event.preventDefault();
+        var selectedAnalysisId = $(event.target).attr('id');
+        var currentAnalysisIds = Session.get('tempAnalyses');
+        var newAnalysisIds = [];
+        if (currentAnalysisIds && currentAnalysisIds.length > 0) {
+            currentAnalysisIds.forEach(function(analysisId) {
+                if (analysisId != selectedAnalysisId)
+                    newAnalysisIds.push(analysisId);
+            });
+            Session.set('tempAnalyses', newAnalysisIds);
+            // add current analysis to array of analyses to delete when submitting the form
+            var analysesToDelete = Session.get('analysesToDelete');
+            analysesToDelete.push(selectedAnalysisId);
+            Session.set('analysesToDelete', analysesToDelete);
+        }
+        else {
+            $('.error').html('Error removing analysis, please try again');
+            $('.error').show();
+        }
+    },
 };
 
 function getTempBenchmarks() {
@@ -307,6 +344,17 @@ Template.modelOutput.helpers({
                 return model.name;
         }
     }
+  },
+  analyses: function() {
+    var modelOutputId = getCurrentObjectId();
+    if( modelOutputId ) {
+      return Analyses.find({'modelOutput':modelOutputId});
+    }
+    else return;
+    },
+  tempAnalyses: function() {
+    var analysisIds = Session.get('tempAnalyses');
+    return getRecordsFromIds(analysisIds, Analyses);
   }
 });
 
@@ -444,17 +492,7 @@ Template.modelOutput.events({
         }
     },
 
-    'click .delete-analysis':function(event) {
-        console.log('deleting analysis');
-        if( confirm("Are you sure?")) {
-            if( Template.modelOutput.owner() ) {
-                var id = $(event.target).attr('id');
-                Meteor.call('deleteAnalysis',id,function(error,result){
-                    if( error ) alert(error);
-                });
-            }
-        }
-    },
+
     // 'change .file-select': function(event, template){
     //     var file = event.target.files[0];
     //     var reader = new FileReader();
