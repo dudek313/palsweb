@@ -114,11 +114,13 @@ Meteor.methods({
         console.log('deleting analysis: ' + id);
         var analysis = Analyses.findOne({_id:id});
         if( analysis ) {
-             if( analysis.results ) {
-                 for( var i=0; i < analysis.results.length; ++i ) {
-                     console.log('Deleting file: ' + analysis.results[i].path)
-                     deleteFile(analysis.results[i].path);
-                 }
+             if( analysis.results && analysis.results.length > 0 ) {
+                analysis.results.forEach(function(result) {
+                    if (result && result.path) {
+                        console.log('Deleting file: ' + result.path)
+                        deleteFile(result.path);
+                    }
+                });
              }
              Analyses.remove({'_id':id},function(error){
                   if( error ) console.log(error);

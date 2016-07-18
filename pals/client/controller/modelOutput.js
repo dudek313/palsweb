@@ -39,6 +39,30 @@ AutoForm.hooks({
             return false;
         }
     },
+    before: {
+        normal: function(doc) {
+            var self = this;
+            var analysesToDelete = Session.get('analysesToDelete');
+
+            if (analysesToDelete && analysesToDelete.length > 0) {
+                new Confirmation({
+                    message: "Are you sure that you want to delete the specified analysis/es?",
+                    title: "Confirmation",
+                    cancelText: "Cancel",
+                    okText: "Ok",
+                    success: true, // whether the button should be green or red
+                    focus: "cancel" // which button to autofocus, "cancel" (default) or "ok", or "none"
+                }, function (confirmed) {
+                    if (confirmed) {
+                        self.result(doc);
+                    }
+                    else {
+                        self.result(false);
+                    }
+                });
+            }
+        }
+    },
     updateModelOutput: {
         // this will be called upon submitting the form in update mode.
         // updateDoc contains the selector which will be used to update
@@ -46,42 +70,48 @@ AutoForm.hooks({
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
           // tempFile contains the data about the uploaded file which needs
           // to be added to the model output document at submission time.
-            updateDoc.$set.owner = Meteor.user()._id;
 
-            tempFile = Session.get('tempFile');
-            if (tempFile)
-                updateDoc.$set.file = Session.get('tempFile');
+            event.preventDefault();
 
-            tempBenchmarks = getTempBenchmarks();
-            if (tempBenchmarks)
-                updateDoc.$set.benchmarks = tempBenchmarks;
+//            var analysesToDelete = Session.get('analysesToDelete');
+            //if (!analysesToDelete || analysesToDelete.length < 1 || confirmed) {
+                updateDoc.$set.owner = Meteor.user()._id;
 
-            updateDoc.$set.experiments = [getExperimentId()];
-            // update Model Outputs collection
-            Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
-                if(error) {
-                    $('.error').html('Failed to update the data set. Please try again.');
-                    $('.error').show();
-                    console.log(error.reason);
-                }
-                else {
-                    // if successful, display the updated model output document
-                    Router.go('/modelOutput/display/' + currentDoc._id);
-                }
-            });
+                tempFile = Session.get('tempFile');
+                if (tempFile)
+                    updateDoc.$set.file = Session.get('tempFile');
 
-            // remove deleted analysis files from Analyses collection
-            var analysesToDelete = Session.get('analysesToDelete');
-            analysesToDelete.forEach(function(analysisId) {
-                Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
-                    if (error) {
-                        $('.error').html('Failed to delete analysis (Id: ' + analysisId + ').');
+                tempBenchmarks = getTempBenchmarks();
+                if (tempBenchmarks)
+                    updateDoc.$set.benchmarks = tempBenchmarks;
+
+                updateDoc.$set.experiments = [getExperimentId()];
+                // update Model Outputs collection
+                Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
+                    if(error) {
+                        $('.error').html('Failed to update the data set. Please try again.');
                         $('.error').show();
                         console.log(error.reason);
                     }
+                    else {
+                        // if successful, display the updated model output document
+                        Router.go('/modelOutput/display/' + currentDoc._id);
+                    }
                 });
-            });
 
+                // remove deleted analysis files from Analyses collection
+                var analysesToDelete = Session.get('analysesToDelete');
+                analysesToDelete.forEach(function(analysisId) {
+                    Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
+                        if (error) {
+                            $('.error').html('Failed to delete analysis (Id: ' + analysisId + ').');
+                            $('.error').show();
+                            console.log(error.reason);
+                        }
+                    });
+                });
+
+//            }
             this.done();
             return false;
         }
