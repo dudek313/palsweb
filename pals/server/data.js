@@ -1,9 +1,9 @@
-var rootWorkspace = Workspaces.findOne({"name":"public"});
+var rootWorkspace = Workspaces.findOne({"name":"browsing"});
 if( !rootWorkspace ) {
-    Workspaces.insert({"name": "public"});
+    Workspaces.insert({"name": "browsing"});
 }
 else {
-    Workspaces.update(rootWorkspace,{"name":"public"});
+    Workspaces.update(rootWorkspace,{"name":"browsing"});
 }
 
 /* Already included in both/collections.js

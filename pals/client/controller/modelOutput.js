@@ -302,12 +302,12 @@ Template.modelOutput.helpers({
   benchmarks: function() {
       var modelOutput = getCurrentModelOutput();
       if (modelOutput && modelOutput.benchmarks)
-          return getRecordsFromIds(modelOutput.benchmarks, ModelOutputs);
+          return getDocsFromIds(modelOutput.benchmarks, ModelOutputs);
   },
   tempBenchmarks: function() {
     var tempBenchmarkIds = getTempBenchmarks();
     if (tempBenchmarkIds)
-        return getRecordsFromIds(tempBenchmarkIds, ModelOutputs);
+        return getDocsFromIds(tempBenchmarkIds, ModelOutputs);
   },
   experiment: function() {
     var modelOutput = getCurrentModelOutput();
@@ -390,7 +390,7 @@ Template.modelOutput.helpers({
   tempAnalyses: function() {
     var analysisIds = Session.get('tempAnalyses');
     if (analysisIds)
-        return getRecordsFromIds(analysisIds, Analyses);
+        return getDocsFromIds(analysisIds, Analyses);
   }
 });
 
@@ -454,7 +454,7 @@ Template.modelOutput.performUpdate = function(fieldName,value) {
             currentModelOutput = {
                 'owner' : user._id,
                 'created' : new Date(),
-                'workspaces' : [user.profile.currentWorkspace._id]
+                'workspaces' : [user.profile.currentWorkspace]
             };
             if( fieldName != 'stateSelection' ) currentModelOutput.stateSelection = reference.stateSelection[0];
             if( fieldName != 'parameterSelection' ) currentModelOutput.parameterSelection = reference.parameterSelection[0];
@@ -591,7 +591,7 @@ Template.modelOutput.models = function() {
     var user = Meteor.user();
     if( user ) {
         var selector = {
-            'workspaces':user.profile.currentWorkspace._id,
+            'workspaces':user.profile.currentWorkspace,
             'owner':user._id
         }
     }

@@ -1,5 +1,15 @@
 <template name="experiments">
 <div class="text-content">
+  <div class="form-group" align="center">
+    <label>Experiment Type</label>&nbsp;
+    <input type="radio" name="spatialLevel" value="All" {{isChecked 'All'}}>All&nbsp;
+    <input type="radio" name="spatialLevel" value="SingleSite" {{isChecked 'SingleSite'}}>SingleSite&nbsp;
+    <input type="radio" name="spatialLevel" value="MultipleSite" {{isChecked 'MultipleSite'}}>MultipleSite&nbsp;
+    <input type="radio" name="spatialLevel" value="Catchment" {{isChecked 'Catchment'}}>Catchment&nbsp;
+    <input type="radio" name="spatialLevel" value="Regional" {{isChecked 'Regional'}}>Regional&nbsp;
+    <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
+  </div>
+
   <h1>
     {{#if areEqual source 'templates'}}
       {{currentSpatialLevel}} Experiment Templates For Cloning Into Current Workspace

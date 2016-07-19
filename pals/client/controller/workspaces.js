@@ -50,6 +50,14 @@ Template.workspaces.events({
           Router.go('/workspace/'+id);
       }
   },
+  'click .leave-workspace':function (event) {
+      event.preventDefault();
+      var userId = Meteor.userId();
+      browsingWS = Workspaces.findOne({name:'browsing'})
+      if (browsingWS)
+          var browsingId = browsingWS._id;
+      Meteor.users.update({_id:userId}, {$set:{'profile.currentWorkspace': browsingId}});
+  },
   'click .delete-workspace':function (event) {
       var id = $(event.target).attr('id');
       var user = Meteor.user();

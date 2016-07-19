@@ -67,7 +67,7 @@ Template.modelOutputs.events({
 });
 /*
           var modelOutputs;
-          var modelOutputs = ModelOutputs.find({'workspaces':user.profile.currentWorkspace._id},
+          var modelOutputs = ModelOutputs.find({'workspaces':user.profile.currentWorkspace},
               {sort:{created:-1}}).fetch();
           if( modelOutputs )
           {

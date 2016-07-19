@@ -27,7 +27,6 @@ getModelOutputsInWorkspace = function(ws) {
     var exps = Experiments.find(expSelector).fetch();
     var expIds = getIdsFromObjects(exps);
     var modelOutputs = ModelOutputs.find({experiments: {$in: expIds}}).fetch();
-    console.log(modelOutputs);
     return modelOutputs;
 }
 
@@ -65,11 +64,11 @@ Template.models.helpers({
         }
     },
     models: function() {
-        var userId = Meteor.userId();
+        var user = Meteor.user();
 
         var source = getSource();
         if (source == 'mine')
-            var models = Models.find({'owner':userId}).fetch();
+            var models = Models.find({'owner':user._id}).fetch();
         else if (source == 'workspace' || source == 'anywhere') {
 
            // select relevant modelOutputs and associated models

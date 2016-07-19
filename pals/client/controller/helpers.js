@@ -27,7 +27,7 @@ Template.registerHelper("disabledInBrowseMode", function( ) {
       if (Meteor.user()) {
           var currentWorkspace = getCurrentWorkspace();
           if (currentWorkspace) {
-              if  (currentWorkspace.name == 'public') {
+              if  (currentWorkspace.name == 'browsing') {
                   return "disabled";
               }
               else return "";
@@ -60,7 +60,7 @@ Template.registerHelper("disabledIfNotLoggedIn", function( ) {
 Template.registerHelper("disabledIfNotInWorkspace", function( ) {
       var currentWorkspace = getCurrentWorkspace();
       if (currentWorkspace)
-          return (currentWorkspace.name == 'public') ? "disabled" : ""
+          return (currentWorkspace.name == 'browsing') ? "disabled" : ""
       else
           return "disabled";
 });

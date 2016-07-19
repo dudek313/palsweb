@@ -4,6 +4,11 @@ Template.datasets.rendered = function() {
 
 
 Template.datasets.events({
+    'click input[name="spatialLevel"]' : function(event) {
+        event.preventDefault();
+        var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+        Router.go('/dataSets/' + getSource() + '/' + spatialLevel);
+    },
     'click .delete' : function(event) {
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -56,6 +61,10 @@ getMultipleExperimentDataSetIds = function(experiments) {
 }
 
 Template.datasets.helpers({
+    isChecked: function(buttonLevel) {
+      var level = getCurrentSpatialLevel();
+      return (level == buttonLevel) ? 'checked' : ''
+    },
    dataSets: function() {
      var source = getSource();
      var selector = {};
@@ -63,7 +72,7 @@ Template.datasets.helpers({
      if( source == 'workspace' ) {
          var user = Meteor.user();
          if( user ) {
-           selector.workspace = user.profile.currentWorkspace._id;
+           selector.workspace = user.profile.currentWorkspace;
          }
      }
 /*     else {
@@ -79,7 +88,7 @@ Template.datasets.helpers({
      var experiments = Experiments.find(selector);
      var dataSetIds = getMultipleExperimentDataSetIds(experiments);
 
-     return getRecordsFromIds(dataSetIds, DataSets);
+     return getDocsFromIds(dataSetIds, DataSets);
 //     return DataSets.find({_id:{$in:dataSetIds}}, {sort: {name:1}});
 
    },

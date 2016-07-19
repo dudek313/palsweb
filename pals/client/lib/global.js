@@ -15,13 +15,14 @@ getAvailableWorkspaces = function() {
     return workspaces;
 }
 
+/** returns the ids of workspaces available to the current user */
 getAvailableWorkspaceIds = function() {
     var workspaces = getAvailableWorkspaces();
     return getIdsFromObjects(workspaces);
 }
 
-
-getRecordsFromIds = function(idArray, collection) {
+/** takes an array of ids of documents in a collection and returns an array of the documents themselves */
+getDocsFromIds = function(idArray, collection) {
     if (idArray)
         return collection.find({_id:{$in:idArray}}, {sort:{name:1}}).fetch();
     else {
@@ -89,7 +90,7 @@ getCurrentWorkspaceId = function() {
             user.profile = {};
         }
         if( !user.profile.currentWorkspace ) {
-            var rootWorkspace = Workspaces.findOne({"name":"public"});
+            var rootWorkspace = Workspaces.findOne({"name":"browsing"});
             user.profile.currentWorkspace = rootWorkspace._id;
             Meteor.users.update({'_id':user._id},
                 {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});

@@ -2,7 +2,7 @@ Template.myModelOutputs.modelOutputs = function() {
     var user = Meteor.user();
     if( user ) {
         var modelOutputs = 
-            ModelOutputs.find({'owner':user._id,'workspaces':user.profile.currentWorkspace._id},
+            ModelOutputs.find({'owner':user._id,'workspaces':user.profile.currentWorkspace},
                 {sort:{created:-1}}).fetch();
         if( modelOutputs )
         {

@@ -106,7 +106,7 @@ templateSharedObjects.form = function(spec) {
                 currentDocument = {
                     'owner' : user._id,
                     'created' : new Date(),
-                    'workspaces' : [user.profile.currentWorkspace._id]
+                    'workspaces' : [user.profile.currentWorkspace]
                 };
                 if( fieldName != 'spatialLevel' ) currentDocument.spatialLevel = reference.spatialLevel[0];
                 currentDocument[fieldName] = value;

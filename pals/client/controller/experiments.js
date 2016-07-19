@@ -1,57 +1,60 @@
 Template.experiments.helpers({
-   areEqual: function(firstString,secondString) {
-       if( firstString === secondString ) {
-           return true;
-       }
-   },
-   experiments: function() {
-     var source = getSource();
-     var selector = {};
+  isChecked: function(buttonLevel) {
+    var level = getCurrentSpatialLevel();
+    return (level == buttonLevel) ? 'checked' : ''
+  },
+  experiments: function() {
+    var source = getSource();
+    var selector = {};
 
-     if( source == 'workspace' ) {
-         var user = Meteor.user();
-         if( user ) {
-             selector.workspace = user.profile.currentWorkspace;
-             selector.recordType = 'instance';
-         }
-         else console.log('Error: User not logged in');
-     }
-     else if (source == 'templates') {
-          selector.recordType='template';
-     }
-     else if (source == 'anywhere') {
-          workspaces = getAvailableWorkspaceIds();
-          selector.workspace = {$in:workspaces};
-          selector.recordType = 'instance';
-     }
+    if( source == 'workspace' ) {
+        var user = Meteor.user();
+        if( user ) {
+            selector.workspace = user.profile.currentWorkspace;
+            selector.recordType = 'instance';
+        }
+    }
+    else if (source == 'templates') {
+         selector.recordType='template';
+    }
+    else if (source == 'anywhere') {
+         workspaces = getAvailableWorkspaceIds();
+         selector.workspace = {$in:workspaces};
+         selector.recordType = 'instance';
+    }
 
-     var resolution = getCurrentSpatialLevel();
-     if( resolution != 'All' ) {
-         selector.spatialLevel = resolution;
-     }
+    var resolution = getCurrentSpatialLevel();
+    if( resolution != 'All' ) {
+        selector.spatialLevel = resolution;
+    }
 
-     return Experiments.find(selector,{sort:{name:1}});
-   },
-   notCloned: function(experimentId) {
-     var selector = {templateId:experimentId};
-     selector.recordType = 'instance';
-     selector.workspace = Meteor.user().profile.currentWorkspace._id;
-     return (Experiments.find(selector).fetch().length > 0) ? false : true;
-   },
-   source: function() {
-       return getSource();
-   },
-   currentSpatialLevel: function() {
-       return getCurrentSpatialLevel();
-   },
-   analysesExist: function(analysisId) {
-      return (Analyses.findOne({'_id':analysisId})) ? true : false;
+    return Experiments.find(selector,{sort:{name:1}});
+  },
+  notCloned: function(experimentId) {
+    var selector = {templateId:experimentId};
+    selector.recordType = 'instance';
+    selector.workspace = Meteor.user().profile.currentWorkspace;
+    return (Experiments.find(selector).fetch().length > 0) ? false : true;
+  },
+  source: function() {
+    return getSource();
+  },
+  currentSpatialLevel: function() {
+    return getCurrentSpatialLevel();
+  },
+  analysesExist: function(analysisId) {
+    return (Analyses.findOne({'_id':analysisId})) ? true : false;
 
-   }
+  }
 });
 
 
 Template.experiments.events({
+    'click input[name="spatialLevel"]' : function(event) {
+        event.preventDefault();
+        var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+        Router.go('/experiments/' + getSource() + '/' + spatialLevel);
+    },
     'click .delete' : function(event) {
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -88,7 +91,7 @@ Template.experiments.events({
             delete newExpInstance._id;
             newExpInstance.recordType = 'instance';
             newExpInstance.templateId = id;
-            newExpInstance.workspace = Meteor.user().profile.currentWorkspace._id;
+            newExpInstance.workspace = Meteor.user().profile.currentWorkspace;
             newExpInstance.templateVersion = newExpInstance._version;
             if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
                 newExpInstance.dataSets.forEach(function(dataset){
@@ -117,7 +120,7 @@ experiments: function() {
       var source = Session.get('source');
       // if the source is from the current workspace
       if( source ) {
-        selector = {'workspaces':user.profile.currentWorkspace._id};
+        selector = {'workspaces':user.profile.currentWorkspace};
       }
       selector.recordType='template';
       //selector.$where = 'this.latest == true';
