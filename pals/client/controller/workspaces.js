@@ -2,7 +2,7 @@ Template.workspaces.helpers({
     myWorkspaces: function() {
         var user = Meteor.user();
         if( user ) {
-            var workspaces =  Workspaces.find({'owner':user._id});
+            var workspaces =  Workspaces.find({'owner':user._id}).fetch();
             return workspaces;
         }
     },
@@ -62,9 +62,11 @@ Template.workspaces.events({
       var id = $(event.target).attr('id');
       var user = Meteor.user();
       if( id ) {
-          Workspaces.remove({'_id':id},function(error){
-              if( error ) alert(error);
-          });
+          if (confirm('Are you sure?')) {
+            Workspaces.remove({'_id':id},function(error){
+                if( error ) alert(error);
+            });
+          }
       }
   },
   'click .open-workspace-shared':function (event) {
