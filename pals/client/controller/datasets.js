@@ -16,7 +16,7 @@ Template.datasets.events({
         if( confirm("Are you sure?")) {
             var id = $(event.target).attr('id');
             if( id ) {
-                DataSets.remove({'_id':id},function(error){
+                Meteor.call('removeDataSet', {'_id':id},function(error){
                     if(error) {
                         $('.error').html('Failed to delete the data set, please try again');
                         $('.error').show();

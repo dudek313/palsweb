@@ -31,9 +31,9 @@
       <form>
         <div class="form-group">
           <label>Workspace Name</label>
-          <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200" {{disabledInBrowseMode}}>
+          <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200" {{disabledIfNotLoggedIn}}>
         </div>
-        <button class="btn btn-default" id="add-workspace" {{disabledInBrowseMode}}>Add New Workspace</button>
+        <button class="btn btn-default" id="add-workspace" {{disabledIfNotLoggedIn}}>Add New Workspace</button>
       </form>
 
     </div>

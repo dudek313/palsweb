@@ -67,7 +67,7 @@ Template.models.helpers({
         var user = Meteor.user();
 
         var source = getSource();
-        if (source == 'mine')
+        if (source == 'mine' && user)
             var models = Models.find({'owner':user._id}).fetch();
         else if (source == 'workspace' || source == 'anywhere') {
 
@@ -92,13 +92,15 @@ Template.models.helpers({
                     }
                 }
             });
-        }
 
-        return models.sort(function(a,b) {
-            x = a.name.toLowerCase();
-            y = b.name.toLowerCase();
-            return x < y ? -1 : x > y ? 1 : 0;
-        });
+            return models.sort(function(a,b) {
+              x = a.name.toLowerCase();
+              y = b.name.toLowerCase();
+              return x < y ? -1 : x > y ? 1 : 0;
+            });
+
+        }
+        else return null;
 
 
     }

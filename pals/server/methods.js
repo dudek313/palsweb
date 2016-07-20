@@ -48,6 +48,15 @@ Meteor.methods({
           return DataSets.insert(dataSetDoc);
         }
     },
+    'removeDataSet': function(dataSetDoc) {
+        var userId = Meteor.userId();
+        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+          return DataSets.remove(dataSetDoc);
+        }
+    },
     'updateExperiment': function(currentDoc, updateDoc) {
         var userId = Meteor.userId();
         if( !Roles.userIsInRole(userId, 'edit', 'experiment: ' + currentDoc._id) ) {
@@ -109,7 +118,6 @@ Meteor.methods({
           return docId;
         }
     },
-
     deleteAnalysis: function(id) {
         console.log('deleting analysis: ' + id);
         var analysis = Analyses.findOne({_id:id});
