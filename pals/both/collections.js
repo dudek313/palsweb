@@ -9,6 +9,7 @@ Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
 Variables = new Meteor.Collection("variables");
 
+/* Code for yogiben:admin package - package currently not being used
 AdminConfig = {
   name: 'My App',
   adminEmails: ['gabsun@gmail.com'],
@@ -21,7 +22,7 @@ AdminConfig = {
     Analyses:{},
     Models:{},
   }
-};
+};*/
 
 GetCollectionByName = function(name) {
     switch(name) {
@@ -95,428 +96,109 @@ if( !reference ) {
 }
 
 ModelOutputs.attachSchema(new SimpleSchema({
-  _id: {
-    type: String,
-    optional: true
-  },
-  _version: {
-    type: Number,
-    optional: true
-  },
-  name: {
-    type: String,
-    label: "Name",
-    optional: true
-  },
-  owner: {
-    type: String,
-    label: "Owner",
-    optional: true
-  },
-  'experiments': {
-    type: [String],
-    optional: true
-  },
-  model: {
-    type: String,
-    label: "Model",
-    optional: true
-  },
-  created: {
-    type: Date,
-    label: "Created",
-    optional: true
-  },
-  parameterSelection: {
-    type: String,
-    label: "Parameter Selection",
-    allowedValues: Reference.findOne().parameterSelection,
-    optional: true
-  },
-  stateSelection: {
-    type: String,
-    label: "State Selection",
-    allowedValues: Reference.findOne().stateSelection,
-    optional: true
-  },
-  accessLevel: {
-    type: String,
-    label: "Access Level",
-    optional: true
-  },
-  'file.path': {
-    type: String,
-    optional: true
-  },
-  'file.filename': {
-    type: String,
-    optional: true
-  },
-  'file.size': {
-    type: Number,
-    optional: true
-  },
-  'file.key': {
-    type: String,
-    optional: true
-  },
-  'file.created': {
-    type: String,
-    optional: true
-  },
-  comments: {
-    type: String,
-    optional: true
-  },
-  status: {
-    type: String,
-    optional: true
-  },
-  benchmarks: {
-    type: [String],
-    optional: true
-  }
+  _id:              {type: String, optional: true},
+  _version:         {type: Number, optional: true},
+  name:             {type: String, label: "Name", optional: true},
+  owner:            {type: String, label: "Owner", optional: true},
+  'experiments':    {type: [String], optional: true},
+  model:            {type: String, label: "Model", optional: true},
+  created:          {type: Date, label: "Created", optional: true},
+  parameterSelection: {type: String, label: "Parameter Selection",
+                    allowedValues: Reference.findOne().parameterSelection, optional: true},
+  stateSelection:   {type: String, label: "State Selection",
+                    allowedValues: Reference.findOne().stateSelection, optional: true},
+  accessLevel:      {type: String, label: "Access Level", optional: true},
+  'file.path':      {type: String, optional: true},
+  'file.filename':  {type: String, optional: true},
+  'file.size':      {type: Number, optional: true},
+  'file.key':       {type: String, optional: true},
+  'file.created':   {type: String, optional: true},
+  comments:         {type: String, optional: true},
+  status:           {type: String, optional: true},
+  benchmarks:       {type: [String], optional: true}
 }));
 
 Models.attachSchema(new SimpleSchema({
-  _id: {
-    type: String,
-    optional: true
-  },
-  name: {
-    type: String,
-    label: "Name"
-  },
-  owner: {
-    type: String,
-    label: "Owner",
-    optional: true
-  },
-  created: {
-    type: Date,
-    label: "Created",
-    optional: true
-  },
-  modified: {
-    type: Date,
-    label: "Last Modified",
-    optional: true
-  },
-  url: {
-    type: SimpleSchema.RegEx.Url,
-    label: "URL",
-    optional: true
-  },
-  references: {
-    type: String,
-    label: "References",
-    optional: true
-  },
-  comments: {
-    type: String,
-    label: "Comments",
-    optional: true
-  }
+  _id:        {type: String, optional: true},
+  name:       {type: String, label: "Name"},
+  owner:      {type: String, label: "Owner", optional: true},
+  created:    {type: Date, label: "Created", optional: true},
+  modified:   {type: Date, label: "Last Modified", optional: true},
+  url:        {type: SimpleSchema.RegEx.Url, label: "URL", optional: true},
+  references: {type: String, label: "References", optional: true},
+  comments:   {type: String, label: "Comments", optional: true}
 }));
 
 Experiments.attachSchema(new SimpleSchema({
-  _id: {
-    type: String,
-    optional: true
-  },
-  name: {
-    type: String,
-    label: "Name"
-  },
-  recordType: {
-    type: String,
-    allowedValues: ['template', 'instance'],
-    optional: true
-  },
-  owner: {
-    type: String,
-    optional: true
-  },
-  created: {
-    type: Date,
-    optional: true
-  },
-  modified: {
-    type: Date,
-    optional: true
-  },
-  country: {
-    type: String,
-    label: "Country",
-    allowedValues: Reference.findOne().country,
-    optional: true
-  },
-  vegType: {
-    type: String,
-    label: "IGBP Vegetation Type",
-    allowedValues: Reference.findOne().vegType,
-    optional: true
-  },
-  otherVegType: {
-    type: String,
-    label: "Other Vegetation Type",
-    optional: true
-  },
-  spatialLevel: {
-    type: String,
-    label: "Spatial Level",
-    allowedValues: Reference.findOne().spatialLevel
-  },
-  timeStepSize: {
-    type: String,
-    label: "Time Step Size",
-    allowedValues: Reference.findOne().timeStepSize,
-    optional: true
-  },
-  shortDescription: {
-    type: String,
-    label: "Short Description",
-    optional: true
-  },
-  longDescription: {
-    type: String,
-    label: "Long Description",
-    optional: true
-  },
-  region: {
-    type: String,
-    label: "Region",
-    optional: true
-  },
-  resolution: {
-    type: String,
-    label: "Resolution",
-    allowedValues: Reference.findOne().resolution,
-    optional: true
-  },
-  _version: {
-    type: Number,
-    optional: true
-  },
-  versionDescription: {
-    type: String,
-    optional: true
-  },
-  'scripts.$.path': {
-    type: String,
-    optional: true
-  },
-  'scripts.$.filename': {
-    type: String,
-    optional: true
-  },
-  'scripts.$.key': {
-    type: String,
-    optional: true
-  },
-  'dataSets.$._id': {
-    type: String,
-    optional: true
-  },
-  'dataSets.$._version': {
-    type: Number,
-    optional: true
-  },
-  templateId: {
-    type: String,
-    optional: true
-  },
-  templateVersion: {
-    type: Number,
-    optional: true
-  },
-  workspace: {
-    type: String,
-    optional: true
-  }
+  _id:          {type: String, optional: true},
+  name:         {type: String, label: "Name"},
+  recordType:   {type: String, allowedValues: ['template', 'instance'], optional: true},
+  owner:        {type: String, optional: true},
+  created:      {type: Date, optional: true},
+  modified:     {type: Date, optional: true},
+  country:      {type: String, label: "Country", allowedValues: Reference.findOne().country, optional: true},
+  vegType:      {type: String, label: "IGBP Vegetation Type", allowedValues: Reference.findOne().vegType, optional: true},
+  otherVegType: {type: String, label: "Other Vegetation Type", optional: true},
+  spatialLevel: {type: String, label: "Spatial Level", allowedValues: Reference.findOne().spatialLevel},
+  timeStepSize: {type: String, label: "Time Step Size", allowedValues: Reference.findOne().timeStepSize, optional: true},
+  shortDescription:     {type: String, label: "Short Description", optional: true},
+  longDescription:      {type: String, label: "Long Description", optional: true},
+  region:       {type: String, label: "Region", optional: true},
+  resolution:   {type: String, label: "Resolution", allowedValues: Reference.findOne().resolution, optional: true},
+  _version:     {type: Number, optional: true},
+  versionDescription:   {type: String, optional: true},
+  'scripts.$.path':     {type: String, optional: true},
+  'scripts.$.filename': {type: String, optional: true},
+  'scripts.$.key':      {type: String, optional: true},
+  'dataSets.$._id':     {type: String, optional: true},
+  'dataSets.$._version':    {type: Number, optional: true},
+  templateId:   {type: String, optional: true},
+  templateVersion: {type: Number, optional: true},
+  workspace: {type: String, optional: true}
 }));
 
 dataSetSchema = new SimpleSchema({
-  _id: {
-    type: String,
-    optional: true
-  },
-  name: {
-    type: String,
-    label: "Name",
-    max: 50,
-    index: true,
-    unique: true
-  },
-  type: {
-    type: String,
-    label: "Type",
-    allowedValues: Reference.findOne().dataSetType
-  },
-  createdAt: {
-    type: Date,
-    optional: true
-  },
-  modifiedAt: {
-    type: Date,
-    optional: true
-  },
-  spatialLevel: {
-    type: String,
-    label: "Spatial Resolution",
-    allowedValues: Reference.findOne().spatialLevel
-  },
-  owner: {
-    type: String,
-    label: "Created By",
-    optional: true
-  },
-  country: {
-    type: String,
-    label: "Country",
-    allowedValues: Reference.findOne().country,
-    optional: true
-  },
-  vegType: {
-    type: String,
-    label: "IGBP Vegetation Type",
-    allowedValues: Reference.findOne().vegType,
-    optional: true
-  },
-  otherVegType: {
-    type: String,
-    label: "Other Vegetation Type",
-    optional: true
-  },
-  soilType: {
-    type: String,
-    label: "Soil Type",
-    optional: true
-  },
-  url: {
-    type: SimpleSchema.RegEx.Url,
-    label: "Site Description URL",
-    optional: true
-  },
-  lat: {
-    type: Number,
-    label: "Latitude (decimal)",
-    min: -90,
-    max: 90,
-    decimal: true,
-    optional: true
-  },
-  lon: {
-    type: Number,
-    label: "Longitude (decimal)",
-    min: -180,
-    max: 180,
-    decimal: true,
-    optional: true
-  },
-  elevation: {
-    type: Number,
-    label: "Elevation (m)",
-    min: 0,
-    decimal: true,
-    optional: true
-  },
-  maxVegHeight: {
-    type: Number,
-    label: "Max Vegetation Height (m)",
-    min: 0,
-    decimal: true,
-    optional: true
-  },
-  utcOffset: {
-    type: Number,
-    label: "UTC Offset (hours)",
-    min: -12,
-    max: 12,
-    optional: true
-  },
-  siteContact: {
-    type: String,
-    label: "Site Contact",
-    optional: true
-  },
-  references: {
-    type: String,
-    label: "References",
-    optional: true
-  },
-  comments: {
-    type: String,
-    label: "Comments",
-    optional: true
-  },
-  "variables.NEE": {
-    type: Boolean,
-    label: "NEE"
-  },
-  "variables.Qg": {
-    type: Boolean,
-    label: "Qg"
-  },
-  "variables.Qh": {
-    type: Boolean,
-    label: "Qh"
-  },
-  "variables.Qle": {
-    type: Boolean,
-    label: "Qle"
-  },
-  "variables.Rnet": {
-    type: Boolean,
-    label: "Rnet"
-  },
-  "variables.SWnet": {
-    type: Boolean,
-    label: "Swnet"
-  },
-  region: {
-    type: String,
-    label: "Region",
-    optional: true
-  },
-  resolution: {
-    type: String,
-    label: "Resolution",
-    allowedValues: Reference.findOne().resolution,
-    optional: true
-  },
-  _version: {
-    type: Number,
-    optional: true
-  },
-  'files.$.path': {
-    type: String,
-    optional: true
-  },
-  'files.$.name': {
-    type: String,
-    optional: true
-  },
-  'files.$.size': {
-    type: Number,
-    optional: true
-  },
-  'files.$.key': {
-    type: String,
-    optional: true
-  },
-  'files.$.date': {
-    type: Date,
-    optional: true
-  },
-  'files.$.downloadable': {
-    type: Boolean,
-    optional: true
-  },
-  'files.$.type': {
-    type: String,
-    optional: true
-  }
+  _id:            {type: String, optional: true},
+  name:           {type: String, label: "Name", index: true, unique: true},
+  type:           {type: String, label: "Type", allowedValues: Reference.findOne().dataSetType},
+  createdAt:      {type: Date, optional: true},
+  modifiedAt:     {type: Date, optional: true},
+  spatialLevel:   {type: String, label: "Spatial Resolution",
+                  allowedValues: Reference.findOne().spatialLevel},
+  owner:          {type: String, label: "Created By", optional: true},
+  country:        {type: String, label: "Country", allowedValues: Reference.findOne().country, optional: true},
+  vegType:        {type: String, label: "IGBP Vegetation Type",
+                  allowedValues: Reference.findOne().vegType, optional: true},
+  otherVegType:   {type: String, label: "Other Vegetation Type", optional: true},
+  soilType:       {type: String, label: "Soil Type", optional: true},
+  url:            {type: SimpleSchema.RegEx.Url, label: "Site Description URL", optional: true},
+  lat:            {type: Number, label: "Latitude (decimal)", min: -90, max: 90,
+                  decimal: true, optional: true},
+  lon:            {type: Number, label: "Longitude (decimal)", min: -180,
+                  max: 180, decimal: true, optional: true},
+  elevation:      {type: Number, label: "Elevation (m)", min: 0, decimal: true, optional: true},
+  maxVegHeight:   {type: Number, label: "Max Vegetation Height (m)", min: 0, decimal: true, optional: true},
+  utcOffset:      {type: Number, label: "UTC Offset (hours)", min: -12, max: 12, optional: true},
+  siteContact:    {type: String, label: "Site Contact", optional: true},
+  references:     {type: String, label: "References", optional: true},
+  comments:       {type: String, label: "Comments", optional: true},
+  "variables.NEE":  {type: Boolean, label: "NEE"},
+  "variables.Qg":   {type: Boolean, label: "Qg"},
+  "variables.Qh":   {type: Boolean, label: "Qh"},
+  "variables.Qle":  {type: Boolean, label: "Qle"},
+  "variables.Rnet": {type: Boolean, label: "Rnet"},
+  "variables.SWnet":    {type: Boolean, label: "Swnet"},
+  region:         {type: String, label: "Region", optional: true},
+  resolution:     {type: String, label: "Resolution",
+                  allowedValues: Reference.findOne().resolution, optional: true},
+  _version:       {type: Number, optional: true},
+  'files.$.path': {type: String, optional: true},
+  'files.$.name': {type: String, optional: true},
+  'files.$.size': {type: Number, optional: true},
+  'files.$.key':  {type: String, optional: true},
+  'files.$.date': {type: Date, optional: true},
+  'files.$.downloadable':   {type: Boolean, optional: true},
+  'files.$.type': {type: String, optional: true}
 });
 
 DataSets.attachSchema(dataSetSchema);

@@ -59,7 +59,7 @@ Meteor.publish('draftDataSets',function(){
     return DraftDataSets.find();
 });
 
-DataSets.allow({
+/*DataSets.allow({
     insert: function(userId, doc) {
         var user = Meteor.user();
         return ( userId && user.admin );
@@ -72,7 +72,7 @@ DataSets.allow({
         var user = Meteor.user();
         return ( userId && user.admin );
     }
-});
+});*/
 
 DraftDataSets.allow({
     insert: function(userId, doc) {

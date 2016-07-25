@@ -2,8 +2,33 @@
 Template.dataset.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-//    Session.set('uploadButtonClicked', false);
+    Session.set('filesToDelete', []);
+    Session.set('filesUploaded', []);
 };
+
+// Currently not working. findOne() returns 'undefined'
+function removeDeletedFiles(fileIds) {
+
+    if (fileIds && fileIds.length > 0) {
+        fileIds.forEach(function(fileId) {
+            var fileDoc = Files.findOne({_id:fileId});
+            if (fileDoc) {
+                Files.remove(fileDoc, function(err, doc) {
+                    if (err)
+                        console.log('Unable to delete file: ' + fileId);
+                    else {
+                        console.log('Deleted file: ' + fileId);
+                    }
+                });
+            }
+            else console.log('File not found: ' + fileId);
+        });
+    }
+}
+
+function testFiles() {
+    console.log(Files.find().fetch());
+}
 
 AutoForm.hooks({
     createDatasetForm: {
@@ -22,6 +47,11 @@ AutoForm.hooks({
                 }
                 else {
                     // if successful, display the created data sets
+                    testFiles();
+                    removeDeletedFiles(Session.get('filesToDelete'));
+                    Session.set('filesToDelete', []);
+
+                    Session.set('dirty', false);
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -40,6 +70,10 @@ AutoForm.hooks({
                     console.log(error.reason);
                 }
                 else {
+                    Session.set('dirty', false);
+                    removeDeletedFiles(Session.get('filesToDelete'));
+                    Session.set('filesToDelete', []);
+
                     var currentDataSetId = getCurrentObjectId();
                     Router.go('/dataset/display/' + currentDataSetId);
                 }
@@ -58,25 +92,36 @@ Template.dataset.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
+        removeDeletedFiles(Session.get('filesUploaded'));
+        Session.set('filesUploaded', []);
         Router.go('/dataset/display/' + getCurrentObjectId());
-//        Session.set('screenMode','display');
     },
     'click .cancel-create':function(event){
         event.preventDefault();
+        removeDeletedFiles(Session.get('filesUploaded'));
+        Session.set('filesUploaded', []);
         Router.go('/home')
     },
     'click .delete-file':function(event) {
         event.preventDefault();
         var selectedFileId = $(event.target).attr('id');
         var currentFiles = Session.get('tempFiles');
+
         var newFiles = [];
         if (currentFiles && currentFiles.length > 0) {
+          // remove file from tempFiles session variable
             currentFiles.forEach(function(file) {
                 if (file.key != selectedFileId)
                     newFiles.push(file);
             });
             Session.set('tempFiles', newFiles);
+
+            // add file to filesToDelete session variable
+            var filesToDelete = Session.get('filesToDelete');
+            filesToDelete.push(selectedFileId);
+            Session.set('filesToDelete', filesToDelete);
         }
+
         else {
             $('.error').html('Error removing data set, please try again');
             $('.error').show();
@@ -113,6 +158,13 @@ Template.dataset.events = {
                     var tempFiles = Session.get('tempFiles');
                     tempFiles.push(fileRecord);
                     Session.set('tempFiles', tempFiles);
+                    Session.set('dirty', true);
+                    Session.set('uploadButtonClicked', false);
+
+                    // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
+                    var filesUploaded = Session.get('filesUploaded');
+                    filesUploaded.push(name);
+                    Session.set('filesUploaded', filesUploaded);
                 }
             });
 

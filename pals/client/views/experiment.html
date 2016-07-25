@@ -76,15 +76,19 @@
           <div class="panel panel-success">
             <div class="panel-heading">Scripts</div>
             <div class="panel-body">
-              <table class="table">
-                <tr>
-                  <th>Filename</th>
-                </tr>
-                {{#each scripts}}
+              <table class="table table-hover">
+                <thead>
                   <tr>
-                    <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                    <th>Filename</th>
                   </tr>
-                {{/each}}
+                </thead>
+                <tbody>
+                  {{#each scripts}}
+                    <tr>
+                      <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                    </tr>
+                  {{/each}}
+                </tbody>
               </table>
            </div>
           </div>
@@ -111,24 +115,35 @@
               </div>
             </div>
           </form>
+
           {{#if areEqual recordType 'instance'}}
-            <div class="panel panel-primary">
-            <div class="panel-heading">Model Outputs</div>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{#each modelOutputs}}
-                <tr>
-                    <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
-                </tr>
-                {{/each}}
-                </tbody>
-            </table>
-            </div>
+
+            <form>
+              <div class="panel panel-primary">
+                <div class="panel-heading">Model Outputs</div>
+                <div class="panel-body">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                          <th>Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each modelOutputs}}
+                        <tr>
+                          {{#if currentUser}}
+                            <td onclick="Router.go('/modelOutput/display/{{_id}}')">{{name}}</td>
+                          {{else}}
+                            <td>{{name}}</td>
+                          {{/if}}
+                        </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </form>
+
           {{/if}}
   <!--        </div> -->
           <div class="col-md-12">

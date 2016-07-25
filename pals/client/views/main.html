@@ -19,14 +19,14 @@
       <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles<b class="caret"></b></a>
             <ul class="dropdown-menu">
-                <li class={{disabledIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
-                <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
+                <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
+                <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
                 <li><a href="javascript:void(0)" onclick="Router.go('/models/anywhere');">In All Available Workspaces</a></li>
                 <li class="divider"></li>
                 {{#if currentUser}}
                 <li><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
                 {{else}}
-                <li class={{disabledIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
+                <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
                 {{/if}}
             </ul>
       </li>
@@ -34,18 +34,18 @@
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li class={{disabledIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/mine');">Owned By Me</a></li>
-            <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/workspace');">In Current Workspace</a></li>
+            <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/mine');">Owned By Me</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/workspace');">In Current Workspace</a></li>
             <li class="divider"></li>
-            <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput/create');">Upload Model Output</a></li>
-            <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput/create');">Upload Model Output</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
         </ul>
       </li>
 
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/All');">In All Available Workspaces</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/experiments/templates/All');">Experiment Templates To Clone</a></li>
           {{#if authorisedToEdit 'experiment'}}
@@ -58,7 +58,7 @@
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets<b class="caret"></b></a>
         <ul class="dropdown-menu">
-          <li class={{disabledIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/All');">All Data Sets</a></li>
           {{#if authorisedToEdit 'dataset'}}
                <li class="divider"></li>
