@@ -48,7 +48,7 @@
                 {{> globalHeadings}}
             {{/if}}
           {{/if}}
-          {{#if areEqual source 'Templates'}}<th>Clone</th>
+          {{#if areEqual source 'templates'}}<th>Clone</th>
           {{else}}<th>View Analyses</th>{{/if}}
           <th>Delete</th>
         </tr>
@@ -78,7 +78,7 @@
                   {{> globalRow}}
               {{/if}}
             {{/if}}
-            {{#if areEqual source 'Templates'}}
+            {{#if areEqual source 'templates'}}
               {{#if notCloned _id}}<td><button class='btn btn-primary btn-xs clone-exp' id="{{_id}}">Clone</button></td>
               {{else}}<td>Cloned</td>
               {{/if}}

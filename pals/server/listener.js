@@ -25,7 +25,7 @@ function processNext() {
 }
 
 function handleMessage(message) {
-    console.log(JSON.stringify(message));
+		console.log(message);
     var selector = {'_id':message._id};
     var change = {};
     if( message.error ) {

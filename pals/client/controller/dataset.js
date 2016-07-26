@@ -6,6 +6,7 @@ Template.dataset.rendered = function() {
     Session.set('filesUploaded', []);
 };
 
+// Currently not working. findOne() returns 'undefined'
 function removeDeletedFiles(fileIds) {
 
     if (fileIds && fileIds.length > 0) {
@@ -25,6 +26,10 @@ function removeDeletedFiles(fileIds) {
     }
 }
 
+function testFiles() {
+    console.log(Files.find().fetch());
+}
+
 AutoForm.hooks({
     createDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
@@ -42,7 +47,7 @@ AutoForm.hooks({
                 }
                 else {
                     // if successful, display the created data sets
-
+                    testFiles();
                     removeDeletedFiles(Session.get('filesToDelete'));
                     Session.set('filesToDelete', []);
 

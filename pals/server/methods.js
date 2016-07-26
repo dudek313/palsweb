@@ -148,6 +148,7 @@ Meteor.methods({
 
         var user = Meteor.user();
         var currentModelOutput = ModelOutputs.findOne({'_id':modelOutputId});
+        console.log('Benchmarks: '); console.log(currentModelOutput.benchmarks);
         if( !currentModelOutput )
             throw new Meteor.Error(500,'Error: Unable to load model output.');
 
@@ -173,10 +174,12 @@ Meteor.methods({
             var moFile = currentModelOutput.file;
             moFile.type = 'ModelOutput';
             moFile.name = currentModelOutput.name;
+            moFile.number = "1";
             files.push(moFile);
 
-            // Does this make sense? Isn't 'files' a local variable?
             addDataSets(files, experiment.dataSets,'DataSet');
+
+            addBenchmarks(files, currentModelOutput.benchmarks);
 
             if( !experiment.scripts || experiment.scripts.length <=0 ) {
                 throw new Meteor.Error(500,'The chosen experiment does not have a script');
@@ -203,6 +206,8 @@ Meteor.methods({
                //'experimentModelOutputs' : experimentModelOutputs
            };
 
+           console.log('Input to analysis script: '); console.log(analysis);
+
            saveAnalysis(analysis,analysisComplete);
            return analysis;
        }
@@ -220,6 +225,35 @@ getLatestVersion = function(dataSet,type) {
         }
     }
     return null;
+}
+
+addBenchmarks = function(files, benchmarkIds) {
+    if (benchmarkIds && benchmarkIds.length > 0) {
+
+        console.log('Number of benchmarks: ' + benchmarkIds.length);
+
+        for (var i = 0; i < benchmarkIds.length; ++i ) {
+            if(benchmarkIds[i]) {
+                var benchmark = ModelOutputs.findOne({'_id':benchmarkIds[i]});
+                console.log('processing benchmark: ' + benchmarkIds[i]);
+    //        var version = getLatestVersion(dataSet);
+    //        version.name = dataSet.name;
+    //        if( version ) {
+    //            files.push(version);
+    //        }
+                benchmark.file.type = 'Benchmark';
+                benchmark.file.number = i + 1;
+                files.push(benchmark.file);
+                console.log('processing file: ' + benchmark.file.name);
+            }
+            else {
+                throw new Meteor.Error('Benchmark details invalid');
+            }
+
+        }
+    }
+    else console.log('No benchmarks');
+
 }
 
 addDataSets = function(files,dataSets,type) {
@@ -243,8 +277,8 @@ addDataSets = function(files,dataSets,type) {
             console.log('Files in data set: ' + dataSet.files.length);
             if (dataSet && dataSet.files && dataSet.files.length > 0)
                 dataSet.files.forEach(function(file) {
-                    if (file.type == 'evaluation')
-                        file.type = 'DataSet';
+                    file.type = 'DataSet';
+                    file.number = "1";
                     files.push(file);
                     console.log('processing file: ' + file.name);
                 });
