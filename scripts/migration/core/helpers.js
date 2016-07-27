@@ -8,7 +8,7 @@ exports.postgres = function () {
     that = {};
 
     that.pg = require('pg');
-    that.connectionString = "pg://docker:docker@192.168.56.102:32768/docker"
+    that.connectionString = "pg://docker:docker@129.94.166.218:32768/docker"
 
     function sql(query,callback) {
         that.client.query(query,null,function(err,result){
@@ -43,7 +43,7 @@ exports.mongo = function() {
 
     var that = {};
     that.mongo = require('mongodb');
-    that.host = '192.168.56.100';
+    that.host = '129.94.166.218';
     //DF: that.host = 'localhost';
     that.port = 27017;
     //DF: that.port = 81;
@@ -115,6 +115,18 @@ exports.mongo = function() {
        });
     };
     that.insert = insert;
+
+    function update(table,doc1,doc2,callback) {
+       that.db.collection(table,function(err,collection){
+          if(err) console.log(err);
+          else {
+              collection.update(doc1,doc2,{w:1},function(err,result){
+                 callback(err);
+              });
+          }
+       });
+    };
+    that.update = update;
 
     return that;
 };

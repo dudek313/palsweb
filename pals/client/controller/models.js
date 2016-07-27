@@ -14,7 +14,7 @@ Template.models.events({
         }
     }
 });
-
+ 
 getModelOutputsInWorkspace = function(ws) {
     var user = Meteor.user();
     if (ws)

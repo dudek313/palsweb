@@ -386,7 +386,7 @@ function insertDefaultExperiment(dataSet,mongoInstance,publicWorkspace) {
         scripts : [{
             path : '/pals/data/SingleSiteExperiment.R',
             filename : 'SingleSiteExperiment.R',
-            key : 'SingleSiteExperimnet.R',
+            key : 'SingleSiteExperiment.R',
         }],
         dataSets : [dataSet._id],
         owner : dataSet.owner,
