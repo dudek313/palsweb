@@ -110,22 +110,61 @@
 
           </div>
 
-      </fieldset>
-      {{#if areEqual screenMode 'create'}}
-        <div class="col-md-12">
-          <button type="submit" class="create-btn btn btn-primary">Save</button>
-          <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
-        </div>
-      {{else}}
-        <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
-          <br>Data set won't be updated until "Save Changes" is clicked below.</b>
-        </div>
-        <br>
-        <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
-      {{/if}}
+        </fieldset>
+        {{#if areEqual screenMode 'create'}}
+          <div class="col-md-12">
+            <button type="submit" class="create-btn btn btn-primary">Save</button>
+            <button type="reset" class="create-btn btn btn-primary cancel-create">Cancel</button>
+          </div>
+        {{else}}
+          <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+            <br>Data set won't be updated until "Save Changes" is clicked below.</b>
+          </div>
+          <br>
+          <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
+        {{/if}}
       {{/autoForm}}
+<!--
+      <div class="panel panel-primary">
+        <div class="panel-heading">Versions</div>
+        <div class="panel-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Number</th>
+                <th>Date Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each version}}
+                <tr>
+                  <th>{{}}
+
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">Usage</div>
+        <div class="panel-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Experiment Template Name</th>
+                <th>Workspace Name</th>
+                <th>Data Set Version Imported</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each version}}
+                <tr>
+                      insert stuff
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+-->
 
     {{else}}
       {{#if areEqual screenMode 'display'}}

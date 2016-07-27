@@ -195,6 +195,33 @@ Template.experiment.events = {
             $('.error').show();
         }
     },
+    'click .clone' : function(event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        var newExpInstance = getCurrentExperiment();
+        newExpInstance.templateId = newExpInstance._id;
+        delete newExpInstance._id;
+        newExpInstance.recordType = 'instance';
+        newExpInstance.workspace = Meteor.user().profile.currentWorkspace;
+        newExpInstance.templateVersion = newExpInstance._version;
+        if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
+            newExpInstance.dataSets.forEach(function(dataset){
+                dataset._version = getDataSetVersion(dataset._id);
+            });
+        }
+        else console.log("Experiment doesn't have datasets");
+        Meteor.call('insertExperiment', newExpInstance, function(error,docId){
+            if (error) {
+                $('.error').html('Failed to clone the experiment, please try again');
+                $('.error').show();
+                console.log(error.reason);
+            }
+            else console.log('Created experiment: ' + docId);
+        });
+
+    }
+
 };
 
 
@@ -222,6 +249,16 @@ Template.experiment.helpers({
     if(screenMode == 'create') formId = "createExperimentForm";
     else if(screenMode == 'update') formId = "updateExperimentForm";
     return formId;
+  },
+  // determines whether current experiment has already been cloned into the current workspace
+  notCloned: function() {
+    var template = getCurrentExperiment();
+    if (template) {
+        var selector = {templateId: template._id};
+        selector.recordType = 'instance';
+        selector.workspace = Meteor.user().profile.currentWorkspace;
+        return (Experiments.find(selector).fetch().length > 0) ? false : true;
+    }
   },
   // returns the data sets used by the current experiment
   dataSets: function() {
