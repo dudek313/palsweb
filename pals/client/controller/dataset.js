@@ -33,7 +33,6 @@ function testFiles() {
 AutoForm.hooks({
     createDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            event.preventDefault();
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             insertDoc.files = Session.get('tempFiles');

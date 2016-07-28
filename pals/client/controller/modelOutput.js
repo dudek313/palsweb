@@ -13,7 +13,6 @@ AutoForm.hooks({
         as _version and owner.
 */
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            event.preventDefault();
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             // tempFile contains the data about the uploaded file which needs
@@ -70,8 +69,6 @@ AutoForm.hooks({
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
           // tempFile contains the data about the uploaded file which needs
           // to be added to the model output document at submission time.
-
-            event.preventDefault();
 
             var analysesToDelete = Session.get('analysesToDelete');
             if (analysesToDelete && analysesToDelete.length > 0)

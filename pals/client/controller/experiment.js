@@ -16,7 +16,6 @@ AutoForm.hooks({
 */
 
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            event.preventDefault();
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             insertDoc.scripts = Session.get('tempScripts');
