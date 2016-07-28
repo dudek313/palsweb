@@ -5,7 +5,6 @@ Template.model.rendered = function() {
 AutoForm.hooks({
     createModelForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            event.preventDefault();
             insertDoc._version = 1;
             insertDoc.owner = Meteor.user()._id;
             insertDoc.created = new Date();
@@ -90,7 +89,7 @@ Template.model.helpers({
     if(screenMode == 'create') return "insert"
     else if(screenMode == 'update') return "update"
     else return null;
-  }, 
+  },
   owner: function() {
       var user = Meteor.user();
       var model = getCurrentModel();
