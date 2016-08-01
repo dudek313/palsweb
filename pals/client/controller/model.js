@@ -10,9 +10,10 @@ AutoForm.hooks({
             insertDoc.created = new Date();
             Meteor.call('insertModel', insertDoc, function(error, docId){
                 if(error) {
-                    $('.error').html('Failed to create the model profile. Please try again.');
+                    window.scrollTo(0,0);
+                    $('.error').html(error.error);
                     $('.error').show();
-                    console.log(error.reason);
+                    console.log(error);
                 }
                 else {
                     console.log(docId);
@@ -35,6 +36,7 @@ AutoForm.hooks({
             updateDoc.$set.modified = new Date();
             Meteor.call('updateModel', currentDoc, updateDoc, function(error, docId){
                 if(error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Failed to update the model. Please try again.');
                     $('.error').show();
                     console.log(error.reason);
@@ -60,14 +62,14 @@ function getCurrentModel() {
 Template.model.events = {
     'click .cancel-update':function(event){
         event.preventDefault();
-        Router.go('/display/' + getCurrentObjectId());
+        Router.go('/model/display/' + getCurrentObjectId());
     },
     'click .cancel-create':function(event){
         event.preventDefault();
         Router.go('/home')
     },
     'click .enable-update':function(event){
-        Router.go('/update/' + getCurrentObjectId());
+        Router.go('/model/update/' + getCurrentObjectId());
     }
 };
 

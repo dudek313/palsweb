@@ -64,6 +64,7 @@ Template.experiments.events({
             if( id ) {
                 Meteor.call('deleteExperiment', {'_id':id}, function(error){
                     if(error) {
+                        window.scrollTo(0,0);
                         $('.error').html('Failed to delete the experiment, please try again');
                         $('.error').show();
                         console.log(error.reason);
@@ -101,6 +102,7 @@ Template.experiments.events({
             else console.log("Experiment doesn't have datasets");
             Meteor.call('insertExperiment', newExpInstance, function(error,docId){
                 if (error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Failed to clone the experiment, please try again');
                     $('.error').show();
                     console.log(error.reason);

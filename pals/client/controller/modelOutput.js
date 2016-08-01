@@ -24,6 +24,7 @@ AutoForm.hooks({
             // insert model output document to the mongodb collection
             Meteor.call('insertModelOutput', insertDoc, function(error, docId){
                 if(error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Failed to upload the model output. Please try again.');
                     $('.error').show();
                     console.log(error.reason);
@@ -90,6 +91,7 @@ AutoForm.hooks({
                 // update Model Outputs collection
                 Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
                     if(error) {
+                        window.scrollTo(0,0);
                         $('.error').html('Failed to update the data set. Please try again.');
                         $('.error').show();
                         console.log(error.reason);
@@ -104,6 +106,7 @@ AutoForm.hooks({
                 analysesToDelete.forEach(function(analysisId) {
                     Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
                         if (error) {
+                            window.scrollTo(0,0);
                             $('.error').html('Failed to delete analysis (Id: ' + analysisId + ').');
                             $('.error').show();
                             console.log(error.reason);
@@ -184,6 +187,7 @@ Template.modelOutput.events = {
                 Session.set('tempBenchmarks', currentBenchmarks);
             }
             else {
+              window.scrollTo(0,0);
               $('.error').html('Error adding data set, please try again');
               $('.error').show();
             }
@@ -205,6 +209,7 @@ Template.modelOutput.events = {
             Session.set('tempBenchmarks', newBenchmarkIds);
         }
         else {
+            window.scrollTo(0,0);
             $('.error').html('Error removing benchmark, please try again');
             $('.error').show();
         }
@@ -239,6 +244,7 @@ Template.modelOutput.events = {
             Session.set('analysesToDelete', analysesToDelete);
         }
         else {
+            window.scrollTo(0,0);
             $('.error').html('Error removing analysis, please try again');
             $('.error').show();
         }
@@ -442,7 +448,7 @@ Template.modelOutput.performUpdate = function(fieldName,value) {
             var modifier = {'$set':fieldModifier};
             ModelOutputs.update(selector,modifier,function(error){
                 if( error ) {
-                    $('.error').html('There was an error saving the field, please try again');
+                    window.scrollTo(0,0);$('.error').html('There was an error saving the field, please try again');
                     $('.error').show();
                 }
             });
@@ -459,8 +465,8 @@ Template.modelOutput.performUpdate = function(fieldName,value) {
             currentModelOutput[fieldName] = value;
             ModelOutputs.insert(currentModelOutput,function(error,id) {
                 if( error ) {
-                    if( error.error == 409 ) $('.error').html('A model output with that name already exists');
-                    else $('.error').html('There was an error saving your value, please try again');
+                    if( error.error == 409 ) window.scrollTo(0,0);$('.error').html('A model output with that name already exists');
+                    else window.scrollTo(0,0);$('.error').html('There was an error saving your value, please try again');
                     $('.error').show();
                 }
                 else {
@@ -510,7 +516,7 @@ Template.modelOutput.events({
                         ModelOutputs.update({'_id':currentModelOutput._id},
                             {$pull : {'versions':{ 'key':key }}}, function(error) {
                                 if( error ) {
-                                    $('.error').html('Failed to delete version, please try again');
+                                    window.scrollTo(0,0);$('.error').html('Failed to delete version, please try again');
                                     $('.error').show();
                                 }
                             }

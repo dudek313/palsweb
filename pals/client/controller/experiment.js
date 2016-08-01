@@ -37,6 +37,7 @@ AutoForm.hooks({
             // insert experiment document to the mongodb collection
             Meteor.call('insertExperiment', insertDoc, function(error, docId){
                 if(error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Error: Failed to create the experiment');
                     $('.error').show();
                     console.log(error.reason);
@@ -169,6 +170,7 @@ Template.experiment.events = {
                 Session.set('tempDataSets', currentDataSets);
             }
             else {
+              window.scrollTo(0,0);
               $('.error').html('Error adding data set, please try again');
               $('.error').show();
             }
@@ -190,6 +192,7 @@ Template.experiment.events = {
             Session.set('tempDataSets', newDataSetIds);
         }
         else {
+            window.scrollTo(0,0);
             $('.error').html('Error removing data set, please try again');
             $('.error').show();
         }
@@ -212,6 +215,7 @@ Template.experiment.events = {
         else console.log("Experiment doesn't have datasets");
         Meteor.call('insertExperiment', newExpInstance, function(error,docId){
             if (error) {
+                window.scrollTo(0,0);
                 $('.error').html('Failed to clone the experiment, please try again');
                 $('.error').show();
                 console.log(error.reason);

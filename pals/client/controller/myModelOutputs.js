@@ -1,14 +1,14 @@
 Template.myModelOutputs.modelOutputs = function() {
     var user = Meteor.user();
     if( user ) {
-        var modelOutputs = 
+        var modelOutputs =
             ModelOutputs.find({'owner':user._id,'workspaces':user.profile.currentWorkspace},
                 {sort:{created:-1}}).fetch();
         if( modelOutputs )
         {
             modelOutputs.forEach(function(modelOutput){
                 if( modelOutput.experiment ) {
-                    modelOutput.experiment = 
+                    modelOutput.experiment =
                         Experiments.findOne({'_id':modelOutput.experiment},{'_id':1,'name':1});
                 }
             });
@@ -24,6 +24,7 @@ Template.myModelOutputs.events({
             if( confirm("Are you sure?")) {
                 ModelOutputs.remove({'_id':id},function(error){
                     if(error) {
+                        window.scrollTo(0,0);
                         $('.error').html('Failed to delete the model output, please try again');
                         $('.error').show();
                     }

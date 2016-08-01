@@ -37,11 +37,18 @@
     color: lightgray;
 }
 
+.break-word {
+    word-wrap: break-word;
+}
+
 .detail-form {
     max-width:800px;
     margin: 0px auto;
 }
 
+#login-dropdown-list {
+    left:-130px;
+}
 
 .login-buttons {
     padding-top: 15px;

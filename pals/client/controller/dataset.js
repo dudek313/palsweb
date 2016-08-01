@@ -39,6 +39,7 @@ AutoForm.hooks({
             // insert data set document to the mongodb collection
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Failed to create the data set. Please try again.');
                     $('.error').show();
 
@@ -64,6 +65,7 @@ AutoForm.hooks({
             updateDoc.$set.files = Session.get('tempFiles');
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
+                    window.scrollTo(0,0);
                     $('.error').html('Failed to update the data set. Please try again.');
                     $('.error').show();
                     console.log(error.reason);
@@ -122,6 +124,7 @@ Template.dataset.events = {
         }
 
         else {
+            window.scrollTo(0,0);
             $('.error').html('Error removing data set, please try again');
             $('.error').show();
         }

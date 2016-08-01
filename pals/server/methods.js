@@ -109,7 +109,10 @@ Meteor.methods({
     },
     'insertModel': function(modelDoc) {
         if( !Meteor.user() ) {
-            throw new Meteor.Error('not-authorized')
+          throw new Meteor.Error('not-authorized')
+        }
+        else if(Models.findOne({name:modelDoc.name})) {
+          throw new Meteor.Error('Model name already exists');
         }
         else {
           var docId = Models.insert(modelDoc);

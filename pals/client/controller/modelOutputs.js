@@ -57,6 +57,7 @@ Template.modelOutputs.events({
             if( confirm("Are you sure?")) {
                 ModelOutputs.remove({'_id':id},function(error){
                     if(error) {
+                        window.scrollTo(0,0);
                         $('.error').html('Failed to delete the model output, please try again');
                         $('.error').show();
                     }

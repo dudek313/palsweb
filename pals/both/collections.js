@@ -118,16 +118,19 @@ ModelOutputs.attachSchema(new SimpleSchema({
   benchmarks:       {type: [String], optional: true}
 }));
 
-Models.attachSchema(new SimpleSchema({
+modelSchema = new SimpleSchema({
   _id:        {type: String, optional: true},
-  name:       {type: String, label: "Name"},
+  name:       {type: String, label: "Name", unique: true},
+  _version:   {type: Number, optional: true},
   owner:      {type: String, label: "Owner", optional: true},
   created:    {type: Date, label: "Created", optional: true},
   modified:   {type: Date, label: "Last Modified", optional: true},
-  url:        {type: SimpleSchema.RegEx.Url, label: "URL", optional: true},
+  url:        {type: String, regEx: SimpleSchema.RegEx.Url, label: "URL", optional: true},
   references: {type: String, label: "References", optional: true},
   comments:   {type: String, label: "Comments", optional: true}
-}));
+});
+
+Models.attachSchema(modelSchema);
 
 Experiments.attachSchema(new SimpleSchema({
   _id:          {type: String, optional: true},
@@ -159,7 +162,7 @@ Experiments.attachSchema(new SimpleSchema({
 
 dataSetSchema = new SimpleSchema({
   _id:            {type: String, optional: true},
-  name:           {type: String, label: "Name", index: true, unique: true},
+  name:           {type: String, label: "Name", unique: true},
   type:           {type: String, label: "Type", allowedValues: Reference.findOne().dataSetType},
   createdAt:      {type: Date, optional: true},
   modifiedAt:     {type: Date, optional: true},
@@ -171,7 +174,7 @@ dataSetSchema = new SimpleSchema({
                   allowedValues: Reference.findOne().vegType, optional: true},
   otherVegType:   {type: String, label: "Other Vegetation Type", optional: true},
   soilType:       {type: String, label: "Soil Type", optional: true},
-  url:            {type: SimpleSchema.RegEx.Url, label: "Site Description URL", optional: true},
+  url:            {type: String, regEx: SimpleSchema.RegEx.Url, label: "Site Description URL", optional: true},
   lat:            {type: Number, label: "Latitude (decimal)", min: -90, max: 90,
                   decimal: true, optional: true},
   lon:            {type: Number, label: "Longitude (decimal)", min: -180,
