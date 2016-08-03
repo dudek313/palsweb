@@ -18,8 +18,8 @@ class ModelsPage(unittest.TestCase):
 # Unfinished. Needs a lot of changes...       
     def test_models_page(self):
         self.valid_login()
-#        self.create_data_set("Data Set 2", "SingleSite")
-##        self.create_data_set("Data Set 3", "SingleSite")
+        self.create_data_set("Data Set 2", "SingleSite")
+#        self.create_data_set("Data Set 3", "SingleSite")
  #       self.create_data_set("Data Set 4", "MultipleSite")
  #       self.create_data_set("Data Set 5", "Catchment")
  #       self.create_data_set("Data Set 6", "Regional")
@@ -84,7 +84,6 @@ class ModelsPage(unittest.TestCase):
         self.assertTrue(self.is_text_present("Data Set 5"))
         driver.back()
 
-
         #filter Regional
         driver.find_element_by_xpath("/html/body/div/div[2]/div/div[1]/input[5]").click()
         self.assertTrue(self.is_text_present("Regional Data Sets"))
@@ -112,6 +111,19 @@ class ModelsPage(unittest.TestCase):
         table_rows[1].click()
         self.assertTrue(self.is_text_present("Data Set 7"))
         driver.back()
+        
+        #delete a data set
+        driver.find_element_by_xpath("/html/body/div/div[2]/div/div[1]/input[1]").click()
+        driver.find_element_by_class_name("delete").click()
+        alert = driver.switch_to.alert
+        alert.dismiss()
+        time.sleep(0.5)
+        self.assertTrue(self.is_text_present("Data Set 2"))
+        driver.find_element_by_class_name("delete").click()
+        alert = driver.switch_to.alert
+        alert.accept()
+        time.sleep(0.5)
+        self.assertFalse(self.is_text_present("Data Set 2"))
 
     def valid_login(self):
         driver = self.driver
