@@ -7,7 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 import unittest, time, re
 
-class ModelsPage(unittest.TestCase):
+class DataSetsPage(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
@@ -16,14 +16,14 @@ class ModelsPage(unittest.TestCase):
         self.accept_next_alert = True
  
 # Unfinished. Needs a lot of changes...       
-    def test_models_page(self):
+    def test_data_sets_page(self):
         self.valid_login()
         self.create_data_set("Data Set 2", "SingleSite")
-#        self.create_data_set("Data Set 3", "SingleSite")
- #       self.create_data_set("Data Set 4", "MultipleSite")
- #       self.create_data_set("Data Set 5", "Catchment")
- #       self.create_data_set("Data Set 6", "Regional")
- #       self.create_data_set("Data Set 7", "Global")
+        self.create_data_set("Data Set 3", "SingleSite")
+        self.create_data_set("Data Set 4", "MultipleSite")
+        self.create_data_set("Data Set 5", "Catchment")
+        self.create_data_set("Data Set 6", "Regional")
+        self.create_data_set("Data Set 7", "Global")
         self.run_test()
              
     def run_test(self):
@@ -119,11 +119,15 @@ class ModelsPage(unittest.TestCase):
         alert.dismiss()
         time.sleep(0.5)
         self.assertTrue(self.is_text_present("Data Set 2"))
+        table_rows = driver.find_elements_by_css_selector("tr")
+        self.assertTrue(len(table_rows) == 7)
         driver.find_element_by_class_name("delete").click()
         alert = driver.switch_to.alert
         alert.accept()
         time.sleep(0.5)
         self.assertFalse(self.is_text_present("Data Set 2"))
+        table_rows = driver.find_elements_by_css_selector("tr")
+        self.assertTrue(len(table_rows) == 6)
 
     def valid_login(self):
         driver = self.driver
