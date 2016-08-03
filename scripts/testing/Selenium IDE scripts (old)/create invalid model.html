@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://192.168.56.100:3000/" />
+<title>create invalid model</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">create invalid model</td></tr>
+</thead><tbody>
+<tr>
+	<td>click</td>
+	<td>link=Workspaces</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td></td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//tr[2]/td</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td></td>
+	<td>Workspace:</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Model Profiles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create Model Profile</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=span.help-block</td>
+	<td>Name is required</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=name</td>
+	<td>ok ok</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=url</td>
+	<td>whatever</td>
+</tr>
+<tr>
+	<td>waitForCondition</td>
+	<td>selenium.isTextPresent('URL must be a valid URL')</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=references</td>
+	<td>refsfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ Q Q qQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ<br />QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ<br /><br /><br /><br />n<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />\asdfsdfasdfasdfasdfasdf</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=comments</td>
+	<td>comments</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[@type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=legend</td>
+	<td>Create New Model Profile</td>
+</tr>
+</tbody></table>
+</body>
+</html>
