@@ -163,10 +163,10 @@
         {{else}}
           {{#if inEditMode}}
 
-            {{#autoForm collection="Experiments" id=formId doc=this type="normal" validation='blur'}}
+            {{#autoForm collection="Experiments" id=formId doc=this type="normal" resetOnSuccess=false validation='blur'}}
               <fieldset>
                 {{#if areEqual screenMode 'create'}}
-                  <h1>Create New Experiment</h1>
+                  <h1>Create New Experiment Template</h1>
                 {{else}} <!-- if in update mode -->
                   <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
                     <br>Experiment details won't be updated until "Save Changes" is clicked below.</b></div>
