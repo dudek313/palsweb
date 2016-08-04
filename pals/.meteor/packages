@@ -23,14 +23,6 @@ cfs:autoform
 cfs:ui
 matdutour:popup-confirm
 houston:admin
-<<<<<<< HEAD
 okgrow:router-autoscroll
 practicalmeteor:mocha
 templating@1.2.13
-tinytest
-=======
-
-
-npm-container
-practicalmeteor:mocha
->>>>>>> 79ce4b54ee0ad9a9ff64a2a1739f88d3ab037d04
