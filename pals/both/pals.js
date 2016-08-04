@@ -160,6 +160,7 @@ Router.map(function () {
         onBeforeAction: [
             function() {
                 $('.error').hide();
+                this.next()
             }
         ]
     });
