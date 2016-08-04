@@ -88,11 +88,11 @@ exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstan
                             }
                             console.log(fileData);
                             user = users[row.mo_username];
-                            if( user ) {
+//                            if( user ) {
 				//console.log('Copying : ' + filename + ', ' + fileData)
                                 copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces);
-                            }
-                            else console.log('Could not locate username ' + row.ds_username);
+//                            }
+//                            else console.log('Could not locate username ' + row.ds_username);
                         }
                     });
                 }
@@ -109,6 +109,10 @@ maxCopies = 100;
 
 function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
     console.log('Copying model output: ' + row.a_name);
+    if (user)
+	ownerId = user._id;
+    else
+	ownerId = null;
     copyFile(filename,fileData.path,function(err){
         if( err ) console.log(err);
         else {
@@ -118,7 +122,7 @@ function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
                 created : row.mo_uploaddate,
                 model : row.mo_modelid.toString(),
                 name : row.a_name,
-                owner : user._id,
+                owner : ownerId,
                 parameterSelection : row.mo_parameterselection,
                 stateSelection : row.mo_stateselection,
                 accessLevel : row.mo_accesslevel,
@@ -141,10 +145,10 @@ function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
                 }
                 else {
                     if (doc) {
-                        modelOutput.experiment = doc._id;
+                        modelOutput.experiments = [doc._id];
                     }
                     else {
-                        modelOutput.experiment = null;
+                        modelOutput.experiments = [];
                     }
                     mongoInstance.insert('modelOutputs',modelOutput,function(err){
                       if(err) {

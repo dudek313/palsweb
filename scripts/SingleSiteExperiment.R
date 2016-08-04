@@ -7,8 +7,8 @@ library(parallel)
 print(input["_id"])
 files <- input[["files"]]
 
-# Retrieve model output, forcing and evaluation data set and benchmark location and 
-# meta data from javascript input list: 
+# Retrieve model output, forcing and evaluation data set and benchmark location and
+# meta data from javascript input list:
 ModelOutputs = list()
 ForcingDataSets = list()
 EvalDataSets = list()
@@ -23,7 +23,8 @@ for (i in 1:(length(files))  ) {
     	MOctr = MOctr + 1
         ModelOutputs[[MOctr]] = list(path=file[['path']],mimetype=file[['mimetype']],
         	name=file[['name']])
-    }else if( (file[['type']] == "DataSet")) {
+#    }else if( (file[['type']] == "DataSet")) {
+    }else if( (file[['type']] == "evaluation")) {
     	EDSctr = EDSctr + 1
         EvalDataSets[[EDSctr]] = list(path=file[['path']],mimetype=file[['mimetype']],
         	name=file[['name']])
@@ -45,7 +46,7 @@ vars = GetVariableDetails(c('Qle','Qh','NEE','Rnet','Qg','SWnet'))
 genAnalysis = c('Timeseries','AnnualCycle','DiurnalCycle','PDF','Scatter','Taylor','AvWindow')
 
 # Determine number of user-nominated benchmarks:
-nBench = NumberOfBenchmarks(Benchmarks,Bctr)
+#nBench = NumberOfBenchmarks(Benchmarks,Bctr)
 
 # Set up analysis data and analysis list so we can use lapply or parlapply:
 AnalysisData = list()
@@ -55,8 +56,8 @@ AnalysisList = list()
 analysis_number = 0
 for(v in 1:length(vars)){
 	obs = GetFluxnetVariable(vars[[v]],EvalDataSets[[1]])
-    model = GetModelOutput(vars[[v]],ModelOutputs)
-    bench = GetBenchmarks(vars[[v]],Benchmarks,nBench)
+  model = GetModelOutput(vars[[v]],ModelOutputs)
+#    bench = GetBenchmarks(vars[[v]],Benchmarks,nBench)
 	# Save model, obs, bench data for each variable:
 	AnalysisData[[v]] = list(obs=obs, model=model, bench = bench)
 	# Add those analyses that are equally applicable to any variable to analysis list:
