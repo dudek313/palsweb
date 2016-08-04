@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://192.168.56.100:3000/" />
+<title>createDataSet</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">createDataSet</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/dataset/create</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Data Sets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForElementPresent</td>
+	<td>link=Create Data Set</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Create Data Set</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=name</td>
+	<td>Data set 1</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>name=type</td>
+	<td>label=reanalysis</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>name=spatialLevel</td>
+	<td>label=SingleSite</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>name=country</td>
+	<td>label=Anguilla</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>name=vegType</td>
+	<td>label=Deciduous needleleaf</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=soilType</td>
+	<td>dirty soil</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=url</td>
+	<td>no good</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td></td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Site Description URL must be a valid URL</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=url</td>
+	<td>http://site.description.url</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td></td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>assertElementNotPresent</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lat</td>
+	<td>-91</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Latitude (decimal) must be at least -90</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lat</td>
+	<td>91</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Latitude (decimal) cannot exceed 90</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lat</td>
+	<td>89</td>
+</tr>
+<tr>
+	<td>assertElementNotPresent</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lon</td>
+	<td>181</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Longitude (decimal) cannot exceed 180</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lon</td>
+	<td>-181</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Longitude (decimal) must be at least -180</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=lon</td>
+	<td>-179</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertElementNotPresent</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=elevation</td>
+	<td>-5</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Elevation (m) must be at least 0</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=elevation</td>
+	<td>0.01</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=maxVegHeight</td>
+	<td>-5</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>Max Vegetation Height (m) must be at least 0</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=maxVegHeight</td>
+	<td>1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=utcOffset</td>
+	<td>12.5</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>UTC Offset (hours) cannot exceed 12</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=utcOffset</td>
+	<td>-12.5</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td>UTC Offset (hours) must be at least -12</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=utcOffset</td>
+	<td>12</td>
+</tr>
+<tr>
+	<td>assertElementNotPresent</td>
+	<td>css=div.form-group.has-error &gt; span.help-block</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=siteContact</td>
+	<td>787</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=references</td>
+	<td>Any reference<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=comments</td>
+	<td>come on<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />come one</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>name=variables.NEE</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>name=variables.Qh</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>name=variables.Rnet</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=region</td>
+	<td>the best</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>name=resolution</td>
+	<td>label=2 deg</td>
+</tr>
+<tr>
+	<td>driver.findElement(By.id(&quot;...&quot;)).isEnabled()</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=downloadable</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=file-select</td>
+	<td>C:\Users\Danny\Downloads\pals-nci\webappdata\boone\isba_ElSaler2_dif_2005-2006.nc</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=td</td>
+	<td>isba_ElSaler2_dif_2005-2006.nc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=(//button[@id='files-owxdwv3zZbu6tTCvH-isba_ElSaler2_dif_2005-2006.nc'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertNotText</td>
+	<td>css=td</td>
+	<td>isba_ElSaler2_dif_2005-2006.nc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>xpath=(//input[@name='fileType'])[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=file-select</td>
+	<td>C:\Users\Danny\Downloads\pals-nci\webappdata\boone\isba_Amplero_dif_2003-2006.nc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div[3]/div[2]/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>id=downloadable</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name=file-select</td>
+	<td>C:\Users\Danny\Downloads\pals-nci\webappdata\boone\isba_Amplero_3l_2003-2006.nc</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[@type='submit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertElementNotPresent</td>
+	<td>//form[@id='createDatasetForm']/fieldset/div</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
