@@ -80,6 +80,7 @@ Template.workspaces.events({
           }
       }
       else {
+          window.scrollTo(0,0);
           $('.error').html('To enter a workspace, please login or create an account.');
           $('.error').show();
       }

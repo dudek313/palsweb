@@ -6,6 +6,7 @@ Template.models.events({
                 console.log(id);
                 Models.remove({'_id':id},function(error){
                     if(error) {
+                        window.scrollTo(0,0);
                         $('.error').html('Failed to delete the model, please try again');
                         $('.error').show();
                     }
@@ -14,7 +15,7 @@ Template.models.events({
         }
     }
 });
- 
+
 getModelOutputsInWorkspace = function(ws) {
     var user = Meteor.user();
     if (ws)
@@ -59,6 +60,7 @@ Template.models.helpers({
         else if (source == 'anywhere')
             return "Model Profiles in All Available Workspaces";
         else {
+          window.scrollTo(0,0);
           $('.error').html('An error occurred in displaying the page. Please try again.');
           $('.error').show();
         }
@@ -77,6 +79,7 @@ Template.models.helpers({
             var models = getModelsFromModelOutputs(modelOutputs);
         }
         else {
+            window.scrollTo(0,0);
             $('.error').html('Unable to display models');
             $('.error').show();
         }

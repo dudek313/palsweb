@@ -1,5 +1,6 @@
 var queue = 'pals.input';
 
+var redis = require("redis");
 var REDIS_HOST = process.env.REDIS_HOST;
 if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
 var REDIS_PORT = process.env.REDIS_PORT;
@@ -108,7 +109,10 @@ Meteor.methods({
     },
     'insertModel': function(modelDoc) {
         if( !Meteor.user() ) {
-            throw new Meteor.Error('not-authorized')
+          throw new Meteor.Error('not-authorized')
+        }
+        else if(Models.findOne({name:modelDoc.name})) {
+          throw new Meteor.Error('Model name already exists');
         }
         else {
           var docId = Models.insert(modelDoc);

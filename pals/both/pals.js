@@ -39,6 +39,7 @@ Router.map(function () {
         data: function() { return DataSets.findOne({_id:this.params.id}); },
         onBeforeAction: [
             function() {
+                $('.error').hide();
                 if (this.params.screenMode == 'update') {
                     ds = DataSets.findOne({_id:this.params.id});
                     if (ds) {
@@ -83,6 +84,7 @@ Router.map(function () {
         data: function() { return Experiments.findOne({_id:this.params.id}) },
         onBeforeAction: [
             function() {
+                $('.error').hide();
                 if (this.params.screenMode == 'update') {
                     exp = Experiments.findOne({_id:this.params.id});
                     if (exp) {
@@ -117,6 +119,7 @@ Router.map(function () {
         data: function() { return ModelOutputs.findOne({_id : this.params.id}); },
         onBeforeAction: [
             function() {
+                $('.error').hide();
                 if (this.params.screenMode == 'update') {
                     var mo = ModelOutputs.findOne({_id:this.params.id});
                     if (mo) {
@@ -150,10 +153,16 @@ Router.map(function () {
         path: '/model/:screenMode',
         template: 'model'
     });
-    this.route('modelById',{
+    this.route('displayOrUpdateModel',{
         path: '/model/:screenMode/:id',
         template: 'model',
-        data: function() { return Models.findOne({_id : this.params.id}) }
+        data: function() { return Models.findOne({_id : this.params.id}) },
+        onBeforeAction: [
+            function() {
+                $('.error').hide();
+                this.next()
+            }
+        ]
     });
     this.route('analyses');
     this.route('file',{
