@@ -102,6 +102,7 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                       path : newDataDir + '/' + newFilename,
                       name : filenameHead + '_' + filetype + '.nc',
                       size : stats['size'],
+      		      oldName: filename,
                       key : newFilename,
                       createdAt : row.dsv_uploaddate,
                       type : filetype,
