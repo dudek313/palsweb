@@ -120,7 +120,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
 
 modelSchema = new SimpleSchema({
   _id:        {type: String, optional: true},
-  name:       {type: String, label: "Name", unique: true},
+  name:       {type: String, label: "Name"},
   _version:   {type: Number, optional: true},
   owner:      {type: String, label: "Owner", optional: true},
   created:    {type: Date, label: "Created", optional: true},
