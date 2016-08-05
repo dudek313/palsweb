@@ -35,46 +35,6 @@ GetCollectionByName = function(name) {
     }
 }
 
-Docs = new Meteor.Collection("docs");
-
-Docs.attachSchema(new SimpleSchema({
-  name: {
-    type: String
-  },
-  fileId: {
-    type: String
-/*
-  }
-  path: {
-    type: String,
-    optional: true
-  },
-  size: {
-    type: Number,
-    optional: true
-  },
-  key: {
-    type: String,
-    optional: true
-  },
-  date: {
-    type: Date,
-    optional: true
-  },
-  downloadable: {
-    label: "Downloadable",
-    type: Boolean,
-    optional: true
-  },
-  type: {
-    label: "Type",
-    type: String,
-    optional: true
-*/
-  }
-
-
-}));
 
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
@@ -120,7 +80,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
 
 modelSchema = new SimpleSchema({
   _id:        {type: String, optional: true},
-  name:       {type: String, label: "Name", unique: true},
+  name:       {type: String, label: "Name"},
   _version:   {type: Number, optional: true},
   owner:      {type: String, label: "Owner", optional: true},
   created:    {type: Date, label: "Created", optional: true},
