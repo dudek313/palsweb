@@ -17,8 +17,8 @@ Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
 var gab = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})
 if (gab) {
     var gabId = gab._id;
-    Roles.addUserToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
-    Roles.addUserToRoles(gabId, 'access', 'all workspaces');
+    Roles.addUsersToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
+    Roles.addUsersToRoles(gabId, 'access', 'all workspaces');
 }
 
 var danny = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'});

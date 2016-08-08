@@ -213,7 +213,7 @@ Template.modelOutput.events = {
             $('.error').html('Error removing benchmark, please try again');
             $('.error').show();
         }
-    },
+    }, 
     'click .run-analysis':function(event) {
         var userId = Meteor.userId();
         var currentModelOutputId = getCurrentObjectId();
