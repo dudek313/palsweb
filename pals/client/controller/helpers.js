@@ -86,10 +86,18 @@ Template.registerHelper("screenMode", function() {
     return getScreenMode();
 });
 
+Template.registerHelper('authorised', function(action, objType, id) {
+    var userId = Meteor.userId();
+    var group = objType + "s";
+    var groupWithId = objType + ": " + id;
+    var authorised = Roles.userIsInRole(userId, action, group) || Roles.userIsInRole(userId, action, groupWithId);
+    return authorised;
+});
+
 Template.registerHelper('authorisedToEdit', function(objType, id) {
     var userId = Meteor.userId();
     var group = objType + "s";
-    var groupWithId = group + ": " + id;
+    var groupWithId = objType + ": " + id;
     var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
     return authorised;
 });

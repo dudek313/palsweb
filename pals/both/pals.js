@@ -108,7 +108,7 @@ Router.map(function () {
                 this.next();
             }
         ]
-    });
+    }); 
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',
         template: 'modelOutputs'

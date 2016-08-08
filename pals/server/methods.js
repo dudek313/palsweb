@@ -12,11 +12,15 @@ var fs = Npm.require('fs');
 
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
-      if( !Meteor.user() ) {
+      var userId = Meteor.userId();
+      if( !userId ) {
           throw new Meteor.Error('not-authorized');
       }
       else {
-        return ModelOutputs.insert(modelOutputDoc);
+        var moId = ModelOutputs.insert(modelOutputDoc);
+        var group = 'modelOutput: ' + moId;
+        Roles.addUsersToRoles(userId, 'edit', group);
+        return moId;
       }
   },
   'updateModelOutput': function(currentDoc, updateDoc) {
@@ -46,7 +50,10 @@ Meteor.methods({
             throw new Meteor.Error('not-authorized')
         }
         else {
-          return DataSets.insert(dataSetDoc);
+          var dsId = DataSets.insert(dataSetDoc);
+          var group = 'dataSet: ' + moId;
+          Roles.addUsersToRoles(userId, 'edit', group);
+          return dsId;
         }
     },
     'removeDataSet': function(dataSetDoc) {
@@ -69,18 +76,20 @@ Meteor.methods({
         }
 
     },
-    'insertExperiment': function(dataSetDoc) {
+    'insertExperiment': function(expDoc) {
         var userId = Meteor.userId();
         var docId;
-        if (userId && dataSetDoc.recordType == 'instance') {
-            docId = Experiments.insert(dataSetDoc);
+        if (userId && expDoc.recordType == 'instance') {
+            docId = Experiments.insert(expDoc);
             var group = 'experiment: ' + docId;
-            Roles.addUsersToRoles(dataSetDoc.owner, 'edit', group);
+            Roles.addUsersToRoles(expDoc.owner, 'edit', group);
             return docId;
         }
-        else if( dataSetDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
-            docId = Experiments.insert(dataSetDoc);
-            return docId
+        else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
+            var expId = Experiments.insert(expDoc);
+            var group = 'experiment: ' + expId;
+            Roles.addUsersToRoles(userId, 'edit', group);
+            return expId;
         }
         else {
             throw new Meteor.Error('not-authorized')
@@ -108,11 +117,12 @@ Meteor.methods({
 
     },
     'insertModel': function(modelDoc) {
-        if( !Meteor.user() ) {
+        user = Meteor.user();
+        if( !user ) {
           throw new Meteor.Error('not-authorized')
         }
-        else if(Models.findOne({name:modelDoc.name})) {
-          throw new Meteor.Error('Model name already exists');
+        else if(Models.findOne({name:modelDoc.name, owner: user._id })) {
+          throw new Meteor.Error('You already have a model with called ' + modelDoc.name);
         }
         else {
           var docId = Models.insert(modelDoc);

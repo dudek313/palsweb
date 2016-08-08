@@ -1,6 +1,6 @@
-Houston.add_collection(Meteor.users);
-Houston.add_collection(Houston._admins);
-Houston.hide_collection(Reference);
+// Houston.add_collection(Meteor.users);
+// Houston.add_collection(Houston._admins);
+// Houston.hide_collection(Reference);
 
 Meteor.publish('workspaces',function(){
     return Workspaces.find();
@@ -17,8 +17,8 @@ Meteor.users.update({'emails.address':'gabsun@gmail.com'},{'$set':
 var gab = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})
 if (gab) {
     var gabId = gab._id;
-    Roles.addUsersToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
-    Roles.addUsersToRoles(gabId, 'access', 'all workspaces');
+    Roles.addUserToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
+    Roles.addUserToRoles(gabId, 'access', 'all workspaces');
 }
 
 var danny = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'});
@@ -157,7 +157,7 @@ Meteor.publish('models',function(){
     return Models.find();
 });
 
-// Old code assumed unique model name. Only needs to be unique for workspace.
+// Old code assumed unique model name. Only needs to be unique for user.
 //Models._ensureIndex('name', {unique: 1});
 //Models._ensureIndex('_id', {unique: 1});
 
