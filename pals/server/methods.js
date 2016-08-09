@@ -12,7 +12,7 @@ var fs = Npm.require('fs');
 
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
-      var userId = Meteor.userId();
+      var userId = this.userId;
       if( !userId ) {
           throw new Meteor.Error('not-authorized');
       }
@@ -24,7 +24,7 @@ Meteor.methods({
       }
   },
   'updateModelOutput': function(currentDoc, updateDoc) {
-      var userId = Meteor.userId();
+      var userId = this.userId;
       var group = 'modelOutput: ' + currentDoc._id;
       if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = ModelOutputs.update(currentDoc, updateDoc);
@@ -35,7 +35,7 @@ Meteor.methods({
       }
   },
   'updateDataSet': function(currentDoc, dataSetDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
             throw new Meteor.Error('not-authorized')
         }
@@ -45,7 +45,7 @@ Meteor.methods({
 
     },
     'insertDataSet': function(dataSetDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
             throw new Meteor.Error('not-authorized')
         }
@@ -57,7 +57,7 @@ Meteor.methods({
         }
     },
     'removeDataSet': function(dataSetDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
             throw new Meteor.Error('not-authorized')
         }
@@ -66,7 +66,7 @@ Meteor.methods({
         }
     },
     'updateExperiment': function(currentDoc, updateDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'experiment: ' + currentDoc._id) ) {
             throw new Meteor.Error('not-authorized')
         }
@@ -77,7 +77,7 @@ Meteor.methods({
 
     },
     'insertExperiment': function(expDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         var docId;
         if (userId && expDoc.recordType == 'instance') {
             docId = Experiments.insert(expDoc);
@@ -96,7 +96,7 @@ Meteor.methods({
         }
     },
     'deleteExperiment': function(dataSetDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         var group = 'experiment: ' + dataSetDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group) ) {
             throw new Meteor.Error('not-authorized')
@@ -106,7 +106,7 @@ Meteor.methods({
         }
     },
     'updateModel': function(currentDoc, modelDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         var group = 'model: ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
             throw new Meteor.Error('not-authorized')
@@ -150,15 +150,31 @@ Meteor.methods({
     },
 
     'updateWorkspace': function(currentDoc, updateDoc) {
-        var userId = Meteor.userId();
+        var userId = this.userId;
         var group = 'workspace: ' + currentDoc._id;
-        console.log('authorized?'); console.log(Roles.userIsInRole(userId, 'edit', group));
         if( !Roles.userIsInRole(userId, 'edit', group)) {
             throw new Meteor.Error('not-authorized')
         }
         else {
             return Workspaces.update(currentDoc, updateDoc);
         }
+
+    },
+
+    'changeWorkspace': function(workspaceId) {
+      var userId = this.userId;
+      var workspace = Workspaces.findOne({_id: workspaceId});
+      if( userId && workspace ) {
+        return Meteor.users.update({_id: userId}, {$set: {'profile.currentWorkspace': workspaceId}});
+      }
+    },
+
+    'removeWorkspace': function(workspaceId) {
+      var userId = this.userId;
+      var workspace = Workspaces.findOne({_id: workspaceId});
+      if( userId && workspace && workspace.owner && workspace.owner == userId) {
+        return Workspaces.remove({_id: workspaceId});
+      }
 
     },
 

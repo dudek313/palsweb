@@ -18,17 +18,6 @@ Template.workspace.helpers({
           return public;
       }
   },
-/*  created: function() {
-      var user = Meteor.user();
-      if( user ) {
-          this.id = Session.get('currentWorkspace');
-          var query = {'_id':this.id,'owner':user._id};
-          this.workspaceId = Router.current().data._id;
-          Meteor.users.update({'_id':user._id},
-              {'$set' : {'profile.currentWorkspace':this.workspaceId}});
-      }
-  },
-*/
   isOwner: function() {
       var user = Meteor.user();
       var workspace = getWorkspaceDetails();

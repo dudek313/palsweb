@@ -24,47 +24,60 @@ Template.workspaces.helpers({
 
 Template.workspaces.events({
   'click #add-workspace': function (event) {
-      event.preventDefault();
-      var user = Meteor.user();
-      var name = $('input[name="workspace.name"]').val();
-      if( name && name.length > 0 ) {
-          Meteor.call('insertWorkspace', name, function(error,id){
-              if( error ) alert(error);
-              else {
-                  var workspace = Workspaces.findOne({'_id':id});
-                  user.profile.currentWorkspace = workspace._id;
-                  Meteor.users.update({'_id':user._id},
-                      {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
-                  Router.go('/workspace/'+id);
-              }
+    event.preventDefault();
+    var user = Meteor.user();
+    var name = $('input[name="workspace.name"]').val();
+    if( name && name.length > 0 ) {
+      Meteor.call('insertWorkspace', name, function(error,id){
+        if( error ) alert(error);
+        else {
+          Meteor.call('changeWorkspace', id, function(error) {
+            if(error) alert(error)
+            else Router.go('/workspace/'+id);
           });
-      }
+        }
+      });
+    }
   },
   'click .open-workspace':function (event) {
       var id = $(event.target).attr('id');
       if( id ) {
           var user = Meteor.user();
           var workspace = Workspaces.findOne({'_id':id});
-          Meteor.users.update({'_id':user._id},
-            {'$set' : {'profile.currentWorkspace':workspace._id}});
-          Router.go('/workspace/'+id);
+          if(workspace) {
+            Meteor.call('changeWorkspace', id, function(error) {
+              if(error) alert(error)
+              else Router.go('/workspace/'+id);
+            });
+          }
+          else {
+            $('.error').html('Unable to access workspace');
+            $('.error').show();
+          }
       }
   },
   'click .leave-workspace':function (event) {
       event.preventDefault();
       var userId = Meteor.userId();
       browsingWS = Workspaces.findOne({name:'browsing'})
-      if (browsingWS)
-          var browsingId = browsingWS._id;
-      Meteor.users.update({_id:userId}, {$set:{'profile.currentWorkspace': browsingId}});
+      if (browsingWS && browsingWS._id) {
+        Meteor.call('changeWorkspace', browsingWS._id, function(error) {
+          if(error) alert(error)
+          else Router.go('/workspace/' + browsingWS._id);
+        });
+      }
+      else {
+        $('.error').html('Unable to access browsing workspace');
+        $('.error').show();
+      }
   },
   'click .delete-workspace':function (event) {
       var id = $(event.target).attr('id');
       var user = Meteor.user();
       if( id ) {
           if (confirm('Are you sure?')) {
-            Workspaces.remove({'_id':id},function(error){
-                if( error ) alert(error);
+            Meteor.call('removeWorkspace', id, function(error){
+              if( error ) alert(error);
             });
           }
       }
@@ -75,8 +88,16 @@ Template.workspaces.events({
           var id = $(event.target).attr('id');
           if( id ) {
               var workspace = Workspaces.findOne({'_id':id});
-              Meteor.users.update({'_id':user._id},
-                {'$set' : {'profile.currentWorkspace':workspace._id}});
+              if(workspace) {
+                Meteor.call('changeWorkspace', id, function(error) {
+                  if(error) alert(error)
+                  else Router.go('/workspace/'+id);
+                });
+              }
+              else {
+                $('.error').html('Unable to access workspace');
+                $('.error').show();
+              }
           }
       }
       else {
