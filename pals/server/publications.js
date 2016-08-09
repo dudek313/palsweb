@@ -38,88 +38,52 @@ if (danny) {
     Roles.addUsersToRoles(dannyId, 'edit', 'experiments');
 }
 
-Meteor.users.allow({
-    update: function (userId, doc, fields, modifier) {
-        return (userId && doc._id === userId);
-    }
-});
-
-/*Workspaces.allow({
-    insert: function(userId, doc) {
-        return ( userId && doc.owner == userId );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        return ( userId && doc.owner === userId );
-    },
-    remove: function(userId, doc) {
-        return ( userId && doc.owner === userId );
-    }
-});*/
-
 Meteor.publish('directory',function(){
    return Meteor.users.find();
 });
 
-
-//DataSets._ensureIndex('_id', {unique: 1});
-
-
 Meteor.publish('dataSets',function(){
-    return DataSets.find();
+    var userId = this.userId;
+    if( userId )
+      return DataSets.find();
 });
-
-/*Meteor.publish('draftDataSets',function(){
-    return DraftDataSets.find();
-});*/
-
-/*DataSets.allow({
-    insert: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    },
-    remove: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    }
-});*/
-
-/*DraftDataSets.allow({
-    insert: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    },
-    remove: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    }
-});*/
 
 Meteor.publish('reference',function(){
     return Reference.find();
 });
 
-Reference.allow({
-    insert: function(userId, doc) {
-        return (userId);
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        return (userId);
-    },
-    remove: function(userId, doc) {
-        return (userId);
-    }
-});
-
 Meteor.publish('experiments',function(){
-    return Experiments.find();
+  var wsSelector = {};
+
+  var userId = this.userId;
+  var selector = {'public':true};
+
+  // find all workspaces to which the user has access
+  if( userId ) {
+    if( Roles.userIsInRole(userId, 'access', 'all workspaces' )) {
+      selector = {}
+    }
+    else
+      selector = {$or: [selector, {'owner':userId}, {'guests':userId}]};
+  }
+  workspaces = Workspaces.find(selector).fetch();
+
+  // compile an array of workspace ids
+  var workspaceIds = [];
+  if (workspaces && workspaces.length > 0) {
+    workspaces.forEach(function(ws) {
+      if (ws._id)
+        workspaceIds.push(ws._id);
+      else
+        console.log('Object has no _id value');
+    });
+  }
+
+  wsSelector.workspace = {$in:workspaceIds};
+  wsSelector.recordType = 'instance';
+  selector = {$or: [wsSelector, {recordType: 'template'}]};
+
+  return Experiments.find(selector);
 });
 
 Experiments.allow({

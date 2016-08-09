@@ -3,6 +3,7 @@ Template.experiments.helpers({
     var level = getCurrentSpatialLevel();
     return (level == buttonLevel) ? 'checked' : ''
   },
+
   experiments: function() {
     var source = getSource();
     var selector = {};
@@ -13,6 +14,7 @@ Template.experiments.helpers({
             selector.workspace = user.profile.currentWorkspace;
             selector.recordType = 'instance';
         }
+        else selector.recordType = ' '; // not logged in, find should return empty
     }
     else if (source == 'templates') {
          selector.recordType='template';
@@ -30,11 +32,16 @@ Template.experiments.helpers({
 
     return Experiments.find(selector,{sort:{name:1}});
   },
+
   notCloned: function(experimentId) {
     var selector = {templateId:experimentId};
     selector.recordType = 'instance';
-    selector.workspace = Meteor.user().profile.currentWorkspace;
-    return (Experiments.find(selector).fetch().length > 0) ? false : true;
+    var user = Meteor.user();
+    if( user ) {
+      selector.workspace = user.profile.currentWorkspace;
+      return (Experiments.find(selector).fetch().length > 0) ? false : true;
+    }
+    else return null;
   },
   source: function() {
     return getSource();

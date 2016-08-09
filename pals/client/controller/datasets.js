@@ -18,9 +18,8 @@ Template.datasets.events({
       if( id ) {
         Meteor.call('removeDataSet', {'_id':id},function(error){
           if(error) {
-            window.scrollTo(0,0);
-            $('.error').html('Failed to delete the data set, please try again');
-            $('.error').show();
+            displayError('Failed to delete the data set, please try again');
+            console.log(error.reason);
           }
         });
       }

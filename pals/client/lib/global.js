@@ -1,24 +1,22 @@
 getAvailableWorkspaces = function() {
-/*    var workspaces = Workspaces.find({'public':true}).fetch();
-    var user = Meteor.user();
-    if( user ) {
-        sharedWorkspaces =  Workspaces.find({'guests':user._id}).fetch();
-        Array.prototype.push.apply(workspaces, sharedWorkspaces);
-    } */
-    var selector = {'public':true};
-    var user = Meteor.user();
-    if( user ) {
-        selector = {$or: [selector, {'owner':user._id}, {'guests':user._id}]};
+  var selector = {'public':true};
+  var userId = Meteor.userId();
+  if( userId ) {
+    if( Roles.userIsInRole(userId, 'access', 'all workspaces' )) {
+      selector = {}
     }
-    workspaces = Workspaces.find(selector).fetch();
+    else
+      selector = {$or: [selector, {'owner':userId}, {'guests':userId}]};
+  }
+  workspaces = Workspaces.find(selector).fetch();
 
-    return workspaces;
+  return workspaces;
 }
 
 /** returns the ids of workspaces available to the current user */
 getAvailableWorkspaceIds = function() {
-    var workspaces = getAvailableWorkspaces();
-    return getIdsFromObjects(workspaces);
+  var workspaces = getAvailableWorkspaces();
+  return getIdsFromObjects(workspaces);
 }
 
 /** takes an array of ids of documents in a collection and returns an array of the documents themselves */
@@ -83,6 +81,12 @@ getSource = function() {
     return Router.current().params.source;
 }
 
+displayError = function(errMessage) {
+  window.scrollTo(0,0);
+  $('.error').html(errMessage);
+  $('.error').show();
+}
+
 getCurrentWorkspaceId = function() {
     var user = Meteor.user();
     if( user ) {
@@ -91,9 +95,11 @@ getCurrentWorkspaceId = function() {
         }
         if( !user.profile.currentWorkspace ) {
             var rootWorkspace = Workspaces.findOne({"name":"browsing"});
-            user.profile.currentWorkspace = rootWorkspace._id;
-            Meteor.users.update({'_id':user._id},
-                {'$set' : {'profile.currentWorkspace':user.profile.currentWorkspace}});
+            Meteor.call('changeWorkspace', rootWorkspace._id, function(error) {
+              if( error ) {
+                console.log('Unable to change to the browsing workspace');
+              }
+            });
         }
         return user.profile.currentWorkspace;
     }
