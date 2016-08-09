@@ -132,6 +132,36 @@ Meteor.methods({
           return docId;
         }
     },
+
+    'insertWorkspace': function(name) {
+        user = Meteor.user();
+        if( !user ) {
+          throw new Meteor.Error('not-authorized')
+        }
+        else if(Workspaces.findOne({name: name})) {
+          throw new Meteor.Error('There is already a workspace with name: ' + name);
+        }
+        else {
+          var docId =  Workspaces.insert({owner: user._id, name: name});
+          Roles.addUsersToRoles(user._id, 'edit', 'workspace: ' + docId);
+
+          return docId;
+        }
+    },
+
+    'updateWorkspace': function(currentDoc, updateDoc) {
+        var userId = Meteor.userId();
+        var group = 'workspace: ' + currentDoc._id;
+        console.log('authorized?'); console.log(Roles.userIsInRole(userId, 'edit', group));
+        if( !Roles.userIsInRole(userId, 'edit', group)) {
+            throw new Meteor.Error('not-authorized')
+        }
+        else {
+            return Workspaces.update(currentDoc, updateDoc);
+        }
+
+    },
+
     deleteAnalysis: function(id) {
         console.log('deleting analysis: ' + id);
         var analysis = Analyses.findOne({_id:id});

@@ -15,15 +15,15 @@ jquery@1.11.9
 npm-container
 aldeed:collection2
 aldeed:autoform
-alanning:roles
 ecmascript@0.5.7
 es5-shim@4.6.13
 mickaelfm:vermongo
 cfs:autoform
 cfs:ui
 matdutour:popup-confirm
-houston:admin
 okgrow:router-autoscroll
 practicalmeteor:mocha
 templating@1.2.13
 tinytest
+alanning:roles
+houston:admin

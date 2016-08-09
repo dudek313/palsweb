@@ -1,9 +1,9 @@
 Workspaces = new Meteor.Collection("workspaces");
 DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId: 'modifierId'});
-DraftDataSets = new Meteor.Collection("draftDataSets");
+//DraftDataSets = new Meteor.Collection("draftDataSets");
 Reference = new Meteor.Collection("reference");
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
-DraftExperiments = new Meteor.Collection("draftExperiments")
+//DraftExperiments = new Meteor.Collection("draftExperiments")
 ModelOutputs = new Meteor.Collection("modelOutputs").vermongo({timestamps: true, userId: 'modifierId'});
 Analyses = new Meteor.Collection("analyses");
 Models = new Meteor.Collection("models");
@@ -165,4 +165,4 @@ dataSetSchema = new SimpleSchema({
 });
 
 DataSets.attachSchema(dataSetSchema);
-DraftDataSets.attachSchema(dataSetSchema);
+//DraftDataSets.attachSchema(dataSetSchema);

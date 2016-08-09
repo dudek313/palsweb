@@ -1,10 +1,19 @@
-// Houston.add_collection(Meteor.users);
-// Houston.add_collection(Houston._admins);
-// Houston.hide_collection(Reference);
+Houston.add_collection(Meteor.users);
+Houston.add_collection(Houston._admins);
+Houston.hide_collection(Reference);
 
-Meteor.publish('workspaces',function(){
-    return Workspaces.find();
+Meteor.publish('workspaces', function(){
+    var selector = {'public':true};
+    var userId = this.userId;
+    if( userId ) {
+      if( Roles.userIsInRole(userId, 'access', 'all workspaces'))
+        selector = {};
+      else
+        selector = {$or: [selector, {'owner':userId}, {'guests':userId}]};
+    }
+    return Workspaces.find(selector);
 });
+
 
 Workspaces._ensureIndex('name', {unique: 1});
 
@@ -35,7 +44,7 @@ Meteor.users.allow({
     }
 });
 
-Workspaces.allow({
+/*Workspaces.allow({
     insert: function(userId, doc) {
         return ( userId && doc.owner == userId );
     },
@@ -45,7 +54,7 @@ Workspaces.allow({
     remove: function(userId, doc) {
         return ( userId && doc.owner === userId );
     }
-});
+});*/
 
 Meteor.publish('directory',function(){
    return Meteor.users.find();
@@ -59,9 +68,9 @@ Meteor.publish('dataSets',function(){
     return DataSets.find();
 });
 
-Meteor.publish('draftDataSets',function(){
+/*Meteor.publish('draftDataSets',function(){
     return DraftDataSets.find();
-});
+});*/
 
 /*DataSets.allow({
     insert: function(userId, doc) {
@@ -78,7 +87,7 @@ Meteor.publish('draftDataSets',function(){
     }
 });*/
 
-DraftDataSets.allow({
+/*DraftDataSets.allow({
     insert: function(userId, doc) {
         var user = Meteor.user();
         return ( userId && user.admin );
@@ -91,7 +100,7 @@ DraftDataSets.allow({
         var user = Meteor.user();
         return ( userId && user.admin );
     }
-});
+});*/
 
 Meteor.publish('reference',function(){
     return Reference.find();

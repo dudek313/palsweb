@@ -181,6 +181,7 @@ function filenameAlreadyExists(filename) {
 }
 
 function getCurrentDataSet() {
+  if(Router.current().data && Router.current().data())
     return Router.current().data();
 }
 

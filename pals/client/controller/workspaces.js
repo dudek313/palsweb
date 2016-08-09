@@ -28,7 +28,7 @@ Template.workspaces.events({
       var user = Meteor.user();
       var name = $('input[name="workspace.name"]').val();
       if( name && name.length > 0 ) {
-          Workspaces.insert({"owner":user._id,"name":name},function(error,id){
+          Meteor.call('insertWorkspace', name, function(error,id){
               if( error ) alert(error);
               else {
                   var workspace = Workspaces.findOne({'_id':id});

@@ -213,7 +213,7 @@ Template.modelOutput.events = {
             $('.error').html('Error removing benchmark, please try again');
             $('.error').show();
         }
-    }, 
+    },
     'click .run-analysis':function(event) {
         var userId = Meteor.userId();
         var currentModelOutputId = getCurrentObjectId();
@@ -258,6 +258,7 @@ function getTempBenchmarks() {
 }
 // returns the current experiment record from the mongodb collection
 function getCurrentModelOutput() {
+  if(Router.current().data && Router.current().data())
     return Router.current().data();
 }
 

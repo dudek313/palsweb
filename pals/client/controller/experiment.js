@@ -244,7 +244,8 @@ function getRecordType() {
 
 // returns the current experiment record from the mongodb collection
 function getCurrentExperiment() {
-  return Router.current().data();
+  if(Router.current().data && Router.current().data())
+    return Router.current().data();
 }
 
 Template.experiment.helpers({

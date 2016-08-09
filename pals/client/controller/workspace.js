@@ -4,10 +4,6 @@ Template.workspace.helpers({
     return Session.get('isPublic') ? "color:gray" : "color:black";
   },
 
-  workspace: function() {
-      var ws = getCurrentWorkspace();
-      return ws;
-  },
   disabled: function() {
     return Session.get('isPublic') ? "disabled" : "";
   },
@@ -15,27 +11,27 @@ Template.workspace.helpers({
       if( isTrue ) return 'checked';
   },
   isPublic: function() {
-      var currentWorkspace = getCurrentWorkspace();
+      var currentWorkspace = getWorkspaceDetails();
       if (currentWorkspace) {
           public = currentWorkspace.public
           Session.set('isPublic', public);
           return public;
       }
   },
-  created: function() {
+/*  created: function() {
       var user = Meteor.user();
       if( user ) {
           this.id = Session.get('currentWorkspace');
           var query = {'_id':this.id,'owner':user._id};
-          this.workspaceId = getCurrentWorkspaceId();
+          this.workspaceId = Router.current().data._id;
           Meteor.users.update({'_id':user._id},
               {'$set' : {'profile.currentWorkspace':this.workspaceId}});
       }
   },
-
+*/
   isOwner: function() {
       var user = Meteor.user();
-      var workspace = getCurrentWorkspace();
+      var workspace = getWorkspaceDetails();
       if( workspace && user && workspace.owner == user._id ) return true;
       else return false;
   },
@@ -43,7 +39,7 @@ Template.workspace.helpers({
 
   users: function() {
       var users = Meteor.users.find().fetch();
-      var workspace = getCurrentWorkspace();
+      var workspace = getWorkspaceDetails();
       if( workspace ) {
           users.forEach(function(user){
               if( workspace.guests && workspace.guests.lastIndexOf(user._id) >= 0 ) {
@@ -59,36 +55,50 @@ Template.workspace.helpers({
   }
 });
 
+getWorkspaceDetails = function() {
+  if(Router.current().data && Router.current().data())
+    return Router.current().data();
+}
+
 Template.workspace.events({
   'click .make-public': function (event) {
       var checked = $(event.target).is(":checked");
-      var workspaceId = Session.get('currentWorkspace');
-      selector = { '_id' : workspaceId };
-      var update = { '$set' :  { 'public' : checked } };
-      Workspaces.update(selector,update,function(error){
-          if( error ) alert(error);
-      });
-      Session.set('isPublic', checked);
+      wsDetails = getWorkspaceDetails();
+      if( wsDetails && wsDetails._id ) {
+        var workspaceId = wsDetails._id;
+        selector = { '_id' : workspaceId };
+        var update = { '$set' :  { 'public' : checked } };
+        Meteor.call('updateWorkspace', selector, update, function(error){
+  //      Workspaces.update(selector,update,function(error){
+            if( error ) {
+              alert(error);
+            }
+            else Session.set('isPublic', checked);;
+        });
+      }
   },
   'click .invite-user': function (event) {
-        var user = Meteor.user();
-        var id = $(event.target).attr('id');
-        var checked = $(event.target).is(":checked");
-        if( id && checked ) {
-            var workspaceId = Session.get('currentWorkspace');
-            selector = { '_id' : workspaceId };
-            var update = { '$addToSet' :  { 'guests' : id } };
-            Workspaces.update(selector,update,function(error){
-                if( error ) alert(error);
-            });
-        }
-        else if( id && !checked ) {
-            var workspaceId = Session.get('currentWorkspace');
-            var selector = { '_id' : workspaceId };
-            var update = { '$pull' :  { 'guests' : id } };
-            Workspaces.update(selector,update,function(error){
-                if( error ) alert(error);
-            });
-        }
+    var user = Meteor.user();
+    var id = $(event.target).attr('id');
+    var checked = $(event.target).is(":checked");
+    wsDetails = getWorkspaceDetails();
+    if( wsDetails && wsDetails._id) {
+      workspaceId = wsDetails._id;
+      if( id && checked ) {
+        selector = { '_id' : workspaceId };
+        var update = { '$addToSet' :  { 'guests' : id } };
+        Meteor.call('updateWorkspace', selector, update, function(error){
+            if( error ) alert(error);
+        });
+      }
+
+      else if( id && !checked ) {
+        var selector = { '_id' : workspaceId };
+        var update = { '$pull' :  { 'guests' : id } };
+        Meteor.call('updateWorkspace', selector, update, function(error){
+            if( error ) alert(error);
+        });
+      }
     }
+  }
 });

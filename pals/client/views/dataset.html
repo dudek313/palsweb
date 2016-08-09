@@ -8,7 +8,7 @@
 -->
   {{#if authorized 'dataset' _id}}
     {{#if inEditMode}}
-      {{#autoForm collection="DraftDataSets" id=formId doc=this type="normal" validation='blur'}}
+      {{#autoForm collection="DataSets" id=formId doc=this type="normal" validation='blur'}}
         <fieldset>
           {{#if areEqual screenMode 'create'}}
             <legend>Create New Data Set</legend>

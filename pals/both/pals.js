@@ -7,7 +7,7 @@ Router.configure({
     notFoundTemplate: 'notFound'
 });
 
-//Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
+Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
 
 Router.map(function () {
     this.route('root',{
@@ -22,12 +22,13 @@ Router.map(function () {
     this.route('workspace',{
        path: '/workspace/:id',
        template: 'workspace',
+       data: function() { return Workspaces.findOne({_id:this.params.id}); } /*,
        onBeforeAction: [
           function() {
               Session.set('currentWorkspace',this.params.id);
               this.next();
            }
-       ]
+       ]*/
     });
     this.route('datasets',{
         path: '/datasets/:source/:resolution',
@@ -65,7 +66,6 @@ Router.map(function () {
     this.route('createExperiment',{
         path: '/experiment/:screenMode',
         template: 'experiment',
-        data: function() { return null },
         onBeforeAction: [
             function() {
                 Session.set('tempScripts', []);
@@ -99,7 +99,6 @@ Router.map(function () {
     this.route('createModelOutput',{
         path: '/modelOutput/:screenMode',
         template: 'modelOutput',
-        data: function() { return null },
         onBeforeAction: [
             function() {
                 Session.set('tempFile',undefined);
@@ -108,7 +107,7 @@ Router.map(function () {
                 this.next();
             }
         ]
-    }); 
+    });
     this.route('modelOutputs',{
         path: '/modelOutputs/:source',
         template: 'modelOutputs'
