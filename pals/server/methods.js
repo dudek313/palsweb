@@ -34,6 +34,19 @@ Meteor.methods({
           throw new Meteor.Error('not-authorized');
       }
   },
+
+  'removeModelOutput': function(moId) {
+      var userId = this.userId;
+      var group = 'modelOutput: ' + moId;
+      if( Roles.userIsInRole(userId, 'edit', group) ) {
+        mo = ModelOutputs.remove({_id: moId});
+        return mo;
+      }
+      else {
+          throw new Meteor.Error('not-authorized');
+      }
+  },
+
   'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
@@ -130,6 +143,18 @@ Meteor.methods({
           Roles.addUsersToRoles(modelDoc.owner, 'edit', group);
 
           return docId;
+        }
+    },
+
+    'removeModel': function(moId) {
+        var userId = this.userId;
+        var group = 'model: ' + moId;
+        if( Roles.userIsInRole(userId, 'edit', group) ) {
+          mo = Models.remove({_id: moId});
+          return mo;
+        }
+        else {
+            throw new Meteor.Error('not-authorized');
         }
     },
 

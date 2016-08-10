@@ -17,12 +17,13 @@ Template.experiments.helpers({
         else selector.recordType = ' '; // not logged in, find should return empty
     }
     else if (source == 'templates') {
-         selector.recordType='template';
+      selector.recordType='template';
     }
     else if (source == 'anywhere') {
-         workspaces = getAvailableWorkspaceIds();
-         selector.workspace = {$in:workspaces};
-         selector.recordType = 'instance';
+      userId = Meteor.userId();
+      workspaces = getAvailableWorkspaceIds(userId);
+      selector.workspace = {$in:workspaces};
+      selector.recordType = 'instance';
     }
 
     var resolution = getCurrentSpatialLevel();

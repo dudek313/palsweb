@@ -11,7 +11,7 @@
             <th>URL</th>
             <th>References</th>
             <th>Comments</th>
-            {{#if authorisedToEdit 'model'}}<th>Delete</th>{{/if}}
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -23,7 +23,7 @@
             <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; word-wrap:break-word; overflow:hidden">{{url}}</div></td>
             <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; overflow:hidden">{{references}}</div></td>
             <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; overflow:hidden">{{comments}}</div></td>
-            {{#if authorisedToEdit 'model'}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+            {{#if authorisedToEdit 'model' _id}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
         {{/each}}
         </tbody>

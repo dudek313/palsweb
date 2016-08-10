@@ -6,14 +6,13 @@ Meteor.publish('workspaces', function(){
     var selector = {'public':true};
     var userId = this.userId;
     if( userId ) {
-      if( Roles.userIsInRole(userId, 'access', 'all workspaces'))
+      if( Roles.userIsInRole(userId, 'workspaceAccess', Roles.GLOBAL_GROUP))
         selector = {};
       else
         selector = {$or: [selector, {'owner':userId}, {'guests':userId}]};
     }
     return Workspaces.find(selector);
 });
-
 
 Workspaces._ensureIndex('name', {unique: 1});
 
@@ -27,7 +26,7 @@ var gab = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})
 if (gab) {
     var gabId = gab._id;
     Roles.addUsersToRoles(gabId, 'edit', Roles.GLOBAL_GROUP);
-    Roles.addUsersToRoles(gabId, 'access', 'all workspaces');
+    Roles.addUsersToRoles(gabId, 'workspaceAccess', Roles.GLOBAL_GROUP);
 }
 
 var danny = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'});
@@ -56,28 +55,7 @@ Meteor.publish('experiments',function(){
   var wsSelector = {};
 
   var userId = this.userId;
-  var selector = {'public':true};
-
-  // find all workspaces to which the user has access
-  if( userId ) {
-    if( Roles.userIsInRole(userId, 'access', 'all workspaces' )) {
-      selector = {}
-    }
-    else
-      selector = {$or: [selector, {'owner':userId}, {'guests':userId}]};
-  }
-  workspaces = Workspaces.find(selector).fetch();
-
-  // compile an array of workspace ids
-  var workspaceIds = [];
-  if (workspaces && workspaces.length > 0) {
-    workspaces.forEach(function(ws) {
-      if (ws._id)
-        workspaceIds.push(ws._id);
-      else
-        console.log('Object has no _id value');
-    });
-  }
+  var workspaceIds = getAvailableWorkspaceIds(userId);
 
   wsSelector.workspace = {$in:workspaceIds};
   wsSelector.recordType = 'instance';
@@ -86,38 +64,26 @@ Meteor.publish('experiments',function(){
   return Experiments.find(selector);
 });
 
-Experiments.allow({
-    insert: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
-    },
-    remove: function(userId, doc) {
-        var user = Meteor.user();
-        return ( userId && user.admin && doc.owner === userId );
-    }
-});
-
 //Experiments._ensureIndex('_id', {unique: 1});
 
-Meteor.publish('modelOutputs',function(){
-    return ModelOutputs.find();
-});
+Meteor.publish('modelOutputs',function() {
+  var wsSelector = {};
+  var modelOutputs = null;
 
-ModelOutputs.allow({
-    insert: function(userId, doc) {
-        return ( userId );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        var user = Meteor.user();
-        return ( userId && doc.owner === userId );
-    },
-    remove: function(userId, doc) {
-        return ( userId && doc.owner === userId );
-    }
+  var userId = this.userId;
+  if (userId) {
+    var workspaceIds = getAvailableWorkspaceIds(userId);
+
+    var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
+    var experiments = Experiments.find(expSelector).fetch();
+
+    experimentIds = getIdsFromObjects(experiments);
+
+    var moSelector = {experiments: {$in: experimentIds}};
+    var modelOutputs = ModelOutputs.find(moSelector);
+  }
+
+  return modelOutputs;
 });
 
 //ModelOutputs._ensureIndex('name', {unique: 1});

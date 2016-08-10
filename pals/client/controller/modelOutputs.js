@@ -55,11 +55,10 @@ Template.modelOutputs.events({
         var id = $(event.target).attr('id');
         if( id ) {
             if( confirm("Are you sure?")) {
-                ModelOutputs.remove({'_id':id},function(error){
+                Meteor.call('removeModelOutputs', id, function(error){
                     if(error) {
-                        window.scrollTo(0,0);
-                        $('.error').html('Failed to delete the model output, please try again');
-                        $('.error').show();
+                        displayError('Failed to delete the model output, please try again');
+                        console.log(error);
                     }
                 });
             }

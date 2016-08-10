@@ -4,7 +4,7 @@ Template.models.events({
             var id = $(event.target).attr('id');
             if( id ) {
                 console.log(id);
-                Models.remove({'_id':id},function(error){
+                Meteor.call('removeModels', id, function(error){
                     if(error) {
                         window.scrollTo(0,0);
                         $('.error').html('Failed to delete the model, please try again');
@@ -22,7 +22,8 @@ getModelOutputsInWorkspace = function(ws) {
         var expSelector = {workspace:ws};
     else {
         // get model outputs from all available workspaces
-        var availableWorkspaceIds = getAvailableWorkspaceIds();
+        var userId = Meteor.userId();
+        var availableWorkspaceIds = getAvailableWorkspaceIds(userId);
         var expSelector = {workspace:{$in:availableWorkspaceIds}};
     }
     var exps = Experiments.find(expSelector).fetch();
