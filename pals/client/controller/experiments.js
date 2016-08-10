@@ -33,6 +33,11 @@ Template.experiments.helpers({
     return Experiments.find(selector,{sort:{name:1}});
   },
 
+  workspaceName: function(workspaceId) {
+    var ws = Workspaces.findOne({_id: workspaceId});
+    if (ws && ws.name) return ws.name;
+  },
+
   notCloned: function(experimentId) {
     var selector = {templateId:experimentId};
     selector.recordType = 'instance';

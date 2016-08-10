@@ -49,7 +49,9 @@
             {{/if}}
           {{/if}}
           {{#if areEqual source 'templates'}}<th>Clone</th>
-          {{else}}<th>View Analyses</th>{{/if}}
+          {{else}}
+            {{#if areEqual source 'anywhere'}}<th>Workspace</th>{{/if}}
+            <th>View Analyses</th>{{/if}}
           <th>Delete</th>
         </tr>
         </thead>
@@ -83,6 +85,7 @@
               {{else}}<td>Cloned</td>
               {{/if}}
             {{else}}
+              {{#if areEqual source 'anywhere'}}<td>{{workspaceName workspace}}</td>{{/if}}
               {{#if analysesExist}}<td><button class='btn btn-primary btn-xs view-analysis' id="{{_id}}">View Analyses</button></td>
               {{else}}<td>Unavailable</td>
               {{/if}}

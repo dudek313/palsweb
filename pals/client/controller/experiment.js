@@ -309,14 +309,28 @@ Template.experiment.helpers({
   },
   modelOutputs: function() {
     return getModelOutputs();
+  },
+  workspaceName: function() {
+    var name = '';
+    var currentExperiment = getCurrentExperiment();
+    if( currentExperiment ) {
+      var wsId = currentExperiment.workspace;
+      if( wsId ) {
+        var ws = Workspaces.findOne({_id: wsId});
+        if( ws ) {
+          name = ws.name;
+        }
+      }
+    }
+    return name;
   }
 });
 
 // returns the model outputs associated with the current experiment
 function getModelOutputs() {
-  currentExperimentId = getCurrentExperiment()._id;
-  if( currentExperimentId ) {
-    var selector = {'experiments':currentExperimentId};
+  currentExperiment = getCurrentExperiment();
+  if( currentExperiment ) {
+    var selector = {'experiments':currentExperiment._id};
     return  ModelOutputs.find(selector,{sort:{created:-1}}).fetch();
   }
 }

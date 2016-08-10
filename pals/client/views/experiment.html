@@ -31,6 +31,10 @@
                   <div class="display">{{name}}</div>
                 </div>
                 <div class="form-group">
+                  <label>Workspace</label>
+                  <div class="display">{{workspaceName}}</div>
+                </div>
+                <div class="form-group">
                   {{#if country}}
                       <label>Country</label>
                       <div class="display">{{country}}</div>
@@ -186,6 +190,10 @@
                   <div class="panel-heading">Details</div>
                   <div class="panel-body">
                     {{> afQuickField name='name'}}
+                    <div class="form-group">
+                      <label>Workspace</label>
+                      <div class="display">{{workspaceName}}</div>
+                    </div>
                     {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
                     {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
                     {{#if afFieldValueIs name='vegType' value='Other'}}
