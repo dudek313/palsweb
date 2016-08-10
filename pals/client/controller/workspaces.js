@@ -10,7 +10,7 @@ Template.workspaces.helpers({
         var userId = Meteor.userId();
         var selector = {'public':true};
         if( userId ) {
-            if (!Roles.userIsInRole(userId, 'access', 'all workspaces'))
+            if (!Roles.userIsInRole(userId, 'workspaceAccess', Roles.GLOBAL_GROUP))
                 selector = {$or: [selector, {'guests':userId}]};
             else selector = {};
         }

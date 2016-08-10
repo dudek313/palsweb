@@ -1,6 +1,6 @@
-var rootWorkspace = Workspaces.findOne({"name":"browsing"});
-if( !rootWorkspace ) {
-    Workspaces.insert({"name": "browsing", public: true});
+var browseWorkspace = Workspaces.findOne({"name":"browsing"});
+if( !browseWorkspace ) {
+    Workspaces.insert({"name": "browsing", public: false});
 }
 
 var variablesCursor = Variables.find();
