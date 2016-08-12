@@ -45,7 +45,9 @@ AutoForm.hooks({
             console.log(error.reason);
           }
           else {
-            // if successful, display the created experiment
+            // if successful, refresh the publication to ensure the user has access to the new experiment document
+            // then display the new document
+            Meteor.subscribe('experiments');
             Router.go('/experiment/display/' + docId);
           }
         });

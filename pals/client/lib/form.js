@@ -1,7 +1,7 @@
 if( typeof templateSharedObjects === 'undefined' ) templateSharedObjects = {};
 
 // The form class turns a form in a meteor template into a form which saves
-// attributes to the database whenever the user shifts focus away from input elements. 
+// attributes to the database whenever the user shifts focus away from input elements.
 // The events() function returns an object of event handlers which should be
 // passed to the Template.myTemplateName.events(events) function. This returned object has an
 // extend(extraEvents) function which can be used to add extra event handlers.
@@ -22,20 +22,20 @@ if( typeof templateSharedObjects === 'undefined' ) templateSharedObjects = {};
 // Parameters:
 // meteorSessionId - An identifier of a global reactive meteor variable which indicates
 //     the current document. This is used for initialising the form with an existing document.
-// collectionName - The collection in which to save the document. The GetCollectionByName(name) 
+// collectionName - The collection in which to save the document. The GetCollectionByName(name)
 //     function (see pals/both/collections.js) is used to retrieve the actual collection.
 // errorClass - The class of the html element in which to display any error messages.
 //     This is optional and defaults to '.error'.
 //
 templateSharedObjects.form = function(spec) {
     var that = {};
-    
+
     var meteorSessionId = spec.meteorSessionId; // global session identifier for current document
     var collectionName = spec.collectionName; // name of the Collection to save the document in
     var errorClass = spec.errorClass || '.error';
-    
+
     // events returns an object of event handler functions to be passed to Template.name.events().
-    // The function extend(other) is provided to add additional functions to the returned object. 
+    // The function extend(other) is provided to add additional functions to the returned object.
     function events() {
         return {
             'blur input': function (event) {
@@ -52,7 +52,7 @@ templateSharedObjects.form = function(spec) {
             },
             // add all the event handlers from the given object to this object
             // actually adds all attributes, but not those from the prototype chain
-            'extend':function(other) { 
+            'extend':function(other) {
                 for( var i in other ) {
                     if( other.hasOwnProperty(i) ) {
                         this[i] = other[i];
@@ -63,7 +63,7 @@ templateSharedObjects.form = function(spec) {
         }
     };
     that.events = events;
-    
+
     // update(event) triggers an update in the database based on an event.
     function update(event) {
         var fieldName = $(event.target).attr('name');
@@ -77,7 +77,7 @@ templateSharedObjects.form = function(spec) {
         }
         performUpdate(fieldName,value);
     };
-    
+
     // performUpdate(fieldName,value) updates the given field of the document in the database.
     // First the current document is loaded based on the meteorSessionId. If it is found the
     // document is updated, setting the field with the given fieldName to the given value.
@@ -89,7 +89,7 @@ templateSharedObjects.form = function(spec) {
             var user = Meteor.user();
             currentDocumentId = Session.get(meteorSessionId);
             var reference = Reference.findOne();
-        
+
             if( currentDocumentId ) {
                 if ( value == "n/a" ) value = null;
                 var selector = {'_id':currentDocumentId};
@@ -122,8 +122,8 @@ templateSharedObjects.form = function(spec) {
                 });
             }
         };
-        
-        // displayError displays the given error message on the console and in the given errorClass 
+
+        // displayError displays the given error message on the console and in the given errorClass
         // html element.
         function displayError(message) {
             console.log(message);
@@ -131,6 +131,6 @@ templateSharedObjects.form = function(spec) {
             $(errorClass).show();
         };
     };
-    
+
     return that;
 }

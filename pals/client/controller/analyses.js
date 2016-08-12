@@ -1,3 +1,7 @@
+Template.analyses.onCreated(function() {
+  Meteor.subscribe('analyses');
+});
+
 var maxIndex = 4;
 
 Session.set('analyses.clearIndex',maxIndex);
@@ -6,7 +10,7 @@ Session.set('analyses.1.type','model');
 Session.set('analyses.2.type','experiment');
 Session.set('analyses.3.type','modelOutput');
 Session.set('analyses.4.type','analysis');
- 
+
 Template.analyses.currentType = function(typeIndex) {
     return Session.get('analyses.'+typeIndex+'.type');
 }

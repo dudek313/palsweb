@@ -1,3 +1,8 @@
+Template.models.onCreated(function() {
+  Meteor.subscribe('models');
+});
+
+
 Template.models.events({
     'click .delete' : function(event) {
         if( confirm("Are you sure?")) {

@@ -1,3 +1,7 @@
+Template.modelOutputs.onCreated(function() {
+  Meteor.subscribe('modelOutputs');
+});
+
 Template.modelOutputs.helpers({
   // finds model output data to populate the model outputs table
   modelOutputs : function() {
@@ -57,8 +61,7 @@ Template.modelOutputs.events({
             if( confirm("Are you sure?")) {
                 Meteor.call('removeModelOutputs', id, function(error){
                     if(error) {
-                        displayError('Failed to delete the model output, please try again');
-                        console.log(error);
+                        displayError('Failed to delete the model output, please try again', error);
                     }
                 });
             }

@@ -281,7 +281,7 @@ Meteor.methods({
             var analysis = {
                'owner' : user._id,
                'created' : new Date(),
-               'workspaces' : [user.profile.currentWorkspace],
+               'workspace' : user.profile.currentWorkspace,
                'modelOutput' : currentModelOutput._id,
                'modelOutputVersion' : '',
 //               'modelOutputVersion' : currentVersion,

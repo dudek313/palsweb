@@ -47,7 +47,7 @@
         <ul class="dropdown-menu">
           <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/All');">In All Available Workspaces</a></li>
-          <li><a href="javascript:void(0)" onclick="Router.go('/experiments/templates/All');">Experiment Templates To Clone</a></li>
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/templates/All');">Experiment Templates To Clone</a></li>
           {{#if authorisedToEdit 'experiment'}}
             <li class="divider"></li>
             <li><a href="javascript:void(0)" onclick="Router.go('/experiment/create');">Create Experiment Template</a></li>

@@ -1,5 +1,6 @@
 Template.datasets.rendered = function() {
   window['directives']();
+  Meteor.subscribe('dataSets');
 };
 
 
@@ -18,8 +19,7 @@ Template.datasets.events({
       if( id ) {
         Meteor.call('removeDataSet', {'_id':id},function(error){
           if(error) {
-            displayError('Failed to delete the data set, please try again');
-            console.log(error.reason);
+            displayError('Failed to delete the data set, please try again', error);
           }
         });
       }

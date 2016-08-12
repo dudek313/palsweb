@@ -1,3 +1,8 @@
+// The publications limit user access to records based on the workspaces they have access to.
+// These publications are not necessarily refreshed when users create new documents (e.g. model outputs),
+// and therefore they might not have be given access to them.
+// To deal with this, we call subscribe() after new documents have been created to refresh the publication.
+
 Houston.add_collection(Meteor.users);
 Houston.add_collection(Houston._admins);
 Houston.hide_collection(Reference);
@@ -38,7 +43,7 @@ if (danny) {
 }
 
 Meteor.publish('directory',function(){
-   return Meteor.users.find();
+   return Meteor.users.find({}, {fields: {emails: 1}});
 });
 
 Meteor.publish('dataSets',function(){
@@ -89,7 +94,11 @@ Meteor.publish('modelOutputs',function() {
 //ModelOutputs._ensureIndex('name', {unique: 1});
 
 Meteor.publish('analyses',function(){
-    return Analyses.find();
+  var userId = this.userId;
+  var workspaceIds = getAvailableWorkspaceIds(userId);
+  selector = {workspace: {$in: workspaceIds}};
+
+  return Analyses.find(selector);
 });
 
 Meteor.publish('models',function(){
@@ -100,19 +109,6 @@ Meteor.publish('models',function(){
 //Models._ensureIndex('name', {unique: 1});
 //Models._ensureIndex('_id', {unique: 1});
 
-
-Models.allow({
-    insert: function(userId, doc) {
-        return ( userId && doc.owner === userId );
-    },
-    update: function(userId, doc, fieldNames, modifier) {
-        var group = "Model: " + doc._id;
-        return Roles.userIsInRole(userId, 'edit', group);
-    },
-    remove: function(userId, doc) {
-        return ( userId && doc.owner === userId );
-    }
-});
 
 Meteor.publish('variables',function(){
     return Variables.find();

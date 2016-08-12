@@ -39,16 +39,18 @@ AutoForm.hooks({
             // insert data set document to the mongodb collection
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
-                  displayError('Failed to create the data set. Please try again.');
-                  console.log(error.reason);
+                  displayError('Failed to create the data set. Please try again.', error);
                 }
                 else {
                     // if successful, display the created data sets
-                    testFiles();
+
+                    // Deleting files is currently not working
+/*                    testFiles();
                     removeDeletedFiles(Session.get('filesToDelete'));
                     Session.set('filesToDelete', []);
-
                     Session.set('dirty', false);
+*/
+                    Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
                     Router.go('/dataset/display/' + docId);
                 }
             });
@@ -62,8 +64,7 @@ AutoForm.hooks({
             updateDoc.$set.files = Session.get('tempFiles');
             Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
                 if(error) {
-                  displayError('Failed to update the data set. Please try again.');
-                  console.log(error.reason);
+                  displayError('Failed to update the data set. Please try again.', error);
                 }
                 else {
                     Session.set('dirty', false);
@@ -119,8 +120,7 @@ Template.dataset.events = {
         }
 
         else {
-          displayError('Error removing data set, please try again');
-          console.log(error.reason);
+          displayError('Error removing data set, please try again', error);
         }
     },
     'click .enable-update':function(event){

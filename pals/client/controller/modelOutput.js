@@ -31,6 +31,7 @@ AutoForm.hooks({
                 }
                 else {
                     // if successful, display the created experiment
+                    Meteor.subscribe('modelOutputs'); // Refresh the publication to allow user access to new model output
                     Router.go('/modelOutput/display/' + docId);
                 }
             });

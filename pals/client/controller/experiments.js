@@ -1,3 +1,7 @@
+Template.experiments.onCreated(function() {
+  Meteor.subscribe('experiments');
+});
+
 Template.experiments.helpers({
   isChecked: function(buttonLevel) {
     var level = getCurrentSpatialLevel();
@@ -45,6 +49,9 @@ Template.experiments.helpers({
     var user = Meteor.user();
     if( user ) {
       selector.workspace = user.profile.currentWorkspace;
+console.log('selector');console.log(selector);
+console.log('Experiment found in workspace?');
+console.log(Experiments.find(selector).fetch().length)
       return (Experiments.find(selector).fetch().length > 0) ? false : true;
     }
     else return null;
@@ -120,7 +127,11 @@ Template.experiments.events({
                     $('.error').show();
                     console.log(error.reason);
                 }
-                else console.log('Created experiment: ' + docId);
+                else {
+                  // if successful, refresh the publication to ensure the user has access to the new experiment document
+                  Meteor.subscribe('experiments');
+                  console.log('Created experiment: ' + docId);
+                }
             });
         }
     }

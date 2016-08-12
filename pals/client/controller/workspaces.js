@@ -1,3 +1,8 @@
+Template.workspaces.onCreated(function() {
+  Meteor.subscribe('workspaces');
+});
+
+
 Template.workspaces.helpers({
     myWorkspaces: function() {
         var user = Meteor.user();

@@ -81,10 +81,11 @@ getSource = function() {
     return Router.current().params.source;
 }
 
-displayError = function(errMessage) {
+displayError = function(errMessage, error) {
   window.scrollTo(0,0);
   $('.error').html(errMessage);
   $('.error').show();
+  console.log(error);
 }
 
 getCurrentWorkspaceId = function() {
