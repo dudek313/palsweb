@@ -1,4 +1,5 @@
 var queue = 'pals.input';
+SimpleSchema.debug = true;
 
 var redis = require("redis");
 var REDIS_HOST = process.env.REDIS_HOST;
@@ -64,7 +65,7 @@ Meteor.methods({
         }
         else {
           var dsId = DataSets.insert(dataSetDoc);
-          var group = 'dataSet: ' + dsId;
+          var group = 'dataSet ' + dsId;
           Roles.addUsersToRoles(userId, 'edit', group);
           return dsId;
         }
@@ -80,7 +81,7 @@ Meteor.methods({
     },
     'updateExperiment': function(currentDoc, updateDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'experiment: ' + currentDoc._id) ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -94,13 +95,13 @@ Meteor.methods({
         var docId;
         if (userId && expDoc.recordType == 'instance') {
             docId = Experiments.insert(expDoc);
-            var group = 'experiment: ' + docId;
+            var group = 'experiment ' + docId;
             Roles.addUsersToRoles(expDoc.owner, 'edit', group);
             return docId;
         }
         else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
             var expId = Experiments.insert(expDoc);
-            var group = 'experiment: ' + expId;
+            var group = 'experiment ' + expId;
             Roles.addUsersToRoles(userId, 'edit', group);
             return expId;
         }
@@ -110,7 +111,7 @@ Meteor.methods({
     },
     'deleteExperiment': function(dataSetDoc) {
         var userId = this.userId;
-        var group = 'experiment: ' + dataSetDoc._id;
+        var group = 'experiment ' + dataSetDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group) ) {
             throw new Meteor.Error('not-authorized')
         }
@@ -120,7 +121,7 @@ Meteor.methods({
     },
     'updateModel': function(currentDoc, modelDoc) {
         var userId = this.userId;
-        var group = 'model: ' + currentDoc._id;
+        var group = 'model ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
             throw new Meteor.Error('not-authorized')
         }
@@ -139,7 +140,7 @@ Meteor.methods({
         }
         else {
           var docId = Models.insert(modelDoc);
-          var group = 'model: ' + docId;
+          var group = 'model ' + docId;
           Roles.addUsersToRoles(modelDoc.owner, 'edit', group);
 
           return docId;
@@ -148,7 +149,7 @@ Meteor.methods({
 
     'removeModel': function(moId) {
         var userId = this.userId;
-        var group = 'model: ' + moId;
+        var group = 'model ' + moId;
         if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = Models.remove({_id: moId});
           return mo;
@@ -164,11 +165,11 @@ Meteor.methods({
           throw new Meteor.Error('not-authorized')
         }
         else if(Workspaces.findOne({name: name})) {
-          throw new Meteor.Error('There is already a workspace with name: ' + name);
+          throw new Meteor.Error('There is already a workspace with name ' + name);
         }
         else {
           var docId =  Workspaces.insert({owner: user._id, name: name});
-          Roles.addUsersToRoles(user._id, 'edit', 'workspace: ' + docId);
+          Roles.addUsersToRoles(user._id, 'edit', 'workspace ' + docId);
 
           return docId;
         }
@@ -176,7 +177,7 @@ Meteor.methods({
 
     'updateWorkspace': function(currentDoc, updateDoc) {
         var userId = this.userId;
-        var group = 'workspace: ' + currentDoc._id;
+        var group = 'workspace ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
             throw new Meteor.Error('not-authorized')
         }
@@ -204,13 +205,13 @@ Meteor.methods({
     },
 
     deleteAnalysis: function(id) {
-        console.log('deleting analysis: ' + id);
+        console.log('deleting analysis ' + id);
         var analysis = Analyses.findOne({_id:id});
         if( analysis ) {
              if( analysis.results && analysis.results.length > 0 ) {
                 analysis.results.forEach(function(result) {
                     if (result && result.path) {
-                        console.log('Deleting file: ' + result.path)
+                        console.log('Deleting file ' + result.path)
                         deleteFile(result.path);
                     }
                 });
@@ -229,7 +230,7 @@ Meteor.methods({
 
     startAnalysis: function (modelOutputId) {
 
-        console.log('starting analysis for model output: ' + modelOutputId);
+        console.log('starting analysis for model output ' + modelOutputId);
 
         var user = Meteor.user();
         var currentModelOutput = ModelOutputs.findOne({'_id':modelOutputId});

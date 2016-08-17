@@ -4,14 +4,16 @@ Template.dataset.rendered = function() {
     templateSharedObjects.progress().hide();
     Session.set('filesToDelete', []);
     Session.set('filesUploaded', []);
+    SimpleSchema.debug = true;
 };
 
-// Currently not working. findOne() returns 'undefined'
+// Currently not working - issue with publish & subscribe?
 function removeDeletedFiles(fileIds) {
 
-    if (fileIds && fileIds.length > 0) {
+/*    if (fileIds && fileIds.length > 0) {
         fileIds.forEach(function(fileId) {
             var fileDoc = Files.findOne({_id:fileId});
+            console.log(fileDoc);
             if (fileDoc) {
                 Files.remove(fileDoc, function(err, doc) {
                     if (err)
@@ -23,7 +25,7 @@ function removeDeletedFiles(fileIds) {
             }
             else console.log('File not found: ' + fileId);
         });
-    }
+    }*/
 }
 
 function testFiles() {
@@ -45,9 +47,9 @@ AutoForm.hooks({
                     // if successful, display the created data sets
 
                     // Deleting files is currently not working
-/*                    testFiles();
+//                    testFiles();
                     removeDeletedFiles(Session.get('filesToDelete'));
-                    Session.set('filesToDelete', []);
+/*                    Session.set('filesToDelete', []);
                     Session.set('dirty', false);
 */
                     Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
@@ -67,9 +69,9 @@ AutoForm.hooks({
                   displayError('Failed to update the data set. Please try again.', error);
                 }
                 else {
-                    Session.set('dirty', false);
+                /*    Session.set('dirty', false);
                     removeDeletedFiles(Session.get('filesToDelete'));
-                    Session.set('filesToDelete', []);
+                    Session.set('filesToDelete', []); */
 
                     var currentDataSetId = getCurrentObjectId();
                     Router.go('/dataset/display/' + currentDataSetId);
@@ -133,12 +135,12 @@ Template.dataset.events = {
             while(filenameAlreadyExists(filename = file.name)) {
                 filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
             };
+            file.type = 'dataSet';
+            file.dataSetId = getCurrentObjectId();
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {
-//                    var originalFilename = filename;
                     var name = 'files-' + fileObj._id + '-' + filename;
-//                    var name = 'files-' + fileObj._id + '-' + originalFilename;
                     var isDownloadable = document.getElementById('downloadable').checked;
                     var fileType = $("input[type='radio'][name='fileType']:checked").val();
                     var fileRecord = {
@@ -146,7 +148,6 @@ Template.dataset.events = {
                         name: filename,
                         size: fileObj.size(),
                         key: name,
-  //                        fileObjId: fileObj._id,
                         created: new Date(),
                         downloadable: isDownloadable,
                         type: fileType,

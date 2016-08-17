@@ -63,6 +63,8 @@ ModelOutputs.attachSchema(new SimpleSchema({
   'experiments':    {type: [String], optional: true},
   model:            {type: String, label: "Model", optional: true},
   created:          {type: Date, label: "Created", optional: true},
+  modified:         {type: Date, label: "Last Modified", optional: true},
+  modifierId:       {type: String, optional: true},
   parameterSelection: {type: String, label: "Parameter Selection",
                     allowedValues: Reference.findOne().parameterSelection, optional: true},
   stateSelection:   {type: String, label: "State Selection",
@@ -85,6 +87,7 @@ modelSchema = new SimpleSchema({
   owner:      {type: String, label: "Owner", optional: true},
   created:    {type: Date, label: "Created", optional: true},
   modified:   {type: Date, label: "Last Modified", optional: true},
+  modifierId: {type: String, optional: true},
   url:        {type: String, regEx: SimpleSchema.RegEx.Url, label: "URL", optional: true},
   references: {type: String, label: "References", optional: true},
   comments:   {type: String, label: "Comments", optional: true}
@@ -99,6 +102,7 @@ Experiments.attachSchema(new SimpleSchema({
   owner:        {type: String, optional: true},
   created:      {type: Date, optional: true},
   modified:     {type: Date, optional: true},
+  modifierId:   {type: String, optional: true},
   country:      {type: String, label: "Country", allowedValues: Reference.findOne().country, optional: true},
   vegType:      {type: String, label: "IGBP Vegetation Type", allowedValues: Reference.findOne().vegType, optional: true},
   otherVegType: {type: String, label: "Other Vegetation Type", optional: true},
@@ -155,14 +159,107 @@ dataSetSchema = new SimpleSchema({
   resolution:     {type: String, label: "Resolution",
                   allowedValues: Reference.findOne().resolution, optional: true},
   _version:       {type: Number, optional: true},
+  'files.$.created':  {type: Date, optional: true},
   'files.$.path': {type: String, optional: true},
   'files.$.name': {type: String, optional: true},
   'files.$.size': {type: Number, optional: true},
   'files.$.key':  {type: String, optional: true},
-  'files.$.date': {type: Date, optional: true},
   'files.$.downloadable':   {type: Boolean, optional: true},
-  'files.$.type': {type: String, optional: true}
+  'files.$.type': {type: String, optional: true},
+  modifierId: {type: String, optional: true}
 });
 
 DataSets.attachSchema(dataSetSchema);
 //DraftDataSets.attachSchema(dataSetSchema);
+
+/*Schema = {};
+
+Schema.UserProfile = new SimpleSchema({
+    firstName: {
+        type: String,
+        optional: true
+    },
+    lastName: {
+        type: String,
+        optional: true
+    },
+    birthday: {
+        type: Date,
+        optional: true
+    },
+    gender: {
+        type: String,
+        allowedValues: ['Male', 'Female'],
+        optional: true
+    },
+    organization : {
+        type: String,
+        optional: true
+    },
+    website: {
+        type: String,
+        regEx: SimpleSchema.RegEx.Url,
+        optional: true
+    },
+    bio: {
+        type: String,
+        optional: true
+    },
+    country: {
+        type: String,
+        optional: true
+    }
+});
+
+Schema.User = new SimpleSchema({
+    username: {
+        type: String,
+        // For accounts-password, either emails or username is required, but not both. It is OK to make this
+        // optional here because the accounts-password package does its own validation.
+        // Third-party login packages may not require either. Adjust this schema as necessary for your usage.
+        optional: true
+    },
+    emails: {
+        type: Array,
+        // For accounts-password, either emails or username is required, but not both. It is OK to make this
+        // optional here because the accounts-password package does its own validation.
+        // Third-party login packages may not require either. Adjust this schema as necessary for your usage.
+        optional: true
+    },
+    "emails.$": {
+        type: Object
+    },
+    "emails.$.address": {
+        type: String,
+        regEx: SimpleSchema.RegEx.Email
+    },
+    "emails.$.verified": {
+        type: Boolean
+    },
+    createdAt: {
+        type: Date
+    },
+    profile: {
+        type: Schema.UserProfile,
+        optional: true
+    },
+    // Make sure this services field is in your schema if you're using any of the accounts packages
+    services: {
+        type: Object,
+        optional: true,
+        blackbox: true
+    },
+    roles: {
+        type: Object,
+        optional: true,
+        blackbox: true
+    },
+    // In order to avoid an 'Exception in setInterval callback' from Meteor
+    heartbeat: {
+        type: Date,
+        optional: true
+    }
+});
+
+Meteor.users.attachSchema(Schema.User);
+*/

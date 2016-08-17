@@ -139,6 +139,8 @@ Template.experiment.events = {
   'change .file-select':function(event, template){
 //    var CurrentExperimentId = getCurrentExperiment()._id;
     FS.Utility.eachFile(event, function(file) {
+      file.type = 'analysisScript';
+      file.experimentId = getCurrentObjectId;
       Files.insert(file, function (err, fileObj) {
         if(err) console.log(err);
         else {

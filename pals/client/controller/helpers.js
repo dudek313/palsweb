@@ -31,7 +31,9 @@ Template.registerHelper("loggedIn", function() {
 Template.registerHelper("authorized", function(objType, id) {
     var userId = Meteor.userId();
     var screenMode = getScreenMode();
-    var group = objType + ': ' + id;
+    var group = objType + ' ' + id;
+
+//    console.log('Roles'); console.log(Meteor.user().roles);
     if (screenMode == 'display' || (screenMode == 'create' && userId) ||
         (screenMode == 'update' && Roles.userIsInRole(userId, 'edit', group)) ||
         (screenMode != 'display' && screenMode != 'update' && screenMode != 'create')) // needs to display 'Page not found'

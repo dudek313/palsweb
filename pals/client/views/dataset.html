@@ -6,7 +6,7 @@
       <button type="submit">Upload File</button>
   {{/autoForm}}
 -->
-  {{#if authorized 'dataset' _id}}
+  {{#if authorized 'dataSet' _id}}
     {{#if inEditMode}}
       {{#autoForm collection="DataSets" id=formId doc=this type="normal" validation='blur'}}
         <fieldset>

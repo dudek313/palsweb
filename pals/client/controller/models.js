@@ -1,3 +1,5 @@
+import '../views/models.html';
+
 Template.models.onCreated(function() {
   Meteor.subscribe('models');
 });

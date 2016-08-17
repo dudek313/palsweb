@@ -1,3 +1,5 @@
+import '../views/workspaces.html';
+
 Template.workspaces.onCreated(function() {
   Meteor.subscribe('workspaces');
 });
@@ -64,7 +66,8 @@ Template.workspaces.events({
   'click .leave-workspace':function (event) {
       event.preventDefault();
       var userId = Meteor.userId();
-      browsingWS = Workspaces.findOne({name:'browsing'})
+      enterBrowseMode();
+/*      browsingWS = Workspaces.findOne({name:'browsing'})
       if (browsingWS && browsingWS._id) {
         Meteor.call('changeWorkspace', browsingWS._id, function(error) {
           if(error) alert(error)
@@ -75,6 +78,7 @@ Template.workspaces.events({
         $('.error').html('Unable to access browsing workspace');
         $('.error').show();
       }
+      */
   },
   'click .delete-workspace':function (event) {
       var id = $(event.target).attr('id');

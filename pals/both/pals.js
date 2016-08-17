@@ -14,6 +14,7 @@ Router.map(function () {
         path: '/',
         template: 'home'
     });
+    this.route('registration');
     this.route('home',{
         path: '/home',
         template: 'home'

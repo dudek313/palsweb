@@ -24,10 +24,7 @@ AutoForm.hooks({
             // insert model output document to the mongodb collection
             Meteor.call('insertModelOutput', insertDoc, function(error, docId){
                 if(error) {
-                    window.scrollTo(0,0);
-                    $('.error').html('Failed to upload the model output. Please try again.');
-                    $('.error').show();
-                    console.log(error.reason);
+                    displayError('Failed to upload the model output. Please try again.', error);
                 }
                 else {
                     // if successful, display the created experiment
@@ -149,6 +146,8 @@ Template.modelOutput.events = {
     // Uses collection-fs package, which has been deprecated, but is still widely used
     'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
+            file.type = 'modelOutput';
+            file.modelOutputId = getCurrentObjectId();
             Files.insert(file, function (err, fileObj) {
                 if(err) console.log(err);
                 else {

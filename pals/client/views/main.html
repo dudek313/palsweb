@@ -70,9 +70,15 @@
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
-        <li> <!-- class="double-vertical-menu">-->
-            {{> loginButtons}}
-        </li>
+
+      {{#if loggedIn}}
+        {{> loginButtons}}
+      {{else}}
+        <div class="btns-group">
+          <a href="/login" class="btn-secondary">Login</a>
+          <a href="/sign-up" class="btn-secondary">Register</a>
+        </div>
+      {{/if}}
     </ul>
   </div><!-- /.navbar-collapse -->
   </div><!-- /container -->

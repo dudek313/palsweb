@@ -15,3 +15,10 @@ Template.main.helpers({
   }
 
 })
+
+Template.main.events({
+  'click .login-toggle': function() {
+    Router.go('/registration');
+//    Session.set('nav-toggle', 'open');
+  }
+});
