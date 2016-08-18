@@ -1,0 +1,17 @@
+<template name="registration">
+  <h1 align="center">Welcome to the PALS System</h1>
+  <div class="registration-form enabledStatus">
+    <div class="panel panel-primary">
+      <div class="panel-heading"></div>
+      <div class="panel-body">
+        {{#if atDisabled}}
+        <p><b>Please wait...</b></p><br>
+        {{/if}}
+        <p><i><b>Note:</b> If you used the previous PALS system and want to access your previous
+          data on the current system, please check <b>"Recover my data from old PALS system"</b> below
+          and we will endeavour to recover and import it.</i></p>
+        {{> atForm}}
+      </div>
+    </div>
+  </div>
+</template>
