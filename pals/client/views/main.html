@@ -69,17 +69,17 @@
 
     </ul>
 
-    <ul class="nav navbar-nav navbar-right">
 
-      {{#if loggedIn}}
+    {{#if loggedIn}}
+      <ul class="nav navbar-nav navbar-right">
         {{> loginButtons}}
-      {{else}}
-        <div class="btns-group">
-          <a href="/login" class="btn-secondary">Login</a>
-          <a href="/sign-up" class="btn-secondary">Register</a>
-        </div>
-      {{/if}}
-    </ul>
+      </ul>
+    {{else}}
+      <div class="btns-group nav navbar-nav navbar-right">
+        <a href="/login" class="btn-secondary">Login</a>
+        <a href="/registration" class="btn-secondary RbtnMargin">Register</a>
+      </div>
+    {{/if}}
   </div><!-- /.navbar-collapse -->
   </div><!-- /container -->
 </nav>

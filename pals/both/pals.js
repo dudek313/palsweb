@@ -14,11 +14,6 @@ Router.map(function () {
         path: '/',
         template: 'home'
     });
-    this.route('registration');
-    this.route('home',{
-        path: '/home',
-        template: 'home'
-    });
     this.route('workspaces');
     this.route('workspace',{
        path: '/workspace/:id',

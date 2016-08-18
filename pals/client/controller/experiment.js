@@ -316,13 +316,21 @@ Template.experiment.helpers({
   },
   workspaceName: function() {
     var name = '';
-    var currentExperiment = getCurrentExperiment();
-    if( currentExperiment ) {
-      var wsId = currentExperiment.workspace;
-      if( wsId ) {
-        var ws = Workspaces.findOne({_id: wsId});
-        if( ws ) {
-          name = ws.name;
+    var screenMode = getScreenMode();
+    if (screenMode == 'create') {
+      currentWS = getCurrentWorkspace();
+      if (currentWS && currentWS.name)
+        name = currentWS.name;
+    }
+    else {
+      var currentExperiment = getCurrentExperiment();
+      if( currentExperiment ) {
+        var wsId = currentExperiment.workspace;
+        if( wsId ) {
+          var ws = Workspaces.findOne({_id: wsId});
+          if( ws ) {
+            name = ws.name;
+          }
         }
       }
     }
