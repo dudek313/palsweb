@@ -9,9 +9,9 @@ AccountsTemplates.configure({
 });
 
 AccountsTemplates.configureRoute('signIn', {
-    name: 'sign-in',
+    name: 'signIn',
     path: '/login',
-    template: 'sign-in',
+    template: 'signIn',
     layoutTemplate: 'main',
     redirect: '/',
 });

@@ -13,6 +13,13 @@
     z-index: 2;
 }
 
+.at-error {
+    color: red;
+}
+
+.at-result {
+    color: green;
+}
 .no-workspace-header {
     background:DodgerBlue;
     position: fixed;
