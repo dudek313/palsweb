@@ -1,0 +1,13 @@
+.italicised-text {
+    font-style: italic;
+    font-size: 75%;
+    color: green;
+}
+
+.at-error {
+    color: red;
+}
+
+.at-result {
+    color: green;
+}
