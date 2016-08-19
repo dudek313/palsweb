@@ -28,28 +28,41 @@ AccountsTemplates.addFields([
   {
     _id: 'name',
     type: 'text',
-    displayName: 'Name',
-    required: true
+    displayName: 'Full name',
+    required: true,
+    options: {
+      italicisedText: '(public)'
+    }
   }, {
-    _id: 'username',
+    _id: 'organisation',
     type: 'text',
-    displayName: 'Username',
-    required: true
-  }, {
-    _id: 'organization',
-    type: 'text',
-    dispayName: 'Organization',
-    required: true
-  }, {
-    _id: 'city',
-    type: 'text',
-    dispayName: 'City',
-    required: true
+    dispayName: 'Organisation',
+    required: true,
+    options: {
+      italicisedText: '(public)'
+    }
   }, {
     _id: 'country',
     type: 'text',
     dispayName: 'Country',
-    required: true
+    options: {
+      italicisedText: '(optional)'
+    }
+  }, {
+    _id: 'currentWork',
+    type: 'text',
+    dispayName: 'Brief description of current work',
+    required: true,
+    options: {
+      italicisedText: '(public)'
+    }
+  }, {
+    _id: 'webPage',
+    type: 'text',
+    dispayName: 'Web page',
+    options: {
+      italicisedText: '(optional, public)'
+    }
   }, {
     _id: 'requestsDataRecovery',
     type: 'checkbox',

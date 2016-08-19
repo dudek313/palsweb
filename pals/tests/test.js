@@ -21,7 +21,7 @@ describe('Login', function() {
 
   it('should allow registered user to login @watch', function() {
     browser.url('http://localhost:3000');
-    browser.pause(1000);
+    browser.pause(2000);
     browser.click(".login-btn");
     browser.pause(500);
 //    browser.setValue('#at-field-username_and_email', 'gabsun@gmail.com');

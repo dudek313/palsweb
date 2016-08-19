@@ -26,6 +26,8 @@ Router.map(function () {
            }
        ]*/
     });
+    this.route('term-of-use');
+    this.route('privacy');
     this.route('datasets',{
         path: '/datasets/:source/:resolution',
         template: 'datasets'
