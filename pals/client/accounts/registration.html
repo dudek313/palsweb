@@ -1,0 +1,8 @@
+<template name="registration">
+  <div class="registration-form enabledStatus">
+    {{#if atDisabled}}
+      <p><b>Please wait...</b></p><br>
+    {{/if}}
+    {{> atForm}}
+  </div>
+</template>

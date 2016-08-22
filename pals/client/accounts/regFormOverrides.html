@@ -1,18 +1,133 @@
+<template name="override-atForm">
+  {{#unless hide}}
+    <div class="at-form">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          {{#if showTitle}}
+            {{> atTitle}}
+          {{/if}}
+        </div>
+        <div class="panel-body">
+          {{#if showOauthServices}}
+            {{> atOauth}}
+          {{/if}}
+          {{#if showServicesSeparator}}
+            {{> atSep}}
+          {{/if}}
+          {{#if showError}}
+            {{> atError}}
+          {{/if}}
+          {{#if atDisabled}}
+            <p><b>Please wait...</b></p><br>
+          {{/if}}
+          {{#if showResult}}
+            {{> atResult}}
+          {{/if}}
+          {{#if showMessage}}
+            {{> atMessage}}
+          {{/if}}
+          {{#if showPwdForm}}
+            {{> atPwdForm}}
+          {{/if}}
+          {{#if showTermsLink}}
+            {{> atTermsLink}}
+          {{/if}}
+          {{#if showSignInLink}}
+            {{> atSigninLink}}
+          {{/if}}
+          {{#if showSignUpLink}}
+            {{> atSignupLink}}
+          {{/if}}
+          {{#if showResendVerificationEmailLink}}
+            {{> atResendVerificationEmailLink}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  {{/unless}}
+</template>
+
+<template name="override-atPwdForm">
+  <div class="at-pwd-form">
+    <form role="form" id="at-pwd-form" class="{{disabled}}" novalidate action="#" method="POST">
+
+      {{#if isRegistrationForm}}
+
+        <div class="panel">
+          <div class="panel-heading"><h5><b><i>INFORMATION THAT WILL BE MADE PUBLIC</i></b></h5></div>
+          <div class="panel-body">
+            {{#each fields}}
+              {{#if options.public}}
+                {{> atInput}}
+              {{/if}}
+            {{/each}}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-heading"><h5><b><i>INFORMATION THAT WILL NOT BE MADE PUBLIC</i></b></h5></div>
+          <div class="panel-body">
+            {{#each fields}}
+              {{#unless options.public}} {{#unless options.putLast}}
+                {{> atInput}}
+              {{/unless}} {{/unless}}
+            {{/each}}
+          </div>
+        </div>
+
+        {{#each fields}}
+          {{#if options.putLast}}
+            {{> atInput}}
+          {{/if}}
+        {{/each}}
+
+      {{else}}
+        {{#each fields}}
+          {{> atInput}}
+        {{/each}}
+      {{/if}}
+
+      {{#if showReCaptcha}}
+        {{> atReCaptcha}}
+      {{/if}}
+      {{#if showForgotPasswordLink}}
+        {{> atPwdLink}}
+      {{/if}}
+      {{> atPwdFormBtn}}
+    </form>
+  </div>
+</template>
+
+<template name="override-atInput">
+  <div class="form-group">
+    {{#if options.introductoryMessage}}
+      <div>
+        <p><b><i>{{options.introductoryMessage}}</i></b></p>
+      </div>
+    {{/if}}
+
+    {{> Template.dynamic template=templateName}}
+  </div>
+</template>
+
 <template name="override-atTextInput">
-  <div class="at-input form-group {{#if isValidating}}validating{{/if}} {{#if hasError}}has-error{{/if}} {{#if hasSuccess}}has-success{{/if}} {{#if feedback}}has-feedback{{/if}}">
+  <div class="at-input {{#if isValidating}}validating{{/if}} {{#if hasError}}has-error{{/if}} {{#if hasSuccess}}has-success{{/if}} {{#if feedback}}has-feedback{{/if}}">
 
       {{#if showLabels}}
         <label for="at-field-{{_id}}" class="control-label">
           {{displayName}} <!--{{#unless required}}{{optionalText}}{{/unless}}-->
-          {{#if options.italicisedText}}
-            <span class="italicised-text">{{options.italicisedText}}</span>
-              {{/if}}
         </label>
       {{/if}}
+
       <div>
-        <input type="{{type}}" class="form-control" id="at-field-{{_id}}" name="at-field-{{_id}}" autocapitalize="none" autocorrect="off">
-<!--        <input type="{{type}}" class="form-control" id="at-field-{{_id}}" name="at-field-{{_id}}" placeholder="{{placeholder}}" autocapitalize="none" autocorrect="off">-->
+        {{#if options.textArea}}
+          <textarea type="{{type}}" class="form-control" id="at-field-{{_id}}" name="at-field-{{_id}}" rows="5" placeholder="{{placeholder}}" autocapitalize="none" autocorrect="off"></textarea>
+        {{else}}
+<!--          <input type="{{type}}" class="form-control" id="at-field-{{_id}}" name="at-field-{{_id}}" autocapitalize="none" autocorrect="off"> -->
+        <input type="{{type}}" class="form-control" id="at-field-{{_id}}" name="at-field-{{_id}}" placeholder="{{placeholder}}" autocapitalize="none" autocorrect="off">
+        {{/if}}
       </div>
+
       {{#if hasIcon}}
           <span class="{{iconClass}}"></span>
       {{/if}}
@@ -20,4 +135,24 @@
         <span>{{errorText}}</span>
       {{/if}}
   </div>
+</template>
+
+<template name="override-atSelectInput">
+  <div class="at-input">
+    <label for="at-field-{{_id}}">{{displayName}}</label>
+    <div>
+      <select id="at-field-{{_id}}" class="form-control" name="at-field-{{_id}}">
+        <option value="" selected>(Select one)</option>
+        {{#each values}}
+          <option value="{{value}}">{{text}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+</template>
+
+<template name="override-atPwdFormBtn">
+  <button type="submit" class="at-btn btn btn-primary submit {{submitDisabled}}" id="at-btn">
+    {{buttonText}}
+  </button>
 </template>

@@ -5,10 +5,6 @@ Template.registration.events({
 });
 
 Template.registration.helpers({
-  atDisabled: function() {
-    return AccountsTemplates.disabled();
-  },
-
   enabledStatus: function() {
     return AccountsTemplates.disabled() ? 'disabled' : 'active';
   }
