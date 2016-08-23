@@ -407,6 +407,7 @@ deleteFile = function(path) {
     });
 }
 
+/*
 createFileRecord = function(fileName,fileSize,fileData) {
     var fileToken = Meteor.uuid();
     fs.writeFile(fileBucket+'/'+fileToken, fileData, 'binary');
@@ -419,7 +420,7 @@ createFileRecord = function(fileName,fileSize,fileData) {
     };
     return fileRecord;
 }
-
+*/
 /**
  * Loads all the current versions of the model outputs which are associated with the given experiment.
  * A list of model output file records are returned.

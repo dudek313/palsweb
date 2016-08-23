@@ -52,10 +52,6 @@ Meteor.publish('dataSets',function(){
       return DataSets.find();
 });
 
-Meteor.publish('reference',function(){
-    return Reference.find();
-});
-
 Meteor.publish('experiments',function(){
   var wsSelector = {};
 

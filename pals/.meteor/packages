@@ -11,7 +11,6 @@ standard-minifier-js@1.1.8
 accounts-ui@1.1.9
 standard-app-packages@1.0.9
 jquery@1.11.9
-npm-container
 aldeed:collection2
 aldeed:autoform
 ecmascript@0.5.7

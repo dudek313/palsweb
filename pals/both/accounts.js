@@ -1,4 +1,4 @@
-import './collections.js'
+import './collections.js';
 
 AccountsTemplates.configure({
   defaultLayout: 'main',
@@ -35,9 +35,9 @@ AccountsTemplates.configureRoute('verifyEmail');
 AccountsTemplates.removeField('email');
 AccountsTemplates.removeField('password');
 
-var countryNames = Reference.findOne().country;
+//var countryNames = CountryNames.slice();
 var countryTuples = [];
-countryNames.forEach(function(countryName) {
+CountryNames.forEach(function(countryName) {
   var tuple = {text: countryName, value: countryName};
   countryTuples.push(tuple);
 })
@@ -55,8 +55,8 @@ AccountsTemplates.addFields([
   }, {
     _id: 'surname',
     type: 'text',
-    displayName: 'Surname*',
-    placeholder: 'Surname',
+    displayName: 'Last name*',
+    placeholder: 'Last name',
     required: true,
     options: {
       public: true

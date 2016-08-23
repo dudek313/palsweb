@@ -7,11 +7,6 @@ Handlebars.registerHelper('breaklines',
     }
 );
 
-Handlebars.registerHelper("reference", function() {
-    var reference = Reference.findOne();
-    return reference;
-});
-
 Handlebars.registerHelper('encode',
     function(str) {
         return encodeURIComponent(str);

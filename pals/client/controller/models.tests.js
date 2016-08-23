@@ -20,7 +20,7 @@ describe('login', function() {
             done();
         });
     });
-
+/*
     describe('create workspace', function() {
       it('creates a new workspace', function(done) {
         Router.go('/workspaces');
@@ -39,7 +39,7 @@ describe('login', function() {
 
       });
     });
-
+*/
     describe('models', function() {
         it('creates a new workspace')
 
@@ -85,4 +85,3 @@ describe('login', function() {
 describe('uploadDataSet', function() {
     it('')
 });
-*/
