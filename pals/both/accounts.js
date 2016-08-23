@@ -35,7 +35,6 @@ AccountsTemplates.configureRoute('verifyEmail');
 AccountsTemplates.removeField('email');
 AccountsTemplates.removeField('password');
 
-//var countryNames = CountryNames.slice();
 var countryTuples = [];
 CountryNames.forEach(function(countryName) {
   var tuple = {text: countryName, value: countryName};

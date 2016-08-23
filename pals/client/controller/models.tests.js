@@ -20,6 +20,19 @@ describe('login', function() {
             done();
         });
     });
+
+    describe('insertModel', function(done) {
+      it('allows a registered user to insert a model', function(done) {
+        var newModel = makeModel("Model 1");
+        Meteor.call('insertModel', newModel, function(err, ok) {
+          chai.assert.isUndefined(err);
+          done();
+        });
+        done();
+      });
+    });
+
+
 /*
     describe('create workspace', function() {
       it('creates a new workspace', function(done) {
@@ -85,3 +98,11 @@ describe('login', function() {
 describe('uploadDataSet', function() {
     it('')
 });
+
+function makeModel(modelName) {
+  var model = {
+    name: modelName
+  };
+
+  return model;
+}

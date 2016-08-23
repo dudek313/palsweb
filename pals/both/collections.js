@@ -1,6 +1,5 @@
 Workspaces = new Meteor.Collection("workspaces");
 DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId: 'modifierId'});
-Reference = new Meteor.Collection("reference");
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
 ModelOutputs = new Meteor.Collection("modelOutputs").vermongo({timestamps: true, userId: 'modifierId'});
 Analyses = new Meteor.Collection("analyses");

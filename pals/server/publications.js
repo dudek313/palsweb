@@ -3,10 +3,6 @@
 // and therefore they might not have be given access to them.
 // To deal with this, we call subscribe() after new documents have been created to refresh the publication.
 
-Houston.add_collection(Meteor.users);
-Houston.add_collection(Houston._admins);
-Houston.hide_collection(Reference);
-
 Meteor.publish('workspaces', function(){
     var selector = {'public':true};
     var userId = this.userId;
