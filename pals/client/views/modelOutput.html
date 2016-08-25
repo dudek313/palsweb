@@ -1,152 +1,297 @@
 <template name="modelOutput">
-<div class="model-output">
-<div class="row">
-<div class="col-md-8">
-<form role="form">
-    <h1>Model Output: {{modelOutput.name}}</h1>
-    <div class="alert alert-danger error"></div>
-    <div class="form-group">
-        <label>Model Output name</label>
-        {{#if owner}}<input class="modifier form-control" type="text" name="name" value="{{modelOutput.name}}">
-        {{else}}
-        <div class="display">{{modelOutput.name}}</div>
-        {{/if}}
-    </div>
-    <div class="form-group">
-       {{#if owner}}
-       <label>Experiment</label>
-       <select name="experiment" class="form-control">
-           {{#each experiments}}
-           <option value='{{_id}}' {{selected this._id modelOutput.experiment._id}}>{{name}}</option>
-           {{/each}}
-       </select>
-       {{else}}
-       {{#if modelOutput.model}}
-           <label>Experiment</label>
-           <div class="display">{{modelOutput.experiment.name}}</div>
-       {{/if}}
-       {{/if}}
-   </div>
-   <div class="form-group">
-       {{#if owner}}
-       <label>Model</label>
-       <select name="model" class="form-control">
-           <option value='n/a'></option>
-           {{#each models}}
-           <option value='{{_id}}' {{selected this._id modelOutput.model}}>{{name}}</option>
-           {{/each}}
-       </select>
-       {{else}}
-       {{#if modelOutput.model}}
-           <label>Model</label>
-           <div class="display">{{modelOutput.model.name}}</div>
-       {{/if}}
-       {{/if}}
-   </div>
-   <div class="form-group">
-       {{#if owner}}
-       <label>State Selection</label>
-       <select name="stateSelection" class="form-control">
-           {{#each reference.stateSelection}}
-           <option value='{{_id}}' {{selected this  modelOutput.stateSelection}}>{{this}}</option>
-           {{/each}}
-       </select>
-       {{else}}
-       {{#if modelOutput.stateSelection}}
-           <label>State Selection</label>
-           <div class="display">{{modelOutput.stateSelection}}</div>
-       {{/if}}
-       {{/if}}
-   </div>
-   <div class="form-group">
-       {{#if owner}}
-       <label>Parameter Selection</label>
-       <select name="parameterSelection" class="form-control">
-           {{#each reference.parameterSelection}}
-           <option value='{{_id}}' {{selected this  modelOutput.parameterSelection}}>{{this}}</option>
-           {{/each}}
-       </select>
-       {{else}}
-       {{#if modelOutput.parameterSelection}}
-           <label>Parameter Selection</label>
-           <div class="display">{{modelOutput.parameterSelection}}</div>
-       {{/if}}
-       {{/if}}
-   </div>
-   <div class="form-group">
-       {{#if owner}}
-           <label>Please add any comments that would aid reproducing this simulation: </label>
-           <textarea class="modifier form-control" type="text" name="comments">{{modelOutput.comments}}</textarea>
-       {{else}}
-           {{#if modelOutput.comments}}
-               <label>Comments</label>
-               <div class="display">{{{breaklines modelOutput.comments}}}</div>
-           {{/if}}
-       {{/if}}
-   </div>
-   {{#if analyses}}
-   <br/>
-   <h3>Analyses</h3>
-   <table class="table">
-        <tr>
-            <th>id</th>
-            <th>MO Version</th>
-            <th>Status</th>
-            <th>Error Message</th>
-            <th>View Results</th>
-            <th>Delete</th>
-        </tr>
-        {{#each analyses}}
-        <tr>
-            <td>{{_id}}</td>
-            <td>{{modelOutputVersion.filename}}</td>
-            <td>{{status}}</td>
-            <td>{{error}}</td>
-            <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
-            <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
-        </tr>
-        {{/each}}
-    </table>
-    {{/if}}
-   
-</form>
-</div>
-<div class="col-md-4">
-    <div class="panel panel-primary">
-    <div class="panel-heading">Versions</div>
-    <div class="panel-body">
-    {{#if owner}}
-        <label>Upload a new version</label>
-        <input type="file" class="file-select" name="file-select"/>
-        <div class="progress progress-striped active">
-          <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-              style="width:0%">
+  <div class="detail-form">
+    {{#if authorized 'modelOutput' _id}}
+      {{#if areEqual screenMode 'display'}}
+
+        <form role="form">
+          {{#if authorisedToEdit 'modelOutput' _id}}
+            <a class="btn btn-primary run-analysis pull-right RbtnMargin">Run Analysis</a>
+            <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
+            <br><br>
+          {{/if}}
+          <h1>Model Output: {{name}}</h1>
+          <div class="panel panel-primary">
+            <div class="panel-heading">Details</div>
+            <div class="panel-body">
+
+              <div class="form-group">
+                  <label>Name</label>
+                  <div class="display">{{name}}</div>
+              </div>
+              <div class="form-group">
+                <label>Experiment</label>
+                <div class="display">{{experimentName}}</div>
+              </div>
+              <div class="form-group">
+                <label>Model</label>
+                <div class="display">{{modelName}}</div>
+              </div>
+              <div class="form-group">
+                <label>State Selection</label>
+                <div class="display">{{stateSelection}}</div>
+              </div>
+              <div class="form-group">
+                <label>Parameter Selection</label>
+                <div class="display">{{parameterSelection}}</div>
+              </div>
+              {{#if comments}}
+                <div class="form-group">
+                  <label>Comments</label>
+                  <div class="display break-word">{{{breaklines comments}}}</div>
+                </div>
+              {{/if}}
+
+            </div>
           </div>
-        </div>
+
+         <!-- File panel -->
+          <div class="panel panel-success">
+            <div class="panel-heading">File</div>
+            <div class="panel-body">
+            {{#if file}}
+              <table class="table">
+                <tr>
+                  <th>Filename</th>
+                  <th>Download</th>
+                </tr>
+                <tr>
+                  <td>{{file.filename}}</td>
+                  <td><button class='download-file btn btn-primary btn-xs' id='{{file.key}}'
+                        onclick="window.location.href='/file/{{file.key}}/{{file.filename}}'">Download</button></td>
+                </tr>
+              </table>
+            {{else}}
+              <tr>No file uploaded.</tr>
+            {{/if}}
+            </div>
+          </div>
+
+          <div class="panel panel-success">
+            <div class="panel-heading">Benchmarks</div>
+            <div class="panel-body">
+            {{#if benchmarks}}
+              <table class="table">
+                <tr>
+                  <th>Model Output Name</th>
+                </tr>
+                {{#each benchmark in benchmarks}}
+                  <tr>
+                    <td onclick="/modelOutput/display/{{benchmark._id}}">{{benchmark.name}}</td>
+                  </tr>
+                {{/each}}
+              </table>
+            {{else}}
+              <tr>No benchmarks specified.</tr>
+            {{/if}}
+            </div>
+          </div>
+
+          <div class="panel panel-primary">
+            <div class="panel-heading">Analyses</div>
+            <div class="panel-body">
+
+              {{#if analyses}}
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>id</th>
+                      <th>MO Version</th>
+                      <th>Status</th>
+                      <th>Error Message</th>
+                      <th>View Results</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#each analyses}}
+                      <tr>
+                        <td>{{_id}}</td>
+                        <td>{{modelOutputVersion.filename}}</td>
+                        <td>{{status}}</td>
+                        <td><div style="height:20px; word-wrap:break-word; overflow:hidden">{{error}}</div></td>
+                        <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody> 
+                </table>
+              {{else}}
+                No analyses recorded
+              {{/if}}
+
+            </div>
+          </div>
+        </form>
+        {{#if authorisedToEdit 'modelOutput' _id}}
+          <a class="btn btn-primary run-analysis pull-right RbtnMargin">Run Analysis</a>
+          <a class="btn btn-primary enable-update pull-right">Edit Model Output Details</a>
+          <br><br>
+        {{/if}}
+
+      {{else}}  <!-- If screen mode is "create" or "update" -->
+        {{#if inEditMode}}
+          {{#if areEqual screenMode 'create'}}
+            <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+              <br>Model output details and files won't be saved until "Save" is clicked below.</b></div>
+          {{else}}
+            <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+              <br>Model output details won't be updated until "Save Changes" is clicked below.</b></div>
+          {{/if}}
+
+          {{#autoForm collection="ModelOutputs" id=formId doc=this type="normal" validation='blur'}}
+            <fieldset>
+              {{#if areEqual screenMode 'create'}}
+                <h1>Create New Model Output</h1>
+              {{else}} <!-- if in update mode -->
+                <h1>Model Output: {{name}}</h1>
+                <br>
+              {{/if}}
+              <div class="alert alert-danger error"></div>
+              <div class="panel panel-primary">
+                <div class="panel-heading">Details</div>
+                <div class="panel-body">
+
+                  {{> afQuickField name='name'}}
+
+                  <div class="form-group">
+                     <label>Experiment</label>
+                     <select name="experiment" id="experimentId" class="form-control">
+                       <option value=''>(Select One)</option>
+                       {{#each exp in expList}}
+                         <option value='{{exp._id}}' {{selected exp._id experiment._id}}>{{exp.name}}</option>
+                       {{/each}}
+                     </select>
+                   </div>
+
+  <!--                {{> afArrayField name='experiments' type='select' firstOption="(Select One)" options=expOptions}} -->
+                  {{> afQuickField name='model' type='select' firstOption="(Select One)" options=myModels}}
+                  {{> afQuickField name='stateSelection' type='select' firstOption="(Select One)" options="allowed"}}
+                  {{> afQuickField name='parameterSelection' type='select' firstOption="(Select One)" options="allowed"}}
+
+                  <div class="form-group">
+                    <label>Please add any comments that would aid reproducing this simulation: </label>
+                    <textarea class="modifier form-control" type="text" name="comments">{{comments}}</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel panel-success">
+                <div class="panel-heading">File</div>
+                <div class="panel-body">
+
+                {{#if tempFile}}
+                  <table class="table">
+                    <tr>
+                      <th>Filename</th>
+                      <th>Delete</th>
+                    </tr>
+                    <tr>
+                      <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
+                      <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                    </tr>
+                  </table>
+
+                {{else}}
+                   <label>Upload a model output file</label>
+                   <input type="file" class="file-select" name="file-select"/>
+                   <div class="progress progress-striped active">
+                     <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                         style="width:0%">
+                     </div>
+                   </div>
+                 {{/if}}
+
+                </div>
+              </div>
+
+              <div class="panel panel-success">
+                <div class="panel-heading">Benchmarks (up to 3)</div>
+                <div class="panel-body">
+
+                  {{#if tempBenchmarks}}
+                    <table class="table">
+                      <tr>
+                        <th>Model Output Name</th>
+                        <th>Remove</th>
+                      </tr>
+                      {{#each benchmark in tempBenchmarks}}
+                        <tr>
+                          <td onclick="/modelOutput/display/{{benchmark._id}}">{{benchmark.name}}</td>
+                          <td><button class='remove-benchmark btn btn-danger btn-xs' id='{{benchmark._id}}'>Remove</button></td>
+                        </tr>
+                      {{/each}}
+                    </table>
+
+                  {{else}}
+                    <tr>No benchmarks specified.</tr> <br>
+                  {{/if}}
+
+                  <div class="form-group">
+                    <select name="addBenchmark" class="form-control">
+                      <option selected disabled>(Select One)</option>
+                      {{#each otherModelOutputs}}
+                        <option value="{{_id}}">{{name}}</option>
+                      {{/each}}
+                    </select>
+                  </div>
+                  <button class='btn btn-default bottom-margin' id="addBenchmark">Add Benchmark</button>
+
+                </div>
+              </div>
+
+              {{#if areEqual screenMode 'update'}}
+                {{#if tempAnalyses}}
+                  <h3>Analyses</h3>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>id</th>
+                        <th>MO Version</th>
+                        <th>Status</th>
+                        <th>Error Message</th>
+                        <th>View Results</th>
+                        <th>Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#each tempAnalyses}}
+                        <tr>
+                          <td>{{_id}}</td>
+                          <td>{{modelOutputVersion.filename}}</td>
+                          <td>{{status}}</td>
+                          <td><div style="height:20px; word-wrap:break-word; overflow:hidden">{{error}}</div></td>
+                          <td>{{#if results}}<a href="/analysis/{{_id}}">View</a>{{/if}}</td>
+                          <td><button id="{{_id}}" class="delete-analysis btn btn-danger btn-xs">Delete</button></td>
+                        </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                {{/if}}
+              {{/if}}
+
+            </fieldset>
+            <div class="col-md-12">
+              {{#if areEqual screenMode 'create'}}
+                <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+                  <br>Model output details and files won't be saved until "Save" is clicked below.</b></div>
+                  <button type="submit" class="create-btn btn btn-primary">Save</button>
+                  <button type="reset" class="btn btn-primary cancel-create">Cancel</button>
+              {{else}}
+                <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
+                  <br>Experiment details won't be updated until "Save Changes" is clicked below.</b>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary save-update">Save Changes</button>
+                <button type="reset" class="cancel-update btn btn-primary">Cancel</button>
+
+              {{/if}}
+            </div>
+          {{/autoForm}}
+
+        {{else}}
+          {{> notFound}}
+        {{/if}}
+      {{/if}}
+    {{else}}
+      {{> unauthorized}}
     {{/if}}
-    </div>
-    {{#if hasVersions}}
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>File</th>
-            {{#if owner}}<th>delete</th>{{/if}}
-            {{#if owner}}<th>Start Analysis</th>{{/if}}
-        </tr>
-        </thead>
-        <tbody>
-        {{#each modelOutput.versions}}
-        <tr>
-            <td onclick="window.location.href='/file/{{key}}/{{encode "application/x-ncdf"}}'">{{filename}}</td>
-            {{#if owner}}<td><button class='delete-version btn btn-danger btn-xs' id='{{key}}'>delete</button></td>{{/if}}
-            {{#if owner}}<td><button class='start-analysis btn btn-primary btn-xs' id='{{key}}'>start new analysis!</button></td>{{/if}}
-        </tr>
-        {{/each}}
-        </tbody>
-    </table>
-    {{/if}}
-</div>
-</div>
-</div>
-</div><!--model-output-->
+  </div>
 </template>

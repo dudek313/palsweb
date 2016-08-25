@@ -1,6 +1,6 @@
 <template name="models">
 <div class="text-content">
-    <h1>Models</h1>
+    <h1>{{pageTitle}}</h1>
     <div class="alert alert-danger error"></div>
     <table class="table table-hover">
         <thead>
@@ -11,21 +11,21 @@
             <th>URL</th>
             <th>References</th>
             <th>Comments</th>
-            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
         {{#each models}}
         <tr>
-            <td onclick="Router.go('/models/{{_id}}')">{{name}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{owner.email}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{created}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{url}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{references}}</td>
-            <td onclick="Router.go('/models/{{_id}}')">{{comments}}</td>
-            {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; word-wrap:break-word; overflow:hidden">{{name}}</div></td>
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; word-wrap:break-word; overflow:hidden">{{owner.email}}</div></td>
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; word-wrap:break-word; overflow:hidden">{{created}}</div></td>
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; word-wrap:break-word; overflow:hidden">{{url}}</div></td>
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; overflow:hidden">{{references}}</div></td>
+            <td onclick="Router.go('/model/display/{{_id}}')"><div style="height:20px; width:250px; overflow:hidden">{{comments}}</div></td>
+            {{#if authorisedToEdit 'model' _id}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
          </tr>
-        {{/each}} 
+        {{/each}}
         </tbody>
     </table>
 </div>

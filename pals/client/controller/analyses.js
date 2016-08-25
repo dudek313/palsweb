@@ -1,3 +1,7 @@
+Template.analyses.onCreated(function() {
+  Meteor.subscribe('analyses');
+});
+
 var maxIndex = 4;
 
 Session.set('analyses.clearIndex',maxIndex);
@@ -28,7 +32,7 @@ Template.analyses.image = function() {
     var modelOutputId = Session.get('analyses.modelOutput');
     var analysisType = Session.get('analyses.analysis');
     var experimentId = Session.get('analyses.experiment');
-    
+
     if( modelOutputId && analysisType && experimentId ) {
     	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId} );
         console.log(analysis);
@@ -49,7 +53,7 @@ Template.analyses.selectOptions = function(selectIndex) {
     var type = Session.get('analyses.'+selectIndex+'.type');
     var previousIndex = selectIndex - 1;
     var previousType = Session.get('analyses.'+previousIndex+'.type');
-    
+
     if( type == 'model' ) {
         if( previousType && previousType == 'experiment') {
             var experimentId = Session.get('analyses.experiment');
@@ -84,7 +88,7 @@ Template.analyses.selectOptions = function(selectIndex) {
 					uniqueModelIds[modelOutput.model]=modelOutput.model;
 				}
 			}
-			
+
 			var modelIds = new Array();
 			if( haveModelId ) {
 			    for( var key in uniqueModelIds ) {
@@ -239,7 +243,7 @@ Template.analyses.events({
         var type = Session.get('analyses.'+key+'.type');
         var value = $(event.target).val();
         Session.set('analyses.'+type,value);
-        
+
         if( Session.get('analyses.clearIndex') <= key ) {
             Session.set('analyses.clearIndex',parseInt(key)+1)
         }
@@ -264,7 +268,7 @@ Template.analyses.events({
             var fromValue = Session.get('analyses.'+fromKey+'.type');
             Session.set('analyses.'+toKey+'.type',fromValue);
             Session.set('analyses.'+fromKey+'.type',toValue);
-            
+
             Session.set('analyses.clearIndex',Math.min(toKey,fromKey));
         }
     }

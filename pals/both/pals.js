@@ -3,128 +3,132 @@
 FILE_BUCKET = '/pals/data';
 
 Router.configure({
-    layoutTemplate: 'main'
+    layoutTemplate: 'main',
+    notFoundTemplate: 'notFound'
 });
+
+Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
 
 Router.map(function () {
     this.route('root',{
         path: '/',
         template: 'home'
     });
-    this.route('home',{
-        path: '/home',
-        template: 'home'
-    });
     this.route('workspaces');
     this.route('workspace',{
-       path: '/workspaces/:id',
+       path: '/workspace/:id',
        template: 'workspace',
+       data: function() { return Workspaces.findOne({_id:this.params.id}); } /*,
        onBeforeAction: [
-           function() {
-               Session.set('currentWorkspace',this.params.id);
-	       this.next();
+          function() {
+              Session.set('currentWorkspace',this.params.id);
+              this.next();
            }
-       ] 
+       ]*/
     });
+    this.route('term-of-use');
+    this.route('privacy');
     this.route('datasets',{
-        path: '/datasets',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialResolution',null);
-		this.next();
-            }
-        ]
+        path: '/datasets/:source/:resolution',
+        template: 'datasets'
     });
-    this.route('dataset',{
-        path: '/datasets/:id',
+    this.route('displayOrUpdateDataset',{
+        path: '/dataset/:screenMode/:id',
         template: 'dataset',
+        data: function() { return DataSets.findOne({_id:this.params.id}); },
         onBeforeAction: [
             function() {
-                Session.set('currentDataSet',this.params.id);
-                this.next();
-            }
-        ]
-    });
-    this.route('dataSetsBySpatialResolution',{
-        path: '/dataSetsBySpatialResolution/:resolution',
-        template: 'datasets',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialResolution',this.params.resolution);
+                $('.error').hide();
+                if (this.params.screenMode == 'update') {
+                    ds = DataSets.findOne({_id:this.params.id});
+                    if (ds) {
+                        Session.set('tempFiles', ds.files);
+                    }
+                    Session.set('uploadButtonClicked', false);
+                }
                 this.next();
             }
         ]
     });
     this.route('createDataset',{
-        path: '/dataset',
+        path: '/dataset/:screenMode',
         template: 'dataset',
         onBeforeAction: [
             function() {
-                Session.set('currentDataSet',undefined);
-		this.next();
+                Session.set('tempFiles', []);
+                Session.set('uploadButtonClicked', false);
+                this.next();
             }
         ]
     });
-    this.route('experiment',{
-        path: '/experiment',
+    this.route('createExperiment',{
+        path: '/experiment/:screenMode',
         template: 'experiment',
         onBeforeAction: [
             function() {
-                Session.set('currentExperiment',undefined);
+                Session.set('tempScripts', []);
+                Session.set('tempDataSets', []);
                 this.next();
             }
         ]
     });
     this.route('experiments',{
-        path: '/experiments',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialResolution',null);
-                this.next();
-            }
-        ]
+        path: '/experiments/:source/:resolution',
+        template: 'experiments'
     });
-    this.route('experimentsById',{
-        path: '/experiments/:id',
+    this.route('displayOrUpdateExperiment',{
+        path: '/experiment/:screenMode/:id',
         template: 'experiment',
+        data: function() { return Experiments.findOne({_id:this.params.id}) },
         onBeforeAction: [
             function() {
-                Session.set('currentExperiment',this.params.id);
+                $('.error').hide();
+                if (this.params.screenMode == 'update') {
+                    exp = Experiments.findOne({_id:this.params.id});
+                    if (exp) {
+                        Session.set('tempScripts', exp.scripts);
+                        Session.set('tempDataSets', exp.dataSets);
+                    }
+                }
                 this.next();
             }
         ]
     });
-    this.route('experimentsBySpatialResolution',{
-        path: '/experimentsBySpatialResolution/:resolution',
-        template: 'experiments',
-        onBeforeAction: [
-            function() {
-                Session.set('currentSpatialResolution',this.params.resolution);
-                this.next();
-            }
-        ]
-    });
-    this.route('modelOutput',{
-        path: '/modelOutput',
+    this.route('createModelOutput',{
+        path: '/modelOutput/:screenMode',
         template: 'modelOutput',
         onBeforeAction: [
             function() {
-                Session.set('currentModelOutput',undefined);
+                Session.set('tempFile',undefined);
+                Session.set('tempBenchmarks', []);
+                Session.set('tempAnalyses', []);
                 this.next();
             }
         ]
     });
-    this.route('myModelOutputs');
-    this.route('modelOutputs');
-    this.route('modelOutputsById',{
-        path: '/modelOutputs/:id',
+    this.route('modelOutputs',{
+        path: '/modelOutputs/:source',
+        template: 'modelOutputs'
+    });
+    this.route('displayOrUpdateModelOutput',{
+        path: '/modelOutput/:screenMode/:id',
         template: 'modelOutput',
+        data: function() { return ModelOutputs.findOne({_id : this.params.id}); },
         onBeforeAction: [
             function() {
-                Session.set('currentModelOutput',this.params.id);
-		this.next();
+                $('.error').hide();
+                if (this.params.screenMode == 'update') {
+                    var mo = ModelOutputs.findOne({_id:this.params.id});
+                    if (mo) {
+                        Session.set('tempFile', mo.file);
+                        Session.set('tempBenchmarks', mo.benchmarks);
+                        var analyses = Analyses.find({modelOutput:mo._id}).fetch();
+                        var analysisIds = getIdsFromObjects(analyses);
+                        Session.set('tempAnalyses', analysisIds);
+                        Session.set('analysesToDelete', []);
+                    }
+                }
+                this.next();
             }
         ]
     });
@@ -138,24 +142,22 @@ Router.map(function () {
             }
         ]
     });
-    this.route('models');
-    this.route('model',{
-        path: '/model',
-        template: 'model',
-        onBeforeAction: [
-            function() {
-                Session.set('currentModel',undefined);
-                this.next();
-            }
-        ]
+    this.route('models', {
+        path: '/models/:source',
+        template: 'models'
     });
-    this.route('modelsById',{
-        path: '/models/:id',
+    this.route('createModel',{
+        path: '/model/:screenMode',
+        template: 'model'
+    });
+    this.route('displayOrUpdateModel',{
+        path: '/model/:screenMode/:id',
         template: 'model',
+        data: function() { return Models.findOne({_id : this.params.id}) },
         onBeforeAction: [
             function() {
-                Session.set('currentModel',this.params.id);
-                this.next();
+                $('.error').hide();
+                this.next()
             }
         ]
     });
@@ -175,15 +177,17 @@ Router.map(function () {
     });
 });
 
-// Router.onBeforeAction(function(){
-//     if (!Meteor.user()) {
-//         this.render('login');
-//         this.stop();
-//     }
-// }, {except: ['home','root','file']});
-// 
-// if( Meteor.isClient ) {
-//     Router.configure({
-//       autoRender: false
-//     });
-// }
+/** Confirms before allowing a user to navigate away from a page before saving edits.
+/* Doesn't work
+Router.onBeforeAction(function(pause) {
+    if(Session.get('dirty')) {
+        if(confirm("Are you sure you want to navigate away?")) {
+            Session.set('dirty', false);
+            this.next();
+        }
+    }
+    else {
+        this.next();
+    }
+});
+*/

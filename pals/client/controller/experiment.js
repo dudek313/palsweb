@@ -1,237 +1,348 @@
 Template.experiment.rendered = function() {
-    window['directives']();
-    templateSharedObjects.progress().hide();
+  window['directives']();
+  templateSharedObjects.progress().hide();
 };
 
-Template.experiment.experiment = function() {
-    currentExperimentId = Session.get('currentExperiment');
-    if( currentExperimentId ) {
-        var experiment = Experiments.findOne({'_id':currentExperimentId});
-        if( experiment && experiment.scripts ) {
-            experiment.scripts.sort(function(a,b){
-                if(a.created >= b.created) return -1
-                else return 1
-            });
+AutoForm.hooks({
+  createExperimentForm: {
+/*    this will only be called when creating experiment templates, not active experiments.
+    insertDoc contains the values of the fields filled in on the form.
+    This function also adds extra fields not included in the form, e.g. _version, owner and recordType.
+
+    tempScripts and tempDataSets contain the data about the sets of to be added to the experiment document at submission time.
+*/
+
+    onSubmit: function(insertDoc, updateDoc, currentDoc) {
+      if(Experiments.findOne({name: insertDoc.name})) {
+        $('.error').html('An experiment template with this name already exists');
+        $('.error').show();
+        window.scrollTo(0, 0);
+      }
+      else {
+        insertDoc._version = 1;
+        insertDoc.owner = Meteor.user()._id;
+        insertDoc.scripts = Session.get('tempScripts');
+        insertDoc.recordType = 'template';
+        var currentDataSets = Session.get('tempDataSets');
+        // for each data set added, need to format as id and version number
+        insertDoc.dataSets = [];
+        if (currentDataSets && currentDataSets.length > 0) {
+          currentDataSets.forEach(function(dataSet) {
+            var dataSetDetails = {
+              _id : dataSet._id,
+              _version : null //  experiment templates don't need data set version
+                      //  numbers, as the most recent version will be used when cloned.
+            };
+            insertDoc.dataSets.push(dataSetDetails);
+          })
         }
-        return experiment;
+        // insert experiment document to the mongodb collection
+        Meteor.call('insertExperiment', insertDoc, function(error, docId){
+          if(error) {
+            window.scrollTo(0,0);
+            $('.error').html('Error: Failed to create the experiment');
+            $('.error').show();
+            console.log(error.reason);
+          }
+          else {
+            // if successful, refresh the publication to ensure the user has access to the new experiment document
+            // then display the new document
+            Meteor.subscribe('experiments');
+            Router.go('/experiment/display/' + docId);
+          }
+        });
+
+      }
+      this.done();
+      return false;
     }
-}
+  },
+  updateExperimentForm: {
+    onSubmit: function(insertDoc, updateDoc, currentDoc) {
+      updateDoc.$set.scripts = Session.get('tempScripts');
+      var currentDataSets = Session.get('tempDataSets');
+      updateDoc.$set.dataSets = [];
+      var recordType = getRecordType();
+      if (recordType != 'template' && recordType != 'instance') {
+        window.scrollTo(0,0);
+        $('.error').html('Error: Failed to update the data set');
+        $('.error').show();
+      }
+      else {
+        // add version number to the data set details, if relevant.
+        // Templates don't need data set version numbers,
+        // but active experiments ("instances") do.
+        if (currentDataSets && currentDataSets.length > 0) {
+          currentDataSets.forEach(function(dataSet) {
+            var dataSetDetails = {
+              _id : dataSet._id,
+              _version : (recordType == 'template') ? null : dataSet._version
+            };
+            updateDoc.$set.dataSets.push(dataSetDetails);
+          });
+        }
+      }
 
-Template.experiment.modelOutputs = function() {
-    currentExperimentId = Session.get('currentExperiment');
-    var user = Meteor.user();
-    var selector = {'experiment':currentExperimentId};
-    if( user && user.profile.currentWorkspace ) {
-        selector.workspaces = user.profile.currentWorkspace._id;
-    }
-    if( currentExperimentId ) {
-        return  ModelOutputs.find(selector,{sort:{created:-1}});
-    }
-}
-
-Template.experiment.reference = function() {
-    return Reference.findOne();
-};
-
-Template.experiment.update = function(event) {
-    var fieldName = $(event.target).attr('name');
-    var value = $(event.target).val();
-    Template.experiment.performUpdate(fieldName,value);
-};
-
-Template.experiment.performUpdate = function(fieldName,value) {
-
-    if( value ) {
-    
-        var user = Meteor.user();
-        currentExperimentId = Session.get('currentExperiment');
-        var reference = Template.experiment.reference();
-        
-        if( currentExperimentId ) {
-        
-            if( value == "n/a" ) value = null;
-        
-            var selector = {'_id':currentExperimentId};
-            var fieldModifier = {};
-            fieldModifier[fieldName] = value;
-            var modifier = {'$set':fieldModifier};
-            Experiments.update(selector,modifier,function(error){
-                if( error ) {
-                    $('.error').html('There was an error saving the field, please try again');
-                    $('.error').show();
-                }
-            });
+      // update experiment collection
+      Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
+        if(error) {
+          window.scrollTo(0,0);
+          $('.error').html('Error: Failed to update the experiment. ');
+          $('.error').show();
+          console.log(error.message);
         }
         else {
-            currentExperiment = {
-                'owner' : user._id,
-                'created' : new Date(),
-                'workspaces' : [user.profile.currentWorkspace._id]
-            };
-            //if( fieldName != 'type' ) currentExperiment.type = reference.dataSetType[0];
-            //if( fieldName != 'country' ) currentExperiment.country = reference.country[0];
-            //if( fieldName != 'vegType' ) currentExperiment.vegType = reference.vegType[0];
-            if( fieldName != 'spatialLevel' ) currentExperiment.spatialLevel = reference.spatialLevel[0];
-            if( fieldName != 'timeStepSize' ) currentExperiment.timeStepSize = reference.timeStepSize[0];
-            currentExperiment[fieldName] = value;
-            Experiments.insert(currentExperiment,function(error,id) {
-                if( error ) {
-                    if( error.error == 409 ) $('.error').html('An experiment with that name already exists');
-                    else $('.error').html('There was an error saving your value, please try again');
-                    $('.error').show();
-                }
-                else {
-                    currentExperiment._id = id;
-                    Session.set('currentExperiment',id);
-                }
-            });
+          // if successful, display the updated experiment document
+          Router.go('/experiment/display/' + currentDoc._id);
         }
+      });
+      this.done();
+      return false;
     }
+  }
+})
+
+Template.experiment.events = {
+  // when user clicks cancel during update experiment, returns them to display mode
+  'click .cancel-update':function(event){
+    event.preventDefault();
+    Router.go('/experiment/display/' + getCurrentExperiment()._id)
+  },
+  // when user clicks cancel while creating experiment, returns them to home page
+  'click .cancel-create':function(event){
+    event.preventDefault();
+    Router.go('/home')
+  },
+  // when user clicks on delete script button,
+  //removes script from the tempScripts session variable
+  'click .delete-script':function(event) {
+    event.preventDefault();
+    var key = $(event.target).attr('id');
+    var tempScripts = Session.get('tempScripts');
+    var newScripts = [];
+    tempScripts.forEach(function(script) {
+      if (script.key != key)
+        newScripts.push(script);
+    });
+    Session.set('tempScripts', newScripts);
+  },
+
+  // when user clicks on update experiment button,
+  // changes from display mode to update mode
+  'click .enable-update':function(event){
+    // store current experiment scripts and data sets in session variables
+    // to be updated without making the changes permanent
+    var currentExperiment = getCurrentExperiment();
+    Router.go('/experiment/update/' + currentExperiment._id);
+  },
+  // uploads script files after selection
+  'change .file-select':function(event, template){
+//    var CurrentExperimentId = getCurrentExperiment()._id;
+    FS.Utility.eachFile(event, function(file) {
+      file.type = 'analysisScript';
+      file.experimentId = getCurrentObjectId;
+      Files.insert(file, function (err, fileObj) {
+        if(err) console.log(err);
+        else {
+          var originalFilename = fileObj.name();
+          var name = 'files-' + fileObj._id + '-' + originalFilename;
+          var fileRecord = {
+            path: FILE_BUCKET+'/'+name,
+            filename: originalFilename,
+            key: name,
+          };
+          var tempScripts = Session.get('tempScripts');
+          tempScripts.push(fileRecord);
+          Session.set('tempScripts', tempScripts);
+        }
+      });
+    });
+  },
+/*
+  'click .download-file':function(event, template){
+    event.preventDefault();
+  },*/
+  // when a user selects a data set to add (in update mode), this function
+  // adds the id and latest version number of the data set to the
+  // tempDataSets session variable, causing it to display on the update screen
+  'click #add-data-set':function(event) {
+    event.preventDefault();
+    var selected = $('select[name="addDataSet"]').val();
+    if( selected ) {
+      var currentDataSets = Session.get('tempDataSets');
+      if (currentDataSets) {
+        var currentVersion = getDataSetVersion(selected);
+        dataSetDetails = {_id: selected, _version: currentVersion};
+        currentDataSets.push(dataSetDetails);
+        Session.set('tempDataSets', currentDataSets);
+      }
+      else {
+        window.scrollTo(0,0);
+        $('.error').html('Error adding data set, please try again');
+        $('.error').show();
+      }
+
+    }
+  },
+  // removes a selected dataset from the tempDataSets session variable,
+  // thereby removing it from display on the update page
+  'click .remove-dataset':function(event) {
+    event.preventDefault();
+    var selectedDataSetId = $(event.target).attr('id');
+    var currentDataSets = Session.get('tempDataSets');
+    var newDataSetIds = [];
+    if (currentDataSets && currentDataSets.length > 0) {
+      currentDataSets.forEach(function(currentDataSet) {
+        if (currentDataSet._id != selectedDataSetId)
+          newDataSetIds.push(currentDataSet);
+      });
+      Session.set('tempDataSets', newDataSetIds);
+    }
+    else {
+      window.scrollTo(0,0);
+      $('.error').html('Error removing data set, please try again');
+      $('.error').show();
+    }
+  },
+  'click .clone' : function(event) {
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    var newExpInstance = getCurrentExperiment();
+    newExpInstance.templateId = newExpInstance._id;
+    delete newExpInstance._id;
+    newExpInstance.recordType = 'instance';
+    newExpInstance.workspace = Meteor.user().profile.currentWorkspace;
+    newExpInstance.templateVersion = newExpInstance._version;
+    if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
+      newExpInstance.dataSets.forEach(function(dataset){
+        dataset._version = getDataSetVersion(dataset._id);
+      });
+    }
+    else console.log("Experiment doesn't have datasets");
+    Meteor.call('insertExperiment', newExpInstance, function(error,docId){
+      if (error) {
+        window.scrollTo(0,0);
+        $('.error').html('Failed to clone the experiment, please try again');
+        $('.error').show();
+        console.log(error.reason);
+      }
+      else console.log('Created experiment: ' + docId);
+    });
+
+  }
+
 };
 
-Template.experiment.events({
-    'blur input': function (event) {
-        Template.experiment.update(event);
-    },
-    'blur textarea': function (event) {
-        Template.experiment.update(event);
-    },
-    'change select':function(event) {
-        Template.experiment.update(event);
-    },
-    'click #driving-data-set':function(event) {
-        event.preventDefault();
-        var selected = $('select[name="drivingDataSet"]').val();
-        if( selected ) {
-            var experimentId = Session.get('currentExperiment');
-            if( !experimentId ) alert('Please enter an experiment name before adding data sets');
-            else {
-                Experiments.update({'_id':experimentId},
-                    {'$push':{'dataSets':selected}},function(error){
-                    if( error ) {
-                         $('.error').html('Error adding data set, please try again');
-                         $('.error').show();
-                    }
-                });
-            }
-        }
-    },
-    'click .remove-driving-dataset':function(event) {
-        console.log('here');
-        var dataSetId = $(event.target).attr('id');
-        var experimentId = Session.get('currentExperiment');
-        if( dataSetId && experimentId ) {
-            Experiments.update({_id:experimentId},
-                {$pull:{'dataSets':dataSetId}},function(error){
-                if(error) {
-                    $('.error').html('Sorry, there was an error removing the data set, try again');
-                    $('.error').show();
-                }
-            });
-        }
-    },
-    'click .delete-script':function(event) {
-        if( Meteor.user().admin ) {
-            var key = $(event.target).attr('id');
-        
-            var currentExperiment = Template.experiment.experiment();
-            if( currentExperiment.scripts ) {
-                var currentScript = undefined;
-                currentExperiment.scripts.forEach(function(script) {
-                    if( script.key == key ) {
-                        currentScript = script;
-                    }
-                });
-                if( currentScript ) {
-                    Experiments.update({'_id':currentExperiment._id},
-                        {$pull : {'scripts':{ 'key':key }}}, function(error) {
-                            if( error ) {
-                                $('.error').html('Failed to delete script, please try again');
-                                $('.error').show();
-                            }
-                        }
-                    );
-                
-                    Files.remove({_id:currentScript.fileObjId},function(err){
-                       if(err) console.log(err);
-                    });
-                }
-            }
-        }
-    },
-    // 'change .file-select': function(event, template){
-    //     var file = event.target.files[0];
-    //     var reader = new FileReader();
-    //     var currentExperimentId = Session.get('currentExperiment');
-    //     if( !currentExperimentId ) {
-    //         alert("Please enter an experiment name before uploading scripts");
-    //         return;
-    //     }
-    //     var progress = templateSharedObjects.progress();
-    //     progress.showProgress();
-    //     reader.onload = function(fileLoadEvent) {
-    //         Meteor.call('uploadScript', currentExperimentId, file.name, file.size, reader.result);
-    //     };
-    //     reader.onprogress = progress.readerProgress;
-    //     reader.readAsBinaryString(file);
-    // }
-    'change .file-select': function(event, template){
-        
-        var currentExperimentId = Session.get('currentExperiment');
-        if( !currentExperimentId ) {
-            alert("Please enter an experiment name before uploading scripts");
-            return;
-        }
-        
-        FS.Utility.eachFile(event, function(file) {
-            Files.insert(file, function (err, fileObj) {
-                if(err) console.log(err);
-                else {
-                    var originalFilename = fileObj.name();
-                    var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    
-                    var fileRecord = {
-                        path: FILE_BUCKET+'/'+name,
-                        filename: originalFilename,
-                        size: fileObj.size(),
-                        key: name,
-                        fileObjId: fileObj._id,
-                        created: new Date()
-                    };
-                    Experiments.update({'_id':currentExperimentId},
-                        {'$push':{'scripts':fileRecord}},function(error){
-                            if( error ) {
-                                console.log(error);
-                                console.log('Failed to add uploaded script to the experiment');
-                            }
-                    });
-                }
-            });
-        });
+
+// returns the record type of the current experiment,
+// whether it is an experiment template or an instance (active experiment)
+function getRecordType() {
+  var experiment = getCurrentExperiment();
+  if (experiment)
+    return experiment.recordType;
+  else {
+    return null;
+  }
+}
+
+// returns the current experiment record from the mongodb collection
+function getCurrentExperiment() {
+  if(Router.current().data && Router.current().data())
+    return Router.current().data();
+}
+
+Template.experiment.helpers({
+  // determines whether the current form is a create form or an update form
+  formId: function() {
+  var screenMode = getScreenMode();
+  var formId = null;
+  if(screenMode == 'create') formId = "createExperimentForm";
+  else if(screenMode == 'update') formId = "updateExperimentForm";
+  return formId;
+  },
+  // determines whether current experiment has already been cloned into the current workspace
+  notCloned: function() {
+  var template = getCurrentExperiment();
+  if (template) {
+    var selector = {templateId: template._id};
+    selector.recordType = 'instance';
+    selector.workspace = Meteor.user().profile.currentWorkspace;
+    return (Experiments.find(selector).fetch().length > 0) ? false : true;
+  }
+  },
+  // returns the data sets used by the current experiment
+  dataSets: function() {
+  var exp = getCurrentExperiment();
+  if( exp && exp.dataSets && exp.dataSets.length > 0) {
+    exp.dataSets.forEach(function(dataSet){
+    dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+    });
+    return exp.dataSets;
+
+  }
+  else return [];
+  },
+  // returns the details of the scripts currently uploaded
+  tempScripts: function() {
+    return Session.get('tempScripts');
+  },
+  // identifies data sets not yet associated with this experiment
+  // that can now be associated with it
+  otherDataSets: function() {
+  var currentDataSets = Session.get('tempDataSets');
+  var currentDataSetIds = getIdsFromObjects(currentDataSets);
+  selector = {_id:{$nin:currentDataSetIds}};
+  return DataSets.find(selector,{sort:{name:1}});
+  },
+  // determines the record type of the current experiment
+  recordType: function() {
+  return getRecordType();
+  },
+  // returns an array with the names of the data sets currently
+  // associated with the current experiment in create or update mode
+  tempDataSets: function() {
+  var tempDataSets = Session.get('tempDataSets');
+  if( tempDataSets && tempDataSets.length > 0) {
+    tempDataSets.forEach(function(dataSet){
+    dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+    });
+    return tempDataSets;
+  }
+  else return [];
+  },
+  modelOutputs: function() {
+    return getModelOutputs();
+  },
+  workspaceName: function() {
+    var name = '';
+    var screenMode = getScreenMode();
+    if (screenMode == 'create') {
+      currentWS = getCurrentWorkspace();
+      if (currentWS && currentWS.name)
+        name = currentWS.name;
     }
+    else {
+      var currentExperiment = getCurrentExperiment();
+      if( currentExperiment ) {
+        var wsId = currentExperiment.workspace;
+        if( wsId ) {
+          var ws = Workspaces.findOne({_id: wsId});
+          if( ws ) {
+            name = ws.name;
+          }
+        }
+      }
+    }
+    return name;
+  }
 });
 
-Template.experiment.dataSets = function() {
-    var publicWorkspace = Workspaces.findOne({"name":"public"});
-    return  DataSets.find({'workspaces':publicWorkspace._id});
-};
-
-Template.experiment.drivingDataSets = function() {
-    var exp = Template.experiment.experiment();
-    if( exp && exp.dataSets && exp.dataSets.length > 0) {
-        var drivingDataSets = DataSets.find({_id:{$in:exp.dataSets}});
-        return drivingDataSets;
-    }
-};
-
-Template.experiment.hasScripts = function() {
-    var experiment = Template.experiment.experiment();
-    if( experiment && experiment.scripts && experiment.scripts.length > 0 ) return true;
-    else return false;
-};
-
-Template.experiment.uploadDisabled = function() {
-    var currentExperiment = Template.experiment.experiment();
-    if( currentExperiment ) return '';
-    else return 'disabled="disabled"';
+// returns the model outputs associated with the current experiment
+function getModelOutputs() {
+  currentExperiment = getCurrentExperiment();
+  if( currentExperiment ) {
+    var selector = {'experiments':currentExperiment._id};
+    return  ModelOutputs.find(selector,{sort:{created:-1}}).fetch();
+  }
 }
