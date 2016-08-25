@@ -1,0 +1,81 @@
+{
+   "_id" : "mVJDHsjHSJWHK",
+   "files" : [
+       {
+           "type" : "ModelOutput",
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_2002.nc",
+           "mimetype" : "application/x-netcdf",
+	   "name" : "CABLEtestAus",
+	   "variable" : "Qle"
+       },
+       {
+           "type" : "ModelOutput",
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_2003.nc",
+           "mimetype" : "application/x-netcdf",
+	   "name" : "CABLEtestAus",
+	   "variable" : "Qle"
+       },
+       {   
+           "type" : "DataSet", 
+           "path" : "/media/nadja/data/ncFiles/DataSet/MODIS/MOD16_ET_Australia_0.5x0.5_2005.nc",
+           "mimetype" : "application/x-netcdf",
+	       "name" : "MODIS",
+	   "variable" : "Qle"
+       },
+       {   
+           "type" : "DataSet", 
+           "path" : "/media/nadja/data/ncFiles/DataSet/MODIS/MOD16_ET_Australia_0.5x0.5_2006.nc",
+           "mimetype" : "application/x-netcdf",
+	       "name" : "MODIS",
+	   "variable" : "Qle"
+       },
+       {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1985.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "1",
+	       "name" : "BenchWY1",
+	   "variable" : "Qle"
+       },
+       {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1986.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "1",
+	       "name" : "BenchWY1",
+	   "variable" : "Qle"
+       },
+       {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1989.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "2",
+	       "name" : "BenchWY2",
+	   "variable" : "Qle"
+       },
+       {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1990.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "2",
+	       "name" : "BenchWY2",
+	   "variable" : "Qle"
+       },
+       {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1997.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "3",
+	       "name" : "BenchWY3",
+	   "variable" : "Qle"
+       },
+	   {
+	   "type" : "Benchmark", 
+           "path" : "/media/nadja/data/ncFiles/ModelOutput/cable_output_GSWP3_Aust_1998.nc",
+           "mimetype" : "application/x-netcdf",
+           "number" : "3",
+	       "name" : "BenchWY3",
+	   "variable" : "Qle"
+       }
+   ]
+}

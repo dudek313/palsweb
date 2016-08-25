@@ -1,0 +1,5 @@
+export REDIS_HOST=172.17.0.2
+export BIND_IP=0.0.0.0 # (*for meteor in dev mode)
+export MONGO_URL=mongodb://172.17.0.3/meteor
+#export MAIL_URL=smtp://postmaster%40sandboxac9ec7474aa24b60a4509179b37d8c2a.mailgun.org:9f6bbf900d0192c0a648cd755a54fb22@smtp.mailgun.org:587
+meteor

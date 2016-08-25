@@ -1,0 +1,71 @@
+<template name="workspaces">
+<div class="alert alert-danger error"></div>
+<div class="detail-form">
+<h1>Workspaces</h1>
+<section class="{{greyIfLoggedOut}}">
+  <div class="panel panel-primary">
+    <div class="panel-heading">My Workspaces</div>
+    <div class="panel-body">
+
+      {{#if myWorkspaces}}
+        <table class="table table-hover">
+          <thead>
+            <tr>
+                <th>Click to load</th>
+                <th>Delete workspace</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each myWorkspaces}}
+              <tr>
+                <td class="open-workspace" id="{{_id}}">{{name}}</td>
+                <td><button class="delete-workspace btn btn-danger btn-xs" id="{{_id}}">Delete</button></td>
+              </tr>
+            {{/each}} 
+          </tbody>
+        </table>
+      {{else}}
+        <i>None</i> <br><br>
+      {{/if}}
+
+      <form>
+        <div class="form-group">
+          <label>Workspace Name</label>
+          <input class="form-control" type="text" name="workspace.name" required="true" maxlength="200" {{disabledIfNotLoggedIn}}>
+        </div>
+        <button class="btn btn-default" id="add-workspace" {{disabledIfNotLoggedIn}}>Add New Workspace</button>
+      </form>
+
+    </div>
+  </div>
+  <a href="javascript:void(0)" class="leave-workspace">Leave workspace (provided for testing purposes)</a>
+
+</section>
+<br>
+
+<section class="workspace-list">
+  <div class="panel panel-primary">
+    <div class="panel-heading">Workspaces Shared With Me</div>
+    <div class="panel-body">
+
+      <table class="table table-hover">
+          <thead>
+          <tr>
+              <th>Click to load</th>
+          </tr>
+          </thead>
+          <tbody>
+      {{#each sharedWorkspaces}}
+          <tr>
+              <td class="open-workspace-shared" id="{{_id}}">{{name}}</td>
+          </tr>
+      {{/each}}
+          </tbody>
+      </table>
+
+    </div>
+  </div>
+</section>
+
+</div>
+</template>

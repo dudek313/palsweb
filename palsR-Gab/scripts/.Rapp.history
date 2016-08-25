@@ -1,0 +1,177 @@
+unique(1,2,3,4,1,2,3,5)
+unique(c(1,2,3,4,1,2,3,5))
+length(unique(c(1,2,3,4,1,2,3,5)))
+as.integer('1',2)
+as.integer(c('1',2))
+a=c()
+a
+b=c(a,'2')
+b
+a=list()
+a[[1:10]] = list()
+a[[1]] = list()
+a
+a=c(1,2,3,4,1,2,3,5)
+a==5
+uniqu(a)
+unique(a)
+a=c(5,1,2,3,4,1,2,3,5)
+unique(a)
+b=list()
+b[[1]] = list('a','1')
+b[[2]] = list('b','2')
+b[[3]] = list('c','3')
+c=c(1,2,3)
+b[[c==2]]
+b[[(c==2)]]
+c==2
+b[[2]]
+d=c(1:3)
+b[[(d(c==2))]]
+b[[(d[c==2)] ]]
+b[[(d[c==2] ]]
+b[[ d[c==2] ]]
+d[c==2]
+b[[ d[c==2] ]]
+b[[ d[c==2] ]][[1]]
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+Minute[1]
+Minute[2]
+sink()
+Minute[2]
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[,3])
+plot(PALSt[,3],type='l')
+plot(PALSt[,25],type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+clear()
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+# Open graphics device:#
+QCplotfile = paste0(basedir, "flux_tower/PALS/ObsUpload/OzFlux/", sitename, "QCplot.png")#
+png(filename = QCplotfile, width = 1200, height = 2200, pointsize = 24) # creates empty png file#
+#
+# Generate and view QC plots:#
+source(paste0(scriptdir,'QCplotsSpreadsheet.R') # QC plots#
+dev.off()#
+system(paste("eog", QCplotfile))
+system(paste('open -a Preview.app', QCplotfile))
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[,31])
+fid
+a = ncvar_get(fid,'GPP_SOLO')
+a
+a$value
+a=NA2MissVal(ncvar_get(fid,'GPP_SOLO'))
+a
+plot(PALSt[,29])
+dim(PALSt
+)
+plot(PALSt[1,29])
+mean(PALSt[,29])
+mean(as.numeric(PALSt[,29]))
+plot(PALSt_old[1,29])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[,29])
+plot(PALSt_old[,29])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[,29])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[,29])
+PALSt[1:100,29]
+PALSt[4:,29]
+PALSt[4:length(PALSt[,1]),29]
+plot(PALSt[4:length(PALSt[,1]),29])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+mean(PALSt_old[4:length(PALSt[,1]),31])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+mean(PALSt[4:length(PALSt[,1]),29])
+mean(PALSt_old[4:length(PALSt[,1]),29])
+mean(PALSt_old[4:length(PALSt_old[,1]),29])
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+mean(PALSt_old[4:length(PALSt[,1]),29])
+mean(PALSt_old[4:length(PALSt_old[,1]),29])
+mean(PALSt_old[4:length(PALSt_old[,1]),29],na.mr=TRUE)
+mean(PALSt_old[4:length(PALSt_old[,1]),29],na.rm=TRUE)
+PALSt_old[4:40,29]
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),5]))
+plot(as.numeric(PALSt[4:length(PALSt[,1]),5]),type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+1:5
+a=c(1:%)
+a=c(1:4)
+a
+cat('hi')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+Year
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+l=length(PALSt[,1])
+l
+l/24
+l/48
+l/48/365
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(PALSt[4:length(PALSt[,1]),14],type='l')
+fid = nc_open(fnet[i], write = FALSE, readunlim = FALSE)
+a = ncvar_get(fid, "Precip_QCFlag") # RainfFLAG, Precip_Con_QCFlag
+plot(a, type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerDINGO2nc.R")
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+a = ncvar_get(fid, "Precip_QCFlag") # RainfFLAG, Precip_Con_QCFlag
+fid = nc_open(fnet[i], write = FALSE, readunlim = FALSE)
+a = ncvar_get(fid, "Precip_QCFlag") # RainfFLAG, Precip_Con_QCFlag
+plot(a, type='l')
+a=na
+a=NA
+as.numeric(a)
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+fid = nc_open(fnet[i], write = FALSE, readunlim = FALSE)
+a = ncvar_get(fid, "Precip_QCFlag") # RainfFLAG, Precip_Con_QCFlag
+plot(a, type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+fid = nc_open(fnet[i], write = FALSE, readunlim = FALSE)
+a = ncvar_get(fid, "Precip_QCFlag") # RainfFLAG, Precip_Con_QCFlag
+a[1:1000]
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+plot(as.numeric(PALSt[4:length(PALSt[,1]),12]),type='l')
+a=c(1,2,3,4,5,6,7,8)
+a==2
+a(a==2) = 10
+a[a==2] = 10
+a
+a=c(1,2,3,4,5,6,7,8)
+a[which(a==2)] = 10
+a
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),12]),type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),12]),type='l')
+plot(as.numeric(PALSt[4:length(PALSt[,1]),14]),type='l')
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+a=c(1,2,3,4,5)
+which(a==2)
+which(a==4)
+which(a==0)
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+tempC=20
+pws = 610.78 * exp( 17.27*tempC / (tempC + 237.3) )
+pws
+tempC=30
+610.78 * exp( 17.27*tempC / (tempC + 237.3) )
+tempC=40
+610.78 * exp( 17.27*tempC / (tempC + 237.3) )
+tempC=50
+610.78 * exp( 17.27*tempC / (tempC + 237.3) )
+exp(1)
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")
+plot(as.numeric(PALSt[4:length(PALSt[,1]),29]),type='l')
+library(zoom)
+zm()
+source("/Users/gab/Documents/admin/PALS/scripts/palsR/scripts/FluxTowerOzFlux2nc.R")

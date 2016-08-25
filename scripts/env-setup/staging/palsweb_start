@@ -1,0 +1,8 @@
+# Starts up the palsweb web application on Meteor
+# Assumes the Docker containers for Meteor, redis and mongoDb have already been setup
+
+sudo docker start mongo
+sudo docker start redis
+sudo docker start palsweb
+
+sudo docker exec -it palsweb /bin/sh -c "sudo -i -u pals -H /bin/sh -c './palsweb_start3'"

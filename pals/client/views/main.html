@@ -1,0 +1,103 @@
+<template name="main">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+  <!-- Brand and toggle get grouped for better mobile display -->
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="/">PALS</a>
+  </div>
+
+  <!-- Collect the nav links, forms, and other content for toggling -->
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li><a href="/workspaces">Workspaces</a></li>
+      <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
+                <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
+                <li><a href="javascript:void(0)" onclick="Router.go('/models/anywhere');">In All Available Workspaces</a></li>
+                <li class="divider"></li>
+                {{#if currentUser}}
+                <li><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
+                {{else}}
+                <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/model/create');">Create Model Profile</a></li>
+                {{/if}}
+            </ul>
+      </li>
+
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/mine');">Owned By Me</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/workspace');">In Current Workspace</a></li>
+            <li class="divider"></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutput/create');">Upload Model Output</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/analyses');">Analyses Browser</a></li>
+        </ul>
+      </li>
+
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
+          <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/All');">In All Available Workspaces</a></li>
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/templates/All');">Experiment Templates To Clone</a></li>
+          {{#if authorisedToEdit 'experiment'}}
+            <li class="divider"></li>
+            <li><a href="javascript:void(0)" onclick="Router.go('/experiment/create');">Create Experiment Template</a></li>
+          {{/if}}
+        </ul>
+      </li>
+
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
+          <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/All');">All Data Sets</a></li>
+          {{#if authorisedToEdit 'dataset'}}
+               <li class="divider"></li>
+               <li><a href="javascript:void(0)" onclick="Router.go('/dataset/create');">Create Data Set</a></li>
+          {{/if}}
+        </ul>
+      </li>
+
+    </ul>
+
+
+    {{#if loggedIn}}
+      <ul class="nav navbar-nav navbar-right">
+        {{> loginButtons}}
+      </ul>
+    {{else}}
+      <div class="btns-group nav navbar-nav navbar-right">
+        <a href="/login" class="btn-secondary login-btn">Login</a>
+        <a href="/registration" class="btn-secondary register-btn RbtnMargin">Register</a>
+      </div>
+    {{/if}}
+  </div><!-- /.navbar-collapse -->
+  </div><!-- /container -->
+</nav>
+<div class="main">
+
+    {{#if loggedIn}}
+      {{#if notInWorkspace}}
+        <div class="no-workspace-header"><b>You are not currently in any workspace. Feel free to browse the site.
+          <br>To contribute to an experiment you must join an existing workspace or create a new one.</b></div>
+      {{else}}
+        <div class="workspace-header" >You are currently in the <b>{{currentWorkspace.name}}</b> workspace.</div>
+      {{/if}}
+    {{else}}
+      <div class="no-workspace-header"><b>You are currently not logged in. Feel free to browse the site.
+        <br>To have full use of PALS, please log in or register.</b></div>
+    {{/if}}
+  <div class="container content">
+    {{> yield}}
+  </div>
+</div>
+</template>
