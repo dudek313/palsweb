@@ -1,6 +1,7 @@
 var redis = require("redis");
 var server = require('./module/server.js');
 var fs = require('fs');
+var waitUntil = require('wait-until');
 
 var REDIS_HOST = process.env.REDIS_HOST;
 if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
@@ -18,25 +19,73 @@ var maxHangSeconds = 10000;
 processNext();
 
 function processNext() {
+	client.lpop('pals.input',function(err,value){
+		setTimeout(processNext,1000);
+		if( value ) {
+			var message = JSON.parse(value);
+			var palsStatus = {}
+			palsStatus._id = message._id;
+			console.log('Received message');
+			console.log('Total number of workers requested: ' + (workers + 1));
+
+			if (workers >= maxWorkers) {
+				palsStatus.status = 'waiting in queue';
+				client.rpush('pals.output', JSON.stringify(palsStatus));
+				console.log(palsStatus.status);
+			}
+
+			waitUntil()
+					.interval(1000)
+					.times(Infinity)
+					.condition(function() {
+							return (workers <= maxWorkers);
+					})
+					.done(function(result) {
+
+						palsStatus.status = 'running analysis';
+						client.rpush('pals.output', JSON.stringify(palsStatus));
+						console.log(palsStatus.status);
+						++workers;
+					  server.handleMessage(message, sendMessage);
+
+					});
+
+		}
+  });
+}
+
+/*function processNext() {
 	if( workers < maxWorkers ) {
 	    client.lpop('pals.input',function(err,value){
 	        if( value ) {
-			    console.log('Received message, number of workers: ' + workers);
-				++workers;
-	    	    server.handleMessage(JSON.parse(value),sendMessage);
-	        }	
+						var message = JSON.parse(value);
+				    console.log('Received message, number of workers: ' + workers);
+
+						var palsStatus = {}
+						palsStatus._id = message._id;
+						palsStatus.status = 'running analysis';
+						client.rpush('pals.output', JSON.stringify(palsStatus));
+						console.log(palsStatus.status);
+						++workers;
+		    	  server.handleMessage(message, sendMessage);
+	        }
 		    setTimeout(processNext,100);
 	    });
     }
 	else {
 		++hangSeconds;
+		var palsStatus = {}
+		palsStatus._id = message._id;
+		palsStatus.status = 'waiting in queue';
+		client.rpush('pals.output', JSON.stringify(palsStatus));
+		console.log(palsStatus.status);
 		if( hangSeconds > maxHangSeconds ) {
 			hangSeconds = 0;
 			workers = 0;
 		}
 		setTimeout(processNext,1000);
 	}
-}
+}*/
 
 function sendMessage(output) {
 	console.log('sending reply to client');
