@@ -1,3 +1,6 @@
+Template.dataset.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+});
 
 Template.dataset.rendered = function() {
     window['directives']();
@@ -130,7 +133,68 @@ Template.dataset.events = {
         var dataSetId = getCurrentObjectId();
         Router.go('/dataset/update/' + dataSetId);
     },
-    'change .file-select':function(event, template){
+
+    'change #fileInput': function (e, template) {
+      if (e.currentTarget.files && e.currentTarget.files[0]) {
+        // We upload only one file, in case
+        // multiple files were selected
+        var file = jQuery.extend({}, e.currentTarget.files[0]);
+
+        var filename = file.name;
+        while(filenameAlreadyExists(filename)) {
+            filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
+        };
+
+        var upload = StoredFiles.insert({
+          file: file,
+          fileName: filename,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('start', function () {
+          template.currentUpload.set(this);
+        });
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            alert('Error during upload: ' + error);
+          } else {
+
+            var isDownloadable = document.getElementById('downloadable').checked;
+            var fileType = $("input[type='radio'][name='fileType']:checked").val();
+            var fileRecord = {
+                path: FILE_DIR + fileObj.path,
+                name: filename,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date(),
+                downloadable: isDownloadable,
+                type: fileType
+            };
+            var tempFiles = Session.get('tempFiles');
+            tempFiles.push(fileRecord);
+            Session.set('tempFiles', tempFiles);
+            Session.set('dirty', true);
+            Session.set('uploadButtonClicked', false);
+
+            // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
+            var filesUploaded = Session.get('filesUploaded');
+            filesUploaded.push(name);
+            Session.set('filesUploaded', filesUploaded);
+
+            alert('File "' + fileObj.name + '" successfully uploaded');
+          }
+          template.currentUpload.set(false);
+        });
+
+        upload.start();
+
+
+      }
+    }
+
+/*    'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
             while(filenameAlreadyExists(filename = file.name)) {
                 filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
@@ -166,7 +230,7 @@ Template.dataset.events = {
             });
 
         });
-    }
+    }*/
 };
 
 function filenameAlreadyExists(filename) {

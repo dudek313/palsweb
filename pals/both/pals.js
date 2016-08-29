@@ -1,6 +1,7 @@
 // GLOBALS
 
 FILE_BUCKET = '/pals/data';
+FILE_DIR = '/root/palsweb/pals/.meteor/local/build/programs/server/'
 
 Router.configure({
     layoutTemplate: 'main',

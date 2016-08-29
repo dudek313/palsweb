@@ -34,3 +34,5 @@ session
 useraccounts:iron-routing
 xolvio:backdoor
 xolvio:cleaner
+ostrio:files@1.7.1
+reactive-var
