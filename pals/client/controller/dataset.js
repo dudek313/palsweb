@@ -136,14 +136,15 @@ Template.dataset.events = {
 
     'change #fileInput': function (e, template) {
       if (e.currentTarget.files && e.currentTarget.files[0]) {
+
+        var file = e.currentTarget.files[0];
         // We upload only one file, in case
         // multiple files were selected
-        var file = jQuery.extend({}, e.currentTarget.files[0]);
 
         var filename = file.name;
         while(filenameAlreadyExists(filename)) {
             filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
-        };
+        }; 
 
         var upload = StoredFiles.insert({
           file: file,

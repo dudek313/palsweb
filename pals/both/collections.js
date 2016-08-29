@@ -67,7 +67,7 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.publish('files.storedFiles.all', function() {
-    return StoredFiles.collection.find({});
+    return StoredFiles.collection.find().cursor;
   });
 }
 
