@@ -20,14 +20,13 @@ processNext();
 
 function processNext() {
 	client.lpop('pals.input',function(err,value){
-
 		setTimeout(processNext,1000);
 		if( value ) {
 			var message = JSON.parse(value);
 			var palsStatus = {}
 			palsStatus._id = message._id;
 			console.log('Received message');
-			console.log('Number of workers requested: ' + (workers + 1));
+			console.log('Total number of workers requested: ' + (workers + 1));
 
 			if (workers >= maxWorkers) {
 				palsStatus.status = 'waiting in queue';

@@ -230,11 +230,6 @@ Meteor.methods({
         })
     },
 
-    checkIfAnalyserOnline: function() {
-      console.log('Checking if analyser online');
-      client.rpush(queue, JSON.stringify(analysis));
-    },
-
     startAnalysis: function (modelOutputId) {
 
         console.log('starting analysis for model output ' + modelOutputId);
@@ -300,7 +295,7 @@ Meteor.methods({
 //               'modelOutputVersion' : currentVersion,
                'experiment' : experiment._id,
 //               'status' : 'started',
-               'status' : 'sent to analyser',
+               'status' : 'analyser yet to respond',
                'files' : files//,
                //'experimentModelOutputs' : experimentModelOutputs
            };
