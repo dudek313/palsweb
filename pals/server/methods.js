@@ -230,6 +230,11 @@ Meteor.methods({
         })
     },
 
+    checkIfAnalyserOnline: function() {
+      console.log('Checking if analyser online');
+      client.rpush(queue, JSON.stringify(analysis));
+    },
+
     startAnalysis: function (modelOutputId) {
 
         console.log('starting analysis for model output ' + modelOutputId);
@@ -295,15 +300,15 @@ Meteor.methods({
 //               'modelOutputVersion' : currentVersion,
                'experiment' : experiment._id,
 //               'status' : 'started',
-               'status' : 'analyser not ready',
+               'status' : 'sent to analyser',
                'files' : files//,
                //'experimentModelOutputs' : experimentModelOutputs
            };
 
-           console.log('Input to analysis script: '); console.log(analysis);
+//           console.log('Input to analysis script: '); console.log(analysis);
 
-//           saveAnalysis(analysis, completeAnalysis);
-           saveAnalysis(analysis, checkPalsNodeRWorking);
+           saveAnalysis(analysis, completeAnalysis);
+//           saveAnalysis(analysis, checkPalsNodeRWorking);
            return analysis;
        }
        return null;
@@ -395,16 +400,18 @@ saveAnalysis = function(analysis,callback) {
         else {
             console.log('analysis saved');
             analysis._id = id;
-            callback(analysis, completeAnalysis);
+            callback(analysis);
         }
     });
 }
 
+/*
 checkPalsNodeRWorking = function(analysis, callback) {
   console.log('Sending ping to PalsNodeR');
   client.rpush(queue, "ping");
   callback(analysis);
 }
+*/
 
 completeAnalysis = function(analysis) {
     console.log('Sending message to redis');

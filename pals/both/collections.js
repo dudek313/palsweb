@@ -48,6 +48,13 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
+/*var StoredFiles = new FilesCollection({
+  collectionName: 'StoredFiles',
+  allowClientCode: false, // Disallow remove files from Client
+  onBeforeUpload: function (file) {
+    // Allow upload
+  }
+})*/
 
 ModelOutputs.attachSchema(new SimpleSchema({
   _id:              {type: String, optional: true},
