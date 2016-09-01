@@ -1,7 +1,6 @@
 var redis = require("redis");
 var server = require('./module/server.js');
 var fs = require('fs');
-var waitUntil = require('wait-until');
 
 var REDIS_HOST = process.env.REDIS_HOST;
 if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
