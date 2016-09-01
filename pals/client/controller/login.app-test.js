@@ -33,6 +33,25 @@ describe('my module', function(done) {
 
 
   describe('Register new user', function() {
+
+    // **************** need to use a meteor method call here instead *****************
+    beforeEach(function(done) {
+      var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+      console.log(testUser);
+      if (testUser) {
+        Meteor.users.remove({_id : testUser._id});
+      }
+      done();
+    });
+
+    afterEach(function(done){
+
+      // ******************* Need to use a Meteor method call instead ****************
+      var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+      Meteor.users.update({_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
+      done();
+    });
+
     it('allows a new user to be registered on the system', function(done) {
       Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1'}, function(err) {
         console.log(err);
@@ -66,19 +85,20 @@ describe('my module', function(done) {
   });
 
   describe('Login registered user', function() {
+
     it('allows a registered user to login', function(done) {
 
       Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
         console.log(err);
         chai.assert.isUndefined(err);
         var user = Meteor.user();
-        chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
+        chai.assert.equal(user.emails[0].address, 'test0@testing.com');
         done();
       });
     });
   });
 
-  describe('Insert new model', function(done) {
+/*  describe('Insert new model', function(done) {
     it('allows a registered user to insert a model', function(done) {
 
       var newModel = makeModel("Model 1");
@@ -129,7 +149,7 @@ describe('my module', function(done) {
   describe('remove registered user', function(done) {
     it('removes a registered user from the system', function(done) {
     });
-  });
+  }); */
 });
 
 
