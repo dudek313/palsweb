@@ -43,7 +43,7 @@ exports.mongo = function() {
 
     var that = {};
     that.mongo = require('mongodb');
-    that.host = '192.168.56.100';
+    that.host = '192.168.56.120';
     //DF: that.host = 'localhost';
     that.port = 27017;
     //DF: that.port = 81;

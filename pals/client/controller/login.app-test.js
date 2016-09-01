@@ -128,9 +128,8 @@ describe('my module', function(done) {
 
   describe('remove registered user', function(done) {
     it('removes a registered user from the system', function(done) {
-      Meteor.
-    })
-  })
+    });
+  });
 });
 
 

@@ -126,8 +126,8 @@ getCurrentWorkspaceId = function() {
             user.profile = {};
             user.profile.currentWorkspace = "";
         }
-        currentWS = user.profile.currentWorkspace;
-        if( !currentWS || !Workspaces.findOne(currentWS)) {
+        var currentWS = user.profile.currentWorkspace;
+        if( !currentWS || !Workspaces.findOne({_id: currentWS})) {
           enterBrowseMode();
         }
         return user.profile.currentWorkspace;

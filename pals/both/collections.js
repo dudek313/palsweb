@@ -48,6 +48,28 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
+this.StoredFiles = new FilesCollection({
+  collectionName: 'StoredFiles',
+  allowClientCode: false, // Disallow remove files from Client
+  onBeforeUpload: function (file) {
+    // Allow upload of nc and r files only
+    if (/nc|R/i.test(file.extension)) {
+      return true;
+    } else {
+      return 'Only NetCDF and R files allowed';
+    }
+  }
+})
+
+if (Meteor.isClient) {
+  Meteor.subscribe('files.storedFiles.all');
+}
+
+if (Meteor.isServer) {
+  Meteor.publish('files.storedFiles.all', function() {
+    return StoredFiles.collection.find().cursor;
+  });
+}
 
 ModelOutputs.attachSchema(new SimpleSchema({
   _id:              {type: String, optional: true},
@@ -160,6 +182,15 @@ dataSetSchema = new SimpleSchema({
   'files.$.key':  {type: String, optional: true},
   'files.$.downloadable':   {type: Boolean, optional: true},
   'files.$.type': {type: String, optional: true},
+/*  'files.$.file': {
+    type: String,
+    autoform: {
+      afFieldInput: {
+        type: 'fileUpload',
+        collection: 'StoredFiles'
+      }
+    }
+  }*/
   modifierId: {type: String, optional: true}
 });
 

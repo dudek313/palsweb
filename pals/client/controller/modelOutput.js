@@ -220,11 +220,18 @@ Template.modelOutput.events = {
         var group = 'modelOutput: ' + currentModelOutputId;
         if( Roles.userIsInRole(userId, 'edit', group) ) {
 //            var key = $(event.target).attr('id');
-
-            Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
-                if( error ) alert(error);
-                console.log(result);
-            });
+/*            Meteor.call('checkIfAnalyserOnline', function(error, online) {
+              if (error)
+                displayError('An error occurred. Analyser might not be currently functioning.', error);
+              else if (!online)
+                displayError('Analyser is not currently functioning. Please try again later.');
+              else {*/
+                Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
+                    if( error ) alert(error);
+                    console.log(result);
+                });
+/*              }
+          });*/
         }
     },
     'click .delete-analysis':function(event) {

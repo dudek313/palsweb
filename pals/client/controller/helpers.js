@@ -37,6 +37,10 @@ Template.registerHelper("authorized", function(objType, id) {
         return false;
 });
 
+Template.registerHelper("currentUpload", function () {
+    return Template.instance().currentUpload.get();
+});
+
 Template.registerHelper("inEditMode", function() {
       var screenMode = getScreenMode();
       return (screenMode =='update' || screenMode =='create');
