@@ -410,6 +410,7 @@ checkPalsNodeRWorking = function(analysis, callback) {
 
 completeAnalysis = function(analysis) {
     console.log('Sending message to redis');
+    console.log(); console.log(analysis);
     client.rpush(queue, JSON.stringify(analysis));
 }
 

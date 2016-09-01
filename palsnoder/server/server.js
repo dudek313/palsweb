@@ -1,7 +1,6 @@
 var redis = require("redis");
 var server = require('./module/server.js');
 var fs = require('fs');
-var waitUntil = require('wait-until');
 
 var REDIS_HOST = process.env.REDIS_HOST;
 if( !REDIS_HOST ) REDIS_HOST = '127.0.0.1';
@@ -18,7 +17,7 @@ var maxHangSeconds = 10000;
 
 processNext();
 
-function processNext() {
+/*function processNext() {
 	client.lpop('pals.input',function(err,value){
 		setTimeout(processNext,1000);
 		if( value ) {
@@ -29,9 +28,7 @@ function processNext() {
 			console.log('Total number of workers requested: ' + (workers + 1));
 
 			if (workers >= maxWorkers) {
-				palsStatus.status = 'waiting in queue';
-				client.rpush('pals.output', JSON.stringify(palsStatus));
-				console.log(palsStatus.status);
+				console.log('waiting in queue');
 			}
 
 			waitUntil()
@@ -42,7 +39,7 @@ function processNext() {
 					})
 					.done(function(result) {
 
-						palsStatus.status = 'running analysis';
+						palsStatus.status = 'running';
 						client.rpush('pals.output', JSON.stringify(palsStatus));
 						console.log(palsStatus.status);
 						++workers;
@@ -52,9 +49,9 @@ function processNext() {
 
 		}
   });
-}
+}*/
 
-/*function processNext() {
+function processNext() {
 	if( workers < maxWorkers ) {
 	    client.lpop('pals.input',function(err,value){
 	        if( value ) {
@@ -63,7 +60,7 @@ function processNext() {
 
 						var palsStatus = {}
 						palsStatus._id = message._id;
-						palsStatus.status = 'running analysis';
+						palsStatus.status = 'running';
 						client.rpush('pals.output', JSON.stringify(palsStatus));
 						console.log(palsStatus.status);
 						++workers;
@@ -74,21 +71,18 @@ function processNext() {
     }
 	else {
 		++hangSeconds;
-		var palsStatus = {}
-		palsStatus._id = message._id;
-		palsStatus.status = 'waiting in queue';
-		client.rpush('pals.output', JSON.stringify(palsStatus));
-		console.log(palsStatus.status);
+//		console.log('all workers busy');
 		if( hangSeconds > maxHangSeconds ) {
 			hangSeconds = 0;
 			workers = 0;
 		}
 		setTimeout(processNext,1000);
 	}
-}*/
+}
 
 function sendMessage(output) {
 	console.log('sending reply to client');
+	console.log(); console.log(output); 
 	--workers;
 	client.rpush('pals.output',JSON.stringify(output));
 }
