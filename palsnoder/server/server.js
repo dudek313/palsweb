@@ -17,6 +17,35 @@ var maxHangSeconds = 10000;
 
 processNext();
 
+function processNext() {
+	if( workers < maxWorkers ) {
+	    client.lpop('pals.input',function(err,value){
+	        if( value ) {
+						var message = JSON.parse(value);
+				    console.log('Received message, number of workers: ' + workers);
+
+						var palsStatus = {}
+						palsStatus._id = message._id;
+						palsStatus.status = 'running';
+						client.rpush('pals.output', JSON.stringify(palsStatus));
+						console.log(palsStatus.status);
+						++workers;
+		    	  server.handleMessage(message, sendMessage);
+	        }
+		    setTimeout(processNext,100);
+	    });
+    }
+	else {
+		++hangSeconds;
+//		console.log('all workers busy');
+		if( hangSeconds > maxHangSeconds ) {
+			hangSeconds = 0;
+			workers = 0;
+		}
+		setTimeout(processNext,1000);
+	}
+}
+
 /*function processNext() {
 	client.lpop('pals.input',function(err,value){
 		setTimeout(processNext,1000);
@@ -79,6 +108,9 @@ function processNext() {
 		setTimeout(processNext,1000);
 	}
 }
+=======
+>>>>>>> ab03a33812c378d8471280cd1ec7fdf1de1e7f69
+
 
 function sendMessage(output) {
 	console.log('sending reply to client');
