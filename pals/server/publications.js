@@ -1,3 +1,15 @@
+// create Browse mode "workspace"
+var browsingWS = Workspaces.findOne({name: "browsing"});
+if (!browsingWS) {
+  Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
+    if (err) {
+      console.log('Unable to create "browsing" workspace');
+      return;
+    }
+  });
+}
+console.log("Browsing workspace: ");console.log(Workspaces.findOne({name: "browsing"}));
+
 // The publications limit user access to records based on the workspaces they have access to.
 // These publications are not necessarily refreshed when users create new documents (e.g. model outputs),
 // and therefore they might not have be given access to them.
@@ -14,6 +26,8 @@ Meteor.publish('workspaces', function(){
     }
     return Workspaces.find(selector);
 });
+
+
 
 Workspaces._ensureIndex('name', {unique: 1});
 
@@ -41,6 +55,9 @@ Meteor.publish('dataSets',function(){
     var userId = this.userId;
     if( userId )
       return DataSets.find();
+    else {
+      return this.ready();
+    }
 });
 
 Meteor.publish('experiments',function(){
@@ -95,7 +112,7 @@ Meteor.publish('models',function(){
 });
 
 // Old code assumed unique model name. Only needs to be unique for user.
-//Models._ensureIndex({'name', 'owner'}, {unique: 1});
+Models._ensureIndex(['name', 'owner'], {unique: 1});
 //Models._ensureIndex('_id', {unique: 1});
 
 

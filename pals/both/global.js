@@ -88,7 +88,7 @@ displayError = function(errMessage, error) {
   console.log(error);
 }
 
-createBrowsingWorkspace = function() {
+/*createBrowsingWorkspace = function() {
   Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
     if (err) {
       console.log('Unable to create "browsing" workspace');
@@ -96,25 +96,15 @@ createBrowsingWorkspace = function() {
     }
     else return doc;
   });
-}
+}*/
 
 enterBrowseMode = function() {
   var user = Meteor.user();
   if (user) {
     Meteor.subscribe('workspaces');
     var browsingWS = Workspaces.findOne({name: "browsing"});
-    if (!browsingWS) {
-      Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
-        if (err) {
-          console.log('Unable to create "browsing" workspace');
-          return;
-        }
-        else {
-          browsingWS = Workspaces.findOne({name: "browsing"});
-        }
-      });
-    }
-    Meteor.call('changeWorkspace', browsingWS._id);
+    if (browsingWS)
+      Meteor.call('changeWorkspace', browsingWS._id);
   }
   else console.log('User not logged in');
 }

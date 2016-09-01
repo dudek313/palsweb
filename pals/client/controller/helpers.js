@@ -14,8 +14,12 @@ Handlebars.registerHelper('encode',
 );
 
 Template.registerHelper("loggedIn", function() {
-      if( Meteor.user() ) return true;
-      else return false;
+      if( Meteor.user() ) {
+        return true;
+      }
+      else {
+        return false;
+      }
 });
 
 /** Used by templates to check if user is authorized to use a page associated with a particular object, eg data set, model, etc.

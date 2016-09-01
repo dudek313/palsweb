@@ -5,7 +5,12 @@ FILE_DIR = '/root/palsweb/pals/.meteor/local/build/programs/server/'
 
 Router.configure({
     layoutTemplate: 'main',
-    notFoundTemplate: 'notFound'
+    notFoundTemplate: 'notFound',
+    waitOn: function() {
+      return [
+        Meteor.subscribe('workspaces')
+      ]
+    }
 });
 
 Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})

@@ -144,7 +144,7 @@ Template.dataset.events = {
         var filename = file.name;
         while(filenameAlreadyExists(filename)) {
             filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
-        }; 
+        };
 
         var upload = StoredFiles.insert({
           file: file,

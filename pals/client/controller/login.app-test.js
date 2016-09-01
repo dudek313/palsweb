@@ -14,142 +14,307 @@ Meteor.methods({
 });*/
 
 describe('my module', function(done) {
-  beforeEach(function(done) {
+  before(function(done) {
     Meteor.call('test.resetDatabase', done);
   });
 
-  describe('Login Admin', function() {
-    it('allows an admin user to login', function(done) {
+  describe('Admin functions', function() {
 
-      Meteor.loginWithPassword('gabsun@gmail.com', 'password', function(err) {
-        console.log(err);
-        chai.assert.isUndefined(err);
-        var user = Meteor.user();
-        chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
+    describe('Login Admin', function() {
+      it('allows an admin user to login', function(done) {
+
+        Meteor.loginWithPassword('gabsun@gmail.com', 'password', function(err) {
+          try {
+            chai.assert.isUndefined(err);
+            var user = Meteor.user();
+            chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+
+    describe('Register new user', function() {
+      beforeEach(function(done) {
+        var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+        if (testUser) {
+          Meteor.call('test.removeUser', {_id: testUser._id})
+        }
         done();
       });
-    });
-  });
 
-
-  describe('Register new user', function() {
-
-    // **************** need to use a meteor method call here instead *****************
-    beforeEach(function(done) {
-      var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
-      console.log(testUser);
-      if (testUser) {
-        Meteor.users.remove({_id : testUser._id});
-      }
-      done();
-    });
-
-    afterEach(function(done){
-
-      // ******************* Need to use a Meteor method call instead ****************
-      var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
-      Meteor.users.update({_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
-      done();
-    });
-
-    it('allows a new user to be registered on the system', function(done) {
-      Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1'}, function(err) {
-        console.log(err);
-        chai.assert.isUndefined(err);
-        done()
+      it('allows a new user to be registered on the system', function(done) {
+        Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1'}, function(err) {
+          console.log(err);
+          try {
+            chai.assert.isUndefined(err);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
       });
     });
-  });
 
-  describe('logout', function() {
-    it('allows a logged-in user to logout', function(done) {
-      Meteor.logout(function(err) {
-        chai.assert.isUndefined(err);
-        var user = Meteor.user();
-        chai.assert.isNull(user);
-        done();
+    describe('Insert new data set by admin', function(done) {
+      it('allows an admin user to insert a data set', function(done) {
+        console.log('insert data set');
+        var newDataSet = makeDataSet("Data Set 1");
+        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
+          console.log(err); console.log(dsId);
+          try {
+            chai.assert.isUndefined(err);
+            var insertedDataSet = DataSets.findOne({_id: dsId});
+            chai.assert.isDefined(insertedDataSet);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
       });
     });
+
+    describe('Insert duplicate data set by admin', function(done) {
+      it('does not allow an admin user to insert a duplicate model', function(done) {
+        console.log('insert data set');
+        var newDataSet = makeDataSet("Data Set 1");
+
+/*        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
+          try {
+            chai.assert.isUndefined(err);
+            var insertedDataSet = DataSets.findOne({_id: dsId});
+            chai.assert.isDefined(insertedDataSet);
+          } catch(error) {
+            done(error);
+          }
+        });
+*/
+        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
+          try {
+            chai.assert.isDefined(err);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+
+
+      });
+    });
+
+
+    describe('logout', function() {
+      it('allows a logged-in user to logout', function(done) {
+        Meteor.logout(function(err) {
+          try {
+            chai.assert.isUndefined(err);
+            var user = Meteor.user();
+            chai.assert.isNull(user);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
   });
 
   describe('try to insert model when not logged in', function(done) {
     it('does not allow unregistered user to insert a model', function(done) {
       var newModel = makeModel("Model 2");
       Meteor.call('insertModel', newModel, function(err, modelId) {
-        chai.assert.isDefined(err);
-        var insertedModel = Models.findOne({_id: modelId});
-        chai.assert.isUndefined(insertedModel);
+        try {
+          chai.assert.isDefined(err);
+          var insertedModel = Models.findOne({_id: modelId});
+          chai.assert.isUndefined(insertedModel);
+        } catch(error) {
+          done(error);
+        }
         done();
       });
     });
   });
 
-  describe('Login registered user', function() {
+  describe('Registered user functions', function() {
 
-    it('allows a registered user to login', function(done) {
-
-      Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
-        console.log(err);
-        chai.assert.isUndefined(err);
-        var user = Meteor.user();
-        chai.assert.equal(user.emails[0].address, 'test0@testing.com');
+    describe('Login registered user', function() {
+      beforeEach(function(done){
+        var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+        if (testUser && testUser._id)
+          Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
         done();
       });
+
+      it('allows a registered user to login', function(done) {
+
+        Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
+          console.log(err);
+          try {
+            chai.assert.isUndefined(err);
+            var user = Meteor.user();
+            chai.assert.equal(user.emails[0].address, 'test0@testing.com');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Insert new model', function(done) {
+      it('allows a registered user to insert a model', function(done) {
+        console.log('insert 1 model');
+        var newModel = makeModel("Model 1");
+        Meteor.call('insertModel', newModel, function(err, modelId) {
+        try {
+          chai.assert.isUndefined(err);
+          var insertedModel = Models.findOne({_id: modelId});
+          chai.assert.equal(insertedModel.name, 'Model 1');
+        } catch(error) {
+          done(error);
+        }
+        done();
+        });
+      });
+    });
+
+    describe('Insert duplicate model', function(done) {
+      it('does not allow a registered user to insert a duplicate model', function(done) {
+        var newModel = makeModel("Model 1");
+/*        Meteor.call('insertModel', newModel, function(err, modelId) {
+          console.log('duplicate model 1');
+  //        chai.assert.isUndefined(err);
+          var insertedModel = Models.findOne({_id: modelId});
+  //        chai.assert.equal(insertedModel.name, 'Model 1');
+          done();
+        });
+*/
+        var newModel = makeModel("Model 1");
+        Meteor.call('insertModel', newModel, function(err, modelId) {
+          console.log('duplicate model 2');
+          try {
+            chai.assert.isDefined(err);
+          } catch(error) {
+            done(error);
+          }
+          var insertedModel = Models.findOne({_id: modelId});
+          done();
+        });
+
+      });
+    });
+
+    describe('insertWorkspace', function(done) {
+      it('allows a registered user to insert a new workspace', function(done) {
+        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+          try {
+            chai.assert.isUndefined(err);
+          } catch(error) {
+            done(error);
+          }
+
+          var insertedWS = Workspaces.findOne({_id: wsId});
+          try {
+            chai.assert.equal(insertedWS.name, 'WS 1');
+          } catch(error) {
+            done(error);
+          }
+
+          done(err);
+        });
+      });
+    });
+
+    describe('insert duplicate workspace', function(done) {
+      it('does not allow a registered user to insert duplicate workspaces', function(done) {
+
+        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+          try {
+            chai.assert.isDefined(err);
+          } catch(error) {
+            done(error);
+          }
+
+          done();
+        });
+
+      });
+    });
+
+    describe('Insert new data set by non-admin', function(done) {
+      it('does not allow a non-admin user to insert a model', function(done) {
+
+        console.log('insert data set');
+        var newDataSet = makeDataSet("Data Set 2");
+        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
+          console.log(err); console.log(dsId);
+          try {
+            chai.assert.isDefined(err);
+            var insertedDataSet = DataSets.findOne({_id: dsId});
+            chai.assert.isUndefined(insertedDataSet);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('File upload', function(done) {
+      it('allows an nc data set file to be uploaded by a registered user', function(done) {
+
+/*        var file = {
+
+        }
+
+        var upload = StoredFiles.insert({
+          file: file,
+          fileName: filename,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('start', function () {
+          template.currentUpload.set(this);
+        });
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            alert('Error during upload: ' + error);
+          } else {
+
+            var isDownloadable = document.getElementById('downloadable').checked;
+            var fileType = $("input[type='radio'][name='fileType']:checked").val();
+            var fileRecord = {
+                path: FILE_DIR + fileObj.path,
+                name: filename,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date(),
+                downloadable: isDownloadable,
+                type: fileType
+            };
+            var tempFiles = Session.get('tempFiles');
+            tempFiles.push(fileRecord);
+            Session.set('tempFiles', tempFiles);
+            Session.set('dirty', true);
+            Session.set('uploadButtonClicked', false);
+
+            // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
+            var filesUploaded = Session.get('filesUploaded');
+            filesUploaded.push(name);
+            Session.set('filesUploaded', filesUploaded);
+
+            alert('File "' + fileObj.name + '" successfully uploaded');
+*/
+      }); 
     });
   });
 
-/*  describe('Insert new model', function(done) {
-    it('allows a registered user to insert a model', function(done) {
-
-      var newModel = makeModel("Model 1");
-      Meteor.call('insertModel', newModel, function(err, modelId) {
-        console.log('err');console.log(err);
-        console.log('modelId');console.log(modelId);
-        chai.assert.isUndefined(err);
-        var insertedModel = Models.findOne({_id: modelId});
-        chai.assert.equal(insertedModel.name, 'Model 1');
-        done();
-      });
-    });
-  });
-
-  describe('Insert duplicate model', function(done) {
-    it('does not allow a registered user to insert a duplicate model', function(done) {
-
-      var newModel = makeModel("Model 1");
-      Meteor.call('insertModel', newModel, function(err, modelId) {
-        chai.assert.isUndefined(err);
-        var insertedModel = Models.findOne({_id: modelId});
-        chai.assert.equal(insertedModel.name, 'Model 1');
-        done();
-      });
-
-      var newModel = makeModel("Model 1");
-      Meteor.call('insertModel', newModel, function(err, modelId) {
-        chai.assert.isDefined(err);
-        var insertedModel = Models.findOne({_id: modelId});
-        chai.assert.isUndefined(insertedModel);
-        done();
-      });
-
-    });
-  });
-
-  describe('insertWorkspace', function(done) {
-    it('allows a registered user to insert a new workspace', function(done) {
-      Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
-        chai.assert.isUndefined(err);
-        var insertedWS = Workspaces.findOne({_id: wsId});
-        chai.assert.equal(insertedWS.name, 'WS 1');
-        done();
-      });
-    });
-  });
-
-  describe('remove registered user', function(done) {
-    it('removes a registered user from the system', function(done) {
-    });
-  }); */
 });
 
 
@@ -161,4 +326,14 @@ function makeModel(modelName) {
   };
 
   return model;
+}
+
+function makeDataSet(dataSetName) {
+  var dataSet = {
+    name: dataSetName,
+    type: 'flux tower',
+    spatialLevel: 'SingleSite'
+  };
+
+  return dataSet;
 }
