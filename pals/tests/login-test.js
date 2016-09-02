@@ -8,7 +8,7 @@ var browser, element, currentCommand = '',
         timeout: 30000,
         retries: 0,
         screenshotFolder: 'screenshots/login_test',
-        baseUrl: 'http://192.168.56.100:3000/'
+        baseUrl: 'http://192.168.56.120:3000/'
     };
 
 module.exports = function testLogin(_browser, _options) {

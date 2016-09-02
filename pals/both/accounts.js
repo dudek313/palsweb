@@ -52,7 +52,7 @@ AccountsTemplates.addFields([
       public: true
     }
   }, {
-    _id: 'surname',
+    _id: 'lastName',
     type: 'text',
     displayName: 'Last name*',
     placeholder: 'Last name',

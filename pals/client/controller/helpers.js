@@ -105,6 +105,7 @@ Template.registerHelper('authorisedToEdit', function(objType, id) {
     var groupWithId = objType + ": " + id;
     var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
     return authorised;
+//    return authorisedToEdit(objType, id); One day just use this
 });
 
 

@@ -134,3 +134,11 @@ getCurrentWorkspace = function() {
     }
     else return null;
 }
+
+authorisedToEdit = function(objType, id) {
+  var userId = Meteor.userId();
+  var group = objType + "s";
+  var groupWithId = objType + ": " + id;
+  var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
+  return authorised;
+};
