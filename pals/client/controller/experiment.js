@@ -255,28 +255,28 @@ function getCurrentExperiment() {
 Template.experiment.helpers({
   // determines whether the current form is a create form or an update form
   formId: function() {
-  var screenMode = getScreenMode();
-  var formId = null;
-  if(screenMode == 'create') formId = "createExperimentForm";
-  else if(screenMode == 'update') formId = "updateExperimentForm";
-  return formId;
+    var screenMode = getScreenMode();
+    var formId = null;
+    if(screenMode == 'create') formId = "createExperimentForm";
+    else if(screenMode == 'update') formId = "updateExperimentForm";
+    return formId;
   },
   // determines whether current experiment has already been cloned into the current workspace
   notCloned: function() {
-  var template = getCurrentExperiment();
-  if (template) {
-    var selector = {templateId: template._id};
-    selector.recordType = 'instance';
-    selector.workspace = Meteor.user().profile.currentWorkspace;
-    return (Experiments.find(selector).fetch().length > 0) ? false : true;
-  }
+    var template = getCurrentExperiment();
+    if (template) {
+      var selector = {templateId: template._id};
+      selector.recordType = 'instance';
+      selector.workspace = Meteor.user().profile.currentWorkspace;
+      return (Experiments.find(selector).fetch().length > 0) ? false : true;
+    }
   },
   // returns the data sets used by the current experiment
   dataSets: function() {
-  var exp = getCurrentExperiment();
-  if( exp && exp.dataSets && exp.dataSets.length > 0) {
-    exp.dataSets.forEach(function(dataSet){
-    dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+    var exp = getCurrentExperiment();
+    if( exp && exp.dataSets && exp.dataSets.length > 0) {
+      exp.dataSets.forEach(function(dataSet){
+      dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
     });
     return exp.dataSets;
 
@@ -290,26 +290,26 @@ Template.experiment.helpers({
   // identifies data sets not yet associated with this experiment
   // that can now be associated with it
   otherDataSets: function() {
-  var currentDataSets = Session.get('tempDataSets');
-  var currentDataSetIds = getIdsFromObjects(currentDataSets);
-  selector = {_id:{$nin:currentDataSetIds}};
-  return DataSets.find(selector,{sort:{name:1}});
+    var currentDataSets = Session.get('tempDataSets');
+    var currentDataSetIds = getIdsFromObjects(currentDataSets);
+    selector = {_id:{$nin:currentDataSetIds}};
+    return DataSets.find(selector,{sort:{name:1}});
   },
   // determines the record type of the current experiment
   recordType: function() {
-  return getRecordType();
+    return getRecordType();
   },
   // returns an array with the names of the data sets currently
   // associated with the current experiment in create or update mode
   tempDataSets: function() {
-  var tempDataSets = Session.get('tempDataSets');
-  if( tempDataSets && tempDataSets.length > 0) {
-    tempDataSets.forEach(function(dataSet){
-    dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
-    });
-    return tempDataSets;
-  }
-  else return [];
+    var tempDataSets = Session.get('tempDataSets');
+    if( tempDataSets && tempDataSets.length > 0) {
+      tempDataSets.forEach(function(dataSet){
+      dataSet.name = DataSets.findOne({_id: dataSet._id}).name;
+      });
+      return tempDataSets;
+    }
+    else return [];
   },
   modelOutputs: function() {
     return getModelOutputs();

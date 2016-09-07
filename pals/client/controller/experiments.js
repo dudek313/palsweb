@@ -128,7 +128,8 @@ Template.experiments.events({
         event.stopPropagation();
         event.stopImmediatePropagation();
         event.preventDefault();
-        Router.go('/experiment/display/' + this._id);
+        if (event.target.className != 'btn delete-btn btn-danger btn-xs')
+          Router.go('/experiment/display/' + this._id);
     },
 
      /*
@@ -176,22 +177,7 @@ Template.experiments.events({
     }
 });
 
-const CLONE_FIELD = {
-  fieldId: "13",
-  key: 'clone',
-  label: "Clone",
-  fn: function (value, object, key) {
-    if (notCloned(object._id)) {
-      return new Spacebars.SafeString(
-        "<button class='btn btn-primary btn-xs clone-exp' id="+ object._id + ">Clone</button>");
-    } else {
-      return new Spacebars.SafeString(
-        "<button class='btn btn-xs' disabled=true>Cloned</button>");
-    }
-  }
-}
-
-function notCloned(experimentId) {
+notCloned = function (experimentId) {
     var selector = { templateId:experimentId };
     selector.recordType = 'instance';
     var user = Meteor.user();

@@ -46,11 +46,13 @@ Template.dataSets.events({
     }
 
   },
+
   'click .reactive-table tbody tr': function (event) {
       event.stopPropagation();
       event.stopImmediatePropagation();
       event.preventDefault();
-      Router.go('/dataSets/display/' + this._id);
+      if (event.target.className != 'btn delete-btn btn-danger btn-xs')
+        Router.go('/dataSet/display/' + this._id);
   },
 
 /*  'click tr' : function(event) {
@@ -60,13 +62,6 @@ Template.dataSets.events({
     var id = $(event.target).parent().attr('id');
     Router.go('/dataSet/display/'+id);
   }*/
-
-  'click .reactive-table tbody tr': function (event) {
-      event.stopPropagation();
-      event.stopImmediatePropagation();
-      event.preventDefault();
-      Router.go('/dataSet/display/' + this._id);
-  }
 
 });
 

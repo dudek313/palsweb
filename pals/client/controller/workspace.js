@@ -34,10 +34,12 @@ Template.workspace.helpers({
               if( workspace.guests && workspace.guests.lastIndexOf(user._id) >= 0 ) {
                   user.invited = true;
               }
-              if( user.emails && user.emails.length > 0 ) {
-                  user.email = user.emails[0].address;
+              var profile = user.profile;
+              if (profile) {
+                if (profile.firstName && profile.lastName) {
+                  profile.fullname = profile.firstName + " " + profile.lastName;
+                }
               }
-              if( !user.email ) user.email = user.username;
           });
       }
       return users;

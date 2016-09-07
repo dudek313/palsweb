@@ -21,13 +21,7 @@
               </tr>
           {{#each users}}
               <tr>
-                <td>
-                  {{#if profile.fullname}} {{profile.fullname}}
-                  {{else}}
-                    {{#if profile.firstName}} {{profile.firstName}} {{/if}}
-                    {{#if profile.lastName}} {{profile.lastName}} {{/if}}
-                  {{/if}}
-                </td>
+                <td>{{profile.fullname}}</td>
                 {{#if isOwner}}<td>
                     <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
                 </td>{{/if}}

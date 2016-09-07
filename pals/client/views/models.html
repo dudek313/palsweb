@@ -2,7 +2,9 @@
 <div class="text-content">
     <h1>{{pageTitle}}</h1>
     <div class="alert alert-danger error"></div>
-    <table class="table table-hover">
+
+      {{> reactiveTable collection=models fields=fields rowsPerPage=10}}
+<!--    <table class="table table-hover">
         <thead>
         <tr>
             <th>Name</th>
@@ -27,6 +29,7 @@
          </tr>
         {{/each}}
         </tbody>
-    </table>
+    </table> -->
+
 </div>
 </template>
