@@ -124,11 +124,13 @@
 <template name="workspaceBadge">
   {{#if loggedIn}}
     {{#if notInWorkspace}}
-      <b>To contribute to an experiment, join or create a workspace.</b>
+      <span title="You are not currently in any workspace. Feel free to browse the site. To contribute to an experiment you must join an existing workspace or create a new one.">
+        <b>To contribute to an experiment, join or create a workspace.</b></span>
     {{else}}
       You are currently in the <b>{{currentWorkspaceName}}</b> workspace.
     {{/if}}
   {{else}}
-    <b>Not logged in. Feel free to browse or register.</b>
+    <span title="You are currently not logged in. Feel free to browse the site. To have full use of PALS, please log in or register.">
+    <b>Not logged in. Feel free to browse or register.</b></span>
   {{/if}}
 </template>
