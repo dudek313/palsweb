@@ -108,13 +108,10 @@ function processNext() {
 		setTimeout(processNext,1000);
 	}
 }
-=======
->>>>>>> ab03a33812c378d8471280cd1ec7fdf1de1e7f69
 
 
 function sendMessage(output) {
 	console.log('sending reply to client');
-	console.log(); console.log(output); 
 	--workers;
 	client.rpush('pals.output',JSON.stringify(output));
 }
