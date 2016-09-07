@@ -142,3 +142,14 @@ authorisedToEdit = function(objType, id) {
   var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
   return authorised;
 };
+
+getUserFullName = function(userId) {
+  var user = Meteor.users.findOne({_id: userId});
+  if (user && user.profile) {
+    if (user.profile.fullname)
+      var fullname = user.profile.fullname;
+    else if (user.profile.firstName && user.profile.lastName)
+      var fullname = user.profile.firstName + " " + user.profile.lastName;
+    return fullname;
+  }
+}

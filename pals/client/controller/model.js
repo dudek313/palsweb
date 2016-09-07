@@ -111,8 +111,15 @@ Template.model.helpers({
       }
       else return '';
   },
+  userFullName: function() {
+    var userId = Meteor.userId();
+    return getUserFullName(userId);
+  },
   model: function() {
-      return getCurrentModel();
+    var currentModel = getCurrentModel();
+    currentModel.ownerName = getUserFullName(currentModel.owner);
+
+    return currentModel;
 
   },
   updateBtnDisabled: function() {

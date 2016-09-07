@@ -17,15 +17,16 @@
             <div class="panel-heading">Details</div>
             <div class="panel-body">
 
-              {{> afQuickField name='name'}}
+              {{> afQuickField name='name' placeholder="Include model version information e.g. repository version"}}
               <label>Owner</label>
-              {{#if areEqual screenMode 'create'}}<div class="display">{{userEmail currentUser._id}}</div>
-              {{else}} <div class="display">{{userEmail model.owner}}</div>
+              {{#if areEqual screenMode 'create'}}<div class="display">{{userFullName}}</div>
+              {{else}} <div class="display">{{model.ownerName}}</div>
               {{/if}}
               <br/>
-              {{> afQuickField name='url'}}
+              {{> afQuickField name='url' placeholder="E.g. homepage or repository link"}}
               {{> afQuickField name='references' rows=6}}
-              {{> afQuickField name='comments' rows=6}}
+              {{> afQuickField name='comments' rows=6
+                placeholder="Include any additional information specific to this model version that could help reproduce simulations"}}
 
             </div>
           </div>
@@ -58,7 +59,7 @@
               <div class="display">{{model.name}}</div>
               <br/>
               <label>Owner</label>
-              <div class="display">{{userEmail model.owner}}</div>
+              <div class="display">{{model.ownerName}}</div>
               <br/>
               <label>Created</label>
               <div class="display">{{model.created}}</div>
