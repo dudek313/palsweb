@@ -49,15 +49,15 @@
 
 
 .login-link-and-dropdown-list {
-    margin-right: 15px;
+    margin-right: 90px;
 }
 
 
-#login-dropdown-list {
+/*#login-dropdown-list {
       position: fixed;
       left: 500px;
       margin: 5px 10px;
-}
+}*/
 
 .login-buttons {
     padding-top: 15px;
@@ -69,7 +69,7 @@
 }
 
 .accounts-dialog {
-    width: 240px;
+    width: 148px;
 }
 
 
@@ -86,7 +86,7 @@
   position: absolute;
   padding: 5px;
   top: 7.5px;
-  margin-left: 30px;
+  margin-left: 10px;
   margin-right: 10px;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -191,7 +191,7 @@ table.table-hover tbody tr:hover {
 }
 
 
-@media (max-width: 1200px) {
+@media (max-width: 1199px) {
   .navbar-header {
       float: none;
   }
