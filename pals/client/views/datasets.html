@@ -1,23 +1,22 @@
 <template name="dataSets">
 <div class="text-content">
 
-  <div class="form-group" align="center">
-    <label>Experiment Type</label>&nbsp;
-    <input type="radio" name="spatialLevel" value="All" {{isChecked 'All'}}>All&nbsp;
-    <input type="radio" name="spatialLevel" value="SingleSite" {{isChecked 'SingleSite'}}>SingleSite&nbsp;
-    <input type="radio" name="spatialLevel" value="MultipleSite" {{isChecked 'MultipleSite'}}>MultipleSite&nbsp;
-    <input type="radio" name="spatialLevel" value="Catchment" {{isChecked 'Catchment'}}>Catchment&nbsp;
-    <input type="radio" name="spatialLevel" value="Regional" {{isChecked 'Regional'}}>Regional&nbsp;
-    <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
-  </div>
+  <div class="alert alert-danger error"></div>
 
-    <h1>
-        {{currentSpatialLevel}} Data Sets
+    <h2>
+        Data Sets
         {{#if areEqual source 'workspace'}}In Current Workspace{{/if}}
-    </h1>
-    <div class="alert alert-danger error"></div>
+    </h2>
+    <div class="form-group">
+      <input type="radio" name="spatialLevel" value="All" {{isChecked 'All'}}>All&nbsp;
+      <input type="radio" name="spatialLevel" value="SingleSite" {{isChecked 'SingleSite'}}>SingleSite&nbsp;
+      <input type="radio" name="spatialLevel" value="MultipleSite" {{isChecked 'MultipleSite'}}>MultipleSite&nbsp;
+      <input type="radio" name="spatialLevel" value="Catchment" {{isChecked 'Catchment'}}>Catchment&nbsp;
+      <input type="radio" name="spatialLevel" value="Regional" {{isChecked 'Regional'}}>Regional&nbsp;
+      <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
+    </div>
 
-    {{> reactiveTable collection=dataSets fields=fields rowsPerPage=10}}
+    {{> reactiveTable class="table table-hover table-framed" collection=dataSets fields=fields rowsPerPage=10}}
 <!--
     <table class="table table-hover">
         <thead>

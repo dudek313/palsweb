@@ -1,6 +1,6 @@
 UI._allowJavascriptUrls();
 
-Template.main.helpers({
+Template.workspaceBadge.helpers({
   currentWorkspace: function() {
       return getCurrentWorkspace();
   },
@@ -15,10 +15,3 @@ Template.main.helpers({
   }
 
 })
-
-Template.main.events({
-  'click .login-toggle': function() {
-    Router.go('/registration');
-//    Session.set('nav-toggle', 'open');
-  }
-});

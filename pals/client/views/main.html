@@ -1,6 +1,6 @@
 <template name="main">
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-  <div class="container">
+  <div class="container-fluid">
   <!-- Brand and toggle get grouped for better mobile display -->
   <div class="navbar-header">
     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -10,6 +10,7 @@
       <span class="icon-bar"></span>
     </button>
     <a class="navbar-brand" href="/">PALS</a>
+    <span class="workspace hidden-lg hidden-xs">{{> workspaceBadge}}</span>
   </div>
 
   <!-- Collect the nav links, forms, and other content for toggling -->
@@ -17,7 +18,7 @@
     <ul class="nav navbar-nav">
       <li><a href="/workspaces">Workspaces</a></li>
       <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles<b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles</a>
             <ul class="dropdown-menu">
                 <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/models/mine');">Owned By Me</a></li>
                 <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/models/workspace');">In Current Workspace</a></li>
@@ -32,7 +33,7 @@
       </li>
 
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Outputs <b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Output</a>
         <ul class="dropdown-menu">
             <li class={{disabledIfNotLoggedIn}} title={{toolTipIfNotLoggedIn}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/mine');">Owned By Me</a></li>
             <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/modelOutputs/workspace');">In Current Workspace</a></li>
@@ -43,7 +44,7 @@
       </li>
 
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments<b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments</a>
         <ul class="dropdown-menu">
           <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/All');">In All Available Workspaces</a></li>
@@ -56,7 +57,7 @@
       </li>
 
       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets<b class="caret"></b></a>
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets</a>
         <ul class="dropdown-menu">
           <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/All');">All Data Sets</a></li>
@@ -66,6 +67,23 @@
           {{/if}}
         </ul>
       </li>
+
+      <li class="workspace visible-lg">
+        {{> workspaceBadge}}
+      </li>
+<!--      <li class="workspace visible-lg">
+        {{#if loggedIn}}
+          {{#if notInWorkspace}}
+            <b>To contribute to an experiment, join or create a workspace.</b>
+          {{else}}
+            You are currently in the <b>{{currentWorkspace.name}}</b> workspace.
+          {{/if}}
+        {{else}}
+          <b>Not logged in. Feel free to browse or register.</b>
+        {{/if}}
+      </li>-->
+
+      <!--You are currently in the <strong>{{currentWorkspace.name}}</strong> workspace</li>-->
 
     </ul>
 
@@ -85,7 +103,7 @@
 </nav>
 <div class="main">
 
-    {{#if loggedIn}}
+<!--    {{#if loggedIn}}
       {{#if notInWorkspace}}
         <div class="no-workspace-header"><b>You are not currently in any workspace. Feel free to browse the site.
           <br>To contribute to an experiment you must join an existing workspace or create a new one.</b></div>
@@ -96,8 +114,21 @@
       <div class="no-workspace-header"><b>You are currently not logged in. Feel free to browse the site.
         <br>To have full use of PALS, please log in or register.</b></div>
     {{/if}}
+-->
   <div class="container content">
     {{> yield}}
   </div>
 </div>
+</template>
+
+<template name="workspaceBadge">
+  {{#if loggedIn}}
+    {{#if notInWorkspace}}
+      <b>To contribute to an experiment, join or create a workspace.</b>
+    {{else}}
+      You are currently in the <b>{{currentWorkspace.name}}</b> workspace.
+    {{/if}}
+  {{else}}
+    <b>Not logged in. Feel free to browse or register.</b>
+  {{/if}}
 </template>

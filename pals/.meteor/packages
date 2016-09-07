@@ -8,7 +8,6 @@ cfs:standard-packages
 cfs:filesystem
 standard-minifier-css
 standard-minifier-js
-accounts-ui@1.1.9
 standard-app-packages@1.0.9
 jquery@1.11.9
 aldeed:collection2
@@ -40,3 +39,6 @@ reactive-var@1.0.10
 aslagle:reactive-table
 templating@1.2.14
 shell-server
+useraccounts:core
+accounts-ui-unstyled
+accounts-ui

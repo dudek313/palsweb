@@ -53,6 +53,7 @@ Meteor.publish('directory',function(){
        'profile.fullname': 1,
        'profile.firstName': 1,
        'profile.lastName': 1,
+       'profile.currentWorkspace': 1,
        organisation: 1,
        country: 1,
        currentWork: 1,

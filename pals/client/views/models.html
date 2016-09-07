@@ -1,9 +1,9 @@
 <template name="models">
 <div class="text-content">
-    <h1>{{pageTitle}}</h1>
+    <h2>{{pageTitle}}</h2>
     <div class="alert alert-danger error"></div>
 
-      {{> reactiveTable collection=models fields=fields rowsPerPage=10}}
+      {{> reactiveTable class="table table-hover table-framed" collection=models fields=fields rowsPerPage=10}}
 <!--    <table class="table table-hover">
         <thead>
         <tr>

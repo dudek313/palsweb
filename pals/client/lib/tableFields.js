@@ -48,6 +48,8 @@ DELETE_FIELD = {
   fieldId: "12",
   key: 'delete',
   label: "Delete",
+  headerClass: 'button-col',
+  cellClass: 'button-col',
   fn: function (value, object, key) {
     return new Spacebars.SafeString(
       "<button class='btn delete-btn btn-danger btn-xs' id="+ object._id +">Delete</button>");
@@ -58,6 +60,8 @@ CLONE_FIELD = {
   fieldId: "13",
   key: 'clone',
   label: "Clone",
+  headerClass: 'button-col',
+  cellClass: 'button-col',
   fn: function (value, object, key) {
     if (notCloned(object._id)) {
       return new Spacebars.SafeString(
