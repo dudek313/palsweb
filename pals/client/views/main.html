@@ -60,9 +60,9 @@
         <ul class="dropdown-menu">
           <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
           <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/All');">All Data Sets</a></li>
-          {{#if authorisedToEdit 'dataset'}}
+          {{#if authorisedToEdit 'dataSet'}}
                <li class="divider"></li>
-               <li><a href="javascript:void(0)" onclick="Router.go('/dataset/create');">Create Data Set</a></li>
+               <li><a href="javascript:void(0)" onclick="Router.go('/dataSet/create');">Create Data Set</a></li>
           {{/if}}
         </ul>
       </li>

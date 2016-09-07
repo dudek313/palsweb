@@ -51,7 +51,7 @@ Meteor.methods({
 
   'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -61,7 +61,7 @@ Meteor.methods({
     },
     'insertDataSet': function(dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -73,7 +73,7 @@ Meteor.methods({
     },
     'removeDataSet': function(dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {

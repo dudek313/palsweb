@@ -1,8 +1,8 @@
-Template.dataset.onCreated(function () {
+Template.dataSet.onCreated(function () {
   this.currentUpload = new ReactiveVar(false);
 });
 
-Template.dataset.rendered = function() {
+Template.dataSet.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
     Session.set('filesToDelete', []);
@@ -56,7 +56,7 @@ AutoForm.hooks({
                     Session.set('dirty', false);
 */
                     Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
-                    Router.go('/dataset/display/' + docId);
+                    Router.go('/dataSet/display/' + docId);
                 }
             });
 
@@ -77,7 +77,7 @@ AutoForm.hooks({
                     Session.set('filesToDelete', []); */
 
                     var currentDataSetId = getCurrentObjectId();
-                    Router.go('/dataset/display/' + currentDataSetId);
+                    Router.go('/dataSet/display/' + currentDataSetId);
                 }
             });
 
@@ -87,7 +87,7 @@ AutoForm.hooks({
     }
 })
 
-Template.dataset.events = {
+Template.dataSet.events = {
     'click .upload-btn':function(event){
         event.preventDefault();
         Session.set('uploadButtonClicked', true);
@@ -96,7 +96,7 @@ Template.dataset.events = {
         event.preventDefault();
         removeDeletedFiles(Session.get('filesUploaded'));
         Session.set('filesUploaded', []);
-        Router.go('/dataset/display/' + getCurrentObjectId());
+        Router.go('/dataSet/display/' + getCurrentObjectId());
     },
     'click .cancel-create':function(event){
         event.preventDefault();
@@ -131,7 +131,7 @@ Template.dataset.events = {
     'click .enable-update':function(event){
         event.preventDefault();
         var dataSetId = getCurrentObjectId();
-        Router.go('/dataset/update/' + dataSetId);
+        Router.go('/dataSet/update/' + dataSetId);
     },
 
     'change #fileInput': function (e, template) {
@@ -256,7 +256,7 @@ function getFiles(dataSet) {
     }
 }
 
-Template.dataset.helpers({
+Template.dataSet.helpers({
   uploadButtonClicked: function() {
     return Session.get('uploadButtonClicked');
   },

@@ -34,13 +34,13 @@ Router.map(function () {
     });
     this.route('term-of-use');
     this.route('privacy');
-    this.route('datasets',{
-        path: '/datasets/:source/:resolution',
-        template: 'datasets'
+    this.route('dataSets',{
+        path: '/dataSets/:source/:resolution',
+        template: 'dataSets'
     });
     this.route('displayOrUpdateDataset',{
-        path: '/dataset/:screenMode/:id',
-        template: 'dataset',
+        path: '/dataSet/:screenMode/:id',
+        template: 'dataSet',
         data: function() { return DataSets.findOne({_id:this.params.id}); },
         onBeforeAction: [
             function() {
@@ -57,8 +57,8 @@ Router.map(function () {
         ]
     });
     this.route('createDataset',{
-        path: '/dataset/:screenMode',
-        template: 'dataset',
+        path: '/dataSet/:screenMode',
+        template: 'dataSet',
         onBeforeAction: [
             function() {
                 Session.set('tempFiles', []);

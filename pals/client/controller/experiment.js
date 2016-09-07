@@ -184,9 +184,9 @@ Template.experiment.events = {
 
     }
   },
-  // removes a selected dataset from the tempDataSets session variable,
+  // removes a selected dataSet from the tempDataSets session variable,
   // thereby removing it from display on the update page
-  'click .remove-dataset':function(event) {
+  'click .remove-dataSet':function(event) {
     event.preventDefault();
     var selectedDataSetId = $(event.target).attr('id');
     var currentDataSets = Session.get('tempDataSets');
@@ -215,11 +215,11 @@ Template.experiment.events = {
     newExpInstance.workspace = Meteor.user().profile.currentWorkspace;
     newExpInstance.templateVersion = newExpInstance._version;
     if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
-      newExpInstance.dataSets.forEach(function(dataset){
-        dataset._version = getDataSetVersion(dataset._id);
+      newExpInstance.dataSets.forEach(function(dataSet){
+        dataSet._version = getDataSetVersion(dataSet._id);
       });
     }
-    else console.log("Experiment doesn't have datasets");
+    else console.log("Experiment doesn't have data sets");
     Meteor.call('insertExperiment', newExpInstance, function(error,docId){
       if (error) {
         window.scrollTo(0,0);

@@ -16,15 +16,21 @@
 
           <table class="table">
               <tr>
-                  <th>email address</th>
+                  <th>Name</th>
                   {{#if isOwner}}<th>invite</th>{{/if}}
               </tr>
           {{#each users}}
               <tr>
-                  <td>{{email}}</td>
-                  {{#if isOwner}}<td>
-                      <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
-                  </td>{{/if}}
+                <td>
+                  {{#if profile.fullname}} {{profile.fullname}}
+                  {{else}}
+                    {{#if profile.firstName}} {{profile.firstName}} {{/if}}
+                    {{#if profile.lastName}} {{profile.lastName}} {{/if}}
+                  {{/if}}
+                </td>
+                {{#if isOwner}}<td>
+                    <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
+                </td>{{/if}}
               </tr>
           {{/each}}
           </table>

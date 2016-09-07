@@ -118,7 +118,7 @@
                    <tbody>
                    {{#each dataSets}}
                    <tr>
-                       <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
+                       <td onclick="Router.go('/dataSet/display/{{_id}}')">{{name}}</td>
                    </tr>
                    {{/each}}
                    </tbody>
@@ -245,8 +245,8 @@
                       <tbody>
                       {{#each tempDataSets}}
                       <tr>
-                          <td onclick="Router.go('/dataset/display/{{_id}}')">{{name}}</td>
-                          <td><button class='remove-dataset btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
+                          <td onclick="Router.go('/dataSet/display/{{_id}}')">{{name}}</td>
+                          <td><button class='remove-dataSet btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
                       </tr>
                       {{/each}}
                       </tbody>

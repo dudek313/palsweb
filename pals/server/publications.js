@@ -42,7 +42,7 @@ if (gab) {
 var danny = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'});
 if (danny) {
     var dannyId = danny._id;
-    Roles.addUsersToRoles(dannyId, 'edit', 'datasets');
+    Roles.addUsersToRoles(dannyId, 'edit', 'dataSets');
     Roles.addUsersToRoles(dannyId, 'edit', 'models');
     Roles.addUsersToRoles(dannyId, 'edit', 'experiments');
 }

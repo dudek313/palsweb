@@ -1,4 +1,4 @@
-Template.datasets.onCreated(function() {
+Template.dataSets.onCreated(function() {
   window['directives']();
   Meteor.subscribe('dataSets');
 });
@@ -24,7 +24,7 @@ Template.datasets.onCreated(function() {
 }*/
 
 
-Template.datasets.events({
+Template.dataSets.events({
   'click input[name="spatialLevel"]' : function(event) {
     event.preventDefault();
     var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
@@ -44,15 +44,29 @@ Template.datasets.events({
         });
       }
     }
-  }/*,
-  'click tr' : function(event) {
+
+  },
+  'click .reactive-table tbody tr': function (event) {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      Router.go('/dataSets/display/' + this._id);
+  },
+
+/*  'click tr' : function(event) {
     event.stopPropagation();
     event.stopImmediatePropagation();
     event.preventDefault();
     var id = $(event.target).parent().attr('id');
-    Router.go('/dataset/display/'+id);
+    Router.go('/dataSet/display/'+id);
   }*/
 
+  'click .reactive-table tbody tr': function (event) {
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      event.preventDefault();
+      Router.go('/dataSet/display/' + this._id);
+  }
 
 });
 
@@ -80,10 +94,10 @@ getMultipleExperimentDataSetIds = function(experiments) {
   return dataSetIds;
 }
 
-function variableList(dataset) {
+variableList = function(dataSet) {
   var varList = "";
-  if(dataset.variables) {
-    var variables = dataset.variables;
+  if(dataSet.variables) {
+    var variables = dataSet.variables;
 
     if(variables.NEE) varList += "NEE  ";
     if(variables.Qg) varList += "Qg  ";
@@ -95,7 +109,7 @@ function variableList(dataset) {
   return varList;
 }
 
-Template.datasets.helpers({
+Template.dataSets.helpers({
   isChecked: function(buttonLevel) {
     var level = getCurrentSpatialLevel();
     return (level == buttonLevel) ? 'checked' : ''
@@ -132,24 +146,24 @@ Template.datasets.helpers({
       case "All":
       case "Global":
       case "MultipleSite":
-        var fields = [ nameField, spLevelField, resolutionField, timeStepField,
-          variablesField, ownerField, viewAnalysesField ];
+        var fields = [ NAME_FIELD, SP_LEVEL_FIELD, RESOLUTION_FIELD, TIME_STEP_FIELD,
+          VARIABLES_FIELD, OWNER_FIELD, VIEW_ANALYSES_FIELD ];
         break;
 
       case "SingleSite":
-        var fields = [ nameField, vegTypeField, countryField, yearsField,
-          variablesField, ownerField, viewAnalysesField ];
+        var fields = [ NAME_FIELD, VEG_TYPE_FIELD, COUNTRY_FIELD, YEARS_FIELD,
+          VARIABLES_FIELD, OWNER_FIELD, VIEW_ANALYSES_FIELD ];
         break;
 
       case "Catchment":
       case "Regional":
-        var fields = [ nameField, regionField, spLevelField, resolutionField,
-          timeStepField, variablesField, viewAnalysesField ];
+        var fields = [ NAME_FIELD, REGION_FIELD, SP_LEVEL_FIELD, RESOLUTION_FIELD,
+          TIME_STEP_FIELD, VARIABLES_FIELD, VIEW_ANALYSES_FIELD ];
         break;
     }
 
-    if (authorisedToEdit("dataset"))
-      fields.push(deleteField);
+    if (authorisedToEdit("dataSet"))
+      fields.push(DELETE_FIELD);
 
     return fields;
   },
@@ -167,10 +181,10 @@ Template.datasets.helpers({
     }
     else return '';
   },
-  variableList: function(dataset) {
+  variableList: function(dataSet) {
     var varList = "";
-    if(dataset.variables) {
-      variables = dataset.variables;
+    if(dataSet.variables) {
+      variables = dataSet.variables;
 
    if(variables.NEE) varList += "NEE  ";
    if(variables.Qg) varList += "Qg  ";
@@ -182,57 +196,3 @@ Template.datasets.helpers({
    return varList;
    }
 });
-
-const nameField = { fieldId: "1", key: 'name', label: 'Name' };
-const spLevelField = { fieldId: "2", key: 'spatialLevel', label: 'Spatial Level' };
-const resolutionField = { fieldId: "3", key: 'resolution', label: 'Resolution' };
-const timeStepField = { fieldId: "4", key: 'timeStepSize', label: 'Time Step Size' };
-const vegTypeField = { fieldId: "5", key: 'vegType', label: 'Vegetation Type' };
-const regionField = { fieldId: "6", key: 'region', label: 'Region' };
-const countryField = { fieldId: "7", key: 'country', label: 'Country' };
-const yearsField = { fieldId: "8", key: 'years', label: 'Years' };
-
-const variablesField = {
-    fieldId: "9",
-    key: 'variables',
-    label: 'Variables',
-    fn: function (value, object, key) {
-      return variableList(object);
-    }
-};
-
-// Fullname has been deprecated from the system. Will need to be updated.
-const ownerField = {
-    fieldId: "10",
-    key: 'ownerName',
-    label: "Owner",
-    fn: function (value, object, key) {
-      var selector = {_id: object.owner};
-      var owner = Meteor.users.findOne(selector);
-      if (owner && owner.profile) {
-        if (owner.profile.fullname)
-          var fullname = owner.profile.fullname;
-        else if (owner.profile.firstName && owner.profile.lastName)
-          var fullname = owner.profile.firstName + " " + owner.profile.lastName;
-      }
-
-      return fullname;
-    }
-};
-
-const viewAnalysesField = {
-    fieldId: "11",
-    key: 'viewAnalyses',
-    label: "View Analyses",
-    fn: function (value, object, key) {   }
-};
-
-const deleteField = {
-  fieldId: "12",
-  key: 'delete',
-  label: "Delete",
-  fn: function (value, object, key) {
-    return new Spacebars.SafeString(
-      "<button class='btn delete-btn btn-danger btn-xs' id="+ object._id +">Delete</button>");
-  }
-}

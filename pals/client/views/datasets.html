@@ -1,4 +1,4 @@
-<template name="datasets">
+<template name="dataSets">
 <div class="text-content">
 
   <div class="form-group" align="center">
@@ -46,7 +46,7 @@
                     {{> globalHeadings}}
                 {{/if}}
             {{/if}}
-            {{#if authorisedToEdit 'dataset'}}<th>Delete</th>{{/if}}
+            {{#if authorisedToEdit 'dataSet'}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
@@ -76,7 +76,7 @@
                     {{> globalRow}}
                 {{/if}}
               {{/if}}
-              {{#if authorisedToEdit 'dataset'}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+              {{#if authorisedToEdit 'dataSet'}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
            </tr>
           {{/each}}
           {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-center" onClick=clickEvent}}
