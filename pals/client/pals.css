@@ -102,6 +102,12 @@ html, body{
    margin-top: 20px;
 }
 
+.workspace-btn {
+  position: absolute;
+  top: 10px;
+  margin-left: 10px;
+}
+
 .workspace {
   position: absolute;
   padding: 5px;

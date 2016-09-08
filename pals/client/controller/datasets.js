@@ -1,3 +1,6 @@
+import '../views/datasets.html';
+import '../lib/tableFields.js';
+
 Template.dataSets.onCreated(function() {
   window['directives']();
   Meteor.subscribe('dataSets');

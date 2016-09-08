@@ -7,6 +7,35 @@ Handlebars.registerHelper('breaklines',
     }
 );
 
+Handlebars.registerHelper('currentWorkspaceName',
+  function() {
+    var ws = getCurrentWorkspace();
+    const MaxLength = 24;
+    if (ws) {
+      var wsName = ws.name;
+      if (wsName.length >= MaxLength) {
+        var wsName = wsName.substr(0, MaxLength) + "...";
+      }
+      return wsName;
+    }
+  }
+);
+
+
+Handlebars.registerHelper('notInWorkspace', function() {
+  return notInWorkspace();
+});
+
+notInWorkspace = function() {
+  var currentWorkspace = getCurrentWorkspace();
+  if( currentWorkspace && (currentWorkspace.name == 'browsing')) {
+      return true;
+  }
+  else {
+      return false;
+  }
+}
+
 Handlebars.registerHelper('encode',
     function(str) {
         return encodeURIComponent(str);
@@ -14,13 +43,17 @@ Handlebars.registerHelper('encode',
 );
 
 Template.registerHelper("loggedIn", function() {
-      if( Meteor.user() ) {
-        return true;
-      }
-      else {
-        return false;
-      }
+  return loggedIn();
 });
+
+loggedIn = function() {
+  if( Meteor.user() ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 /** Used by templates to check if user is authorized to use a page associated with a particular object, eg data set, model, etc.
 /* If in display mode, will always return true. If in create mode, user must be registered and logged in.

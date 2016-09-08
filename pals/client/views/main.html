@@ -10,13 +10,13 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="/">PALS</a>
-      <span class="workspace hidden-lg hidden-xs">{{> workspaceBadge}}</span>
+      <span class="hidden-lg hidden-xs">{{> workspaceBtn}}</span>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse navbar-ex1-collapse">
       <ul class="nav navbar-nav">
-        <li><a href="/workspaces">Workspaces</a></li>
+<!--        <li><a href="/workspaces">Workspaces</a></li> -->
         <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model Profiles</a>
               <ul class="dropdown-menu">
@@ -68,9 +68,9 @@
           </ul>
         </li>
 
-        <li class="workspace visible-lg">
-          {{> workspaceBadge}}
-        </li>
+        <span class="visible-lg">
+          {{> workspaceBtn}}
+        </span>
   <!--      <li class="workspace visible-lg">
           {{#if loggedIn}}
             {{#if notInWorkspace}}
@@ -88,16 +88,14 @@
       </ul>
 
 
-      {{#if loggedIn}}
-        <ul class="nav navbar-nav navbar-right">
-          {{> loginButtons align="right"}}
-        </ul>
-      {{else}}
-        <div class="btns-group nav navbar-nav navbar-right">
-          <a href="/login" class="btn-secondary login-btn">Login</a>
-          <a href="/registration" class="btn-secondary register-btn RbtnMargin">Register</a>
-        </div>
-      {{/if}}
+      <ul class="nav navbar-nav navbar-right">
+        {{#if loggedIn}}
+            {{> loginButtons align="right"}}
+        {{else}}
+          <li onclick="Router.go('/login')" class="btn-secondary login-btn">Login</li>
+          <li onclick="Router.go('/registration')" class="btn-secondary register-btn RbtnMargin">Register</li>
+        {{/if}}
+      </ul>
     </div><!-- /.navbar-collapse -->
     </div><!-- /container -->
   </nav>
@@ -125,16 +123,18 @@
 </div>
 </template>
 
-<template name="workspaceBadge">
-  {{#if loggedIn}}
-    {{#if notInWorkspace}}
-      <span title="You are not currently in any workspace. Feel free to browse the site. To contribute to an experiment you must join an existing workspace or create a new one.">
-        <b>To contribute to an experiment, join or create a workspace.</b></span>
-    {{else}}
-      You are currently in the <b>{{currentWorkspaceName}}</b> workspace.
-    {{/if}}
-  {{else}}
-    <span title="You are currently not logged in. Feel free to browse the site. To have full use of PALS, please log in or register.">
-    <b>Not logged in. Feel free to browse or register.</b></span>
-  {{/if}}
+<template name="workspaceBtn">
+        {{#if loggedIn}}
+          {{#if notInWorkspace}}
+            <a class="workspace-btn btn btn-primary btn-sm" onclick="Router.go('/workspaces')"
+              title="You are not currently in any workspace. Feel free to browse the site. To contribute to an experiment you must join an existing workspace or create a new one.">
+              To contribute to an experiment, join or create a workspace</a>
+          {{else}}
+            <a class="workspace-btn btn btn-primary btn-sm" onclick="Router.go('/workspaces')">You are currently in the <b>{{currentWorkspaceName}}</b> workspace.</a>
+          {{/if}}
+        {{else}}
+            <a class="workspace-btn btn btn-primary btn-sm" onclick="Router.go('/registration')"
+              title="You are currently not logged in. Feel free to browse the site. To have full use of PALS, please log in or register.">
+              Not logged in. Feel free to browse or register</a>
+        {{/if}}
 </template>
