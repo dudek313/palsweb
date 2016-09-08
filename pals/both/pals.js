@@ -181,6 +181,19 @@ Router.map(function () {
             return this.response.end(file);
         }
     });
+    this.route('logo', {
+        where: 'server',
+        path: '/logo/:name/:type',
+        action: function() {
+            var name = this.params.name;
+            var filename = '/mnt/sharing/'+name;
+            var fs = Npm.require('fs');
+            var file = fs.readFileSync(filename);
+            var headers = {'Content-type': this.params.type};
+            this.response.writeHead(200, headers);
+            return this.response.end(file);
+        }
+    });
 });
 
 /** Confirms before allowing a user to navigate away from a page before saving edits.
