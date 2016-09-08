@@ -47,21 +47,14 @@
     margin: 0px auto;
 }
 
-
-.login-link-and-dropdown-list {
-    margin-right: 90px;
-}
-
-
-/*#login-dropdown-list {
-      position: fixed;
-      left: 500px;
-      margin: 5px 10px;
-}*/
-
 .login-buttons {
     padding-top: 15px;
     margin: 0 20px;
+}
+
+.login-link-and-dropdown-list {
+    padding-top: 15px;
+    padding-right: 15px;
 }
 
 #login-name-link {
@@ -69,7 +62,7 @@
 }
 
 .accounts-dialog {
-    width: 148px;
+    width: 240px;
 }
 
 
