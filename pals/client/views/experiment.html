@@ -6,11 +6,11 @@
       {{#if authorized 'experiment' _id}}
         {{#if areEqual screenMode 'display'}}
           <form role="form">
-            {{#if areEqual this.recordType 'template'}}
+<!--            {{#if areEqual this.recordType 'template'}}
               {{#if notCloned}}
                 <a class="btn btn-primary clone pull-right RbtnMargin">Clone Into Current Workspace</a>
               {{/if}}
-            {{/if}}
+            {{/if}}-->
             {{#if authorisedToEdit 'modelOutput' _id}}
               <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
             {{/if}}
@@ -158,13 +158,13 @@
           {{/if}}
   <!--        </div> -->
           <div class="col-md-12">
+            {{#if authorisedToEdit 'experiment' _id}}
+            <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
+            {{/if}}
             {{#if areEqual this.recordType 'template'}}
               {{#if notCloned}}
                 <a class="btn btn-primary clone pull-right RbtnMargin">Clone Into Current Workspace</a>
               {{/if}}
-            {{/if}}
-            {{#if authorisedToEdit 'experiment' _id}}
-              <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
             {{/if}}
           </div>
 
