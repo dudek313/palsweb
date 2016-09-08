@@ -67,7 +67,7 @@ Template.model.events = {
     },
     'click .cancel-create':function(event){
         event.preventDefault();
-        Router.go('/home')
+        Router.go('/')
     },
     'click .enable-update':function(event){
         Router.go('/model/update/' + getCurrentObjectId());

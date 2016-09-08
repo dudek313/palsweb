@@ -17,9 +17,9 @@
             {{/if}}
 
             {{#if areEqual this.recordType 'template'}}
-              <h1>Experiment Template: {{name}}</h1>
+              <h3>Experiment Template: {{name}}</h3>
             {{else}}
-              <h1>Experiment: {{name}}</h1>
+              <h3>Experiment: {{name}}</h3>
             {{/if}}
 
 
@@ -174,16 +174,16 @@
             {{#autoForm collection="Experiments" id=formId doc=this type="normal" resetOnSuccess=false validation='blur'}}
               <fieldset>
                 {{#if areEqual screenMode 'create'}}
-                  <h1>Create New Experiment Template</h1>
+                  <h3>Create New Experiment Template</h3>
                 {{else}} <!-- if in update mode -->
                   <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
                     <br>Experiment details won't be updated until "Save Changes" is clicked below.</b></div>
                   <div class="alert alert-danger error"></div>
     <!--              <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Experiment Details</a> -->
                   {{#if areEqual experiment.recordType 'template'}}
-                    <h1>Experiment Template: {{name}}</h1>
+                    <h3>Experiment Template: {{name}}</h3>
                   {{else}}
-                    <h1>Experiment: {{name}}</h1>
+                    <h3>Experiment: {{name}}</h3>
                   {{/if}}
                 {{/if}}
                 <div class="panel panel-primary">

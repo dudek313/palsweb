@@ -111,7 +111,7 @@ Template.experiment.events = {
   // when user clicks cancel while creating experiment, returns them to home page
   'click .cancel-create':function(event){
     event.preventDefault();
-    Router.go('/home')
+    Router.go('/')
   },
   // when user clicks on delete script button,
   //removes script from the tempScripts session variable

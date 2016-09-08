@@ -128,7 +128,7 @@ Template.modelOutput.events = {
     // returns to home page if user pressed cancel while creating model output
     'click .cancel-create':function(event){
         event.preventDefault();
-        Router.go('/home')
+        Router.go('/')
     },
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){

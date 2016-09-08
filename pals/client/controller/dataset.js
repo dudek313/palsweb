@@ -102,7 +102,7 @@ Template.dataSet.events = {
         event.preventDefault();
         removeDeletedFiles(Session.get('filesUploaded'));
         Session.set('filesUploaded', []);
-        Router.go('/home')
+        Router.go('/')
     },
     'click .delete-file':function(event) {
         event.preventDefault();

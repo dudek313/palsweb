@@ -3,11 +3,11 @@
 /*    margin-bottom: 40px;*/
 }
 
-.workspace-header {
+/*.workspace-header {
     background:DodgerBlue;
     position: fixed;
     text-align: center;
-    top: 50px;
+    top: 30px;
     width:100%;
     padding:10px;
     z-index: 2;
@@ -20,10 +20,10 @@
     top: 50px;
     width:100%;
     z-index: 2;
-}
+}*/
 .content {
     max-width:95%;
-    margin: 100px auto;
+    margin: 50px auto;
     width:100%;
     z-index: 1;
     position: relative;
@@ -83,7 +83,8 @@
   margin-right: 10px;
   border: 1px solid transparent;
   border-radius: 4px;
-  background-color: DodgerBlue;
+  background-color: #66b3ff;
+  color: #003366;
 }
 
 .workspace > p,

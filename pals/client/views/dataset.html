@@ -16,7 +16,7 @@
             <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
               <br>Data set won't be updated until "Save Changes" is clicked below.</b></div>
               <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
-            <h1>Data Set: {{name}}</h1>
+            <h3>Data Set: {{name}}</h3>
             <br>
           {{/if}}
           <div class="alert alert-danger error"></div>
@@ -183,7 +183,7 @@
       {{#if areEqual screenMode 'display'}}
         <form role="form">
           {{#if authorisedToEdit 'dataSet' _id}}<a class="btn btn-primary enable-update pull-right">Edit Data Set</a>{{/if}}
-          <h1>Data Set: {{name}}</h1>
+          <h3>Data Set: {{name}}</h3>
           <div class="alert alert-danger error"></div>
           <br>
           <div class="panel panel-primary">

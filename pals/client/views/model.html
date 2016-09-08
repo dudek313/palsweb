@@ -5,11 +5,11 @@
   {{#if authorized 'model' _id}}
     {{#if inEditMode}}  <!-- in create or update mode -->
       {{#autoForm collection="Models" id=formId doc=dataIfNeeded type='normal' validation='blur'}}
+        <h3>Create New Model Profile</h3>
         <fieldset>
           {{#if areEqual screenMode 'create'}}
-            <legend>Create New Model Profile</legend>
           {{else}} <!-- if in update mode -->
-            <h1>Model: {{model.name}}</h1>
+            <h3>Model: {{model.name}}</h3>
             <br>
           {{/if}}
 
@@ -48,7 +48,7 @@
         {{#if areEqual screenMode 'display'}}
 
           {{#if authorisedToEdit 'model' model._id}}<a class="btn btn-primary enable-update pull-right">Edit Model Profile</a>{{/if}}
-          <h1>Model Profile: {{model.name}}</h1>
+          <h3>Model Profile: {{model.name}}</h3>
           <br/>
 
           <div class="panel panel-primary">
