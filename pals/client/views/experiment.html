@@ -13,7 +13,6 @@
             {{/if}}
             {{#if authorisedToEdit 'modelOutput' _id}}
               <a class="btn btn-primary enable-update pull-right">Edit Experiment Details</a>
-              <br><br>
             {{/if}}
 
             {{#if areEqual this.recordType 'template'}}
@@ -22,7 +21,8 @@
               <h3>Experiment: {{name}}</h3>
             {{/if}}
 
-
+            <div class="alert alert-danger error"></div>
+            <br>
             <div class="panel panel-primary">
               <div class="panel-heading">Details</div>
               <div class="panel-body">

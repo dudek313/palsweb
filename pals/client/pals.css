@@ -1,6 +1,7 @@
 .main {
 /*    margin-top: 60px;*/
 /*    margin-bottom: 40px;*/
+/*    background-color: #e0e0e0*/
 }
 
 /*.workspace-header {
@@ -21,12 +22,37 @@
     width:100%;
     z-index: 2;
 }*/
+
+html, body{
+  height: 100%;
+  background-color: #e6eeff;
+}
+
+/*.main {
+  background-color: #e6eeff;
+}*/
+
+/*.backing {
+  max-width: 100%;
+  background-color: #e6eeff;
+}*/
+
+.table {
+  background-color: #ffffff;
+}
+
 .content {
-    max-width:95%;
+    max-width:95%%;
     margin: 50px auto;
+    padding-top: 1px;
     width:100%;
     z-index: 1;
     position: relative;
+
+}
+
+.inner-content {
+    max-width: 95%;
 }
 
 .RbtnMargin {
@@ -45,6 +71,7 @@
 .detail-form {
     max-width:800px;
     margin: 0px auto;
+
 }
 
 .login-buttons {
@@ -84,7 +111,7 @@
   border: 1px solid transparent;
   border-radius: 4px;
   background-color: #66b3ff;
-  color: #003366;
+  color: #3366ff;
 }
 
 .workspace > p,
@@ -95,6 +122,10 @@
 .workspace > p + p {
   margin-top: 5px;
 }
+/*
+.table {
+  background-color: #ffffff;
+}*/
 
 .table-framed {
   border: 1px solid lightgrey;

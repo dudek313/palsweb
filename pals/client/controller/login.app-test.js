@@ -18,6 +18,14 @@ describe('my module', function(done) {
     Meteor.call('test.resetDatabase', done);
   });
 
+  after(function(done) {
+    var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+    if (testUser) {
+      Meteor.call('test.removeUser', {_id: testUser._id});
+    }
+    done();
+  })
+
   describe('Admin functions', function() {
 
     describe('Login Admin', function() {
@@ -39,7 +47,8 @@ describe('my module', function(done) {
 
     describe('Register new user', function() {
       beforeEach(function(done) {
-        var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+        var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+        console.log('testUser');console.log(testUser);
         if (testUser) {
           Meteor.call('test.removeUser', {_id: testUser._id})
         }
@@ -47,7 +56,7 @@ describe('my module', function(done) {
       });
 
       it('allows a new user to be registered on the system', function(done) {
-        Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1'}, function(err) {
+        Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
           console.log(err);
           try {
             chai.assert.isUndefined(err);
@@ -143,7 +152,7 @@ describe('my module', function(done) {
 
     describe('Login registered user', function() {
       beforeEach(function(done){
-        var testUser = Meteor.users.findOne({'emails.address':'test0@testing.com'});
+        var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
         if (testUser && testUser._id)
           Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
         done();
@@ -264,10 +273,10 @@ describe('my module', function(done) {
       });
     });
 
-    describe('File upload', function(done) {
+/*    describe('File upload', function(done) {
       it('allows an nc data set file to be uploaded by a registered user', function(done) {
 
-/*        var file = {
+        var file = {
 
         }
 
@@ -310,9 +319,9 @@ describe('my module', function(done) {
             Session.set('filesUploaded', filesUploaded);
 
             alert('File "' + fileObj.name + '" successfully uploaded');
-*/
-      }); 
-    });
+
+      });
+    });*/
   });
 
 });
