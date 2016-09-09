@@ -18,13 +18,17 @@ AutoForm.hooks({
 
     onSubmit: function(insertDoc, updateDoc, currentDoc) {
       if(Experiments.findOne({name: insertDoc.name})) {
-        $('.error').html('An experiment template with this name already exists');
-        $('.error').show();
-        window.scrollTo(0, 0);
+        displayError('An experiment template with this name already exists');
+      }
+      else if (Session.get('tempScripts').length == 0) {
+        displayError('At least one analysis script must be uploaded');
+      }
+      else if (Session.get('tempDataSets').length == 0) {
+        displayError('At least one data set must be provided');
       }
       else {
-        insertDoc._version = 1;
-        insertDoc.owner = Meteor.user()._id;
+//        insertDoc._version = 1;
+//        insertDoc.owner = Meteor.user()._id;
         insertDoc.scripts = Session.get('tempScripts');
         insertDoc.recordType = 'template';
         var currentDataSets = Session.get('tempDataSets');
@@ -43,10 +47,7 @@ AutoForm.hooks({
         // insert experiment document to the mongodb collection
         Meteor.call('insertExperiment', insertDoc, function(error, docId){
           if(error) {
-            window.scrollTo(0,0);
-            $('.error').html('Error: Failed to create the experiment');
-            $('.error').show();
-            console.log(error.reason);
+            displayError('Error: Failed to create the experiment', error);
           }
           else {
             // if successful, refresh the publication to ensure the user has access to the new experiment document
@@ -63,46 +64,52 @@ AutoForm.hooks({
   },
   updateExperimentForm: {
     onSubmit: function(insertDoc, updateDoc, currentDoc) {
-      updateDoc.$set.scripts = Session.get('tempScripts');
-      var currentDataSets = Session.get('tempDataSets');
-      updateDoc.$set.dataSets = [];
-      var recordType = getRecordType();
-      if (recordType != 'template' && recordType != 'instance') {
-        window.scrollTo(0,0);
-        $('.error').html('Error: Failed to update the data set');
-        $('.error').show();
+      if (Session.get('tempScripts').length == 0) {
+        displayError('At least one analysis script must be uploaded');
+      }
+      else if (Session.get('tempDataSets').length == 0) {
+        displayError('At least one data set must be provided');
       }
       else {
-        // add version number to the data set details, if relevant.
-        // Templates don't need data set version numbers,
-        // but active experiments ("instances") do.
-        if (currentDataSets && currentDataSets.length > 0) {
-          currentDataSets.forEach(function(dataSet) {
-            var dataSetDetails = {
-              _id : dataSet._id,
-              _version : (recordType == 'template') ? null : dataSet._version
-            };
-            updateDoc.$set.dataSets.push(dataSetDetails);
-          });
-        }
-      }
-
-      // update experiment collection
-      Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
-        if(error) {
+        updateDoc.$set.scripts = Session.get('tempScripts');
+        var currentDataSets = Session.get('tempDataSets');
+        updateDoc.$set.dataSets = [];
+        var recordType = getRecordType();
+        if (recordType != 'template' && recordType != 'instance') {
           window.scrollTo(0,0);
-          $('.error').html('Error: Failed to update the experiment. ');
+          $('.error').html('Error: Failed to update the data set');
           $('.error').show();
-          console.log(error.message);
         }
         else {
-          // if successful, display the updated experiment document
-          Router.go('/experiment/display/' + currentDoc._id);
+          // add version number to the data set details, if relevant.
+          // Templates don't need data set version numbers,
+          // but active experiments ("instances") do.
+          if (currentDataSets && currentDataSets.length > 0) {
+            currentDataSets.forEach(function(dataSet) {
+              var dataSetDetails = {
+                _id : dataSet._id,
+                _version : (recordType == 'template') ? null : dataSet._version
+              };
+              updateDoc.$set.dataSets.push(dataSetDetails);
+            });
+          }
         }
-      });
+
+        // update experiment collection
+        Meteor.call('updateExperiment', currentDoc, updateDoc, function(error, docId){
+          if(error) {
+            displayError('Error: Failed to update the experiment. ', error);
+          }
+          else {
+            // if successful, display the updated experiment document
+            Router.go('/experiment/display/' + currentDoc._id);
+          }
+        });
+      }
       this.done();
       return false;
     }
+
   }
 })
 
@@ -142,12 +149,11 @@ Template.experiment.events = {
 
   'change #fileInput': function (e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
-
       var file = e.currentTarget.files[0];
       // We upload only one file, in case
       // multiple files were selected
 
-      var upload = StoredFiles.insert({
+      var upload = RFiles.insert({
         file: file,
         streams: 'dynamic',
         chunkSize: 'dynamic'

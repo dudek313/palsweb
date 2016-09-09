@@ -2,9 +2,9 @@
 <!--  <div class="row">
     <div class="col-md-9"> -->
   <div class="detail-form">
-      <b><div class="alert alert-danger error"></div></b>
       {{#if authorized 'experiment' _id}}
         {{#if areEqual screenMode 'display'}}
+          <b><div class="alert alert-danger error"></div></b>
           <form role="form">
 <!--            {{#if areEqual this.recordType 'template'}}
               {{#if notCloned}}
@@ -21,8 +21,6 @@
               <h3>Experiment: {{name}}</h3>
             {{/if}}
 
-            <div class="alert alert-danger error"></div>
-            <br>
             <div class="panel panel-primary">
               <div class="panel-heading">Details</div>
               <div class="panel-body">
@@ -30,10 +28,12 @@
                   <label>Name</label>
                   <div class="display">{{name}}</div>
                 </div>
-                <div class="form-group">
-                  <label>Workspace</label>
-                  <div class="display">{{workspaceName}}</div>
-                </div>
+                {{#unless areEqual this.recordType 'template'}}
+                  <div class="form-group">
+                    <label>Workspace</label>
+                    <div class="display">{{workspaceName}}</div>
+                  </div>
+                {{/unless}}
                 <div class="form-group">
                   {{#if country}}
                       <label>Country</label>
@@ -66,7 +66,7 @@
                 <div class="form-group">
                   {{#if longDescription}}
                       <label>Long Description</label>
-                      <div class="display">{{{breaklines experiment.longDescription}}}</div>
+                      <div class="display">{{{breaklines this.longDescription}}}</div>
                   {{/if}}
                 </div>
                 <div class="form-group">
@@ -84,7 +84,7 @@
               </div>
             </div>
           </form>
-          <div class="panel panel-success">
+          <div class="panel panel-primary">
             <div class="panel-heading">Scripts</div>
             <div class="panel-body">
               <table class="table table-hover">
@@ -180,7 +180,7 @@
                     <br>Experiment details won't be updated until "Save Changes" is clicked below.</b></div>
                   <div class="alert alert-danger error"></div>
     <!--              <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Experiment Details</a> -->
-                  {{#if areEqual experiment.recordType 'template'}}
+                  {{#if areEqual this.recordType 'template'}}
                     <h3>Experiment Template: {{name}}</h3>
                   {{else}}
                     <h3>Experiment: {{name}}</h3>
@@ -190,10 +190,12 @@
                   <div class="panel-heading">Details</div>
                   <div class="panel-body">
                     {{> afQuickField name='name'}}
-                    <div class="form-group">
-                      <label>Workspace</label>
-                      <div class="display">{{workspaceName}}</div>
-                    </div>
+                    {{#unless areEqual this.recordType 'template'}}
+                      <div class="form-group">
+                        <label>Workspace</label>
+                        <div class="display">{{workspaceName}}</div>
+                      </div>
+                    {{/unless}}
                     {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
                     {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
                     {{#if afFieldValueIs name='vegType' value='Other'}}
@@ -207,7 +209,7 @@
                     {{> afQuickField name='resolution' type='select' firstOption="(Select One)" options='allowed'}}
                   </div>
                 </div>
-                <div class="panel panel-success">
+                <div class="panel panel-primary">
                   <div class="panel-heading">Scripts</div>
                   <div class="panel-body">
                     <table class="table">

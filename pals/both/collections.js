@@ -48,40 +48,110 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
-this.StoredFiles = new FilesCollection({
-  collectionName: 'StoredFiles',
+this.NcdfFiles = new FilesCollection({
+  collectionName: 'NcdfFiles',
   storagePath: '/pals/data',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
-    if (/nc|R/i.test(file.extension)) {
+    if (/nc/i.test(file.extension)) {
       return true;
     } else {
-      return 'Only NetCDF and R files allowed';
+      return 'Only NetCDF files allowed';
     }
   }
-})
+});
+
+this.RFiles = new FilesCollection({
+  collectionName: 'RFiles',
+  storagePath: '/pals/data',
+  allowClientCode: false, // Disallow remove files from Client
+  onBeforeUpload: function (file) {
+    // Allow upload of nc and r files only
+    if (/R/i.test(file.extension)) {
+      return true;
+    } else {
+      return 'Only R files allowed';
+    }
+  }
+});
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.storedFiles.all');
+  Meteor.subscribe('files.ncdfFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.storedFiles.all', function() {
-    return StoredFiles.collection.find().cursor;
+  Meteor.publish('files.ncdfFiles.all', function() {
+    return NcdfFiles.collection.find().cursor;
+  });
+}
+
+if (Meteor.isClient) {
+  Meteor.subscribe('files.rFiles.all');
+}
+
+if (Meteor.isServer) {
+  Meteor.publish('files.rFiles.all', function() {
+    return RFiles.collection.find().cursor;
   });
 }
 
 ModelOutputs.attachSchema(new SimpleSchema({
-  _id:              {type: String, optional: true},
-  _version:         {type: Number, optional: true},
-  name:             {type: String, label: "Name", optional: true},
-  owner:            {type: String, label: "Owner", optional: true},
+  _id: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    autoValue: function() {
+      if (this.isInsert) {
+        return Random.id()
+      }
+    }
+  },
+  _version: {
+    type: Number,
+    label: "Version",
+    autoValue: function() {
+      if (this.isInsert) {
+        return 1
+      }
+    }
+  },
+  name: {type: String, label: "Name", optional: true},
+  owner: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Created By",
+    autoValue: function() {
+      if (this.isInsert) {
+        return Meteor.userId()
+      }
+    }
+  },
   'experiments':    {type: [String], optional: true},
   model:            {type: String, label: "Model", optional: true},
-  created:          {type: Date, label: "Created", optional: true},
-  modified:         {type: Date, label: "Last Modified", optional: true},
-  modifierId:       {type: String, optional: true},
+  createdAt: {
+    type: Date,
+    autoValue: function() {
+      if (this.isInsert) {
+        return new Date()
+      }
+    }
+  },
+  modifiedAt: {
+    type: Date,
+    optional: true,
+    label: "Last modified"
+/*    autoValue: function() {
+      if (this.isUpdate) {
+        return new Date()
+      }
+    }*/
+  },
+  modifierId: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Modified By",
+    optional: true
+  },
   parameterSelection: {type: String, label: "Parameter Selection",
                     allowedValues: ParameterSelection, optional: true},
   stateSelection:   {type: String, label: "State Selection",
@@ -98,13 +168,59 @@ ModelOutputs.attachSchema(new SimpleSchema({
 }));
 
 modelSchema = new SimpleSchema({
-  _id:        {type: String, optional: true},
+  _id: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    autoValue: function() {
+      if (this.isInsert) {
+        return Random.id()
+      }
+    }
+  },
   name:       {type: String, label: "Name"},
-  _version:   {type: Number, optional: true},
-  owner:      {type: String, label: "Owner", optional: true},
-  created:    {type: Date, label: "Created", optional: true},
-  modified:   {type: Date, label: "Last Modified", optional: true},
-  modifierId: {type: String, optional: true},
+  _version: {
+    type: Number,
+    label: "Version",
+    autoValue: function() {
+      if (this.isInsert) {
+        return 1
+      }
+    }
+  },
+  owner: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Created By",
+    autoValue: function() {
+      if (this.isInsert) {
+        return Meteor.userId()
+      }
+    }
+  },
+  createdAt: {
+    type: Date,
+    autoValue: function() {
+      if (this.isInsert) {
+        return new Date()
+      }
+    }
+  },
+  modifiedAt: {
+    type: Date,
+    optional: true,
+    label: "Last modified"
+  },
+  modifierId: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Modified By",
+    optional: true
+/*    autoValue: function() {
+      if (this.isUpdate) {
+        return Meteor.userId()
+      }
+    }*/
+  },
   url:        {type: String, regEx: SimpleSchema.RegEx.Url, label: "URL", optional: true},
   references: {type: String, label: "References", optional: true},
   comments:   {type: String, label: "Comments", optional: true}
@@ -113,13 +229,46 @@ modelSchema = new SimpleSchema({
 Models.attachSchema(modelSchema);
 
 Experiments.attachSchema(new SimpleSchema({
-  _id:          {type: String, optional: true},
+  _id: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    autoValue: function() {
+      if (this.isInsert) {
+        return Random.id()
+      }
+    }
+  },
   name:         {type: String, label: "Name"},
   recordType:   {type: String, allowedValues: ['template', 'instance'], optional: true},
-  owner:        {type: String, optional: true},
-  created:      {type: Date, optional: true},
-  modified:     {type: Date, optional: true},
-  modifierId:   {type: String, optional: true},
+  owner: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Created By",
+    autoValue: function() {
+      if (this.isInsert) {
+        return Meteor.userId()
+      }
+    }
+  },
+  createdAt: {
+    type: Date,
+    autoValue: function() {
+      if (this.isInsert) {
+        return new Date()
+      }
+    }
+  },
+  modifiedAt: {
+    type: Date,
+    optional: true,
+    label: "Last modified"
+  },
+  modifierId: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Modified By",
+    optional: true
+  },
   country:      {type: String, label: "CountryNames", allowedValues: CountryNames, optional: true},
   vegType:      {type: String, label: "IGBP Vegetation Type", allowedValues: VegType, optional: true},
   otherVegType: {type: String, label: "Other Vegetation Type", optional: true},
@@ -129,7 +278,15 @@ Experiments.attachSchema(new SimpleSchema({
   longDescription:      {type: String, label: "Long Description", optional: true},
   region:       {type: String, label: "Region", optional: true},
   resolution:   {type: String, label: "Resolution", allowedValues: Resolution, optional: true},
-  _version:     {type: Number, optional: true},
+  _version: {
+    type: Number,
+    label: "Version",
+    autoValue: function() {
+      if (this.isInsert) {
+        return 1
+      }
+    }
+  },
   versionDescription:   {type: String, optional: true},
   'scripts.$.path':     {type: String, optional: true},
   'scripts.$.filename': {type: String, optional: true},
@@ -142,14 +299,41 @@ Experiments.attachSchema(new SimpleSchema({
 }));
 
 dataSetSchema = new SimpleSchema({
-  _id:            {type: String, optional: true},
+  _id: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    autoValue: function() {
+      if (this.isInsert) {
+        return Random.id()
+      }
+    }
+  },
   name:           {type: String, label: "Name", unique: true},
   type:           {type: String, label: "Type", allowedValues: DataSetType},
-  createdAt:      {type: Date, optional: true},
-  modifiedAt:     {type: Date, optional: true},
-  spatialLevel:   {type: String, label: "Spatial Resolution",
-                  allowedValues: SpatialLevel},
-  owner:          {type: String, label: "Created By", optional: true},
+  createdAt: {
+    type: Date,
+    autoValue: function() {
+      if (this.isInsert) {
+        return new Date()
+      }
+    }
+  },
+  modifiedAt: {
+    type: Date,
+    optional: true,
+    label: "Last modified"
+  },
+  spatialLevel:   {type: String, label: "Spatial Resolution", allowedValues: SpatialLevel},
+  owner: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Created By",
+    autoValue: function() {
+      if (this.isInsert) {
+        return Meteor.userId()
+      }
+    }
+  },
   country:        {type: String, label: "CountryNames", allowedValues: CountryNames, optional: true},
   vegType:        {type: String, label: "IGBP Vegetation Type",
                   allowedValues: VegType, optional: true},
@@ -173,9 +357,16 @@ dataSetSchema = new SimpleSchema({
   "variables.Rnet": {type: Boolean, label: "Rnet"},
   "variables.SWnet":    {type: Boolean, label: "Swnet"},
   region:         {type: String, label: "Region", optional: true},
-  resolution:     {type: String, label: "Resolution",
-                  allowedValues: Resolution, optional: true},
-  _version:       {type: Number, optional: true},
+  resolution:     {type: String, label: "Resolution", allowedValues: Resolution, optional: true},
+  _version: {
+    type: Number,
+    label: "Version",
+    autoValue: function() {
+      if (this.isInsert) {
+        return 1
+      }
+    }
+  },
   'files.$.created':  {type: Date, optional: true},
   'files.$.path': {type: String, optional: true},
   'files.$.name': {type: String, optional: true},
@@ -192,7 +383,13 @@ dataSetSchema = new SimpleSchema({
       }
     }
   }*/
-  modifierId: {type: String, optional: true}
+  modifierId: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Id,
+    label: "Modified By",
+    optional: true
+  }
+
 });
 
 DataSets.attachSchema(dataSetSchema);

@@ -17,8 +17,8 @@ AutoForm.hooks({
         as _version and owner.
 */
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            insertDoc._version = 1;
-            insertDoc.owner = Meteor.user()._id;
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
             // tempFile contains the data about the uploaded file which needs
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
@@ -172,12 +172,11 @@ Template.modelOutput.events = {
 */
     'change #fileInput': function (e, template) {
       if (e.currentTarget.files && e.currentTarget.files[0]) {
-
         var file = e.currentTarget.files[0];
         // We upload only one file, in case
         // multiple files were selected
 
-        var upload = StoredFiles.insert({
+        var upload = NcdfFiles.insert({
           file: file,
           streams: 'dynamic',
           chunkSize: 'dynamic'

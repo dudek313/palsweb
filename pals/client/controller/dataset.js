@@ -40,27 +40,34 @@ function testFiles() {
 AutoForm.hooks({
     createDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            insertDoc._version = 1;
-            insertDoc.owner = Meteor.user()._id;
+
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
             insertDoc.files = Session.get('tempFiles');
-            // insert data set document to the mongodb collection
-            Meteor.call('insertDataSet', insertDoc, function(error, docId){
+            if (insertDoc.files.length == 0) {
+                displayError('At least one file must be uploaded');
+            }
+            else {
+
+              // insert data set document to the mongodb collection
+              Meteor.call('insertDataSet', insertDoc, function(error, docId){
                 if(error) {
                   displayError('Failed to create the data set. Please try again.', error);
                 }
                 else {
-                    // if successful, display the created data sets
+                  // if successful, display the created data sets
 
-                    // Deleting files is currently not working
-//                    testFiles();
-                    removeDeletedFiles(Session.get('filesToDelete'));
-/*                    Session.set('filesToDelete', []);
-                    Session.set('dirty', false);
-*/
-                    Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
-                    Router.go('/dataSet/display/' + docId);
+                  // Deleting files is currently not working
+                  //                    testFiles();
+                  removeDeletedFiles(Session.get('filesToDelete'));
+                  /*                    Session.set('filesToDelete', []);
+                  Session.set('dirty', false);
+                  */
+                  Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
+                  Router.go('/dataSet/display/' + docId);
                 }
-            });
+              });
+            }
 
             this.done();
             return false;
@@ -69,20 +76,26 @@ AutoForm.hooks({
     updateDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
             updateDoc.$set.files = Session.get('tempFiles');
-            Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
-                if(error) {
-                  displayError('Failed to update the data set. Please try again.', error);
-                }
-                else {
-                /*    Session.set('dirty', false);
-                    removeDeletedFiles(Session.get('filesToDelete'));
-                    Session.set('filesToDelete', []); */
+            if (updateDoc.$set.files.length == 0) {
+                displayError('At least one file must be uploaded');
+            }
+            else {
 
-                    var currentDataSetId = getCurrentObjectId();
-                    Router.go('/dataSet/display/' + currentDataSetId);
-                }
-            });
+              Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
+                  if(error) {
+                    displayError('Failed to update the data set. Please try again.', error);
+                  }
+                  else {
+                  /*    Session.set('dirty', false);
+                      removeDeletedFiles(Session.get('filesToDelete'));
+                      Session.set('filesToDelete', []); */
 
+                      var currentDataSetId = getCurrentObjectId();
+                      Router.go('/dataSet/display/' + currentDataSetId);
+                  }
+              });
+            }
+            
             this.done();
             return false;
         }
@@ -138,7 +151,6 @@ Template.dataSet.events = {
 
     'change #fileInput': function (e, template) {
       if (e.currentTarget.files && e.currentTarget.files[0]) {
-
         var file = e.currentTarget.files[0];
         // We upload only one file, in case
         // multiple files were selected
@@ -148,7 +160,7 @@ Template.dataSet.events = {
             filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
         };
 
-        var upload = StoredFiles.insert({
+        var upload = NcdfFiles.insert({
           file: file,
           fileName: filename,
           streams: 'dynamic',
@@ -343,11 +355,19 @@ Template.dataSet.helpers({
     else return true;
 
   },
-  userEmail: function(userId) {
-      var user = Meteor.users.findOne({'_id':userId});
-      if( user && user.emails && user.emails.length > 0 ) {
-          return Meteor.users.findOne({'_id':userId}).emails[0].address;
+  userName: function(userId) {
+    var user = Meteor.users.findOne({'_id':userId});
+    if (user && user.profile) {
+      if (user.profile.fullname)
+        return user.profile.fullname;
+      else if (user.profile.firstName && user.profile.lastName)
+        return user.profile.firstName + " " + user.profile.lastName;
+      else {
+        return '';
       }
-      else return '';
+    }
+    else {
+      return '';
+    }
   }
 });
