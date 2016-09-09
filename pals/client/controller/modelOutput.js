@@ -199,7 +199,6 @@ Template.modelOutput.events = {
                 created: new Date()
             };
             Session.set('tempFile', fileRecord);
-            alert('File "' + fileObj.name + '" successfully uploaded');
           };
           template.currentUpload.set(false);
         });

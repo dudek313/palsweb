@@ -171,7 +171,6 @@ Template.experiment.events = {
           var tempScripts = Session.get('tempScripts');
           tempScripts.push(fileRecord);
           Session.set('tempScripts', tempScripts);
-          alert('File "' + fileObj.name + '" successfully uploaded');
         };
         template.currentUpload.set(false);
       });

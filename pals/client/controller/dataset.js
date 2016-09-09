@@ -185,8 +185,6 @@ Template.dataSet.events = {
             var filesUploaded = Session.get('filesUploaded');
             filesUploaded.push(name);
             Session.set('filesUploaded', filesUploaded);
-
-            alert('File "' + fileObj.name + '" successfully uploaded');
           }
           template.currentUpload.set(false);
         });

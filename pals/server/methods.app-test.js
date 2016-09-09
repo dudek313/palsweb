@@ -23,7 +23,7 @@ Meteor.methods({
 //    if (user)
     var result = Meteor.users.remove(selector, callback);
 
-    callback(result);
+    return result;
   },
 
   'test.updateUser': function(selector, modifier, callback) {
