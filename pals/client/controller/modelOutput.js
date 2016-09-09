@@ -4,6 +4,10 @@ Template.modelOutput.rendered = function() {
     SimpleSchema.debug = true;
 };
 
+Template.modelOutput.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+});
+
 AutoForm.hooks({
     createModelOutput: {
 /*      this will be called when submitting the form for uploading
@@ -144,7 +148,7 @@ Template.modelOutput.events = {
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
-    'change .file-select':function(event, template){
+/*    'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
             file.type = 'modelOutput';
             file.modelOutputId = getCurrentObjectId();
@@ -165,6 +169,46 @@ Template.modelOutput.events = {
             });
         });
     },
+*/
+    'change #fileInput': function (e, template) {
+      if (e.currentTarget.files && e.currentTarget.files[0]) {
+
+        var file = e.currentTarget.files[0];
+        // We upload only one file, in case
+        // multiple files were selected
+
+        var upload = StoredFiles.insert({
+          file: file,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('start', function () {
+          template.currentUpload.set(this);
+        });
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            alert('Error during upload: ' + error);
+          } else {
+            var fileRecord = {
+                path: FILE_DIR + fileObj.path,
+                filename: fileObj.name,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date()
+            };
+            Session.set('tempFile', fileRecord);
+            alert('File "' + fileObj.name + '" successfully uploaded');
+          };
+          template.currentUpload.set(false);
+        });
+
+        upload.start();
+
+      }
+    },
+
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {
