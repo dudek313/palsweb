@@ -80,8 +80,10 @@
         {{#if loggedIn}}
           <li>  {{> loginButtons align="right"}} </li>
         {{else}}
-          <li onclick="Router.go('/login')" class="btn-secondary login-btn">Login</li>
-          <li onclick="Router.go('/registration')" class="btn-secondary register-btn RbtnMargin">Register</li>
+          <div class="btns-group nav navbar-nav navbar-right">
+            <a href="/login" class="btn-secondary login-btn">Login</a>
+            <a href="/registration" class="btn-secondary register-btn RbtnMargin">Register</a>
+          </div>
         {{/if}}
 
       </ul>

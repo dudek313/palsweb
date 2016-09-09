@@ -3,6 +3,10 @@ Template.experiment.rendered = function() {
   templateSharedObjects.progress().hide();
 };
 
+Template.experiment.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+});
+
 AutoForm.hooks({
   createExperimentForm: {
 /*    this will only be called when creating experiment templates, not active experiments.
@@ -135,7 +139,49 @@ Template.experiment.events = {
     var currentExperiment = getCurrentExperiment();
     Router.go('/experiment/update/' + currentExperiment._id);
   },
-  // uploads script files after selection
+
+  'change #fileInput': function (e, template) {
+    if (e.currentTarget.files && e.currentTarget.files[0]) {
+
+      var file = e.currentTarget.files[0];
+      // We upload only one file, in case
+      // multiple files were selected
+
+      var upload = StoredFiles.insert({
+        file: file,
+        streams: 'dynamic',
+        chunkSize: 'dynamic'
+      }, false);
+
+      upload.on('start', function () {
+        template.currentUpload.set(this);
+      });
+
+      upload.on('end', function (error, fileObj) {
+        if (error) {
+          alert('Error during upload: ' + error);
+        } else {
+          var fileRecord = {
+              path: FILE_DIR + fileObj.path,
+              filename: fileObj.name,
+              size: fileObj.size,
+              key: fileObj._id,
+              created: new Date()
+          };
+          var tempScripts = Session.get('tempScripts');
+          tempScripts.push(fileRecord);
+          Session.set('tempScripts', tempScripts);
+          alert('File "' + fileObj.name + '" successfully uploaded');
+        };
+        template.currentUpload.set(false);
+      });
+
+      upload.start();
+
+    }
+  },
+
+/*  // uploads script files after selection
   'change .file-select':function(event, template){
 //    var CurrentExperimentId = getCurrentExperiment()._id;
     FS.Utility.eachFile(event, function(file) {
@@ -157,7 +203,7 @@ Template.experiment.events = {
         }
       });
     });
-  },
+  },*/
 /*
   'click .download-file':function(event, template){
     event.preventDefault();
