@@ -50,6 +50,7 @@ Files = new FS.Collection("files", {
 
 this.StoredFiles = new FilesCollection({
   collectionName: 'StoredFiles',
+  storagePath: '/pals/data',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only

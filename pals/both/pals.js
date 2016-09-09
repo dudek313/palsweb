@@ -1,7 +1,7 @@
 // GLOBALS
 
-FILE_BUCKET = '/pals/data';
-FILE_DIR = '/root/palsweb/pals/.meteor/local/build/programs/server/'
+FILE_BUCKET = '/pals/data'; // From the old file upload package
+FILE_DIR = '/pals/data';
 
 Router.configure({
     layoutTemplate: 'main',
