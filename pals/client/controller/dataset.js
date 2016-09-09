@@ -1,3 +1,5 @@
+import '../views/dataset.html';
+
 Template.dataSet.onCreated(function () {
   this.currentUpload = new ReactiveVar(false);
 });

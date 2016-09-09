@@ -8,10 +8,10 @@
 -->
   {{#if authorized 'dataSet' _id}}
     {{#if inEditMode}}
+      <h3>Create New Data Set</h3>
       {{#autoForm collection="DataSets" id=formId doc=this type="normal" validation='blur'}}
         <fieldset>
           {{#if areEqual screenMode 'create'}}
-            <legend>Create New Data Set</legend>
           {{else}} <!-- if in update mode -->
             <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
               <br>Data set won't be updated until "Save Changes" is clicked below.</b></div>

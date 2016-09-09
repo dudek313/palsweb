@@ -68,6 +68,7 @@ Meteor.methods({
           var dsId = DataSets.insert(dataSetDoc);
           var group = 'dataSet ' + dsId;
           Roles.addUsersToRoles(userId, 'edit', group);
+          console.log('Data set inserted: ' + dataSetDoc.name);
           return dsId;
         }
     },

@@ -42,3 +42,4 @@ shell-server
 useraccounts:core
 accounts-ui-unstyled
 accounts-ui
+practicalmeteor:sinon

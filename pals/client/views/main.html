@@ -71,30 +71,19 @@
         <span class="visible-lg">
           {{> workspaceBtn}}
         </span>
-  <!--      <li class="workspace visible-lg">
-          {{#if loggedIn}}
-            {{#if notInWorkspace}}
-              <b>To contribute to an experiment, join or create a workspace.</b>
-            {{else}}
-              You are currently in the <b>{{currentWorkspace.name}}</b> workspace.
-            {{/if}}
-          {{else}}
-            <b>Not logged in. Feel free to browse or register.</b>
-          {{/if}}
-        </li>-->
-
-        <!--You are currently in the <strong>{{currentWorkspace.name}}</strong> workspace</li>-->
 
       </ul>
 
 
       <ul class="nav navbar-nav navbar-right">
+
         {{#if loggedIn}}
-            {{> loginButtons align="right"}}
+          <li>  {{> loginButtons align="right"}} </li>
         {{else}}
           <li onclick="Router.go('/login')" class="btn-secondary login-btn">Login</li>
           <li onclick="Router.go('/registration')" class="btn-secondary register-btn RbtnMargin">Register</li>
         {{/if}}
+
       </ul>
     </div><!-- /.navbar-collapse -->
     </div><!-- /container -->

@@ -10,10 +10,20 @@ Meteor.methods({
     Accounts.createUser(emailPassword, callback)
   },
 
+/*  'test.removeUser': function(selector) {
+//    var user = Meteor.users.findOne(selector);
+//    if (user)
+    var result = Meteor.users.remove(selector);
+    console.log(result);
+    return result;
+  },*/
+
   'test.removeUser': function(selector, callback) {
-    var user = Meteor.users.findOne(selector);
-    if (user)
-      Meteor.users.remove(selector, callback);
+//    var user = Meteor.users.findOne(selector);
+//    if (user)
+    var result = Meteor.users.remove(selector, callback);
+
+    callback(result);
   },
 
   'test.updateUser': function(selector, modifier, callback) {
