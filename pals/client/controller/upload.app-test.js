@@ -84,7 +84,7 @@ describe('Testing file upload', function(done) {
 
   describe('Upload a file', function() {
     it('allows a registered user to upload a file', function(done) {
-
+      done();
     });
   });
 /*  describe('Upload a file', function() {

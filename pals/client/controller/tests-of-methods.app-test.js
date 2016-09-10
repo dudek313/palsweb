@@ -89,31 +89,67 @@ describe('Testing methods', function(done) {
       });
     });
 
-/*    describe('Insert duplicate data set by admin', function(done) {
-      it('does not allow an admin user to insert a duplicate model', function(done) {
-        var newDataSet = makeDataSet("Data Set 1");
+    describe('Insert new experiment template by admin', function(done) {
+      it('allows an admin user to insert an experiment template', function(done) {
+        var newExperiment = makeExperimentTemplate("Experiment Template 1");
+        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
+          try {
+            chai.assert.isUndefined(err, 'Error was called');
+            var insertedExperiment = Experiments.findOne({_id: dsId});
+            chai.assert.isDefined(insertedExperiment, 'New experiment template was not inserted');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
 
+
+  });
+
+  describe('Unregistered user', function() {
+
+    describe('inserting model when not logged in', function(done) {
+      it('does not allow unregistered user to insert a model', function(done) {
+        var newModel = makeModel("Model 2");
+        Meteor.call('insertModel', newModel, function(err, modelId) {
+          try {
+            chai.assert.isDefined(err);
+            var insertedModel = Models.findOne({_id: modelId});
+            chai.assert.isUndefined(insertedModel);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('inserting data set when not logged in', function(done) {
+      it('does not allow unregistered user to insert a data set', function(done) {
+        var newDataSet = makeDataSet("Data Set 3");
         Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
+            var insertedDataSet = DataSets.findOne({_id: dsId});
+            chai.assert.isUndefined(insertedDataSet);
           } catch(error) {
             done(error);
           }
           done();
         });
-
-
       });
     });
 
-
-    describe('logout', function() {
-      it('allows a logged-in user to logout', function(done) {
-        Meteor.logout(function(err) {
+    describe('inserting experiment template when not logged in', function(done) {
+      it('does not allow unregistered user to insert an experiment', function(done) {
+        var newExperiment = makeExperimentTemplate("Experiment Template 3");
+        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
-            chai.assert.isUndefined(err);
-            var user = Meteor.user();
-            chai.assert.isNull(user);
+            chai.assert.isDefined(err);
+            var insertedExperiment = Experiments.findOne({_id: dsId});
+            chai.assert.isUndefined(insertedExperiment);
           } catch(error) {
             done(error);
           }
@@ -121,55 +157,7 @@ describe('Testing methods', function(done) {
         });
       });
     });
-*/
-  });
 
-  describe('inserting model when not logged in', function(done) {
-    it('does not allow unregistered user to insert a model', function(done) {
-      var newModel = makeModel("Model 2");
-      Meteor.call('insertModel', newModel, function(err, modelId) {
-        try {
-          chai.assert.isDefined(err);
-          var insertedModel = Models.findOne({_id: modelId});
-          chai.assert.isUndefined(insertedModel);
-        } catch(error) {
-          done(error);
-        }
-        done();
-      });
-    });
-  });
-
-  describe('inserting data set when not logged in', function(done) {
-    it('does not allow unregistered user to insert a data set', function(done) {
-      var newDataSet = makeDataSet("Data Set 3");
-      Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
-        try {
-          chai.assert.isDefined(err);
-          var insertedDataSet = DataSets.findOne({_id: dsId});
-          chai.assert.isUndefined(insertedDataSet);
-        } catch(error) {
-          done(error);
-        }
-        done();
-      });
-    });
-  });
-
-  describe('inserting experiment when not logged in', function(done) {
-    it('does not allow unregistered user to insert an experiment', function(done) {
-      var newExperiment = makeExperiment("Data Set 3");
-      Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
-        try {
-          chai.assert.isDefined(err);
-          var insertedExperiment = Experiments.findOne({_id: dsId});
-          chai.assert.isUndefined(insertedExperiment);
-        } catch(error) {
-          done(error);
-        }
-        done();
-      });
-    });
   });
 
 
@@ -268,6 +256,23 @@ describe('Testing methods', function(done) {
       });
     });
 
+    describe('inserting experiment template by non-data admin', function(done) {
+      it('does not allow a registered, non-admin user to insert an experiment template', function(done) {
+        var newExperiment = makeExperimentTemplate("Experiment Set 3");
+        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
+          try {
+            chai.assert.isDefined(err);
+            console.log(err);
+            var insertedExperiment = Experiments.findOne({_id: dsId});
+            chai.assert.isUndefined(insertedExperiment);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
   });
 
 });
@@ -318,9 +323,12 @@ function makeDataSet(dataSetName) {
   return dataSet;
 }
 
-function makeExperiment(experimentName) {
+function makeExperimentTemplate(experimentName) {
   var experiment = {
     name: experimentName,
+    recordType: 'template',
+    spatialLevel: 'SingleSite'
 
   }
+  return experiment;
 }

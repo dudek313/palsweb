@@ -115,7 +115,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
       }
     }
   },
-  name: {type: String, label: "Name", optional: true},
+  name: {type: String, label: "Name"},
   owner: {
     type: String,
     regEx: SimpleSchema.RegEx.Id,
@@ -126,8 +126,8 @@ ModelOutputs.attachSchema(new SimpleSchema({
       }
     }
   },
-  'experiments':    {type: [String], optional: true},
-  model:            {type: String, label: "Model", optional: true},
+  'experiments':    {type: [String], minCount: 1},
+  model:            {type: String, label: "Model"},
   createdAt: {
     type: Date,
     autoValue: function() {
