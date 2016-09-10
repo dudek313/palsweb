@@ -28,25 +28,9 @@ Template.analyses.getFirstChoice = function(type) {
 }
 */
 
-Template.analyses.image = function() {
-    var modelOutputId = Session.get('analyses.modelOutput');
-    var analysisType = Session.get('analyses.analysis');
-    var experimentId = Session.get('analyses.experiment');
 
-    if( modelOutputId && analysisType && experimentId ) {
-    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId} );
-        console.log(analysis);
-    	if( analysis && analysis.results ) {
-		    for( var j=0; j < analysis.results.length; ++j ) {
-			    var result = analysis.results[j];
-                if( result.type === analysisType ) return result;
-		    }
-        }
-    }
-}
-
-
-Template.analyses.selectOptions = function(selectIndex) {
+Template.analyses.helpers({
+  selectOptions: function(selectIndex) {
 
     if( selectIndex > Session.get('analyses.clearIndex') ) return undefined;
 
@@ -55,166 +39,184 @@ Template.analyses.selectOptions = function(selectIndex) {
     var previousType = Session.get('analyses.'+previousIndex+'.type');
 
     if( type == 'model' ) {
-        if( previousType && previousType == 'experiment') {
-            var experimentId = Session.get('analyses.experiment');
-            var modelOutputs = ModelOutputs.find( {experiment:experimentId}, {fields: {model:1}} ).fetch();
-            console.log(modelOutputs[0]);
-            var modelIdArray = [];
-            for( var i=0; i < modelOutputs.length; ++i ) {
-                var modelOutput = modelOutputs[i];
-                modelIdArray.push(modelOutput.model);
-            }
-            var models = Models.find({_id : {$in : modelIdArray}});
-            return models;
+      if( previousType && previousType == 'experiment') {
+        var experimentId = Session.get('analyses.experiment');
+        var modelOutputs = ModelOutputs.find( {experiment:experimentId}, {fields: {model:1}} ).fetch();
+        console.log(modelOutputs[0]);
+        var modelIdArray = [];
+        for( var i=0; i < modelOutputs.length; ++i ) {
+          var modelOutput = modelOutputs[i];
+          modelIdArray.push(modelOutput.model);
         }
-        else if( previousType && previousType == 'modelOutput' ) {
-            var modelOutputId = Session.get('analyses.modelOutput');
-            if( modelOutputId ) {
-                var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {model:1}});
-                if( modelOutput ) {
-                    return Models.find({_id:modelOutput.model});
-                }
-            }
+        var models = Models.find({_id : {$in : modelIdArray}});
+        return models;
+      }
+      else if( previousType && previousType == 'modelOutput' ) {
+        var modelOutputId = Session.get('analyses.modelOutput');
+        if( modelOutputId ) {
+          var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {model:1}});
+          if( modelOutput ) {
+            return Models.find({_id:modelOutput.model});
+          }
         }
-		else if( previousType && previousType == 'analysis' ) {
-			var analysisType = Session.get('analyses.analysis');
-			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
-			var uniqueModelIds = new Array();
-			var haveModelId;
-			for( var i = 0; i < analysesWithType.length; ++i ) {
-				var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
-				if( modelOutput && modelOutput.model ) {
-					haveModelId = true;
-					uniqueModelIds[modelOutput.model]=modelOutput.model;
-				}
-			}
+      }
+      else if( previousType && previousType == 'analysis' ) {
+        var analysisType = Session.get('analyses.analysis');
+        var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+        var uniqueModelIds = new Array();
+        var haveModelId;
+        for( var i = 0; i < analysesWithType.length; ++i ) {
+          var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
+          if( modelOutput && modelOutput.model ) {
+            haveModelId = true;
+            uniqueModelIds[modelOutput.model]=modelOutput.model;
+          }
+        }
 
-			var modelIds = new Array();
-			if( haveModelId ) {
-			    for( var key in uniqueModelIds ) {
-				    modelIds.push(key);
-			    }
-				var models = Models.find({_id : {$in : modelIds}});
-				return models;
-			}
-			else {
-			    return new Array();
-		    }
-		}
-        else {
-            return Models.find();
+        var modelIds = new Array();
+        if( haveModelId ) {
+          for( var key in uniqueModelIds ) {
+            modelIds.push(key);
+          }
+          var models = Models.find({_id : {$in : modelIds}});
+          return models;
         }
+        else {
+          return new Array();
+        }
+      }
+      else {
+        return Models.find();
+      }
     }
     else if( type == 'experiment' ) {
-        if( previousType && previousType == 'model') {
-            var modelId = Session.get('analyses.model');
-            var modelOutputs = ModelOutputs.find({'model':modelId},{fields: {experiment:1}}).fetch();
-            var experimentIdArray = [];
-            for( var i=0; i < modelOutputs.length; ++i ) {
-                var modelOutput = modelOutputs[i];
-                experimentIdArray.push(modelOutput.experiment);
-            }
-            var experiments = Experiments.find({_id : {$in : experimentIdArray}});
-            return experiments;
+      if( previousType && previousType == 'model') {
+        var modelId = Session.get('analyses.model');
+        var modelOutputs = ModelOutputs.find({'model':modelId},{fields: {experiments:1}}).fetch();
+        var experimentIdArray = [];
+        for( var i=0; i < modelOutputs.length; ++i ) {
+          var modelOutput = modelOutputs[i];
+          experimentIdArray.push(modelOutput.experiments[0]);
         }
-        else if( previousType && previousType == 'modelOutput') {
-            var modelOutputId = Session.get('analyses.modelOutput');
-            if( modelOutputId ) {
-                var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {experiment:1}});
-                if( modelOutput ) {
-                    return Experiments.find({_id:modelOutput.experiment});
-                }
-            }
+        var experiments = Experiments.find({_id : {$in : experimentIdArray}});
+        return experiments;
+      }
+      else if( previousType && previousType == 'modelOutput') {
+        var modelOutputId = Session.get('analyses.modelOutput');
+        if( modelOutputId ) {
+          var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {experiment:1}});
+          if( modelOutput ) {
+            return Experiments.find({_id:modelOutput.experiments[0]});
+          }
         }
-		else if( previousType && previousType == 'analysis' ) {
-			var analysisType = Session.get('analyses.analysis');
-			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
-			var uniqueExperiments = new Array();
-			var haveExperiment;
-			for( var i = 0; i < analysesWithType.length; ++i ) {
-				var experiment = Experiments.findOne({_id:analysesWithType[i].experiment});
-				if( experiment ) {
-					haveExperiment = true;
-					uniqueExperiments[experiment.id]=experiment;
-				}
-			}
-			var experiments = new Array();
-			if( haveExperiment ) {
-				for( var key in uniqueExperiments ) {
-					experiments.push(uniqueExperiments[key]);
-				}
-			}
-			return experiments;
-		}
-        else {
-            return Experiments.find();
+      }
+      else if( previousType && previousType == 'analysis' ) {
+        var analysisType = Session.get('analyses.analysis');
+        var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+        var uniqueExperiments = new Array();
+        var haveExperiment;
+        for( var i = 0; i < analysesWithType.length; ++i ) {
+          var experiment = Experiments.findOne({_id:analysesWithType[i].experiment});
+          if( experiment ) {
+            haveExperiment = true;
+            uniqueExperiments[experiment.id]=experiment;
+          }
         }
+        var experiments = new Array();
+        if( haveExperiment ) {
+          for( var key in uniqueExperiments ) {
+            experiments.push(uniqueExperiments[key]);
+          }
+        }
+        return experiments;
+      }
+      else {
+        return Experiments.find();
+      }
     }
     else if( type == 'modelOutput' ) {
-        if( previousType && previousType == 'experiment') {
-            var experimentId = Session.get('analyses.experiment');
-            if( experimentId ) return ModelOutputs.find({experiment:experimentId});
+      if( previousType && previousType == 'experiment') {
+        var experimentId = Session.get('analyses.experiment');
+        if( experimentId ) return ModelOutputs.find({experiments:experimentId});
+      }
+      else if( previousType && previousType == 'model') {
+        var modelId = Session.get('analyses.model');
+        if( modelId ) return ModelOutputs.find({model:modelId});
+      }
+      else if( previousType && previousType == 'analysis' ) {
+        var analysisType = Session.get('analyses.analysis');
+        var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
+        var uniqueModelOutputs = new Array();
+        var haveModelOutput;
+        for( var i = 0; i < analysesWithType.length; ++i ) {
+          var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
+          if( modelOutput ) {
+            haveModelOutput = true;
+            uniqueModelOutputs[modelOutput.id]=modelOutput
+          }
         }
-        else if( previousType && previousType == 'model') {
-            var modelId = Session.get('analyses.model');
-            if( modelId ) return ModelOutputs.find({model:modelId});
+        var modelOutputs = new Array();
+        if( haveModelOutput ) {
+          for( var key in uniqueModelOutputs ) {
+            modelOutputs.push(uniqueModelOutputs[key]);
+          }
         }
-		else if( previousType && previousType == 'analysis' ) {
-			var analysisType = Session.get('analyses.analysis');
-			var analysesWithType = Analyses.find({'results.type':analysisType}).fetch();
-			var uniqueModelOutputs = new Array();
-			var haveModelOutput;
-			for( var i = 0; i < analysesWithType.length; ++i ) {
-				var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
-				if( modelOutput ) {
-					haveModelOutput = true;
-					uniqueModelOutputs[modelOutput.id]=modelOutput
-				}
-			}
-			var modelOutputs = new Array();
-			if( haveModelOutput ) {
-				for( var key in uniqueModelOutputs ) {
-					modelOutputs.push(uniqueModelOutputs[key]);
-				}
-			}
-			return modelOutputs;
-		}
-        else {
-            return ModelOutputs.find();
-        }
+        return modelOutputs;
+      }
+      else {
+        return ModelOutputs.find();
+      }
     }
-	else if( type == 'analysis' ) {
-		if( previousType && previousType == 'modelOutput' ) {
-			var modelOutputId = Session.get('analyses.modelOutput');
-			if( modelOutputId ) {
-				var analysis = Analyses.findOne({modelOutput:modelOutputId},{sort:{created:-1}});
-				if( analysis && analysis.results ) {
-				    var results = analysis.results;
-				    for( var i=0; i < results.length; ++i ) {
-					    var result = results[i];
-					    result.name = result.type;
-					    result._id = result.type;
-				    }
-				    return results;
-			    }
-			}
-		}
-		else if( previousType && previousType == 'experiment' ) {
-			var experimentId = Session.get('analyses.experiment');
-			var modelOutputs = ModelOutputs.find({experiment:experimentId}).fetch();
-			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
-		}
-		else if( previousType && previousType == 'model' ) {
-			var modelId = Session.get('analyses.model');
-			var modelOutputs = ModelOutputs.find({model:modelId}).fetch();
-			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
-		}
-		else {
-			var modelOutputs = ModelOutputs.find().fetch();
-			return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
-		}
-	}
-}
+    else if( type == 'analysis' ) {
+      if( previousType && previousType == 'modelOutput' ) {
+        var modelOutputId = Session.get('analyses.modelOutput');
+        if( modelOutputId ) {
+          var analysis = Analyses.findOne({modelOutput:modelOutputId},{sort:{created:-1}});
+          if( analysis && analysis.results ) {
+            var results = analysis.results;
+            for( var i=0; i < results.length; ++i ) {
+              var result = results[i];
+              result.name = result.type;
+              result._id = result.type;
+            }
+            return results;
+          }
+        }
+      }
+      else if( previousType && previousType == 'experiment' ) {
+        var experimentId = Session.get('analyses.experiment');
+        var modelOutputs = ModelOutputs.find({experiment:experimentId}).fetch();
+        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+      }
+      else if( previousType && previousType == 'model' ) {
+        var modelId = Session.get('analyses.model');
+        var modelOutputs = ModelOutputs.find({model:modelId}).fetch();
+        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+      }
+      else {
+        var modelOutputs = ModelOutputs.find().fetch();
+        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+      }
+    }
+  },
+
+  image: function() {
+    var modelOutputId = Session.get('analyses.modelOutput');
+    var analysisType = Session.get('analyses.analysis');
+    var experimentId = Session.get('analyses.experiment');
+
+    if( modelOutputId && analysisType && experimentId ) {
+    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {'$exists': true}} );
+    	if( analysis && analysis.results ) {
+		    for( var j=0; j < analysis.results.length; ++j ) {
+			    var result = analysis.results[j];
+                if( result.type === analysisType ) return result;
+		    }
+      }
+    }
+  }
+
+});
 
 Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 	var analyses = new Array();
@@ -249,13 +251,13 @@ Template.analyses.events({
         }
     },
     'dragstart .form-group':function(event) {
-        event.dataTransfer.setData("id",event.target.id);
+        event.originalEvent.dataTransfer.setData("id",event.target.id);
     },
     'dragover .form-group':function(event) {
         event.preventDefault();
     },
     'drop .form-group':function(event) {
-        var id = event.dataTransfer.getData("id");
+        var id = event.originalEvent.dataTransfer.getData("id");
         var from = $('#'+id);
         var to = $(event.target);
         for( var i=0; i < 5 && !to.hasClass("form-group"); ++i ) {
