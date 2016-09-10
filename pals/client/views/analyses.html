@@ -10,7 +10,7 @@
            <form role="form" class="form-inline">
                <div class="form-group" draggable="true" id="form-group-1" data-key="1" >
                        <label>{{currentType 1}}</label>
-                       <select class="form-control" id="1" name="1" onfocus="this.selectedIndex = -1;">
+                     <select class="form-control" id="1" name="1" onfocus="this.selectedIndex = -1;">
                            {{#each selectOptions 1}}
                                <option value="{{_id}}">{{name}}</option>
                            {{/each}}
@@ -53,7 +53,7 @@
                     {{else}}
                     <a href="/file/{{image.key}}/{{encode image.mimetype}}" target="_blank"><img class="img-responsive" src="/file/{{image.key}}/{{encode image.mimetype}}" title="{{image.type}}"/></a>
                     {{/if}}
-                </div> 
+                </div>
             </div>
        </div>
        {{/if}}

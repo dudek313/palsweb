@@ -41,22 +41,24 @@ Template.analyses.helpers({
     if( type == 'model' ) {
       if( previousType && previousType == 'experiment') {
         var experimentId = Session.get('analyses.experiment');
-        var modelOutputs = ModelOutputs.find( {experiment:experimentId}, {fields: {model:1}} ).fetch();
+        var modelOutputs = ModelOutputs.find( {experiments:experimentId}, {fields: {model:1}} ).fetch();
         console.log(modelOutputs[0]);
         var modelIdArray = [];
         for( var i=0; i < modelOutputs.length; ++i ) {
           var modelOutput = modelOutputs[i];
           modelIdArray.push(modelOutput.model);
         }
-        var models = Models.find({_id : {$in : modelIdArray}});
-        return models;
+        var selector = {_id : {$in : modelIdArray}};
+//        var models = Models.find({_id : {$in : modelIdArray}}, {sort: {name: 1}});
+//        return models;
       }
       else if( previousType && previousType == 'modelOutput' ) {
         var modelOutputId = Session.get('analyses.modelOutput');
         if( modelOutputId ) {
           var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {model:1}});
           if( modelOutput ) {
-            return Models.find({_id:modelOutput.model});
+              var selector = {_id:modelOutput.model};
+//            return Models.find({_id:modelOutput.model}, {sort: {name: 1}});
           }
         }
       }
@@ -78,16 +80,20 @@ Template.analyses.helpers({
           for( var key in uniqueModelIds ) {
             modelIds.push(key);
           }
-          var models = Models.find({_id : {$in : modelIds}});
-          return models;
+          var selector = {_id : {$in : modelIds}};
+//          var models = Models.find({_id : {$in : modelIds}});
+//          return models;
         }
         else {
-          return new Array();
+          var selector = {_id: null};
+//          return new Array();
         }
       }
       else {
-        return Models.find();
+        var selector = {};
+//        return Models.find();
       }
+      return Models.find(selector, {sort: {name: 1}});
     }
     else if( type == 'experiment' ) {
       if( previousType && previousType == 'model') {
@@ -98,15 +104,17 @@ Template.analyses.helpers({
           var modelOutput = modelOutputs[i];
           experimentIdArray.push(modelOutput.experiments[0]);
         }
-        var experiments = Experiments.find({_id : {$in : experimentIdArray}});
-        return experiments;
+        var selector = {_id : {$in : experimentIdArray}};
+//        var experiments = Experiments.find({_id : {$in : experimentIdArray}});
+//        return experiments;
       }
       else if( previousType && previousType == 'modelOutput') {
         var modelOutputId = Session.get('analyses.modelOutput');
         if( modelOutputId ) {
           var modelOutput = ModelOutputs.findOne({_id:modelOutputId},{fields: {experiment:1}});
           if( modelOutput ) {
-            return Experiments.find({_id:modelOutput.experiments[0]});
+            var selector = {_id:modelOutput.experiments[0]};
+//            return Experiments.find({_id:modelOutput.experiments[0]});
           }
         }
       }
@@ -116,7 +124,7 @@ Template.analyses.helpers({
         var uniqueExperiments = new Array();
         var haveExperiment;
         for( var i = 0; i < analysesWithType.length; ++i ) {
-          var experiment = Experiments.findOne({_id:analysesWithType[i].experiment});
+          var experiment = Experiments.findOne({_id:analysesWithType[i].experiment}, {sort: {name: 1}});
           if( experiment ) {
             haveExperiment = true;
             uniqueExperiments[experiment.id]=experiment;
@@ -128,20 +136,29 @@ Template.analyses.helpers({
             experiments.push(uniqueExperiments[key]);
           }
         }
+        var selector = "na";
         return experiments;
+
       }
       else {
-        return Experiments.find();
+        var selector = {};
+//        return Experiments.find();
       }
+      if (selector != "na")
+        return Experiments.find(selector, {sort: {name: 1}});
     }
     else if( type == 'modelOutput' ) {
       if( previousType && previousType == 'experiment') {
         var experimentId = Session.get('analyses.experiment');
-        if( experimentId ) return ModelOutputs.find({experiments:experimentId});
+        if( experimentId )
+          var selector = {experiments:experimentId};
+//         return ModelOutputs.find({experiments:experimentId});
       }
       else if( previousType && previousType == 'model') {
         var modelId = Session.get('analyses.model');
-        if( modelId ) return ModelOutputs.find({model:modelId});
+        if( modelId )
+          var selector = {model: modelId};
+//          return ModelOutputs.find({model:modelId});
       }
       else if( previousType && previousType == 'analysis' ) {
         var analysisType = Session.get('analyses.analysis');
@@ -149,7 +166,7 @@ Template.analyses.helpers({
         var uniqueModelOutputs = new Array();
         var haveModelOutput;
         for( var i = 0; i < analysesWithType.length; ++i ) {
-          var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput});
+          var modelOutput = ModelOutputs.findOne({_id:analysesWithType[i].modelOutput}, {sort: {name: 1}});
           if( modelOutput ) {
             haveModelOutput = true;
             uniqueModelOutputs[modelOutput.id]=modelOutput
@@ -161,11 +178,15 @@ Template.analyses.helpers({
             modelOutputs.push(uniqueModelOutputs[key]);
           }
         }
+        var selector = "na";
         return modelOutputs;
       }
       else {
-        return ModelOutputs.find();
+        var selector = {};
+//        return ModelOutputs.find();
       }
+      if (selector != "na")
+        return ModelOutputs.find(selector);
     }
     else if( type == 'analysis' ) {
       if( previousType && previousType == 'modelOutput' ) {
@@ -185,7 +206,7 @@ Template.analyses.helpers({
       }
       else if( previousType && previousType == 'experiment' ) {
         var experimentId = Session.get('analyses.experiment');
-        var modelOutputs = ModelOutputs.find({experiment:experimentId}).fetch();
+        var modelOutputs = ModelOutputs.find({experiments:experimentId}).fetch();
         return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
       }
       else if( previousType && previousType == 'model' ) {
@@ -207,6 +228,7 @@ Template.analyses.helpers({
 
     if( modelOutputId && analysisType && experimentId ) {
     	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {'$exists': true}} );
+      console.log(analysis);
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
 			    var result = analysis.results[j];
