@@ -32,7 +32,7 @@ Template.analyses.getFirstChoice = function(type) {
 Template.analyses.helpers({
   selectOptions: function(selectIndex) {
 
-    if( selectIndex > Session.get('analyses.clearIndex') ) return undefined;
+    if( selectIndex > Session.get('analyses.clearIndex') ) var results = undefined;
 
     var type = Session.get('analyses.'+selectIndex+'.type');
     var previousIndex = selectIndex - 1;
@@ -42,7 +42,7 @@ Template.analyses.helpers({
       if( previousType && previousType == 'experiment') {
         var experimentId = Session.get('analyses.experiment');
         var modelOutputs = ModelOutputs.find( {experiments:experimentId}, {fields: {model:1}} ).fetch();
-        console.log(modelOutputs[0]);
+//        console.log(modelOutputs[0]);
         var modelIdArray = [];
         for( var i=0; i < modelOutputs.length; ++i ) {
           var modelOutput = modelOutputs[i];
@@ -93,7 +93,7 @@ Template.analyses.helpers({
         var selector = {};
 //        return Models.find();
       }
-      return Models.find(selector, {sort: {name: 1}});
+      var results = Models.find(selector, {sort: {name: 1}});
     }
     else if( type == 'experiment' ) {
       if( previousType && previousType == 'model') {
@@ -137,7 +137,7 @@ Template.analyses.helpers({
           }
         }
         var selector = "na";
-        return experiments;
+        var results = experiments;
 
       }
       else {
@@ -145,7 +145,7 @@ Template.analyses.helpers({
 //        return Experiments.find();
       }
       if (selector != "na")
-        return Experiments.find(selector, {sort: {name: 1}});
+        var results = Experiments.find(selector, {sort: {name: 1}});
     }
     else if( type == 'modelOutput' ) {
       if( previousType && previousType == 'experiment') {
@@ -179,14 +179,14 @@ Template.analyses.helpers({
           }
         }
         var selector = "na";
-        return modelOutputs;
+        var results = modelOutputs;
       }
       else {
         var selector = {};
 //        return ModelOutputs.find();
       }
       if (selector != "na")
-        return ModelOutputs.find(selector);
+        var results = ModelOutputs.find(selector);
     }
     else if( type == 'analysis' ) {
       if( previousType && previousType == 'modelOutput' ) {
@@ -200,25 +200,38 @@ Template.analyses.helpers({
               result.name = result.type;
               result._id = result.type;
             }
-            return results;
+//            return results;
           }
         }
       }
       else if( previousType && previousType == 'experiment' ) {
         var experimentId = Session.get('analyses.experiment');
         var modelOutputs = ModelOutputs.find({experiments:experimentId}).fetch();
-        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+        var results = Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
       }
       else if( previousType && previousType == 'model' ) {
         var modelId = Session.get('analyses.model');
         var modelOutputs = ModelOutputs.find({model:modelId}).fetch();
-        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+        var results = Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
       }
       else {
         var modelOutputs = ModelOutputs.find().fetch();
-        return Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
+        var results = Template.analyses.loadUniqueAnalysesFromModelOutputs(modelOutputs);
       }
     }
+
+//    console.log('SelectIndex: ', selectIndex)
+//    console.log('Results: ', results);
+    return results;
+
+/*    var justDragged = Session.get('justDragged');
+    if (justDragged) {
+      for (var i=toKey; i < 5; ++i) {
+        $('#'+i.toString())[0].selectedIndex = -1;
+      }
+      Session.set('justDragged', null);
+    }
+*/
   },
 
   image: function() {
@@ -228,7 +241,7 @@ Template.analyses.helpers({
 
     if( modelOutputId && analysisType && experimentId ) {
     	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {'$exists': true}} );
-      console.log(analysis);
+//      console.log(analysis);
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
 			    var result = analysis.results[j];
@@ -242,8 +255,9 @@ Template.analyses.helpers({
 
 Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 	var analyses = new Array();
+  var analysesArray = new Array();
     for( var i=0; i < modelOutputs.length; ++i ) {
-		var analysis = Analyses.findOne({modelOutput:modelOutputs[i]._id},{sort:{created:-1}});
+		var analysis = Analyses.findOne({modelOutput:modelOutputs[i]._id, results: {$exists: true}},{sort:{created:-1}});
 		if( analysis && analysis.results ) {
 		    var results = analysis.results;
 		    for( var j=0; j < results.length; ++j ) {
@@ -251,13 +265,14 @@ Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 			    result.name = result.type;
 			    result._id = result.type;
 			    analyses[result.name] = result;
+          analysesArray.push(result);
 		    }
 	    }
 	}
-	var analysesArray = new Array();
+/*	var analysesArray = new Array();
 	for( var key in analyses ) {
 	    analysesArray.push(analyses[key]);
-	}
+	}*/
 	return analysesArray;
 }
 
@@ -293,7 +308,14 @@ Template.analyses.events({
             Session.set('analyses.'+toKey+'.type',fromValue);
             Session.set('analyses.'+fromKey+'.type',toValue);
 
-            Session.set('analyses.clearIndex',Math.min(toKey,fromKey));
+            var clearIndex = Math.min(toKey, fromKey);
+            Session.set('analyses.clearIndex', clearIndex);
+
+//            Session.set('justDragged', Math.min(toKey,fromKey));
         }
+
+//        for (var i=clearIndex; i < 5; ++i) {
+//          $('#'+i.toString())[0].selectedIndex = -1;
+//        }
     }
 });
