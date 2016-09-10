@@ -85,7 +85,11 @@ displayError = function(errMessage, error) {
   window.scrollTo(0,0);
   $('.error').html(errMessage);
   $('.error').show();
-  console.log(error);
+  if (error)
+    console.log(error);
+  else {
+    console.log('Error displayed on page: ' + errMessage);
+  }
 }
 
 /*createBrowsingWorkspace = function() {

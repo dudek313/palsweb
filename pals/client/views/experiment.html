@@ -87,20 +87,24 @@
           <div class="panel panel-primary">
             <div class="panel-heading">Scripts</div>
             <div class="panel-body">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Filename</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {{#each scripts}}
+              {{#if scripts}}
+                <table class="table table-hover">
+                  <thead>
                     <tr>
-                      <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                      <th>Filename</th>
                     </tr>
-                  {{/each}}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {{#each scripts}}
+                      <tr>
+                        <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                      </tr>
+                    {{/each}}
+                  </tbody>
+                </table>
+              {{else}}
+                No scripts uploaded.
+              {{/if}}
            </div>
           </div>
 
@@ -108,21 +112,24 @@
             <div class="panel panel-primary">
               <div class="panel-heading">Data Sets</div>
               <div class="panel-body">
-
-                 <table class="table table-hover">
-                   <thead>
-                   <tr>
-                       <th>Name</th>
-                   </tr>
-                   </thead>
-                   <tbody>
-                   {{#each dataSets}}
-                   <tr>
-                       <td onclick="Router.go('/dataSet/display/{{_id}}')">{{name}}</td>
-                   </tr>
-                   {{/each}}
-                   </tbody>
-                 </table>
+                {{#if dataSets}}
+                  <table class="table table-hover">
+                    <thead>
+                    <tr>
+                      <th>Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {{#each dataSets}}
+                      <tr>
+                        <td onclick="Router.go('/dataSet/display/{{_id}}')">{{name}}</td>
+                      </tr>
+                      {{/each}}
+                    </tbody>
+                  </table>
+                {{else}}
+                  No data sets uploaded.
+                {{/if}}
               </div>
             </div>
           </form>
@@ -190,12 +197,14 @@
                   <div class="panel-heading">Details</div>
                   <div class="panel-body">
                     {{> afQuickField name='name'}}
-                    {{#unless areEqual this.recordType 'template'}}
-                      <div class="form-group">
-                        <label>Workspace</label>
-                        <div class="display">{{workspaceName}}</div>
-                      </div>
-                    {{/unless}}
+                    {{#if areEqual screenMode 'update'}}
+                      {{#unless areEqual this.recordType 'template'}}
+                        <div class="form-group">
+                          <label>Workspace</label>
+                          <div class="display">{{workspaceName}}</div>
+                        </div>
+                      {{/unless}}
+                    {{/if}}
                     {{> afQuickField name='country' type='select' firstOption="(Select One)" options='allowed'}}
                     {{> afQuickField name='vegType' type='select' firstOption="(Select One)" options='allowed'}}
                     {{#if afFieldValueIs name='vegType' value='Other'}}
@@ -212,18 +221,20 @@
                 <div class="panel panel-primary">
                   <div class="panel-heading">Scripts</div>
                   <div class="panel-body">
-                    <table class="table">
-                      <tr>
-                        <th>Filename</th>
-                        <th>Delete</th>
-                      </tr>
-                      {{#each tempScripts}}
-                      <tr>
-                        <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
-                        <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
-                      </tr>
-                      {{/each}}
-                    </table>
+                    {{#if tempScripts}}
+                      <table class="table">
+                        <tr>
+                          <th>Filename</th>
+                          <th>Delete</th>
+                        </tr>
+                        {{#each tempScripts}}
+                          <tr>
+                            <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                            <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                          </tr>
+                        {{/each}}
+                      </table>
+                    {{/if}}
                     <label>Upload a new script</label>
                     {{#with currentUpload}}
                       Uploading <b>{{file.name}}</b>:
@@ -245,23 +256,24 @@
               <div class="panel panel-primary">
                 <div class="panel-heading">Data Sets</div>
                 <div class="panel-body">
-                  <table class="table table-hover">
+                  {{#unless isEmptyArray tempDataSets}}
+                    <table class="table table-hover">
                       <thead>
-                      <tr>
+                        <tr>
                           <th>Name</th>
                           <th>Remove</th>
-                      </tr>
+                        </tr>
                       </thead>
                       <tbody>
-                      {{#each tempDataSets}}
-                      <tr>
+                        {{#each tempDataSets}}
+                        <tr>
                           <td onclick="Router.go('/dataSet/display/{{_id}}')">{{name}}</td>
                           <td><button class='remove-dataSet btn btn-danger btn-xs' id='{{_id}}'>Remove</button></td>
-                      </tr>
-                      {{/each}}
+                        </tr>
+                        {{/each}}
                       </tbody>
-                  </table>
-
+                    </table>
+                  {{/unless}}
                   <div class="form-group">
                       <select name="addDataSet" class="form-control">
                           <option selected disabled>(Select One)</option>
