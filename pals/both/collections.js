@@ -126,7 +126,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
       }
     }
   },
-  'experiments':    {type: [String], minCount: 1},
+  'experiments':    {type: [String], optional: true}, // Post-MVP - will want to make this required with minCount: 1. Will have to change interface
   model:            {type: String, label: "Model"},
   createdAt: {
     type: Date,

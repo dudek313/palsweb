@@ -262,7 +262,6 @@ describe('Testing methods', function(done) {
         Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
-            console.log(err);
             var insertedExperiment = Experiments.findOne({_id: dsId});
             chai.assert.isUndefined(insertedExperiment);
           } catch(error) {
