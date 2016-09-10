@@ -55,7 +55,8 @@
                   <th>Download</th>
                 </tr>
                 <tr>
-                  <td>{{file.filename}}</td>
+<!--                  <td>{{file.filename}}</td>-->
+                  <td>{{filename}}</td>
                   <td><button class='download-file btn btn-primary btn-xs' id='{{file.key}}'
                         onclick="window.location.href='/file/{{file.key}}/{{file.filename}}'">Download</button></td>
                 </tr>
@@ -81,7 +82,7 @@
                 {{/each}}
               </table>
             {{else}}
-              <tr>No benchmarks specified.</tr>
+              <tr>No benchmarks specified</tr>
             {{/if}}
             </div>
           </div>
@@ -138,13 +139,13 @@
 
           {{#autoForm collection="ModelOutputs" id=formId doc=this type="normal" validation='blur'}}
             <fieldset>
+              <div class="alert alert-danger error"></div>
               {{#if areEqual screenMode 'create'}}
                 <h3>Create New Model Output</h3>
               {{else}} <!-- if in update mode -->
                 <h3>Model Output: {{name}}</h3>
                 <br>
               {{/if}}
-              <div class="alert alert-danger error"></div>
               <div class="panel panel-primary">
                 <div class="panel-heading">Details</div>
                 <div class="panel-body">
@@ -165,11 +166,7 @@
                   {{> afQuickField name='model' type='select' firstOption="(Select One)" options=myModels}}
                   {{> afQuickField name='stateSelection' type='select' firstOption="(Select One)" options="allowed"}}
                   {{> afQuickField name='parameterSelection' type='select' firstOption="(Select One)" options="allowed"}}
-
-                  <div class="form-group">
-                    <label>Please add any comments that would aid reproducing this simulation: </label>
-                    <textarea class="modifier form-control" type="text" name="comments">{{comments}}</textarea>
-                  </div>
+                  {{> afQuickField name='comments' rows=2}}
                 </div>
               </div>
 
@@ -177,37 +174,32 @@
                 <div class="panel-heading">File</div>
                 <div class="panel-body">
 
-                {{#if tempFile}}
-                  <table class="table">
-                    <tr>
-                      <th>Filename</th>
-                      <th>Delete</th>
-                    </tr>
-                    <tr>
-                      <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
-                      <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
-                    </tr>
-                  </table>
+                  {{#if tempFile}}
+                    <table class="table">
+                      <tr>
+                        <th>Filename</th>
+                        <th>Delete</th>
+                      </tr>
+                      <tr>
+                        <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
+                        <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
+                      </tr>
+                    </table>
 
-                {{else}}
-
-                   <label>Upload a model output file</label>
-                  {{#with currentUpload}}
-                    Uploading <b>{{file.name}}</b>:
-                    <span id="progress">{{progress.get}}%</span>
                   {{else}}
-                    <input id="fileInput" type="file" />
-                  {{/with}}
 
-<!--                   <input type="file" class="file-select" name="file-select"/>
-                   <div class="progress progress-striped active">
-                     <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                         style="width:0%">
-                     </div>
-                   </div>
--->
-                 {{/if}}
+                    <label>Upload a model output file</label>
+                    {{#with currentUpload}}
+                      Uploading <b>{{file.name}}</b>:
+                      <span id="progress">{{progress.get}}%</span>
+                    {{else}}
+                      <input id="fileInput" type="file" />
+                    {{/with}}
 
+<!--                 If using meteor-autoform-file package
+                    {{> afQuickField name="file"}} -->
+
+                  {{/if}}
                 </div>
               </div>
 
@@ -230,7 +222,7 @@
                     </table>
 
                   {{else}}
-                    <tr>No benchmarks specified.</tr> <br>
+                    <tr>No benchmarks specified</tr> <br>
                   {{/if}}
 
                   <div class="form-group">
