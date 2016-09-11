@@ -46,8 +46,8 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Experiments</a>
           <ul class="dropdown-menu">
-            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/All');">In Current Workspace</a></li>
-            <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/All');">In All Available Workspaces</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/workspace/' + Session.get('experiments.workspace'));">In Current Workspace</a></li>
+            <li><a href="javascript:void(0)" onclick="Router.go('/experiments/anywhere/' + Session.get('experiments.anywhere'));">In All Available Workspaces</a></li>
             <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/experiments/templates/All');">Experiment Templates To Clone</a></li>
             {{#if authorisedToEdit 'experiment'}}
               <li class="divider"></li>
@@ -59,8 +59,8 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Sets</a>
           <ul class="dropdown-menu">
-            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/All');">In Current Workspace</a></li>
-            <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/All');">All Data Sets</a></li>
+            <li class={{disabledIfNotInWorkspace}} title={{toolTipIfNotInWorkspace}}><a href="javascript:void(0)" onclick="Router.go('/dataSets/workspace/' + Session.get('dataSets.workspace'));">In Current Workspace</a></li>
+            <li><a href="javascript:void(0)" onclick="Router.go('/dataSets/anywhere/' + Session.get('dataSets.anywhere'));">All Data Sets</a></li>
             {{#if authorisedToEdit 'dataSet'}}
                  <li class="divider"></li>
                  <li><a href="javascript:void(0)" onclick="Router.go('/dataSet/create');">Create Data Set</a></li>

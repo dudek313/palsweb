@@ -2,6 +2,20 @@ import '../views/models.html';
 
 Template.models.onCreated(function() {
   Meteor.subscribe('models');
+
+  // store current page in memory for next time
+  var currentPage = new ReactiveVar(Session.get('current-models-page') || 0);
+  this.currentPage = currentPage;
+  this.autorun(function () {
+    Session.set('current-models-page', currentPage.get());
+  });
+
+  var rowsPerPage = new ReactiveVar(Session.get('rows-per-models-page') || 10);
+  this.rowsPerPage = rowsPerPage;
+  this.autorun(function () {
+    Session.set('rows-per-models-page', rowsPerPage.get());
+  });
+
 });
 
 
@@ -13,9 +27,7 @@ Template.models.events({
                 console.log(id);
                 Meteor.call('removeModel', id, function(error){
                     if(error) {
-                        window.scrollTo(0,0);
-                        $('.error').html('Failed to delete the model, please try again');
-                        $('.error').show();
+                        displayError('Failed to delete the model, please try again');
                     }
                 });
             }
@@ -133,6 +145,14 @@ Template.models.helpers({
       fields.push(DELETE_FIELD);
 
       return fields;
+    },
+
+    tableSettings: function () {
+      return {
+        id: "saveModelsFilter",
+        currentPage: Template.instance().currentPage,
+        rowsPerPage: Template.instance().rowsPerPage
+      };
     }
 
 })

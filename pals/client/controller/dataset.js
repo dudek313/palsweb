@@ -12,7 +12,7 @@ Template.dataSet.rendered = function() {
     SimpleSchema.debug = true;
 };
 
-// Currently not working - issue with publish & subscribe?
+// Currently not working - probably issue with publish & subscribe - for old cfs package
 function removeDeletedFiles(fileIds) {
 
 /*    if (fileIds && fileIds.length > 0) {

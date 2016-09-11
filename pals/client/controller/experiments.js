@@ -1,5 +1,18 @@
 Template.experiments.onCreated(function() {
   Meteor.subscribe('experiments');
+
+  // store current page in memory for next time
+  var currentPage = new ReactiveVar(Session.get('current-experiments-page') || 0);
+  this.currentPage = currentPage;
+  this.autorun(function () {
+    Session.set('current-experiments-page', currentPage.get());
+  });
+
+  var rowsPerPage = new ReactiveVar(Session.get('rows-per-experiments-page') || 10);
+  this.rowsPerPage = rowsPerPage;
+  this.autorun(function () {
+    Session.set('rows-per-experiments-page', rowsPerPage.get());
+  });
 });
 
 Template.experiments.helpers({
@@ -95,6 +108,14 @@ Template.experiments.helpers({
   analysesExist: function(analysisId) {
     return (Analyses.findOne({'_id':analysisId})) ? true : false;
 
+  },
+
+  tableSettings: function () {
+    return {
+      id: "saveExperimentsFilter",
+      currentPage: Template.instance().currentPage,
+      rowsPerPage: Template.instance().rowsPerPage
+    };
   }
 });
 
@@ -103,6 +124,7 @@ Template.experiments.events({
     'click input[name="spatialLevel"]' : function(event) {
         event.preventDefault();
         var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+        Session.set('experiments.' + getSource(), spatialLevel);
         Router.go('/experiments/' + getSource() + '/' + spatialLevel);
     },
     'click .delete' : function(event) {

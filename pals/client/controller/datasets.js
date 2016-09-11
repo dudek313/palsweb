@@ -4,6 +4,20 @@ import '../lib/tableFields.js';
 Template.dataSets.onCreated(function() {
   window['directives']();
   Meteor.subscribe('dataSets');
+
+  // store current page in memory for next time
+  var currentPage = new ReactiveVar(Session.get('current-datasets-page') || 0);
+  this.currentPage = currentPage;
+  this.autorun(function () {
+    Session.set('current-datasets-page', currentPage.get());
+  });
+
+  var rowsPerPage = new ReactiveVar(Session.get('rows-per-datasets-page') || 10);
+  this.rowsPerPage = rowsPerPage;
+  this.autorun(function () {
+    Session.set('rows-per-datasets-page', rowsPerPage.get());
+  });
+
 });
 
 /*function dataSetFilters() {
@@ -31,6 +45,7 @@ Template.dataSets.events({
   'click input[name="spatialLevel"]' : function(event) {
     event.preventDefault();
     var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+    Session.set('dataSets.' + getSource(), spatialLevel);
     Router.go('/dataSets/' + getSource() + '/' + spatialLevel);
   },
   'click .delete-btn' : function(event) {
@@ -172,6 +187,15 @@ Template.dataSets.helpers({
   source: function() {
     return getSource();
   },
+
+  tableSettings: function () {
+    return {
+      id: "saveDSFilter",
+      currentPage: Template.instance().currentPage,
+      rowsPerPage: Template.instance().rowsPerPage
+    };
+  },
+
   userEmail: function(userId) {
     var user = Meteor.users.findOne({'_id':userId});
     if( user && user.emails && user.emails.length > 0 ) {

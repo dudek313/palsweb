@@ -1,5 +1,18 @@
 Template.modelOutputs.onCreated(function() {
   Meteor.subscribe('modelOutputs');
+
+  // store current page in memory for next time
+  var currentPage = new ReactiveVar(Session.get('current-modelOutputs-page') || 0);
+  this.currentPage = currentPage;
+  this.autorun(function () {
+    Session.set('current-modelOutputs-page', currentPage.get());
+  });
+
+  var rowsPerPage = new ReactiveVar(Session.get('rows-per-modelOutputs-page') || 10);
+  this.rowsPerPage = rowsPerPage;
+  this.autorun(function () {
+    Session.set('rows-per-modelOutputs-page', rowsPerPage.get());
+  });
 });
 
 Template.modelOutputs.helpers({
@@ -62,6 +75,14 @@ Template.modelOutputs.helpers({
     // returns the source of model outputs requested
     // either 'mine' or in current 'workspace'
       return getSource();
+  },
+
+  tableSettings: function () {
+    return {
+      id: "saveModelOutputsFilter",
+      currentPage: Template.instance().currentPage,
+      rowsPerPage: Template.instance().rowsPerPage
+    };
   }
 
 });

@@ -15,7 +15,7 @@
       <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
     </div>
 
-    {{> reactiveTable class="table table-hover table-framed" collection=dataSets fields=fields rowsPerPage=10}}
+    {{> reactiveTable class="table table-hover table-framed" collection=dataSets fields=fields settings=tableSettings}}
 <!--
     <table class="table table-hover">
         <thead>
