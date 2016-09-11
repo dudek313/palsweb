@@ -1,6 +1,7 @@
 import '../views/datasets.html';
 import '../lib/tableFields.js';
 
+
 Template.dataSets.onCreated(function() {
   window['directives']();
   Meteor.subscribe('dataSets');
@@ -42,10 +43,11 @@ Template.dataSets.onCreated(function() {
 
 
 Template.dataSets.events({
-  'click input[name="spatialLevel"]' : function(event) {
+  'click input[name="spatialLevel"]' : function(event, template) {
     event.preventDefault();
     var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
     Session.set('dataSets.' + getSource(), spatialLevel);
+    template.currentPage.set(0);
     Router.go('/dataSets/' + getSource() + '/' + spatialLevel);
   },
   'click .delete-btn' : function(event) {

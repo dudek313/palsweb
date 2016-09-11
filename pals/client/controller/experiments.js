@@ -121,9 +121,10 @@ Template.experiments.helpers({
 
 
 Template.experiments.events({
-    'click input[name="spatialLevel"]' : function(event) {
+    'click input[name="spatialLevel"]' : function(event, template) {
         event.preventDefault();
         var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+        template.currentPage.set(0);
         Session.set('experiments.' + getSource(), spatialLevel);
         Router.go('/experiments/' + getSource() + '/' + spatialLevel);
     },

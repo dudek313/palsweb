@@ -48,8 +48,8 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
-this.NcdfFiles = new FilesCollection({
-  collectionName: 'NcdfFiles',
+this.NetCdfFiles = new FilesCollection({
+  collectionName: 'NetCdfFiles',
   storagePath: '/pals/data',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
@@ -77,12 +77,12 @@ this.RFiles = new FilesCollection({
 });
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.ncdfFiles.all');
+  Meteor.subscribe('files.NetCdfFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.ncdfFiles.all', function() {
-    return NcdfFiles.collection.find().cursor;
+  Meteor.publish('files.NetCdfFiles.all', function() {
+    return NetCdfFiles.collection.find().cursor;
   });
 }
 

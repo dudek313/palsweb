@@ -157,3 +157,20 @@ getUserFullName = function(userId) {
     return fullname;
   }
 }
+
+getTablePreferences = function(objectType, field) {
+  var user = Meteor.user();
+  var preferences = new Array();
+
+  if (user && user.profile && user.profile.preferences && user.profile.preferences[objectType] && user.profile.preferences[objectType][field])
+    return user.profile.preferences[objectType][field];
+  else {
+    return null;
+  }
+
+//    var userProfileObjectName = 'user.profile.preferences' + objectType;
+//    var userProfileObjectFieldName = userProfileObjectName + '.' + field;
+//  if (user && user.profile && user.profile.preferences && [eval(userProfileObjectName)] && eval(userProfileObjectFieldName)) {
+//    return eval(userProfileObjectFieldName);
+// }
+}
