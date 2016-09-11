@@ -28,9 +28,139 @@ Template.analyses.getFirstChoice = function(type) {
 }
 */
 
+function columnType(columnNum) {
+  var colType = Session.get('analyses.' + columnNum + '.type');
+  return colType;
+}
+
+function columnValue(columnNum) {
+  var colType = columnType(columnNum);
+  return Session.get('analyses.' + colType);
+}
+
+function columnNumber(field) {
+  for (i = 1; i < 4; ++i) {
+    if (columnType(i) == field)
+      return i;
+  }
+}
 
 Template.analyses.helpers({
   selectOptions: function(selectIndex) {
+    var results;
+    var selector = {};
+    var type = Session.get('analyses.'+selectIndex+'.type');
+
+    // The first column always displays all of its type, so the selector value is blank
+    // The second column values are filtered based on the first column value
+    if (selectIndex == 2) {
+
+      if (type == 'model') {
+        // experiment is the only valid option for column 1
+        if (columnType(1) == 'experiment') {
+          var experimentId = Session.get('analyses.experiment');
+          var modelOutputs = ModelOutputs.find( {experiments:experimentId}, {fields: {model:1}} ).fetch();
+  //        console.log(modelOutputs[0]);
+          var modelIdArray = [];
+          for( var i=0; i < modelOutputs.length; ++i ) {
+            var modelOutput = modelOutputs[i];
+            modelIdArray.push(modelOutput.model);
+          }
+          var selector = {_id : {$in : modelIdArray}};
+        } else {
+          console.log('Error: Invalid field in column 1');
+          results = "blank";
+        }
+      }
+
+      else if (type == 'experiment') {
+        // model is the only valid option for column 1
+        if (columnType(1) == 'model') {
+          var modelId = Session.get('analyses.model');
+          var modelOutputs = ModelOutputs.find({'model':modelId},{fields: {experiments:1}}).fetch();
+          var experimentIdArray = [];
+          for( var i=0; i < modelOutputs.length; ++i ) {
+            var modelOutput = modelOutputs[i];
+            experimentIdArray.push(modelOutput.experiments[0]);
+          }
+          var selector = {_id : {$in : experimentIdArray}};
+        } else {
+          console.log('Error: Invalid field in column 1');
+          results = "blank";
+        }
+      }
+
+      else if (type == 'modelOutput') {
+        if (columnType(1) == 'model') {
+          var modelId = Session.get('analyses.model');
+          if( modelId )
+            selector = {model: modelId};
+        } else if (columnType(1) == 'experiment') {
+          var experimentId = Session.get('analyses.experiment');
+          if( experimentId )
+            selector = {experiments:experimentId};
+        }
+
+      }
+    }
+
+    else if (selectIndex == 3) {
+      if (type == 'modelOutput') {
+        selector.model = Session.get('analyses.model');
+        selector.experiments = Session.get('analyses.experiment')
+      } else {
+        // any other field in this position is redundant and doesn't need to be populated
+        results = "blank";
+      }
+    }
+
+    // assuming for now that the 4th column must contain analysis
+    else if (selectIndex == 4) {
+      var modelOutputId = Session.get('analyses.modelOutput');
+      if( modelOutputId ) {
+        var analysis = Analyses.findOne({modelOutput:modelOutputId},{sort:{created:-1}});
+        if( analysis && analysis.results ) {
+          var results = analysis.results;
+          for( var i=0; i < results.length; ++i ) {
+            var result = results[i];
+            result.name = result.type;
+            result._id = result.type;
+            if (result.type == Session.get('analyses.analysis'))
+              result.ifSelected = function() { return { selected: "selected"}};
+          }
+//            return results;
+        }
+      }
+    }
+
+    Session.set('valuesExist' + selectIndex, null);
+
+    if (results != "blank") {
+      if (type == 'model') {
+        var models = Models.find(selector, {sort: {name: 1}}).fetch();
+        Session.set('valuesExist' + selectIndex, models.length);
+        return models;
+      } else if (type == 'experiment') {
+        selector.recordType = 'instance';
+        var exps = Experiments.find(selector, {sort: {name: 1}}).fetch();
+        Session.set('valuesExist' + selectIndex, exps.length);
+        return exps;
+      } else if (type == 'modelOutput') {
+        var mos = ModelOutputs.find(selector, {sort: {name: 1}}).fetch();
+        Session.set('valuesExist' + selectIndex, mos.length);
+        return mos;
+      } else if (type == 'analysis') {
+        if (results && results.length)
+          Session.set('valuesExist' + selectIndex, results.length);
+        else
+          Session.set('valuesExist' + selectIndex, 0);
+        return results;
+      } else return null;
+    }
+    else return null;
+
+
+/*
 
     if( selectIndex > Session.get('analyses.clearIndex') ) var results = undefined;
 
@@ -223,7 +353,7 @@ Template.analyses.helpers({
 //    console.log('SelectIndex: ', selectIndex)
 //    console.log('Results: ', results);
     return results;
-
+*/
 /*    var justDragged = Session.get('justDragged');
     if (justDragged) {
       for (var i=toKey; i < 5; ++i) {
@@ -234,13 +364,26 @@ Template.analyses.helpers({
 */
   },
 
+  ifSelected: function(selectionId) {
+    if (selectionId == Session.get('analyses.analysis')) {
+      return {
+        selected: "selected"
+      }
+    }
+    else return null;
+  },
+
   image: function() {
     var modelOutputId = Session.get('analyses.modelOutput');
     var analysisType = Session.get('analyses.analysis');
     var experimentId = Session.get('analyses.experiment');
 
-    if( modelOutputId && analysisType && experimentId ) {
-    	var analysis = Analyses.findOne({modelOutput:modelOutputId, experiment:experimentId, results: {'$exists': true}} );
+//    if( modelOutputId && analysisType && experimentId ) {
+    if( modelOutputId && analysisType ) {
+      var selector = {modelOutput:modelOutputId, results: {'$exists': true}};
+      if (experimentId)
+        selector.experiment = experimentId;
+    	var analysis = Analyses.findOne(selector);
 //      console.log(analysis);
     	if( analysis && analysis.results ) {
 		    for( var j=0; j < analysis.results.length; ++j ) {
@@ -249,6 +392,10 @@ Template.analyses.helpers({
 		    }
       }
     }
+  },
+
+  valuesExist: function(columnNum) {
+    return Session.get('valuesExist' + columnNum);
   }
 
 });
@@ -265,6 +412,8 @@ Template.analyses.loadUniqueAnalysesFromModelOutputs = function(modelOutputs) {
 			    result.name = result.type;
 			    result._id = result.type;
 			    analyses[result.name] = result;
+
+          // need to fix this to be unique
           analysesArray.push(result);
 		    }
 	    }
@@ -286,6 +435,20 @@ Template.analyses.events({
         if( Session.get('analyses.clearIndex') <= key ) {
             Session.set('analyses.clearIndex',parseInt(key)+1)
         }
+
+        // after changing the selection in one menu, blank out values in subsequent columns (but not the analysis column)
+        for (var i = parseInt(key) + 1; i <= 3; ++i) {
+          var colType = columnType(i);
+          Session.set('analyses.' + colType, null);
+//          var colObject = $('#' + i)[0];
+//          colObject.selectedIndex = (colObject.length > 1) ? 0 : -1;
+        }
+
+/* this didn't work, because it tries to change the selected item before the menu is updated
+        // try and set the analysis field to its current value if possible
+        if (key != 4)
+          $('#4')[0].value = Session.get('analyses.analysis');
+*/
     },
     'dragstart .form-group':function(event) {
         event.originalEvent.dataTransfer.setData("id",event.target.id);
@@ -311,6 +474,10 @@ Template.analyses.events({
             var clearIndex = Math.min(toKey, fromKey);
             Session.set('analyses.clearIndex', clearIndex);
 
+            for (var i = clearIndex; i <= 3; ++i) {
+              var colType = columnType(i);
+              Session.set('analyses.' + colType, null);
+            }
 //            Session.set('justDragged', Math.min(toKey,fromKey));
         }
 
