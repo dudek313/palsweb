@@ -100,7 +100,7 @@ Template.dataSet.events = {
         event.preventDefault();
         removeDeletedFiles(Session.get('filesUploaded'));
         Session.set('filesUploaded', []);
-        Router.go('/')
+        window.history.back();
     },
     'click .delete-file':function(event) {
         event.preventDefault();

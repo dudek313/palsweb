@@ -132,7 +132,7 @@ Template.modelOutput.events = {
     // returns to home page if user pressed cancel while creating model output
     'click .cancel-create':function(event){
         event.preventDefault();
-        Router.go('/')
+        window.history.back();
     },
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){
@@ -191,7 +191,7 @@ Template.modelOutput.events = {
             alert('Error during upload: ' + error);
           } else {
             var fileRecord = {
-                path: FILE_DIR + fileObj.path,
+                path: fileObj.path,
                 filename: fileObj.name,
                 size: fileObj.size,
                 key: fileObj._id,
