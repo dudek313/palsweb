@@ -55,12 +55,13 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
         (e.experiment_id IS NULL AND e.id IN (995,1004,997,4353,871,4113,5660,3993,6802,5630,7032,7002,6772,1003,994,4233,1005,4203,4083,4053,4143,4173)))\
         ORDER BY a.name;"
 
- //   mongoInstance.dropIndexes('dataSets',function(err){
- //       if(err) console.log(err)
- //       else {
- //         mongoInstance.dropIndexes('experiments', function(err){
- //           if(err) console.log(err)
- //           else {
+/*    mongoInstance.dropIndexes('dataSets',function(err){
+        if(err) console.log(err)
+        else {
+          mongoInstance.dropIndexes('experiments', function(err){
+            if(err) console.log(err)
+            else {
+*/
               pgInstance.sql(loadDataSetsQuery,function(result,client){
                   result.rows.forEach(function(row){
                       //console.log(row);
@@ -79,11 +80,13 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
 
                   client.end();
               });
- //           }
- //         });
- //       }
+/*
+            }
+          });
+        }
 
- //   });
+    });
+*/
 }
 
 
@@ -103,7 +106,6 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                       name : filenameHead + '_' + filetype + '.nc',
                       oldName: filename,
                       size : stats['size'],
-      		      oldName: filename,
                       key : newFilename,
                       createdAt : row.dsv_uploaddate,
                       type : filetype,
@@ -196,8 +198,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
         _id : dataSet._id.toString(),
         name : dataSet.name,
         recordType : 'template',
-        version : 1,
-        latest : true,
+        _version: 1,
         created : dataSet.created,
         spatialLevel : 'SingleSite',
         scripts : [{
@@ -226,8 +227,8 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             templateId : experimentTemplate._id,
             templateVersion: 1,
             latest : true,
-            created : dataSet.created,
-            modified : dataSet.created,
+            createdAt : dataSet.created,
+            modifiedAt : dataSet.created,
             spatialLevel : 'SingleSite',
             scripts : [{
                 path : '/pals/data/SingleSiteExperiment.R',

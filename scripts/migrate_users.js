@@ -5,7 +5,7 @@ var postgres = function () {
     that = {};
     
     that.pg = Npm.require('pg');
-    that.connectionString = "pg://docker:docker@129.94.166.218:32768/docker"
+    that.connectionString = "pg://docker:docker@192.168.56.101:32770/docker"
     //DF: that.connectionString = "pg://postgres:password@localhost:5432/pals"
 
     function sql(query,callback) {
@@ -38,14 +38,14 @@ pgInstance.sql("SELECT * FROM palsuser,institution where palsuser.institution_id
 //             },function(e){console.log(e)}));
 //            if( !user ) {
                 // user doesn't exist, we create the user
-//		try
-//		{
-//			console.log('dropping username index');
-//			Meteor.collection("users").dropIndex("username_1");
-//		}
-//		catch(ex) {
-//			console.log(ex);
-//		}
+		try
+		{
+			console.log('dropping username index');
+			Meteor.collection("users").dropIndex("username_1");
+		}
+		catch(ex) {
+			console.log(ex);
+		}
                 console.log('creating user ' + row.username);
                 if( row.username != 'axel' ) {
                     try
