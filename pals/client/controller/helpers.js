@@ -110,7 +110,7 @@ Template.registerHelper("toolTipIfNotInWorkspace", function( ) {
 Template.registerHelper("greyIfLoggedOut", function() {
     if (Meteor.user()) return ""
     else {
-      return "logged-out";
+      return "greyed-out";
     }
 });
 

@@ -60,7 +60,7 @@ html, body{
     margin-right:15px;
 }
 
-.logged-out {
+.greyed-out {
     color: lightgray;
 }
 

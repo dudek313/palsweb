@@ -32,7 +32,7 @@
                            {{/each}}
                        </select>
                </div>
-               <div class="form-group" draggable="true" id="form-group-3" data-key="3">
+               <div class="form-group {{greyIfRedundant}}" draggable="true" id="form-group-3" data-key="3">
                        <label>{{currentType 3}}</label>
                        <select class="form-control" id="3" name="3"> <!-- onfocus="this.selectedIndex = -1;">-->
                           {{#if valuesExist 3}}
@@ -44,7 +44,7 @@
                            {{/each}}
                        </select>
                </div>
-               <div class="form-group" draggable="true" id="form-group-4" data-key="4">
+               <div class="form-group" draggable="false" id="form-group-4" data-key="4" style="padding-left: 100px;">
                        <label>{{currentType 4}}</label>
                        <select class="form-control" id="4" name="4"> <!-- onfocus="this.selectedIndex = -1;"> -->
                           {{#if valuesExist 4}}

@@ -12,6 +12,7 @@ import { withRenderedTemplate } from './helpers.app-test.js';
 import '../../both/collections.js';
 import './dataset.js';
 
+
 describe('Testing file upload', function(done) {
   before(function(done) {
     Meteor.call('test.resetDatabase', done);
@@ -83,25 +84,73 @@ describe('Testing file upload', function(done) {
   });
 
   describe('Upload a file', function() {
-    it('allows a registered user to upload a file', function(done) {
-      done();
-    });
-  });
-/*  describe('Upload a file', function() {
-    it('allows a registered user to upload a file', function(done) {
-      withRenderedTemplate('dataSet', {}, el => {
-        $(el).find('button.upload-btn').click();
-        var downloadPanel = $(el).find('#upload-panel');
-        chai.assert.isAbove(downloadPanel.length, 0, 'Download panel not displaying');
-        $(el).find('input[type="file"]').val("C:\\Users\\Danny\\Downloads\\pals-nci\\webappdata\\axel\\mo24829.nc");
 
-        setTimeout(function() {
-          var newFile = Files.findOne({name: 'mo24829.nc'});
-          chai.assert.isDefined(newFile);
-          done();
-        }, 5000);
+    it('allows a registered user to upload a file', function(done) {
+
+      getFileObject('img/test.nc', function (file) {
+
+        var filename = 'testfile.nc';
+        var upload = NetCdfFiles.insert({
+          file: file,
+          fileName: filename,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            console.log(error);
+            done();
+          }
+          else {
+            console.log(fileObj);
+            done();
+          }
+        });
+
+        upload.start();
       });
+
     });
   });
-  */
+});
+
+/*      withRenderedTemplate('dataSet', {}, el => {
+console.log(el);
+$(el).find('button.upload-btn').click();
+console.log(el);
+var downloadPanel = $(el).find('#upload-panel');
+chai.assert.isAbove(downloadPanel.length, 0, 'Download panel not displaying');
+$(el).find('input[type="file"]').sendkeys("C:\\Users\\Danny\\Downloads\\pals-nci\\webappdata\\axel\\mo24829.nc");
+
+setTimeout(function() {
+var newFile = Files.findOne({name: 'mo24829.nc'});
+chai.assert.isDefined(newFile);
+done();
+}, 5000);*/
+
+var getFileBlob = function (url, cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
+        xhr.addEventListener('load', function() {
+            cb(xhr.response);
+        });
+        xhr.send();
+};
+
+var blobToFile = function (blob, name) {
+        blob.lastModifiedDate = new Date();
+        blob.name = name;
+        return blob;
+};
+
+var getFileObject = function(filePathOrUrl, cb) {
+       getFileBlob(filePathOrUrl, function (blob) {
+          cb(blobToFile(blob, 'mo24829.nc'));
+       });
+};
+
+getFileObject('file:///C:/Users/Danny/Downloads/pals-nci/webappdata/axel/mo24829.nc', function (file) {
+  console.log(file);
 });

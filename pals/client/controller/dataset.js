@@ -143,7 +143,7 @@ Template.dataSet.events = {
             filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
         };
 
-        var upload = NcdfFiles.insert({
+        var upload = NetCdfFiles.insert({
           file: file,
           fileName: filename,
           streams: 'dynamic',

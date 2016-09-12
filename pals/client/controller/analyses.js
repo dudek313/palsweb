@@ -109,7 +109,7 @@ Template.analyses.helpers({
         selector.model = Session.get('analyses.model');
         selector.experiments = Session.get('analyses.experiment')
       } else {
-        // any other field in this position is redundant and doesn't need to be populated
+        // any other field in this position is redundant and doesn't need to be populated or be enabled
         results = "blank";
       }
     }
@@ -364,6 +364,17 @@ Template.analyses.helpers({
 */
   },
 
+  greyIfRedundant: function() {
+
+    var columnTwoType = Session.get('analyses.2.type');
+    if (columnTwoType == 'modelOutput')
+      return "greyed-out";
+    else {
+      return "";
+    }
+
+  },
+
   ifSelected: function(selectionId) {
     if (selectionId == Session.get('analyses.analysis')) {
       return {
@@ -440,15 +451,8 @@ Template.analyses.events({
         for (var i = parseInt(key) + 1; i <= 3; ++i) {
           var colType = columnType(i);
           Session.set('analyses.' + colType, null);
-//          var colObject = $('#' + i)[0];
-//          colObject.selectedIndex = (colObject.length > 1) ? 0 : -1;
         }
 
-/* this didn't work, because it tries to change the selected item before the menu is updated
-        // try and set the analysis field to its current value if possible
-        if (key != 4)
-          $('#4')[0].value = Session.get('analyses.analysis');
-*/
     },
     'dragstart .form-group':function(event) {
         event.originalEvent.dataTransfer.setData("id",event.target.id);
@@ -463,24 +467,29 @@ Template.analyses.events({
         for( var i=0; i < 5 && !to.hasClass("form-group"); ++i ) {
             to = to.parent();
         }
-        if( to ) {
-            var toKey = to.data('key');
-            var fromKey = from.data('key');
-            var toValue = Session.get('analyses.'+toKey+'.type');
-            var fromValue = Session.get('analyses.'+fromKey+'.type');
-            Session.set('analyses.'+toKey+'.type',fromValue);
-            Session.set('analyses.'+fromKey+'.type',toValue);
+        if (to) {
+          var toKey = to.data('key');
+          var fromKey = from.data('key');
+          var toValue = Session.get('analyses.'+toKey+'.type');
+          var fromValue = Session.get('analyses.'+fromKey+'.type');
 
-            var clearIndex = Math.min(toKey, fromKey);
-            Session.set('analyses.clearIndex', clearIndex);
+          // check that not dragged over to analysis column, that model output column isn't dragged to the far left
+          // and that it isn't dragged to itself
+          if(toKey != 4 && !(toKey == 1 && fromValue == 'modelOutput') &&
+            !(toValue == 'modelOutput' && fromKey == 1) && (toKey != fromKey)) {
+              Session.set('analyses.'+toKey+'.type',fromValue);
+              Session.set('analyses.'+fromKey+'.type',toValue);
 
-            for (var i = clearIndex; i <= 3; ++i) {
-              var colType = columnType(i);
-              Session.set('analyses.' + colType, null);
-            }
-//            Session.set('justDragged', Math.min(toKey,fromKey));
+              var clearIndex = Math.min(toKey, fromKey);
+              Session.set('analyses.clearIndex', clearIndex);
+
+              for (var i = clearIndex; i <= 3; ++i) {
+                var colType = columnType(i);
+                Session.set('analyses.' + colType, null);
+              }
+  //            Session.set('justDragged', Math.min(toKey,fromKey));
+          }
         }
-
 //        for (var i=clearIndex; i < 5; ++i) {
 //          $('#'+i.toString())[0].selectedIndex = -1;
 //        }
