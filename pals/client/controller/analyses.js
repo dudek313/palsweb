@@ -11,10 +11,6 @@ Session.set('analyses.2.type','experiment');
 Session.set('analyses.3.type','modelOutput');
 Session.set('analyses.4.type','analysis');
 
-Template.analyses.currentType = function(typeIndex) {
-    return Session.get('analyses.'+typeIndex+'.type');
-}
-
 Template.analyses.findTypeIndex = function(type) {
     for( var i=1; i <= maxIndex; ++i ) {
         if( Session.get('analyses.'+i+'.type') == type ) return i;
@@ -46,6 +42,10 @@ function columnNumber(field) {
 }
 
 Template.analyses.helpers({
+  currentType: function(typeIndex) {
+      return Session.get('analyses.'+typeIndex+'.type');
+  },
+
   selectOptions: function(selectIndex) {
     var results;
     var selector = {};

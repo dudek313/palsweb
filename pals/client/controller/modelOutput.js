@@ -403,9 +403,9 @@ Template.modelOutput.helpers({
   // pages after searching for all experiments in all workspaces available to the user.
   expList: function() {
       var userId = Meteor.userId();
-      var workspaces = getAvailableWorkspaceIds(userId);
-      var selector = {workspace: {$in:workspaces}, recordType: 'instance'};
-      return Experiments.find(selector,{sort:{created:-1}}).fetch();
+      var workspaceId = getCurrentWorkspaceId();
+      var selector = {workspace: workspaceId, recordType: 'instance'};
+      return Experiments.find(selector,{sort:{name:1}}).fetch();
 
   },
   // returns the list of models to be displayed in the model dropdown menu field
