@@ -259,21 +259,27 @@ Template.modelOutput.events = {
     'click .run-analysis':function(event) {
         var userId = Meteor.userId();
         var currentModelOutputId = getCurrentObjectId();
-        var group = 'modelOutput: ' + currentModelOutputId;
-        if( Roles.userIsInRole(userId, 'edit', group) ) {
-//            var key = $(event.target).attr('id');
-/*            Meteor.call('checkIfAnalyserOnline', function(error, online) {
-              if (error)
-                displayError('An error occurred. Analyser might not be currently functioning.', error);
-              else if (!online)
-                displayError('Analyser is not currently functioning. Please try again later.');
-              else {*/
-                Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
-                    if( error ) alert(error);
-                    console.log(result);
-                });
-/*              }
+        var currentModelOutput = getCurrentModelOutput();
+        if (currentModelOutput && currentModelOutput.file) {
+          var group = 'modelOutput: ' + currentModelOutputId;
+          if( Roles.userIsInRole(userId, 'edit', group) ) {
+            //            var key = $(event.target).attr('id');
+            /*            Meteor.call('checkIfAnalyserOnline', function(error, online) {
+            if (error)
+            displayError('An error occurred. Analyser might not be currently functioning.', error);
+            else if (!online)
+            displayError('Analyser is not currently functioning. Please try again later.');
+            else {*/
+            Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
+              if( error ) alert(error);
+              console.log(result);
+            });
+            /*              }
           });*/
+          }
+
+        } else {
+          displayError("No model output file was uploaded to analyse");
         }
     },
     'click .delete-analysis':function(event) {

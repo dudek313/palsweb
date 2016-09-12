@@ -116,7 +116,7 @@ Template.experiment.events = {
   'click .cancel-create':function(event){
     event.preventDefault();
     window.history.back();
-  },
+  }, 
   // when user clicks on delete script button,
   //removes script from the tempScripts session variable
   'click .delete-script':function(event) {

@@ -104,9 +104,7 @@ Template.models.helpers({
             var models = Models.find({_id : {$in : modelIds}});
         }
         else {
-            window.scrollTo(0,0);
-            $('.error').html('Unable to display models');
-            $('.error').show();
+            displayError('Unable to display models');
             var models = [];
         }
         return models;

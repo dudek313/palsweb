@@ -82,9 +82,10 @@ getSource = function() {
 }
 
 displayError = function(errMessage, error) {
-  window.scrollTo(0,0);
+  alert(errMessage);
+/*  window.scrollTo(0,0);
   $('.error').html(errMessage);
-  $('.error').show();
+  $('.error').show();*/
   if (error)
     console.log(error);
   else {

@@ -63,12 +63,7 @@ Meteor.publish('directory',function(){
 });
 
 Meteor.publish('dataSets',function(){
-    var userId = this.userId;
-    if( userId )
       return DataSets.find();
-    else {
-      return this.ready();
-    }
 });
 
 
@@ -95,18 +90,17 @@ Meteor.publish('modelOutputs',function() {
 function getAvailableModelOutputs(userId) {
     var wsSelector = {};
     var modelOutputs = null;
+  
+    var workspaceIds = getAvailableWorkspaceIds(userId);
 
-    if (userId) {
-      var workspaceIds = getAvailableWorkspaceIds(userId);
+    var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
+    var experiments = Experiments.find(expSelector).fetch();
 
-      var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
-      var experiments = Experiments.find(expSelector).fetch();
+    experimentIds = getIdsFromObjects(experiments);
 
-      experimentIds = getIdsFromObjects(experiments);
+    var moSelector = {experiments: {$in: experimentIds}};
+    var modelOutputs = ModelOutputs.find(moSelector);
 
-      var moSelector = {experiments: {$in: experimentIds}};
-      var modelOutputs = ModelOutputs.find(moSelector);
-    }
     return modelOutputs;
 }
 //ModelOutputs._ensureIndex('name', {unique: 1});
