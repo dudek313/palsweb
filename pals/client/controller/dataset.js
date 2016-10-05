@@ -7,7 +7,7 @@ Template.dataSet.onCreated(function () {
 Template.dataSet.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
-    Session.set('filesToDelete', []);
+//    Session.set('filesToDelete', []);
     Session.set('filesUploaded', []);
     SimpleSchema.debug = true;
 };
@@ -51,7 +51,13 @@ AutoForm.hooks({
                 displayError('Failed to create the data set. Please try again.', error);
               }
               else {
-                // if successful, display the created data set
+                // if successful
+                // set uploaded files as not dirty
+                insertDoc.files.forEach(function(file) {
+                  NetCdfFiles.update({_id: file._id}, {$set: {meta: {dirty: false}}});
+                })
+
+                //display the created data set
                 Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
                 Router.go('/dataSet/display/' + docId);
               }
@@ -116,10 +122,10 @@ Template.dataSet.events = {
             });
             Session.set('tempFiles', newFiles);
 
-            // add file to filesToDelete session variable
+/*            // add file to filesToDelete session variable - don't think this is needed anymore
             var filesToDelete = Session.get('filesToDelete');
             filesToDelete.push(selectedFileId);
-            Session.set('filesToDelete', filesToDelete);
+            Session.set('filesToDelete', filesToDelete);*/
         }
 
         else {
@@ -147,7 +153,10 @@ Template.dataSet.events = {
           file: file,
           fileName: filename,
           streams: 'dynamic',
-          chunkSize: 'dynamic'
+          chunkSize: 'dynamic',
+          meta: {
+            dirty: true
+          }
         }, false);
 
         upload.on('start', function () {
@@ -173,7 +182,6 @@ Template.dataSet.events = {
             var tempFiles = Session.get('tempFiles');
             tempFiles.push(fileRecord);
             Session.set('tempFiles', tempFiles);
-            Session.set('dirty', true);
             Session.set('uploadButtonClicked', false);
 
             // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled

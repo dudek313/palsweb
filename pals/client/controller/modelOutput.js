@@ -23,7 +23,8 @@ AutoForm.hooks({
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
             insertDoc.benchmarks = getTempBenchmarks();
-            insertDoc.experiments = [getExperimentId()];
+//            insertDoc.experiments = [getExperimentId()];
+            insertDoc.experiments = [insertDoc.experiment];
 
             // insert model output document to the mongodb collection
             Meteor.call('insertModelOutput', insertDoc, function(error, docId){
@@ -41,7 +42,7 @@ AutoForm.hooks({
             return false;
         }
     },
-    before: {
+    before: { // not currently operational
         normal: function(doc) {
             var self = this;
             var analysesToDelete = Session.get('analysesToDelete');
@@ -89,7 +90,8 @@ AutoForm.hooks({
                 if (tempBenchmarks)
                     updateDoc.$set.benchmarks = tempBenchmarks;
 
-                updateDoc.$set.experiments = [getExperimentId()];
+//                updateDoc.$set.experiments = [getExperimentId()];
+                updateDoc.$set.experiments = [updateDoc.$set.experiment];
                 // update Model Outputs collection
                 Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
                     if(error) {

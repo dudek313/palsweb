@@ -105,7 +105,6 @@ describe('Testing methods', function(done) {
       });
     });
 
-
   });
 
   describe('Unregistered user', function() {
@@ -116,6 +115,8 @@ describe('Testing methods', function(done) {
         Meteor.call('insertModel', newModel, function(err, modelId) {
           try {
             chai.assert.isDefined(err);
+            chai.assert.equal(err.error, "not-authorized");
+            console.log(err);
             var insertedModel = Models.findOne({_id: modelId});
             chai.assert.isUndefined(insertedModel);
           } catch(error) {
@@ -132,6 +133,8 @@ describe('Testing methods', function(done) {
         Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
+            chai.assert.equal(err.error, "not-authorized");
+            console.log(err);
             var insertedDataSet = DataSets.findOne({_id: dsId});
             chai.assert.isUndefined(insertedDataSet);
           } catch(error) {
@@ -148,6 +151,8 @@ describe('Testing methods', function(done) {
         Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
+            chai.assert.equal(err.error, "not-authorized");
+            console.log(err);
             var insertedExperiment = Experiments.findOne({_id: dsId});
             chai.assert.isUndefined(insertedExperiment);
           } catch(error) {
@@ -155,6 +160,24 @@ describe('Testing methods', function(done) {
           }
           done();
         });
+      });
+    });
+
+    describe('inserting model output when not logged in', function(done) {
+      it('does not allow unregistered user to insert a model output', function(done) {
+        var newModelOutput = makeModelOutput("modelOutput 1");
+        Meteor.call('insertModelOutput', newModelOutput, function(err, moId) {
+          try {
+            chai.assert.isDefined(err);
+            chai.assert.equal(err.error, "not-authorized");
+            console.log(err);
+            var insertedExperiment = Experiments.findOne({_id: moId});
+            chai.assert.isUndefined(insertedExperiment);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        })
       });
     });
 
@@ -272,6 +295,23 @@ describe('Testing methods', function(done) {
       });
     });
 
+    describe('inserting model output by non-admin', function(done) {
+      it('allows a registered user to insert a model output', function(done) {
+        var newModelOutput = makeModelOutput("Model Output 2");
+        Meteor.call('insertModelOutput', newModelOutput, function(err, moId) {
+          try {
+            console.log(err);
+            chai.assert.isUndefined(err);
+            var insertedModelOutput = ModelOutputs.findOne({_id: moId});
+            chai.assert.equal(insertedModelOutput.name, 'Model Output 2');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      })
+    })
+
   });
 
 });
@@ -330,4 +370,11 @@ function makeExperimentTemplate(experimentName) {
 
   }
   return experiment;
+}
+
+function makeModelOutput(modelOutputName) {
+  var modelOutput = {
+    name: modelOutputName,
+    model: 'testModel'
+  }
 }

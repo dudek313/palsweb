@@ -83,7 +83,7 @@ describe('Testing file upload', function(done) {
     Router.current.restore();
   });
 
-  describe('Upload a file', function() {
+/*  describe('Upload a file', function() {
 
     it('allows a registered user to upload a file', function(done) {
 
@@ -112,7 +112,7 @@ describe('Testing file upload', function(done) {
       });
 
     });
-  });
+  });*/
 });
 
 /*      withRenderedTemplate('dataSet', {}, el => {
@@ -128,7 +128,7 @@ var newFile = Files.findOne({name: 'mo24829.nc'});
 chai.assert.isDefined(newFile);
 done();
 }, 5000);*/
-
+/*
 var getFileBlob = function (url, cb) {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", url);
@@ -154,3 +154,4 @@ var getFileObject = function(filePathOrUrl, cb) {
 getFileObject('file:///C:/Users/Danny/Downloads/pals-nci/webappdata/axel/mo24829.nc', function (file) {
   console.log(file);
 });
+*/

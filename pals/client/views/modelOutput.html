@@ -151,7 +151,7 @@
 
                   {{> afQuickField name='name'}}
 
-                  <div class="form-group">
+  <!--                <div class="form-group">
                      <label>Experiment</label>
                      <select name="experiment" id="experimentId" class="form-control">
                        <option value=''>(Select One)</option>
@@ -159,9 +159,10 @@
                          <option value='{{exp._id}}' {{selected exp._id experiment._id}}>{{exp.name}}</option>
                        {{/each}}
                      </select>
-                   </div>
+                   </div> -->
 
-  <!--                {{> afArrayField name='experiments' type='select' firstOption="(Select One)" options=expOptions}} -->
+                  {{> afQuickField name='experiment' type='select' firstOption="(Select One)" options=expOptions}}
+
                   {{> afQuickField name='model' type='select' firstOption="(Select One)" options=myModels}}
                   {{> afQuickField name='stateSelection' type='select' firstOption="(Select One)" options="allowed"}}
                   {{> afQuickField name='parameterSelection' type='select' firstOption="(Select One)" options="allowed"}}
