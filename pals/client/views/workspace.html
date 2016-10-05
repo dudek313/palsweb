@@ -1,6 +1,6 @@
 <template name="workspace">
   <div class="detail-form">
-  <h1>Workspace: {{this.name}}</h1><br>
+  <h3>Workspace: {{this.name}}</h3><br>
   <form>
     <div class="form-group">
       <input type="checkbox" class="make-public" {{checkedIfTrue isPublic}}> Make Public
@@ -16,15 +16,15 @@
 
           <table class="table">
               <tr>
-                  <th>email address</th>
+                  <th>Name</th>
                   {{#if isOwner}}<th>invite</th>{{/if}}
               </tr>
           {{#each users}}
               <tr>
-                  <td>{{email}}</td>
-                  {{#if isOwner}}<td>
-                      <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
-                  </td>{{/if}}
+                <td>{{profile.fullname}}</td>
+                {{#if isOwner}}<td>
+                    <input type="checkbox" class="invite-user" id="{{_id}}" {{checkedIfTrue invited}} {{disabled}}>
+                </td>{{/if}}
               </tr>
           {{/each}}
           </table>

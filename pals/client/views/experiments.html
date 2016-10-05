@@ -1,7 +1,22 @@
 <template name="experiments">
 <div class="text-content">
-  <div class="form-group" align="center">
-    <label>Experiment Type</label>&nbsp;
+  <div class="alert alert-danger error"></div>
+
+  <h3>
+    {{#if areEqual source 'templates'}}
+      Experiment Templates For Cloning Into Current Workspace
+    {{else}}
+      Experiments
+    {{/if}}
+    {{#if areEqual source 'workspace'}}In Current Workspace
+    {{else}}
+      {{#if areEqual source 'anywhere'}}In All Available Workspaces
+      {{/if}}
+    {{/if}}
+  </h3>
+
+  <div class="form-group">
+<!--    <label>Experiment Type</label>&nbsp;-->
     <input type="radio" name="spatialLevel" value="All" {{isChecked 'All'}}>All&nbsp;
     <input type="radio" name="spatialLevel" value="SingleSite" {{isChecked 'SingleSite'}}>SingleSite&nbsp;
     <input type="radio" name="spatialLevel" value="MultipleSite" {{isChecked 'MultipleSite'}}>MultipleSite&nbsp;
@@ -10,20 +25,9 @@
     <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
   </div>
 
-  <h1>
-    {{#if areEqual source 'templates'}}
-      {{currentSpatialLevel}} Experiment Templates For Cloning Into Current Workspace
-    {{else}}
-      {{currentSpatialLevel}} Experiments
-    {{/if}}
-    {{#if areEqual source 'workspace'}}In Current Workspace
-    {{else}}
-      {{#if areEqual source 'anywhere'}}In All Available Workspaces
-      {{/if}}
-    {{/if}}
-  </h1>
-    <div class="alert alert-danger error"></div>
-    <table class="table table-hover">
+    {{> reactiveTable class="table table-hover table-framed" collection=experiments settings=tableSettings fields=fields rowsPerPage=10}}
+
+<!--    <table class="table table-hover">
         <thead>
         <tr>
           {{#if areEqual currentSpatialLevel 'All'}}
@@ -96,6 +100,6 @@
          </tr>
         {{/each}}
         </tbody>
-    </table>
-</div>
+    </table> -->
+  </div>
 </template>

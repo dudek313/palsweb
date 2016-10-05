@@ -1,10 +1,16 @@
 // GLOBALS
 
-FILE_BUCKET = '/pals/data';
+FILE_BUCKET = '/pals/data'; // From the old file upload package
+FILE_DIR = '/pals/data';
 
 Router.configure({
     layoutTemplate: 'main',
-    notFoundTemplate: 'notFound'
+    notFoundTemplate: 'notFound',
+    waitOn: function() {
+      return [
+        Meteor.subscribe('workspaces')
+      ]
+    }
 });
 
 Router.plugin('dataNotFound', {notFoundTemplate: 'notFound'})
@@ -28,13 +34,13 @@ Router.map(function () {
     });
     this.route('term-of-use');
     this.route('privacy');
-    this.route('datasets',{
-        path: '/datasets/:source/:resolution',
-        template: 'datasets'
+    this.route('dataSets',{
+        path: '/dataSets/:source/:resolution',
+        template: 'dataSets'
     });
     this.route('displayOrUpdateDataset',{
-        path: '/dataset/:screenMode/:id',
-        template: 'dataset',
+        path: '/dataSet/:screenMode/:id',
+        template: 'dataSet',
         data: function() { return DataSets.findOne({_id:this.params.id}); },
         onBeforeAction: [
             function() {
@@ -51,8 +57,8 @@ Router.map(function () {
         ]
     });
     this.route('createDataset',{
-        path: '/dataset/:screenMode',
-        template: 'dataset',
+        path: '/dataSet/:screenMode',
+        template: 'dataSet',
         onBeforeAction: [
             function() {
                 Session.set('tempFiles', []);
@@ -168,6 +174,19 @@ Router.map(function () {
         action: function() {
             var id = this.params.id;
             var filename = '/pals/data/'+id;
+            var fs = Npm.require('fs');
+            var file = fs.readFileSync(filename);
+            var headers = {'Content-type': this.params.type};
+            this.response.writeHead(200, headers);
+            return this.response.end(file);
+        }
+    });
+    this.route('logo', {
+        where: 'server',
+        path: '/logo/:name/:type',
+        action: function() {
+            var name = this.params.name;
+            var filename = '/mnt/sharing/'+name;
             var fs = Npm.require('fs');
             var file = fs.readFileSync(filename);
             var headers = {'Content-type': this.params.type};

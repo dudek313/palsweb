@@ -5,11 +5,11 @@
   {{#if authorized 'model' _id}}
     {{#if inEditMode}}  <!-- in create or update mode -->
       {{#autoForm collection="Models" id=formId doc=dataIfNeeded type='normal' validation='blur'}}
+        <h3>Create New Model Profile</h3>
         <fieldset>
           {{#if areEqual screenMode 'create'}}
-            <legend>Create New Model Profile</legend>
           {{else}} <!-- if in update mode -->
-            <h1>Model: {{model.name}}</h1>
+            <h3>Model: {{model.name}}</h3>
             <br>
           {{/if}}
 
@@ -17,15 +17,16 @@
             <div class="panel-heading">Details</div>
             <div class="panel-body">
 
-              {{> afQuickField name='name'}}
+              {{> afQuickField name='name' placeholder="Include model version information e.g. repository version"}}
               <label>Owner</label>
-              {{#if areEqual screenMode 'create'}}<div class="display">{{userEmail currentUser._id}}</div>
-              {{else}} <div class="display">{{userEmail model.owner}}</div>
+              {{#if areEqual screenMode 'create'}}<div class="display">{{userFullName}}</div>
+              {{else}} <div class="display">{{model.ownerName}}</div>
               {{/if}}
               <br/>
-              {{> afQuickField name='url'}}
+              {{> afQuickField name='url' placeholder="E.g. homepage or repository link"}}
               {{> afQuickField name='references' rows=6}}
-              {{> afQuickField name='comments' rows=6}}
+              {{> afQuickField name='comments' rows=6
+                placeholder="Include any additional information specific to this model version that could help reproduce simulations"}}
 
             </div>
           </div>
@@ -47,7 +48,7 @@
         {{#if areEqual screenMode 'display'}}
 
           {{#if authorisedToEdit 'model' model._id}}<a class="btn btn-primary enable-update pull-right">Edit Model Profile</a>{{/if}}
-          <h1>Model Profile: {{model.name}}</h1>
+          <h3>Model Profile: {{model.name}}</h3>
           <br/>
 
           <div class="panel panel-primary">
@@ -58,14 +59,14 @@
               <div class="display">{{model.name}}</div>
               <br/>
               <label>Owner</label>
-              <div class="display">{{userEmail model.owner}}</div>
+              <div class="display">{{model.ownerName}}</div>
               <br/>
-              <label>Created</label>
-              <div class="display">{{model.created}}</div>
+              <label>CreatedAt</label>
+              <div class="display">{{model.createdAt}}</div>
               <br/>
               {{#if model.modified}}
                 <label>Last Modified</label>
-                <div class="display">{{model.modified}}</div>
+                <div class="display">{{model.modifiedAt}}</div>
                 <br/>
               {{/if}}
               {{#if model.url}}

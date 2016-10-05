@@ -3,40 +3,56 @@
 <div class="right-column">
 </div>
 <div class="left-column">
-   <h1>Analyses Browser</h1>
-   <br/>
-   <div class="row">
-       <div class="col-md-12">
-           <form role="form" class="form-inline">
-               <div class="form-group" draggable="true" id="form-group-1" data-key="1" >
-                       <label>{{currentType 1}}</label>
-                       <select class="form-control" id="1" name="1" onfocus="this.selectedIndex = -1;">
-                           {{#each selectOptions 1}}
-                               <option value="{{_id}}">{{name}}</option>
-                           {{/each}}
-                       </select>
-               </div>
+  <h3>Analyses Browser</h3>
+    <br/>
+    <div class="row">
+      <div class="col-md-12">
+        <form role="form" class="form-inline">
+          <div class="form-group" draggable="true" id="form-group-1" data-key="1" >
+            <label>{{currentType 1}}</label>
+            <select class="form-control" id="1" name="1"> <!-- onfocus="this.selectedIndex = -1;"> -->
+              {{#if valuesExist 1}}
+                <option value="" selected>(Select One)</option>
+              {{/if}}
+
+               {{#each selectOptions 1}}
+                   <option value="{{_id}}">{{name}}</option>
+               {{/each}}
+           </select>
+         </div>
+
                <div class="form-group" draggable="true" id="form-group-2" data-key="2">
                        <label>{{currentType 2}}</label>
-                       <select class="form-control" id="2" name="2" onfocus="this.selectedIndex = -1;">
+                       <select class="form-control" id="2" name="2"> <!-- onfocus="this.selectedIndex = -1;"> -->
+                          {{#if valuesExist 2}}
+                            <option value="" selected>(Select One)</option>
+                          {{/if}}
                            {{#each selectOptions 2}}
                                <option value="{{_id}}">{{name}}</option>
                            {{/each}}
                        </select>
                </div>
-               <div class="form-group" draggable="true" id="form-group-3" data-key="3">
+               <div class="form-group {{greyIfRedundant}}" draggable="true" id="form-group-3" data-key="3">
                        <label>{{currentType 3}}</label>
-                       <select class="form-control" id="3" name="3" onfocus="this.selectedIndex = -1;">
+                       <select class="form-control" id="3" name="3"> <!-- onfocus="this.selectedIndex = -1;">-->
+                          {{#if valuesExist 3}}
+                            <option value="" selected>(Select One)</option>
+                          {{/if}}
+
                            {{#each selectOptions 3}}
                                <option value="{{_id}}">{{name}}</option>
                            {{/each}}
                        </select>
                </div>
-               <div class="form-group" draggable="true" id="form-group-4" data-key="4">
+               <div class="form-group" draggable="false" id="form-group-4" data-key="4" style="padding-left: 100px;">
                        <label>{{currentType 4}}</label>
-                       <select class="form-control" id="4" name="4" onfocus="this.selectedIndex = -1;">
+                       <select class="form-control" id="4" name="4"> <!-- onfocus="this.selectedIndex = -1;"> -->
+                          {{#if valuesExist 4}}
+                            <option value="" {{ifSelected _id}}>(Select One)</option>
+                          {{/if}}
+
                            {{#each selectOptions 4}}
-                               <option value="{{_id}}">{{name}}</option>
+                               <option value="{{_id}}" {{ifSelected _id}}>{{name}}</option>
                            {{/each}}
                        </select>
                </div>
@@ -53,7 +69,7 @@
                     {{else}}
                     <a href="/file/{{image.key}}/{{encode image.mimetype}}" target="_blank"><img class="img-responsive" src="/file/{{image.key}}/{{encode image.mimetype}}" title="{{image.type}}"/></a>
                     {{/if}}
-                </div> 
+                </div>
             </div>
        </div>
        {{/if}}

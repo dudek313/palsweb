@@ -1,11 +1,14 @@
 <template name="modelOutputs">
-<div class="text-content">
+  <div class="text-content">
     {{#if areEqual source 'mine'}}
-      <h1>My Model Outputs</h1>
+      <h3>My Model Outputs</h3>
     {{else}}
-      <h1>Model Outputs In Current Workspace</h1>
+      <h3>Model Outputs In Current Workspace</h3>
     {{/if}}
     <div class="alert alert-danger error"></div>
+
+      {{> reactiveTable class="table table-hover table-framed" collection=modelOutputs fields=fields settings=tableSettings rowsPerPage=10}}
+<!--
     <table class="table table-hover">
         <thead>
         <tr>
@@ -23,7 +26,7 @@
               <td onclick="Router.go('/experiment/display/{{experiments.[0]}}')">{{experimentName}}</td>
             {{else}}<td></td>
             {{/if}}
-            <td>{{ownerEmail}}</td>
+            <td>{{owner}}</td>
             {{#if areEqual source 'mine'}}
               <td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>
             {{/if}}
@@ -31,5 +34,7 @@
         {{/each}}
         </tbody>
     </table>
-</div>
+-->
+
+  </div>
 </template>

@@ -1,8 +1,10 @@
 <template name="models">
 <div class="text-content">
-    <h1>{{pageTitle}}</h1>
+    <h3>{{pageTitle}}</h3>
     <div class="alert alert-danger error"></div>
-    <table class="table table-hover">
+
+      {{> reactiveTable class="table table-hover table-framed" collection=models fields=fields settings=tableSettings rowsPerPage=10}}
+<!--    <table class="table table-hover">
         <thead>
         <tr>
             <th>Name</th>
@@ -27,6 +29,7 @@
          </tr>
         {{/each}}
         </tbody>
-    </table>
+    </table> -->
+
 </div>
 </template>

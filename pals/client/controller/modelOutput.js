@@ -4,6 +4,10 @@ Template.modelOutput.rendered = function() {
     SimpleSchema.debug = true;
 };
 
+Template.modelOutput.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+});
+
 AutoForm.hooks({
     createModelOutput: {
 /*      this will be called when submitting the form for uploading
@@ -13,8 +17,8 @@ AutoForm.hooks({
         as _version and owner.
 */
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            insertDoc._version = 1;
-            insertDoc.owner = Meteor.user()._id;
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
             // tempFile contains the data about the uploaded file which needs
             // to be added to the model output document at submission time.
             insertDoc.file = Session.get('tempFile');
@@ -128,7 +132,7 @@ Template.modelOutput.events = {
     // returns to home page if user pressed cancel while creating model output
     'click .cancel-create':function(event){
         event.preventDefault();
-        Router.go('/home')
+        window.history.back();
     },
     // if user clicks update button while in display mode, moves to update mode
     'click .enable-update':function(event){
@@ -144,7 +148,7 @@ Template.modelOutput.events = {
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
-    'change .file-select':function(event, template){
+/*    'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
             file.type = 'modelOutput';
             file.modelOutputId = getCurrentObjectId();
@@ -165,6 +169,44 @@ Template.modelOutput.events = {
             });
         });
     },
+*/
+    'change #fileInput': function (e, template) {
+      if (e.currentTarget.files && e.currentTarget.files[0]) {
+        var file = e.currentTarget.files[0];
+        // We upload only one file, in case
+        // multiple files were selected
+
+        var upload = NetCdfFiles.insert({
+          file: file,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('start', function () {
+          template.currentUpload.set(this);
+        });
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            alert('Error during upload: ' + error);
+          } else {
+            var fileRecord = {
+                path: fileObj.path,
+                filename: fileObj.name,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date()
+            };
+            Session.set('tempFile', fileRecord);
+          };
+          template.currentUpload.set(false);
+        });
+
+        upload.start();
+
+      }
+    },
+
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {
@@ -217,14 +259,27 @@ Template.modelOutput.events = {
     'click .run-analysis':function(event) {
         var userId = Meteor.userId();
         var currentModelOutputId = getCurrentObjectId();
-        var group = 'modelOutput: ' + currentModelOutputId;
-        if( Roles.userIsInRole(userId, 'edit', group) ) {
-//            var key = $(event.target).attr('id');
-
+        var currentModelOutput = getCurrentModelOutput();
+        if (currentModelOutput && currentModelOutput.file) {
+          var group = 'modelOutput: ' + currentModelOutputId;
+          if( Roles.userIsInRole(userId, 'edit', group) ) {
+            //            var key = $(event.target).attr('id');
+            /*            Meteor.call('checkIfAnalyserOnline', function(error, online) {
+            if (error)
+            displayError('An error occurred. Analyser might not be currently functioning.', error);
+            else if (!online)
+            displayError('Analyser is not currently functioning. Please try again later.');
+            else {*/
             Meteor.call('startAnalysis', currentModelOutputId,function(error,result){
-                if( error ) alert(error);
-                console.log(result);
+              if( error ) alert(error);
+              console.log(result);
             });
+            /*              }
+          });*/
+          }
+
+        } else {
+          displayError("No model output file was uploaded to analyse");
         }
     },
     'click .delete-analysis':function(event) {
@@ -354,9 +409,9 @@ Template.modelOutput.helpers({
   // pages after searching for all experiments in all workspaces available to the user.
   expList: function() {
       var userId = Meteor.userId();
-      var workspaces = getAvailableWorkspaceIds(userId);
-      var selector = {workspace: {$in:workspaces}, recordType: 'instance'};
-      return Experiments.find(selector,{sort:{created:-1}}).fetch();
+      var workspaceId = getCurrentWorkspaceId();
+      var selector = {workspace: workspaceId, recordType: 'instance'};
+      return Experiments.find(selector,{sort:{name:1}}).fetch();
 
   },
   // returns the list of models to be displayed in the model dropdown menu field

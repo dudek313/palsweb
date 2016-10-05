@@ -5,9 +5,9 @@ Template.model.rendered = function() {
 AutoForm.hooks({
     createModelForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            insertDoc._version = 1;
-            insertDoc.owner = Meteor.user()._id;
-            insertDoc.created = new Date();
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
+//            insertDoc.created = new Date();
             Meteor.call('insertModel', insertDoc, function(error, docId){
                 if(error) {
                     window.scrollTo(0,0);
@@ -67,7 +67,7 @@ Template.model.events = {
     },
     'click .cancel-create':function(event){
         event.preventDefault();
-        Router.go('/home')
+        window.history.back();
     },
     'click .enable-update':function(event){
         Router.go('/model/update/' + getCurrentObjectId());
@@ -111,8 +111,15 @@ Template.model.helpers({
       }
       else return '';
   },
+  userFullName: function() {
+    var userId = Meteor.userId();
+    return getUserFullName(userId);
+  },
   model: function() {
-      return getCurrentModel();
+    var currentModel = getCurrentModel();
+    currentModel.ownerName = getUserFullName(currentModel.owner);
+
+    return currentModel;
 
   },
   updateBtnDisabled: function() {

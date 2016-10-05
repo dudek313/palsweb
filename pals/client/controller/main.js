@@ -1,24 +1,16 @@
-UI._allowJavascriptUrls();
+Template.main.onCreated(function() {
+  if (!Session.get('experiments.workspace'))
+    Session.set('experiments.workspace', 'All');
 
-Template.main.helpers({
-  currentWorkspace: function() {
-      return getCurrentWorkspace();
-  },
-  notInWorkspace: function() {
-      var currentWorkspace = getCurrentWorkspace();
-      if( currentWorkspace && (currentWorkspace.name == 'browsing')) {
-          return true;
-      }
-      else {
-          return false;
-      }
-  }
+  if (!Session.get('experiments.anywhere'))
+    Session.set('experiments.anywhere', 'All');
 
-})
+  if (!Session.get('dataSets.workspace'))
+    Session.set('dataSets.workspace', 'All');
 
-Template.main.events({
-  'click .login-toggle': function() {
-    Router.go('/registration');
-//    Session.set('nav-toggle', 'open');
-  }
+  if (!Session.get('dataSets.anywhere'))
+    Session.set('dataSets.anywhere', 'All');
+
 });
+
+UI._allowJavascriptUrls();

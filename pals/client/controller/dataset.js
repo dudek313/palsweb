@@ -1,5 +1,10 @@
+import '../views/dataset.html';
 
-Template.dataset.rendered = function() {
+Template.dataSet.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+});
+
+Template.dataSet.rendered = function() {
     window['directives']();
     templateSharedObjects.progress().hide();
     Session.set('filesToDelete', []);
@@ -7,7 +12,7 @@ Template.dataset.rendered = function() {
     SimpleSchema.debug = true;
 };
 
-// Currently not working - issue with publish & subscribe?
+// Currently not working - probably issue with publish & subscribe - for old cfs package
 function removeDeletedFiles(fileIds) {
 
 /*    if (fileIds && fileIds.length > 0) {
@@ -35,27 +40,23 @@ function testFiles() {
 AutoForm.hooks({
     createDatasetForm: {
         onSubmit: function(insertDoc, updateDoc, currentDoc) {
-            insertDoc._version = 1;
-            insertDoc.owner = Meteor.user()._id;
+
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
             insertDoc.files = Session.get('tempFiles');
+
             // insert data set document to the mongodb collection
             Meteor.call('insertDataSet', insertDoc, function(error, docId){
-                if(error) {
-                  displayError('Failed to create the data set. Please try again.', error);
-                }
-                else {
-                    // if successful, display the created data sets
-
-                    // Deleting files is currently not working
-//                    testFiles();
-                    removeDeletedFiles(Session.get('filesToDelete'));
-/*                    Session.set('filesToDelete', []);
-                    Session.set('dirty', false);
-*/
-                    Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
-                    Router.go('/dataset/display/' + docId);
-                }
+              if(error) {
+                displayError('Failed to create the data set. Please try again.', error);
+              }
+              else {
+                // if successful, display the created data set
+                Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
+                Router.go('/dataSet/display/' + docId);
+              }
             });
+
 
             this.done();
             return false;
@@ -74,7 +75,7 @@ AutoForm.hooks({
                     Session.set('filesToDelete', []); */
 
                     var currentDataSetId = getCurrentObjectId();
-                    Router.go('/dataset/display/' + currentDataSetId);
+                    Router.go('/dataSet/display/' + currentDataSetId);
                 }
             });
 
@@ -84,7 +85,7 @@ AutoForm.hooks({
     }
 })
 
-Template.dataset.events = {
+Template.dataSet.events = {
     'click .upload-btn':function(event){
         event.preventDefault();
         Session.set('uploadButtonClicked', true);
@@ -93,13 +94,13 @@ Template.dataset.events = {
         event.preventDefault();
         removeDeletedFiles(Session.get('filesUploaded'));
         Session.set('filesUploaded', []);
-        Router.go('/dataset/display/' + getCurrentObjectId());
+        Router.go('/dataSet/display/' + getCurrentObjectId());
     },
     'click .cancel-create':function(event){
         event.preventDefault();
         removeDeletedFiles(Session.get('filesUploaded'));
         Session.set('filesUploaded', []);
-        Router.go('/home')
+        window.history.back();
     },
     'click .delete-file':function(event) {
         event.preventDefault();
@@ -128,9 +129,68 @@ Template.dataset.events = {
     'click .enable-update':function(event){
         event.preventDefault();
         var dataSetId = getCurrentObjectId();
-        Router.go('/dataset/update/' + dataSetId);
+        Router.go('/dataSet/update/' + dataSetId);
     },
-    'change .file-select':function(event, template){
+
+    'change #fileInput': function (e, template) {
+      if (e.currentTarget.files && e.currentTarget.files[0]) {
+        var file = e.currentTarget.files[0];
+        // We upload only one file, in case
+        // multiple files were selected
+
+        var filename = file.name;
+        while(filenameAlreadyExists(filename)) {
+            filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
+        };
+
+        var upload = NetCdfFiles.insert({
+          file: file,
+          fileName: filename,
+          streams: 'dynamic',
+          chunkSize: 'dynamic'
+        }, false);
+
+        upload.on('start', function () {
+          template.currentUpload.set(this);
+        });
+
+        upload.on('end', function (error, fileObj) {
+          if (error) {
+            alert('Error during upload: ' + error);
+          } else {
+
+            var isDownloadable = document.getElementById('downloadable').checked;
+            var fileType = $("input[type='radio'][name='fileType']:checked").val();
+            var fileRecord = {
+                path: FILE_DIR + fileObj.path,
+                name: filename,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date(),
+                downloadable: isDownloadable,
+                type: fileType
+            };
+            var tempFiles = Session.get('tempFiles');
+            tempFiles.push(fileRecord);
+            Session.set('tempFiles', tempFiles);
+            Session.set('dirty', true);
+            Session.set('uploadButtonClicked', false);
+
+            // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
+            var filesUploaded = Session.get('filesUploaded');
+            filesUploaded.push(name);
+            Session.set('filesUploaded', filesUploaded);
+          }
+          template.currentUpload.set(false);
+        });
+
+        upload.start();
+
+
+      }
+    }
+
+/*    'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
             while(filenameAlreadyExists(filename = file.name)) {
                 filename = prompt('A file with this name has already been uploaded to this data set. Please enter an alternative name for the uploaded file.', filename);
@@ -166,7 +226,7 @@ Template.dataset.events = {
             });
 
         });
-    }
+    }*/
 };
 
 function filenameAlreadyExists(filename) {
@@ -191,7 +251,7 @@ function getFiles(dataSet) {
     }
 }
 
-Template.dataset.helpers({
+Template.dataSet.helpers({
   uploadButtonClicked: function() {
     return Session.get('uploadButtonClicked');
   },
@@ -278,11 +338,19 @@ Template.dataset.helpers({
     else return true;
 
   },
-  userEmail: function(userId) {
-      var user = Meteor.users.findOne({'_id':userId});
-      if( user && user.emails && user.emails.length > 0 ) {
-          return Meteor.users.findOne({'_id':userId}).emails[0].address;
+  userName: function(userId) {
+    var user = Meteor.users.findOne({'_id':userId});
+    if (user && user.profile) {
+      if (user.profile.fullname)
+        return user.profile.fullname;
+      else if (user.profile.firstName && user.profile.lastName)
+        return user.profile.firstName + " " + user.profile.lastName;
+      else {
+        return '';
       }
-      else return '';
+    }
+    else {
+      return '';
+    }
   }
 });

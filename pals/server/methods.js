@@ -51,7 +51,7 @@ Meteor.methods({
 
   'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -61,19 +61,20 @@ Meteor.methods({
     },
     'insertDataSet': function(dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
           var dsId = DataSets.insert(dataSetDoc);
           var group = 'dataSet ' + dsId;
           Roles.addUsersToRoles(userId, 'edit', group);
+          console.log('Data set inserted: ' + dataSetDoc.name);
           return dsId;
         }
     },
     'removeDataSet': function(dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'datasets') ) {
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             throw new Meteor.Error('not-authorized')
         }
         else {
@@ -295,15 +296,15 @@ Meteor.methods({
 //               'modelOutputVersion' : currentVersion,
                'experiment' : experiment._id,
 //               'status' : 'started',
-               'status' : 'analyser not ready',
+               'status' : 'queued',
                'files' : files//,
                //'experimentModelOutputs' : experimentModelOutputs
            };
 
-           console.log('Input to analysis script: '); console.log(analysis);
+//           console.log('Input to analysis script: '); console.log(analysis);
 
-//           saveAnalysis(analysis, completeAnalysis);
-           saveAnalysis(analysis, checkPalsNodeRWorking);
+           saveAnalysis(analysis, completeAnalysis);
+//           saveAnalysis(analysis, checkPalsNodeRWorking);
            return analysis;
        }
        return null;
@@ -395,19 +396,22 @@ saveAnalysis = function(analysis,callback) {
         else {
             console.log('analysis saved');
             analysis._id = id;
-            callback(analysis, completeAnalysis);
+            callback(analysis);
         }
     });
 }
 
+/*
 checkPalsNodeRWorking = function(analysis, callback) {
   console.log('Sending ping to PalsNodeR');
   client.rpush(queue, "ping");
   callback(analysis);
 }
+*/
 
 completeAnalysis = function(analysis) {
     console.log('Sending message to redis');
+    console.log(); console.log(analysis);
     client.rpush(queue, JSON.stringify(analysis));
 }
 

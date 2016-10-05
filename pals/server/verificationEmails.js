@@ -1,5 +1,5 @@
 Accounts.urls.verifyEmail = function(token) {
-  return Meteor.absoluteUrl('verify-email/' + token, {rootUrl: 'http://192.168.56.100:3000'});
+  return Meteor.absoluteUrl('verify-email/' + token, {rootUrl: 'http://192.168.56.120:3000'});
 };
 
 Accounts.emailTemplates.siteName = "PALS";

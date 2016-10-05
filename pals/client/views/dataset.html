@@ -1,4 +1,4 @@
-<template name="dataset">
+<template name="dataSet">
   <div class="detail-form">
 <!--  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
       {{> afQuickField id="name"}}
@@ -11,12 +11,12 @@
       {{#autoForm collection="DataSets" id=formId doc=this type="normal" validation='blur'}}
         <fieldset>
           {{#if areEqual screenMode 'create'}}
-            <legend>Create New Data Set</legend>
+            <h3>Create New Data Set</h3>
           {{else}} <!-- if in update mode -->
             <div class="alert-danger" align="center"><b>Warning: Currently in Draft Mode.
               <br>Data set won't be updated until "Save Changes" is clicked below.</b></div>
               <a class="btn btn-primary enable-update pull-right" disabled=true>Edit Data Set</a>
-            <h1>Data Set: {{name}}</h1>
+            <h3>Data Set: {{name}}</h3>
             <br>
           {{/if}}
           <div class="alert alert-danger error"></div>
@@ -63,7 +63,7 @@
                       <th>Type</th>
                       <th>Public</th>
                       <th>Download</th>
-                      {{#if authorisedToEdit 'dataset' _id}}<th>Delete</th>{{/if}}
+                      {{#if authorisedToEdit 'dataSet' _id}}<th>Delete</th>{{/if}}
                   </tr>
                   </thead>
                   <tbody>
@@ -84,8 +84,11 @@
             <div class="panel-body">
   <!--              <label>Upload a new file</label>-->
               {{#if uploadButtonClicked}}
-                <button class="btn btn-default upload-btn" disabled>Upload A New File</button><br><br>
-                <div class="panel panel-primary">
+
+<!-- Can insert here autoform which writes to a method/record with an onsubmit hook to update the session variable -->
+
+                <button id="upload-btn" class="btn btn-default upload-btn" disabled>Upload A New File</button><br><br>
+                <div id="upload-panel" class="panel panel-primary">
                   <div class="panel-heading">New File Details</div>
                   <div class="panel-body">
                     <b>Downloadable: </b><input type="checkbox" id="downloadable"><br><br>
@@ -95,12 +98,22 @@
                       <input type="radio" name="fileType" value="evaluation">Evaluation
                       <input type="radio" name="fileType" value="other">Other
                     </div>
+
+                    {{#with currentUpload}}
+                      Uploading <b>{{file.name}}</b>:
+                      <span id="progress">{{progress.get}}%</span>
+                    {{else}}
+                      <input id="fileInput" type="file" />
+                    {{/with}}
+<!--
                     <input type="file" class="file-select" name="file-select">
                     <div class="progress progress-striped active">
                       <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                           style="width:0%">
                       </div>
                     </div>
+-->
+
                   </div>
                 </div>
               {{else}}
@@ -169,8 +182,8 @@
     {{else}}
       {{#if areEqual screenMode 'display'}}
         <form role="form">
-          {{#if authorisedToEdit 'dataset' _id}}<a class="btn btn-primary enable-update pull-right">Edit Data Set</a>{{/if}}
-          <h1>Data Set: {{name}}</h1>
+          {{#if authorisedToEdit 'dataSet' _id}}<a class="btn btn-primary enable-update pull-right">Edit Data Set</a>{{/if}}
+          <h3>Data Set: {{name}}</h3>
           <div class="alert alert-danger error"></div>
           <br>
           <div class="panel panel-primary">
@@ -184,7 +197,7 @@
               <div class="form-group">
                 {{#if owner}}
                 <label>Created By</label>
-                <div class="display">{{userEmail owner}}</div>
+                <div class="display">{{userName owner}}</div>
                 {{/if}}
               </div>
               <div class="form-group">
@@ -207,8 +220,12 @@
               </div>
               <div class="form-group">
                   {{#if vegType}}
-                      <label>IGBP Vegetation Type</label>
+                    <label>IGBP Vegetation Type</label>
+                    {{#if areEqual vegType "Other"}}
+                      <div class="display">{{otherVegType}}</div>
+                    {{else}}
                       <div class="display">{{vegType}}</div>
+                    {{/if}}
                   {{/if}}
               </div>
               <div class="form-group">
@@ -334,7 +351,7 @@
           </div>
         </div>
 
-        {{#if authorisedToEdit 'dataset' _id}}
+        {{#if authorisedToEdit 'dataSet' _id}}
             <div class="col-md-12">
                 <a class="btn btn-primary enable-update pull-right">Edit Data Set</a>
             </div>

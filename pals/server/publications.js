@@ -1,3 +1,15 @@
+// create Browse mode "workspace"
+var browsingWS = Workspaces.findOne({name: "browsing"});
+if (!browsingWS) {
+  Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
+    if (err) {
+      console.log('Unable to create "browsing" workspace');
+      return;
+    }
+  });
+}
+
+
 // The publications limit user access to records based on the workspaces they have access to.
 // These publications are not necessarily refreshed when users create new documents (e.g. model outputs),
 // and therefore they might not have be given access to them.
@@ -15,6 +27,8 @@ Meteor.publish('workspaces', function(){
     return Workspaces.find(selector);
 });
 
+
+
 Workspaces._ensureIndex('name', {unique: 1});
 
 var gab = Meteor.users.findOne({'emails.address':'gabsun@gmail.com'})
@@ -28,20 +42,30 @@ if (gab) {
 var danny = Meteor.users.findOne({'emails.address':'ravdanny@gmail.com'});
 if (danny) {
     var dannyId = danny._id;
-    Roles.addUsersToRoles(dannyId, 'edit', 'datasets');
+    Roles.addUsersToRoles(dannyId, 'edit', 'dataSets');
     Roles.addUsersToRoles(dannyId, 'edit', 'models');
     Roles.addUsersToRoles(dannyId, 'edit', 'experiments');
 }
 
 Meteor.publish('directory',function(){
-   return Meteor.users.find({}, {fields: {emails: 1}});
+   return Meteor.users.find({}, {fields:
+     {
+       'profile.fullname': 1,
+       'profile.firstName': 1,
+       'profile.lastName': 1,
+       'profile.currentWorkspace': 1,
+       organisation: 1,
+       country: 1,
+       currentWork: 1,
+       webPage: 1
+    }
+  });
 });
 
 Meteor.publish('dataSets',function(){
-    var userId = this.userId;
-    if( userId )
       return DataSets.find();
 });
+
 
 Meteor.publish('experiments',function(){
   var wsSelector = {};
@@ -66,18 +90,17 @@ Meteor.publish('modelOutputs',function() {
 function getAvailableModelOutputs(userId) {
     var wsSelector = {};
     var modelOutputs = null;
+  
+    var workspaceIds = getAvailableWorkspaceIds(userId);
 
-    if (userId) {
-      var workspaceIds = getAvailableWorkspaceIds(userId);
+    var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
+    var experiments = Experiments.find(expSelector).fetch();
 
-      var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
-      var experiments = Experiments.find(expSelector).fetch();
+    experimentIds = getIdsFromObjects(experiments);
 
-      experimentIds = getIdsFromObjects(experiments);
+    var moSelector = {experiments: {$in: experimentIds}};
+    var modelOutputs = ModelOutputs.find(moSelector);
 
-      var moSelector = {experiments: {$in: experimentIds}};
-      var modelOutputs = ModelOutputs.find(moSelector);
-    }
     return modelOutputs;
 }
 //ModelOutputs._ensureIndex('name', {unique: 1});
@@ -94,8 +117,10 @@ Meteor.publish('models',function(){
     return Models.find();
 });
 
+//Should be unique for user. Currently database has non-unique named models per user
+//Models._ensureIndex(['name', 'owner'], {unique: 1});
+
 // Old code assumed unique model name. Only needs to be unique for user.
-//Models._ensureIndex({'name', 'owner'}, {unique: 1});
 //Models._ensureIndex('_id', {unique: 1});
 
 

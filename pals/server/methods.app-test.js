@@ -10,9 +10,26 @@ Meteor.methods({
     Accounts.createUser(emailPassword, callback)
   },
 
-  'test.removeUser': function(email, callback) {
-    var user = Meteor.users.findOne({'emails.address': email});
-    if (user && user._id)
-    Meteor.users.remove({_id: user._id}, callback);
+/*  'test.removeUser': function(selector) {
+//    var user = Meteor.users.findOne(selector);
+//    if (user)
+    var result = Meteor.users.remove(selector);
+    console.log(result);
+    return result;
+  },*/
+
+  'test.removeUser': function(selector, callback) {
+//    var user = Meteor.users.findOne(selector);
+//    if (user)
+    var result = Meteor.users.remove(selector, callback);
+
+    return result;
+  },
+
+  'test.updateUser': function(selector, modifier, callback) {
+    var user = Meteor.users.findOne(selector);
+    if (user)
+      Meteor.users.update(selector, modifier, callback);
   }
+
 });

@@ -82,13 +82,18 @@ getSource = function() {
 }
 
 displayError = function(errMessage, error) {
-  window.scrollTo(0,0);
+  alert(errMessage);
+/*  window.scrollTo(0,0);
   $('.error').html(errMessage);
-  $('.error').show();
-  console.log(error);
+  $('.error').show();*/
+  if (error)
+    console.log(error);
+  else {
+    console.log('Error displayed on page: ' + errMessage);
+  }
 }
 
-createBrowsingWorkspace = function() {
+/*createBrowsingWorkspace = function() {
   Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
     if (err) {
       console.log('Unable to create "browsing" workspace');
@@ -96,25 +101,15 @@ createBrowsingWorkspace = function() {
     }
     else return doc;
   });
-}
+}*/
 
 enterBrowseMode = function() {
   var user = Meteor.user();
   if (user) {
     Meteor.subscribe('workspaces');
     var browsingWS = Workspaces.findOne({name: "browsing"});
-    if (!browsingWS) {
-      Meteor.call('insertWorkspace', 'browsing', function(err, doc) {
-        if (err) {
-          console.log('Unable to create "browsing" workspace');
-          return;
-        }
-        else {
-          browsingWS = Workspaces.findOne({name: "browsing"});
-        }
-      });
-    }
-    Meteor.call('changeWorkspace', browsingWS._id);
+    if (browsingWS)
+      Meteor.call('changeWorkspace', browsingWS._id);
   }
   else console.log('User not logged in');
 }
@@ -126,8 +121,8 @@ getCurrentWorkspaceId = function() {
             user.profile = {};
             user.profile.currentWorkspace = "";
         }
-        currentWS = user.profile.currentWorkspace;
-        if( !currentWS || !Workspaces.findOne(currentWS)) {
+        var currentWS = user.profile.currentWorkspace;
+        if( !currentWS || !Workspaces.findOne({_id: currentWS})) {
           enterBrowseMode();
         }
         return user.profile.currentWorkspace;
@@ -143,4 +138,40 @@ getCurrentWorkspace = function() {
       else return null;
     }
     else return null;
+}
+
+authorisedToEdit = function(objType, id) {
+  var userId = Meteor.userId();
+  var group = objType + "s";
+  var groupWithId = objType + ": " + id;
+  var authorised = Roles.userIsInRole(userId, 'edit', group) || Roles.userIsInRole(userId, 'edit', groupWithId);
+  return authorised;
+};
+
+getUserFullName = function(userId) {
+  var user = Meteor.users.findOne({_id: userId});
+  if (user && user.profile) {
+    if (user.profile.fullname)
+      var fullname = user.profile.fullname;
+    else if (user.profile.firstName && user.profile.lastName)
+      var fullname = user.profile.firstName + " " + user.profile.lastName;
+    return fullname;
+  }
+}
+
+getTablePreferences = function(objectType, field) {
+  var user = Meteor.user();
+  var preferences = new Array();
+
+  if (user && user.profile && user.profile.preferences && user.profile.preferences[objectType] && user.profile.preferences[objectType][field])
+    return user.profile.preferences[objectType][field];
+  else {
+    return null;
+  }
+
+//    var userProfileObjectName = 'user.profile.preferences' + objectType;
+//    var userProfileObjectFieldName = userProfileObjectName + '.' + field;
+//  if (user && user.profile && user.profile.preferences && [eval(userProfileObjectName)] && eval(userProfileObjectFieldName)) {
+//    return eval(userProfileObjectFieldName);
+// }
 }

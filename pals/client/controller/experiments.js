@@ -1,5 +1,18 @@
 Template.experiments.onCreated(function() {
   Meteor.subscribe('experiments');
+
+  // store current page in memory for next time
+  var currentPage = new ReactiveVar(Session.get('current-experiments-page') || 0);
+  this.currentPage = currentPage;
+  this.autorun(function () {
+    Session.set('current-experiments-page', currentPage.get());
+  });
+
+  var rowsPerPage = new ReactiveVar(Session.get('rows-per-experiments-page') || 10);
+  this.rowsPerPage = rowsPerPage;
+  this.autorun(function () {
+    Session.set('rows-per-experiments-page', rowsPerPage.get());
+  });
 });
 
 Template.experiments.helpers({
@@ -38,6 +51,39 @@ Template.experiments.helpers({
     return Experiments.find(selector,{sort:{name:1}});
   },
 
+  fields: function() {
+    var currentSpatialLevel = getCurrentSpatialLevel();
+    switch (currentSpatialLevel) {
+      case "All":
+      case "Global":
+      case "MultipleSite":
+        var fields = [ NAME_FIELD, SP_LEVEL_FIELD, RESOLUTION_FIELD, TIME_STEP_FIELD,
+          OWNER_FIELD, VIEW_ANALYSES_FIELD ];
+        break;
+
+      case "SingleSite":
+        var fields = [ NAME_FIELD, VEG_TYPE_FIELD, COUNTRY_FIELD, YEARS_FIELD,
+          OWNER_FIELD, VIEW_ANALYSES_FIELD ];
+        break;
+
+      case "Catchment":
+      case "Regional":
+        var fields = [ NAME_FIELD, REGION_FIELD, SP_LEVEL_FIELD, RESOLUTION_FIELD,
+          TIME_STEP_FIELD, VIEW_ANALYSES_FIELD ];
+        break;
+    }
+
+    var source = getSource();
+
+    if (source == "templates")
+      fields.push(CLONE_FIELD);
+
+    if (authorisedToEdit("experiment"))
+      fields.push(DELETE_FIELD);
+
+    return fields;
+  },
+
   workspaceName: function(workspaceId) {
     var ws = Workspaces.findOne({_id: workspaceId});
     if (ws && ws.name) return ws.name;
@@ -49,9 +95,6 @@ Template.experiments.helpers({
     var user = Meteor.user();
     if( user ) {
       selector.workspace = user.profile.currentWorkspace;
-console.log('selector');console.log(selector);
-console.log('Experiment found in workspace?');
-console.log(Experiments.find(selector).fetch().length)
       return (Experiments.find(selector).fetch().length > 0) ? false : true;
     }
     else return null;
@@ -65,14 +108,24 @@ console.log(Experiments.find(selector).fetch().length)
   analysesExist: function(analysisId) {
     return (Analyses.findOne({'_id':analysisId})) ? true : false;
 
+  },
+
+  tableSettings: function () {
+    return {
+      id: "saveExperimentsFilter",
+      currentPage: Template.instance().currentPage,
+      rowsPerPage: Template.instance().rowsPerPage
+    };
   }
 });
 
 
 Template.experiments.events({
-    'click input[name="spatialLevel"]' : function(event) {
+    'click input[name="spatialLevel"]' : function(event, template) {
         event.preventDefault();
         var spatialLevel = $("input[type='radio'][name='spatialLevel']:checked").val();
+        template.currentPage.set(0);
+        Session.set('experiments.' + getSource(), spatialLevel);
         Router.go('/experiments/' + getSource() + '/' + spatialLevel);
     },
     'click .delete' : function(event) {
@@ -93,13 +146,23 @@ Template.experiments.events({
             }
         }
     },
+
+    'click .reactive-table tbody tr': function (event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        event.preventDefault();
+        if (event.target.className != 'btn delete-btn btn-danger btn-xs')
+          Router.go('/experiment/display/' + this._id);
+    },
+
+     /*
     'click tr' : function(event) {
         event.stopPropagation();
         event.stopImmediatePropagation();
         event.preventDefault();
         var id = $(event.target).parent().attr('id');
         Router.go('/experiment/display/'+id);
-    },
+    },*/
     'click .clone-exp' : function(event) {
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -115,11 +178,11 @@ Template.experiments.events({
             newExpInstance.workspace = Meteor.user().profile.currentWorkspace;
             newExpInstance.templateVersion = newExpInstance._version;
             if (newExpInstance.dataSets && newExpInstance.dataSets.length > 0) {
-                newExpInstance.dataSets.forEach(function(dataset){
-                    dataset._version = getDataSetVersion(dataset._id);
+                newExpInstance.dataSets.forEach(function(dataSet){
+                    dataSet._version = getDataSetVersion(dataSet._id);
                 });
             }
-            else console.log("Experiment doesn't have datasets");
+            else console.log("Experiment doesn't have dataSets");
             Meteor.call('insertExperiment', newExpInstance, function(error,docId){
                 if (error) {
                     window.scrollTo(0,0);
@@ -136,6 +199,17 @@ Template.experiments.events({
         }
     }
 });
+
+notCloned = function (experimentId) {
+    var selector = { templateId:experimentId };
+    selector.recordType = 'instance';
+    var user = Meteor.user();
+    if( user ) {
+      selector.workspace = user.profile.currentWorkspace;
+      return (Experiments.find(selector).fetch().length > 0) ? false : true;
+    }
+    else return null;
+}
 
 
 /*helpers

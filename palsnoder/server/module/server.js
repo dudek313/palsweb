@@ -65,15 +65,17 @@ exports.executeScript = function(message, callback) {
     var exec = require('child_process').exec;
     console.log('about to get original dir');
     var originalDir = process.cwd();
-    console.log('here')
+    console.log(originalDir);
     console.log('changing dir: ' + message.dir);
     process.chdir(message.dir);
     console.log('running script: ' + scriptFilename);
     exec('R --no-save < ' + scriptFilename, function(err, stdout, stderr) {
         console.log('exec finished');
         if (err) {
-            callback(err, message);
             process.chdir(originalDir);
+	    var origDir = process.cwd();
+	    console.log('Dir after error: ' + origDir);
+	    callback(err, message);
         } else {
             //console.log(stdout);
             message.outputFilename = message.dir + '/' + 'output.json';

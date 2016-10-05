@@ -17,46 +17,41 @@ processNext();
 
 function processNext() {
 	client.lpop(queue,function(err,value){
-	    if( value ) {
-			console.log('Received message');
-//	    	handleMessage(JSON.parse(value));
-	    	handleMessage(value);
-	    }
+    if( value ) {
+			var message = JSON.parse(value);
+			if (message.status)
+				console.log('Received message: ' + message.status);
+			else
+				console.log('Received analysis results');
+    	handleMessage(JSON.parse(value));
+    }
 		setTimeout(processNext, 1000);
 	});
 }
 
-function handleMessage(value) {
-
+function handleMessage(message) {
 	var change = {};
-
-	if (value == "ping") {
-		console.log ("ping received");
-		change.status = 'starting';
+  if( message.error ) {
+      change.error = message.error;
+      change.status = 'error';
+  }
+	else if (message.status) {
+			change.status = message.status;
 	}
-	else {
-		var message = JSON.parse(value);
-		console.log(message);
-		var selector = {'_id':message._id};
-		if( message.error ) {
-			change.error = message.error;
-			change.status = 'error';
-		}
-		else {
-			change.results = message.files;
-			change.status = 'complete';
-		}
-		var modifier = {'$set':change};
-	}
-
-	Fiber(function(){
-		Analyses.update(selector,modifier,Meteor.bindEnvironment(function(error) {
-			if( error ) {
-				console.log('There was an error setting the value: ' + JSON.stringify(change));
-				console.log(error);
-			}
-		},function(e){console.log(e)}));
-	}).run();
+  else {
+     change.results = message.files;
+     change.status = 'complete';
+  }
+	var selector = {'_id':message._id};
+  var modifier = {'$set':change};
+  Fiber(function(){
+    Analyses.update(selector,modifier,Meteor.bindEnvironment(function(error) {
+      if( error ) {
+        console.log('There was an error setting the value: ' + JSON.stringify(change));
+        console.log(error);
+      }
+    },function(e){console.log(e)}));
+  }).run();
 }
 
 });}

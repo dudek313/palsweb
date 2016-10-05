@@ -198,8 +198,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
         _id : dataSet._id.toString(),
         name : dataSet.name,
         recordType : 'template',
-        version : 1,
-        latest : true,
+        _version: 1,
         created : dataSet.created,
         spatialLevel : 'SingleSite',
         scripts : [{
@@ -228,8 +227,8 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             templateId : experimentTemplate._id,
             templateVersion: 1,
             latest : true,
-            created : dataSet.created,
-            modified : dataSet.created,
+            createdAt : dataSet.created,
+            modifiedAt : dataSet.created,
             spatialLevel : 'SingleSite',
             scripts : [{
                 path : '/pals/data/SingleSiteExperiment.R',

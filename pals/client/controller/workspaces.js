@@ -100,7 +100,6 @@ Template.workspaces.events({
               if(workspace) {
                 Meteor.call('changeWorkspace', id, function(error) {
                   if(error) alert(error)
-                  else Router.go('/workspace/'+id);
                 });
               }
               else {
