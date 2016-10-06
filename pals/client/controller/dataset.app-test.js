@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 /* eslint-disable func-names, prefer-arrow-callback */
-
+/*
 import { chai } from 'meteor/practicalmeteor:chai';
 import { Template } from 'meteor/templating';
 import { $ } from 'meteor/jquery';
@@ -76,7 +76,7 @@ describe('Data set tests', function(done) {
     });
 
   });
-
+*/
 /*  describe('Data set display list page', function(done) {
     before(function(done) {
       var newDataSet = makeDataSet("Data Set 2");
@@ -112,10 +112,10 @@ describe('Data set tests', function(done) {
 
   });
 
-*/
+
 
 });
-
+*/
 
 
 

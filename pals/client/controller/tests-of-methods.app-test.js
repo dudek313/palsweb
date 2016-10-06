@@ -4,6 +4,7 @@ import 'meteor/meteor';
 import { chai } from 'meteor/practicalmeteor:chai';
 
 import '../../both/collections.js';
+import '../../both/global.js';
 
 /*import { resetDatabase } from 'meteor/xolvio:cleaner';
 
@@ -91,7 +92,7 @@ describe('Testing methods', function(done) {
 
     describe('Insert new experiment template by admin', function(done) {
       it('allows an admin user to insert an experiment template', function(done) {
-        var newExperiment = makeExperimentTemplate("Experiment Template 1");
+        var newExperiment = makeExperiment("Experiment 1", "template");
         Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
             chai.assert.isUndefined(err, 'Error was called');
@@ -147,7 +148,7 @@ describe('Testing methods', function(done) {
 
     describe('inserting experiment template when not logged in', function(done) {
       it('does not allow unregistered user to insert an experiment', function(done) {
-        var newExperiment = makeExperimentTemplate("Experiment Template 3");
+        var newExperiment = makeExperiment("Experiment Template 3", "template");
         Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
@@ -279,11 +280,31 @@ describe('Testing methods', function(done) {
       });
     });
 
+    describe('Change workspace', function(done) {
+      it('allows a non-admin user to change workspaces', function(done) {
+        var ws = Workspaces.findOne({name: 'WS 1'});
+        Meteor.call('changeWorkspace', ws._id, function(err, success) {
+          try {
+            console.log('err: ', err);
+            console.log('success: ', success);
+            chai.assert.isUndefined(err);
+            chai.assert.isDefined(success);
+            var currentWorkspace = getCurrentWorkspace();
+            chai.assert.equal(currentWorkspace.name, "WS 1", 'Not in the correct workspace.');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
     describe('inserting experiment template by non-data admin', function(done) {
       it('does not allow a registered, non-admin user to insert an experiment template', function(done) {
-        var newExperiment = makeExperimentTemplate("Experiment Set 3");
+        var newExperiment = makeExperiment("Experiment Set 3", "template");
         Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
           try {
+            console.log(err);
             chai.assert.isDefined(err);
             var insertedExperiment = Experiments.findOne({_id: dsId});
             chai.assert.isUndefined(insertedExperiment);
@@ -295,22 +316,44 @@ describe('Testing methods', function(done) {
       });
     });
 
+    describe('clone experiment into workspace', function(done) {
+      it('allows a registered non-admin user to clone an experiment into their own workspace', function(done) {
+        var expInstance = makeExperiment("Experiment 1", "instance");
+        Meteor.call('insertExperiment', expInstance, function(err, expId) {
+          try {
+            console.log(err);
+            chai.assert.isUndefined(err);
+            Meteor.subscribe('experiments');
+            var insertedExperiment = Experiments.findOne({_id: expId});
+            chai.assert.equal(insertedExperiment.name, "Experiment 1");
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
     describe('inserting model output by non-admin', function(done) {
+
       it('allows a registered user to insert a model output', function(done) {
         var newModelOutput = makeModelOutput("Model Output 2");
+        console.log('newModelOutput: ', newModelOutput);
         Meteor.call('insertModelOutput', newModelOutput, function(err, moId) {
           try {
             console.log(err);
             chai.assert.isUndefined(err);
+            console.log('mo id: ', moId);
             var insertedModelOutput = ModelOutputs.findOne({_id: moId});
+            console.log('inserted mo: ', insertedModelOutput);
             chai.assert.equal(insertedModelOutput.name, 'Model Output 2');
           } catch(error) {
             done(error);
           }
           done();
         });
-      })
-    })
+      });
+    });
 
   });
 
@@ -362,10 +405,10 @@ function makeDataSet(dataSetName) {
   return dataSet;
 }
 
-function makeExperimentTemplate(experimentName) {
+function makeExperiment(experimentName, recordType) {
   var experiment = {
     name: experimentName,
-    recordType: 'template',
+    recordType: recordType,
     spatialLevel: 'SingleSite'
 
   }
@@ -375,7 +418,8 @@ function makeExperimentTemplate(experimentName) {
 function makeModelOutput(modelOutputName) {
   var modelOutput = {
     name: modelOutputName,
-    experiment: 'randomExp',
+    experiment: 'Experiment 1',
     model: 'testModel'
   }
+  return modelOutput;
 }
