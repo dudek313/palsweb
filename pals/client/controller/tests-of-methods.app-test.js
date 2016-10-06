@@ -375,6 +375,7 @@ function makeExperimentTemplate(experimentName) {
 function makeModelOutput(modelOutputName) {
   var modelOutput = {
     name: modelOutputName,
+    experiment: 'randomExp',
     model: 'testModel'
   }
 }

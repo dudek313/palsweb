@@ -81,6 +81,11 @@ getSource = function() {
     return Router.current().params.source;
 }
 
+setFileDirtyStatus = function(fileId, status) {
+  var modifier = {meta: {dirty: status}}
+  Meteor.call('updateNetCdfFiles', fileId, modifier);
+}
+
 displayError = function(errMessage, error) {
   alert(errMessage);
 /*  window.scrollTo(0,0);

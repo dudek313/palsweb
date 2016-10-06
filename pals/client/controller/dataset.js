@@ -2,15 +2,15 @@ import '../views/dataset.html';
 
 Template.dataSet.onCreated(function () {
   this.currentUpload = new ReactiveVar(false);
+  window['directives']();
+  templateSharedObjects.progress().hide();
+  Session.set('deletedFileIds', []);
+//    Session.set('filesUploaded', []);
+  SimpleSchema.debug = true;
 });
 
-Template.dataSet.rendered = function() {
-    window['directives']();
-    templateSharedObjects.progress().hide();
-//    Session.set('filesToDelete', []);
-    Session.set('filesUploaded', []);
-    SimpleSchema.debug = true;
-};
+
+
 
 // Currently not working - probably issue with publish & subscribe - for old cfs package
 function removeDeletedFiles(fileIds) {
@@ -54,8 +54,9 @@ AutoForm.hooks({
                 // if successful
                 // set uploaded files as not dirty
                 insertDoc.files.forEach(function(file) {
-                  NetCdfFiles.update({_id: file._id}, {$set: {meta: {dirty: false}}});
-                })
+                  if (file && file.key)
+                    setFileDirtyStatus(file.key, false);
+                });
 
                 //display the created data set
                 Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
@@ -76,9 +77,18 @@ AutoForm.hooks({
                   displayError('Failed to update the data set. Please try again.', error);
                 }
                 else {
-                /*    Session.set('dirty', false);
-                    removeDeletedFiles(Session.get('filesToDelete'));
-                    Session.set('filesToDelete', []); */
+                    // set uploaded files as clean
+                    updateDoc.$set.files.forEach(function(file) {
+                      if (file && file.key)
+                        setFileDirtyStatus(file.key, false);
+                    });
+
+                    // mark deleted files as dirty
+                    var deletedFileIds = Session.get('deletedFileIds');
+                    deletedFileIds.forEach(function(fileId) {
+                      setFileDirtyStatus(fileId, true);
+                    });
+                    Session.set('deletedFileIds', []);
 
                     var currentDataSetId = getCurrentObjectId();
                     Router.go('/dataSet/display/' + currentDataSetId);
@@ -98,20 +108,25 @@ Template.dataSet.events = {
     },
     'click .cancel-update':function(event){
         event.preventDefault();
-        removeDeletedFiles(Session.get('filesUploaded'));
-        Session.set('filesUploaded', []);
+        Session.set('tempFiles', null);
+        Session.set('deletedFileIds', []);
         Router.go('/dataSet/display/' + getCurrentObjectId());
     },
     'click .cancel-create':function(event){
         event.preventDefault();
-        removeDeletedFiles(Session.get('filesUploaded'));
-        Session.set('filesUploaded', []);
+        Session.set('tempFiles', null);
+        Session.set('deletedFileIds', []);
+//        Session.set('filesUploaded', []);
         window.history.back();
     },
     'click .delete-file':function(event) {
         event.preventDefault();
         var selectedFileId = $(event.target).attr('id');
         var currentFiles = Session.get('tempFiles');
+
+        var deletedFileIds = Session.get('deletedFileIds');
+        deletedFileIds.push(selectedFileId);
+        Session.set('deletedFileIds', deletedFileIds);
 
         var newFiles = [];
         if (currentFiles && currentFiles.length > 0) {
@@ -122,10 +137,6 @@ Template.dataSet.events = {
             });
             Session.set('tempFiles', newFiles);
 
-/*            // add file to filesToDelete session variable - don't think this is needed anymore
-            var filesToDelete = Session.get('filesToDelete');
-            filesToDelete.push(selectedFileId);
-            Session.set('filesToDelete', filesToDelete);*/
         }
 
         else {
@@ -184,10 +195,10 @@ Template.dataSet.events = {
             Session.set('tempFiles', tempFiles);
             Session.set('uploadButtonClicked', false);
 
-            // keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
+/*            keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
             var filesUploaded = Session.get('filesUploaded');
             filesUploaded.push(name);
-            Session.set('filesUploaded', filesUploaded);
+            Session.set('filesUploaded', filesUploaded); */
           }
           template.currentUpload.set(false);
         });

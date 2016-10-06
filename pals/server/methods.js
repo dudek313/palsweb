@@ -206,6 +206,20 @@ Meteor.methods({
 
     },
 
+    updateNetCdfFiles: function(_id, set) {
+      check(_id, String);
+      check(set, Object);
+      var userId = this.userId;
+      var file = NetCdfFiles.findOne({_id: _id});
+      if (userId && file && file.userId == userId) {
+        this.unblock();
+        NetCdfFiles.update({_id: _id}, {$set: set});
+        console.log('updateNetCdfFiles id: ' + _id + ' set: ', set);
+        return true;
+      }
+      else return null;
+    },
+
     deleteAnalysis: function(id) {
         console.log('deleting analysis ' + id);
         var analysis = Analyses.findOne({_id:id});

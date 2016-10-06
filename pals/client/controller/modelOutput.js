@@ -1,11 +1,9 @@
-Template.modelOutput.rendered = function() {
-    window['directives']();
-    templateSharedObjects.progress().hide();
-    SimpleSchema.debug = true;
-};
-
 Template.modelOutput.onCreated(function () {
   this.currentUpload = new ReactiveVar(false);
+  window['directives']();
+  templateSharedObjects.progress().hide();
+  Session.set('deletedFileIds', []);
+  SimpleSchema.debug = true;
 });
 
 AutoForm.hooks({
@@ -32,7 +30,11 @@ AutoForm.hooks({
                     displayError('Failed to upload the model output. Please try again.', error);
                 }
                 else {
-                    // if successful, display the created experiment
+
+                    // if successful
+                    // set uploaded files as not dirty
+                    setFileDirtyStatus(insertDoc.file.key, false);
+
                     Meteor.subscribe('modelOutputs'); // Refresh the publication to allow user access to new model output
                     Router.go('/modelOutput/display/' + docId);
                 }
@@ -95,13 +97,21 @@ AutoForm.hooks({
                 // update Model Outputs collection
                 Meteor.call('updateModelOutput', currentDoc, updateDoc, function(error, docId){
                     if(error) {
-                        window.scrollTo(0,0);
-                        $('.error').html('Failed to update the data set. Please try again.');
-                        $('.error').show();
-                        console.log(error.reason);
+                        displayError('Failed to update the data set.', error);
                     }
                     else {
-                        // if successful, display the updated model output document
+                        // if successful
+                        // set uploaded file as clean
+                        setFileDirtyStatus(updateDoc.$set.file.key, false);
+
+                        // mark deleted files as dirty
+                        var deletedFileIds = Session.get('deletedFileIds');
+                        deletedFileIds.forEach(function(fileId) {
+                          setFileDirtyStatus(fileId, true);
+                        });
+                        Session.set('deletedFileIds', []);
+
+                        //display the updated model output document
                         Router.go('/modelOutput/display/' + currentDoc._id);
                     }
                 });
@@ -110,10 +120,7 @@ AutoForm.hooks({
                 analysesToDelete.forEach(function(analysisId) {
                     Meteor.call('deleteAnalysis', analysisId, function(error, docId) {
                         if (error) {
-                            window.scrollTo(0,0);
-                            $('.error').html('Failed to delete analysis (Id: ' + analysisId + ').');
-                            $('.error').show();
-                            console.log(error.reason);
+                            displayError('Failed to delete analysis (Id: ' + analysisId + ')', error);
                         }
                     });
                 });
@@ -181,7 +188,10 @@ Template.modelOutput.events = {
         var upload = NetCdfFiles.insert({
           file: file,
           streams: 'dynamic',
-          chunkSize: 'dynamic'
+          chunkSize: 'dynamic',
+          meta: {
+            dirty: true
+          }
         }, false);
 
         upload.on('start', function () {
@@ -213,6 +223,9 @@ Template.modelOutput.events = {
         event.preventDefault();
         if( confirm("Are you sure?")) {
             Session.set('tempFile', null);
+            var deletedFileIds = Session.get('deletedFileIds');
+            deletedFileIds.push(selectedFileId);
+            Session.set('deletedFileIds', deletedFileIds);
         }
     },
 
