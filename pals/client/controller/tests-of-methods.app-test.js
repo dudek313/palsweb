@@ -6,6 +6,9 @@ import { chai } from 'meteor/practicalmeteor:chai';
 import '../../both/collections.js';
 import '../../both/global.js';
 
+var DS_ID;
+var EXP_ID;
+var MODEL_ID;
 /*import { resetDatabase } from 'meteor/xolvio:cleaner';
 
 Meteor.methods({
@@ -19,12 +22,12 @@ describe('Testing methods', function(done) {
     Meteor.call('test.resetDatabase', done);
   });
 
-///////////////////// Not working. Tried to copy loginWithPassword below ////////////////
   after(function(done) {
     var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
     if (testUser) {
       Meteor.call('test.removeUser', {_id: testUser._id}, function(err, docId) {
-        done(err);
+        if (err)
+          done(err);
       });
       done(); // temporary - until I work out the problem
     }
@@ -48,6 +51,13 @@ describe('Testing methods', function(done) {
     });
 
     after(function(done) {
+
+      var newModel = makeModel("Model 1");
+      Meteor.call('insertModel', newModel, function(err, modelId) {
+        if (err) console.log('error inserting model 1', err);
+      });
+
+
       Meteor.logout(function(err) {
         try {
           chai.assert.isUndefined(err, 'Logout created error');
@@ -65,6 +75,7 @@ describe('Testing methods', function(done) {
       it('allows a new user to be registered on the system', function(done) {
         Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
           try {
+            console.log('Register new user', err);
             chai.assert.isUndefined(err);
           } catch(error) {
             done(error);
@@ -82,6 +93,7 @@ describe('Testing methods', function(done) {
             chai.assert.isUndefined(err, 'Error was called');
             var insertedDataSet = DataSets.findOne({_id: dsId});
             chai.assert.isDefined(insertedDataSet, 'New data set was not inserted');
+            DS_ID = dsId;
           } catch(error) {
             done(error);
           }
@@ -90,14 +102,14 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('Insert new experiment template by admin', function(done) {
-      it('allows an admin user to insert an experiment template', function(done) {
-        var newExperiment = makeExperiment("Experiment 1", "template");
-        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
+    describe('Update data set by admin', function(done) {
+      it('allows an admin user to update a data set', function(done) {
+        var modifier = {$set: {spatialLevel: "MultipleSite"}};
+        Meteor.call('updateDataSet', {_id: DS_ID}, modifier, function(err, dataSet) {
           try {
             chai.assert.isUndefined(err, 'Error was called');
-            var insertedExperiment = Experiments.findOne({_id: dsId});
-            chai.assert.isDefined(insertedExperiment, 'New experiment template was not inserted');
+            var updatedDataSet = DataSets.findOne({_id: DS_ID});
+            chai.assert.equal(updatedDataSet.spatialLevel, "MultipleSite", 'Data set was not updated');
           } catch(error) {
             done(error);
           }
@@ -105,6 +117,73 @@ describe('Testing methods', function(done) {
         });
       });
     });
+
+    describe('Remove data set by admin', function(done) {
+      it('allows an admin user to remove a data set', function(done) {
+        Meteor.call('removeDataSet', {_id: DS_ID}, function(err, doc) {
+          try {
+            chai.assert.isUndefined(err, 'Error was called');
+            var ds = DataSets.findOne({_id: DS_ID});
+            chai.assert.isUndefined(ds, 'Data set was not removed');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+
+    describe('Insert new experiment template by admin', function(done) {
+      it('allows an admin user to insert an experiment template', function(done) {
+        var newExperiment = makeExperiment("Experiment 1", "template");
+        Meteor.call('insertExperiment', newExperiment, function(err, expId) {
+          try {
+            chai.assert.isUndefined(err, 'Error was called');
+            var insertedExperiment = Experiments.findOne({_id: expId});
+            chai.assert.isDefined(insertedExperiment, 'New experiment template was not inserted');
+            EXP_ID = expId
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Update experiment by admin', function(done) {
+      it('allows an admin user to update an experiment', function(done) {
+        var modifier = {$set: {spatialLevel: "MultipleSite"}};
+        Meteor.call('updateExperiment', {_id: EXP_ID}, modifier, function(err, doc) {
+          try {
+            chai.assert.isUndefined(err, 'Error was called');
+            var updatedExperiment = Experiments.findOne({_id: EXP_ID});
+            chai.assert.equal(updatedExperiment.spatialLevel, "MultipleSite", 'experiment was not updated');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Remove experiment by admin', function(done) {
+      it('allows an admin user to remove an experiment', function(done) {
+        Meteor.call('deleteExperiment', {_id: EXP_ID}, function(err, doc) {
+          try {
+            console.log('Error removing experiment: ', err);
+            chai.assert.isUndefined(err, 'Error was called');
+            if (err) console.log('Error removing experiment', err);
+            var exp = Experiments.findOne({_id: EXP_ID});
+            chai.assert.isUndefined(exp, 'experiment was not removed');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
 
   });
 
@@ -127,6 +206,26 @@ describe('Testing methods', function(done) {
         });
       });
     });
+
+    describe('Updating model when not logged in', function(done) {
+      it('does not allow unregistered user to update a model', function(done) {
+        var modifier = {$set: {references: "All kinds of references to be sure"}};
+        Meteor.call('updateModel', {_id: MODEL_ID}, modifier, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Error was mistakenly not called');
+            console.log('Updating model error', err);
+            Meteor.call('test.Models.findOne', MODEL_ID, function(err, updatedModel) {
+              chai.assert.isUndefined(err);
+              chai.assert.isUndefined(updatedModel.references, 'Model was mistakenly updated');
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
 
     describe('inserting data set when not logged in', function(done) {
       it('does not allow unregistered user to insert a data set', function(done) {
@@ -184,12 +283,13 @@ describe('Testing methods', function(done) {
 
   });
 
-
   describe('Registered user functions', function() {
 
     describe('Login registered user', function() {
-      beforeEach(function(done){
+      before(function(done){
         var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+        console.log('login reg user - testUser', testUser);
+        console.log('currently logged in user: ', Meteor.user())
         if (testUser && testUser._id)
           Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
         done();
@@ -201,6 +301,7 @@ describe('Testing methods', function(done) {
           try {
             chai.assert.isUndefined(err);
             var user = Meteor.user();
+            console.log('login - user: ', user);
             chai.assert.equal(user.emails[0].address, 'test0@testing.com');
           } catch(error) {
             done(error);
@@ -214,14 +315,14 @@ describe('Testing methods', function(done) {
       it('allows a registered user to insert a model', function(done) {
         var newModel = makeModel("Model 1");
         Meteor.call('insertModel', newModel, function(err, modelId) {
-        try {
-          chai.assert.isUndefined(err);
-          var insertedModel = Models.findOne({_id: modelId});
-          chai.assert.equal(insertedModel.name, 'Model 1');
-        } catch(error) {
-          done(error);
-        }
-        done();
+          try {
+            chai.assert.isUndefined(err);
+            var insertedModel = Models.findOne({_id: modelId});
+            chai.assert.equal(insertedModel.name, 'Model 1');
+          } catch(error) {
+            done(error);
+          }
+          done();
         });
       });
     });
@@ -321,11 +422,14 @@ describe('Testing methods', function(done) {
         var expInstance = makeExperiment("Experiment 1", "instance");
         Meteor.call('insertExperiment', expInstance, function(err, expId) {
           try {
-            console.log(err);
+            if (err) console.log('insert clone error', err)
+            else console.log('expId', expId);
             chai.assert.isUndefined(err);
             Meteor.subscribe('experiments');
-            var insertedExperiment = Experiments.findOne({_id: expId});
-            chai.assert.equal(insertedExperiment.name, "Experiment 1");
+            Meteor.call('test.Experiments.findOne', expId, function(err, insertedExperiment) {
+              console.log('insertedExperiment', insertedExperiment);
+              chai.assert.equal(insertedExperiment.name, "Experiment 1");
+            });
           } catch(error) {
             done(error);
           }
@@ -344,9 +448,10 @@ describe('Testing methods', function(done) {
             console.log(err);
             chai.assert.isUndefined(err);
             console.log('mo id: ', moId);
-            var insertedModelOutput = ModelOutputs.findOne({_id: moId});
-            console.log('inserted mo: ', insertedModelOutput);
-            chai.assert.equal(insertedModelOutput.name, 'Model Output 2');
+            Meteor.call('test.ModelOutputs.findOne', moId, function(err, insertedModelOutput) {
+              console.log('insertedModelOutput', insertedModelOutput);
+              chai.assert.equal(insertedModelOutput.name, "Model Output 2");
+            });
           } catch(error) {
             done(error);
           }
@@ -356,6 +461,7 @@ describe('Testing methods', function(done) {
     });
 
   });
+
 
 });
 
@@ -389,7 +495,8 @@ describe('Testing methods', function(done) {
 
 function makeModel(modelName) {
   var model = {
-    name: modelName
+    name: modelName,
+    references: null
   };
 
   return model;
