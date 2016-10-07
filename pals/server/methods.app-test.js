@@ -39,7 +39,9 @@ Meteor.methods({
   'test.updateUser': function(selector, modifier, callback) {
     var user = Meteor.users.findOne(selector);
     if (user)
-      Meteor.users.update(selector, modifier, callback);
+      Meteor.users.update(selector, modifier, function() {
+        callback;
+      });
   }
 
 });
