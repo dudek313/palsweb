@@ -5,12 +5,6 @@ import { chai } from 'meteor/practicalmeteor:chai';
 
 import '../../both/collections.js';
 
-// global variables
-myDsId = '';
-myExpId = '';
-myModelId = '';
-myMoId = '';
-
 /*import { resetDatabase } from 'meteor/xolvio:cleaner';
 
 Meteor.methods({
@@ -51,41 +45,6 @@ describe('Testing methods', function(done) {
       });
     });
 
-    after(function(done) {
-
-      // make a model for other users to try and edit
-      var newModel = makeModel("Model 4");
-      Meteor.call('insertModel', newModel, function(err, modelId) {
-        try {
-          chai.assert.isUndefined(err, 'Error was called');
-          var insertedModel = Models.findOne({_id: modelId});
-          chai.assert.isDefined(insertedModel, 'New model was not inserted');
-          myModelId4 = modelId;
-        } catch(error) {
-          done(error);
-        }
-      });
-
-      Meteor.call('insertWorkspace', "WS 4", function(err, wsId) {
-        try {
-          chai.assert.isUndefined(err, 'error message was given');
-        } catch(error) {
-          done(error);
-        }
-
-        var insertedWS = Workspaces.findOne({_id: wsId});
-        try {
-          chai.assert.equal(insertedWS.name, 'WS 4', 'workspace was not inserted');
-          myWsId4 = wsId;
-        } catch(error) {
-          done(error);
-        }
-
-        done(err);
-      });
-
-
-    });
 
 
 
@@ -248,6 +207,35 @@ describe('Testing methods', function(done) {
         }
       });
 
+      var newModel = makeModel("Model 4");
+      Meteor.call('insertModel', newModel, function(err, modelId) {
+        try {
+          chai.assert.isUndefined(err, 'Error was called');
+          var insertedModel = Models.findOne({_id: modelId});
+          chai.assert.isDefined(insertedModel, 'New model was not inserted');
+          myModelId4 = modelId;
+        } catch(error) {
+          done(error);
+        }
+      });
+
+      Meteor.call('insertWorkspace', "WS 4", function(err, wsId) {
+        try {
+          chai.assert.isUndefined(err, 'error message was given');
+        } catch(error) {
+          done(error);
+        }
+
+        var insertedWS = Workspaces.findOne({_id: wsId});
+        try {
+          chai.assert.equal(insertedWS.name, 'WS 4', 'workspace was not inserted');
+          myWsId4 = wsId;
+        } catch(error) {
+          done(error);
+        }
+
+      });
+
       Meteor.logout(function(err) {
         try {
           chai.assert.isUndefined(err, 'Logout created error');
@@ -281,7 +269,7 @@ describe('Testing methods', function(done) {
     describe('Updating model when not logged in', function(done) {
       it('does not allow unregistered user to update a model', function(done) {
         var modifier = {$set: {references: "All kinds of references to be sure"}};
-        Meteor.call('updateModel', {_id: myModelId}, modifier, function(err, doc) {
+        Meteor.call('updateModel', {_id: myModelId2}, modifier, function(err, doc) {
           try {
             chai.assert.isDefined(err, 'Error was erroneously not called');
             chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
@@ -661,8 +649,8 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('Insert new data set by non-admin', function(done) {
-      it('does not allow a non-admin user to insert a model', function(done) {
+    describe('Inserting new data set', function(done) {
+      it('does not allow a non-admin user to insert a data set', function(done) {
 
         var newDataSet = makeDataSet("Data Set 2");
         Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
@@ -670,6 +658,39 @@ describe('Testing methods', function(done) {
             chai.assert.isDefined(err);
             var insertedDataSet = DataSets.findOne({_id: dsId});
             chai.assert.isUndefined(insertedDataSet);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Updating data set', function(done) {
+      it('does not allow a non-admin user to update a data set', function(done) {
+        var modifier = {$set: {spatialLevel: "MultipleSite"}};
+        Meteor.call('updateDataSet', {_id: myDsId2}, modifier, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Error was erroneously not called');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
+            Meteor.call('test.DataSets.findOne', {_id: myDsId2}, function(err, updatedDataSet) {
+              chai.assert.isUndefined(err);
+              chai.assert.equal(updatedDataSet.spatialLevel, "SingleSite", 'Data set was erroneously updated');
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Removing data set when not logged in', function() {
+      it('does not allow unregistered user to remove a data set', function(done) {
+        Meteor.call('removeDataSet', {_id: myDsId2}, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Data set was erroneously removed');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
           } catch(error) {
             done(error);
           }
