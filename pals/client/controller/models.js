@@ -20,12 +20,12 @@ Template.models.onCreated(function() {
 
 
 Template.models.events({
-    'click .delete' : function(event) {
+    'click .delete-btn' : function(event) {
         if( confirm("Are you sure?")) {
             var id = $(event.target).attr('id');
             if( id ) {
                 console.log(id);
-                Meteor.call('removeModel', id, function(error){
+                Meteor.call('removeModel', {_id: id}, function(error){
                     if(error) {
                         displayError('Failed to delete the model, please try again');
                     }

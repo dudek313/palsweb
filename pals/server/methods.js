@@ -37,11 +37,11 @@ Meteor.methods({
       }
   },
 
-  'removeModelOutput': function(moId) {
+  'removeModelOutput': function(modelOutputDoc) {
       var userId = this.userId;
-      var group = 'modelOutput: ' + moId;
+      var group = 'modelOutput: ' + modelOutputDoc._id;
       if( Roles.userIsInRole(userId, 'edit', group) ) {
-        mo = ModelOutputs.remove({_id: moId});
+        mo = ModelOutputs.remove(modelOutputDoc);
         return mo;
       }
       else {
@@ -111,7 +111,7 @@ Meteor.methods({
             throw new Meteor.Error('not-authorized')
         }
     },
-    'deleteExperiment': function(dataSetDoc) {
+    'removeExperiment': function(dataSetDoc) {
         var userId = this.userId;
         var group = 'experiment ' + dataSetDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group) ) {
@@ -149,11 +149,11 @@ Meteor.methods({
         }
     },
 
-    'removeModel': function(moId) {
+    'removeModel': function(modelDoc) {
         var userId = this.userId;
-        var group = 'model ' + moId;
+        var group = 'model ' + modelDoc._id;
         if( Roles.userIsInRole(userId, 'edit', group) ) {
-          mo = Models.remove({_id: moId});
+          mo = Models.remove(modelDoc);
           return mo;
         }
         else {
@@ -206,6 +206,7 @@ Meteor.methods({
 
     },
 
+    // used to update 'dirty' status for NetCDF Files
     updateNetCdfFiles: function(_id, set) {
       check(_id, String);
       check(set, Object);

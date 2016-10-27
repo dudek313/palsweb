@@ -128,14 +128,14 @@ Template.experiments.events({
         Session.set('experiments.' + getSource(), spatialLevel);
         Router.go('/experiments/' + getSource() + '/' + spatialLevel);
     },
-    'click .delete' : function(event) {
+    'click .delete-btn' : function(event) {
         event.stopPropagation();
         event.stopImmediatePropagation();
         event.preventDefault();
         if( confirm("Are you sure?")) {
             var id = $(event.target).attr('id');
             if( id ) {
-                Meteor.call('deleteExperiment', {'_id':id}, function(error){
+                Meteor.call('removeExperiment', {'_id':id}, function(error){
                     if(error) {
                         window.scrollTo(0,0);
                         $('.error').html('Failed to delete the experiment, please try again');

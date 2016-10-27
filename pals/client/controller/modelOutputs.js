@@ -89,11 +89,11 @@ Template.modelOutputs.helpers({
 
 Template.modelOutputs.events({
     // deletes a model output from the model output list
-    'click .delete' : function(event) {
+    'click .delete-btn' : function(event) {
         var id = $(event.target).attr('id');
         if( id ) {
             if( confirm("Are you sure?")) {
-                Meteor.call('removeModelOutput', id, function(error){
+                Meteor.call('removeModelOutput', {_id: id}, function(error){
                     if(error) {
                         displayError('Failed to delete the model output, please try again', error);
                     }

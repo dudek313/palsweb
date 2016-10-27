@@ -114,7 +114,7 @@ DATE_FIELD = {
   key: "created",
   label: "Created",
   fn: function (value, model, key) {
-    var theDate = new Date(model.created);
+    var theDate = new Date(model.createdAt);
     return theDate.toLocaleDateString();
   }
 }

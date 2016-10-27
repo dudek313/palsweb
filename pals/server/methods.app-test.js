@@ -20,6 +20,10 @@ Meteor.methods({
     return DataSets.findOne({_id: dsId});
   },
 
+  'test.Workspaces.findOne': function(wsId) {
+    return Workspaces.findOne({_id: wsId});
+  },
+
   'test.resetDatabase': function(callback) {
     resetDatabase({excludedCollections: ['users']}, callback)
   },
