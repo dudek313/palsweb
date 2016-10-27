@@ -3,25 +3,25 @@ import { Accounts } from 'meteor/accounts-base';
 
 Meteor.methods({
 
-  'test.Models.findOne': function(modelId) {
-    var model = Models.findOne({_id: modelId});
+  'test.Models.findOne': function(modelDoc) {
+    var model = Models.findOne(modelDoc);
     return model;
   },
 
-  'test.Experiments.findOne': function(expId) {
-    return Experiments.findOne({_id: expId});
+  'test.Experiments.findOne': function(expDoc) {
+    return Experiments.findOne(expDoc);
   },
 
-  'test.ModelOutputs.findOne': function(moId) {
-    return ModelOutputs.findOne({_id: moId});
+  'test.ModelOutputs.findOne': function(moDoc) {
+    return ModelOutputs.findOne(moDoc);
   },
 
-  'test.DataSets.findOne': function(dsId) {
-    return DataSets.findOne({_id: dsId});
+  'test.DataSets.findOne': function(dsDoc) {
+    return DataSets.findOne(dsDoc);
   },
 
-  'test.Workspaces.findOne': function(wsId) {
-    return Workspaces.findOne({_id: wsId});
+  'test.Workspaces.findOne': function(wsDoc) {
+    return Workspaces.findOne(wsDoc);
   },
 
   'test.resetDatabase': function(callback) {

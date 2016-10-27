@@ -85,7 +85,7 @@ Template.workspaces.events({
       var user = Meteor.user();
       if( id ) {
           if (confirm('Are you sure?')) {
-            Meteor.call('removeWorkspace', id, function(error){
+            Meteor.call('removeWorkspace', {_id: id}, function(error){
               if( error ) alert(error);
             });
           }

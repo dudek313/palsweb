@@ -197,13 +197,20 @@ Meteor.methods({
       }
     },
 
-    'removeWorkspace': function(workspaceId) {
+    'removeWorkspace': function(workspaceDoc) {
       var userId = this.userId;
-      var workspace = Workspaces.findOne({_id: workspaceId});
+      var group = 'workspace ' + workspaceDoc._id;
+      if ( !Roles.userIsInRole(userId, 'edit', group)) {
+        throw new Meteor.Error('not-authorized')
+      }
+      else {
+        return Workspaces.remove(workspaceDoc);
+      }
+/*      var workspace = Workspaces.findOne({_id: workspaceId});
       if( userId && workspace && workspace.owner && workspace.owner == userId) {
         return Workspaces.remove({_id: workspaceId});
       }
-
+*/
     },
 
     // used to update 'dirty' status for NetCDF Files
