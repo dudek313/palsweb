@@ -16,6 +16,10 @@ Meteor.methods({
     return ModelOutputs.findOne({_id: moId});
   },
 
+  'test.DataSets.findOne': function(dsId) {
+    return DataSets.findOne({_id: dsId});
+  },
+
   'test.resetDatabase': function(callback) {
     resetDatabase({excludedCollections: ['users']}, callback)
   },
