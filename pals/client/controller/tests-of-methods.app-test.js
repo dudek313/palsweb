@@ -4,11 +4,13 @@ import 'meteor/meteor';
 import { chai } from 'meteor/practicalmeteor:chai';
 
 import '../../both/collections.js';
-import '../../both/global.js';
 
-var DS_ID;
-var EXP_ID;
-var MODEL_ID;
+// global variables
+myDsID = '';
+myExpId = '';
+myModelId = '';
+myMoId = '';
+
 /*import { resetDatabase } from 'meteor/xolvio:cleaner';
 
 Meteor.methods({
@@ -26,8 +28,7 @@ describe('Testing methods', function(done) {
     var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
     if (testUser) {
       Meteor.call('test.removeUser', {_id: testUser._id}, function(err, docId) {
-        if (err)
-          done(err);
+        if (err) done(err);
       });
       done(); // temporary - until I work out the problem
     }
@@ -52,11 +53,12 @@ describe('Testing methods', function(done) {
 
     after(function(done) {
 
+      // insert model in order to test update model method later
       var newModel = makeModel("Model 1");
       Meteor.call('insertModel', newModel, function(err, modelId) {
+	myModelId = modelId;
         if (err) console.log('error inserting model 1', err);
       });
-
 
       Meteor.logout(function(err) {
         try {
@@ -75,7 +77,6 @@ describe('Testing methods', function(done) {
       it('allows a new user to be registered on the system', function(done) {
         Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
           try {
-            console.log('Register new user', err);
             chai.assert.isUndefined(err);
           } catch(error) {
             done(error);
@@ -93,7 +94,6 @@ describe('Testing methods', function(done) {
             chai.assert.isUndefined(err, 'Error was called');
             var insertedDataSet = DataSets.findOne({_id: dsId});
             chai.assert.isDefined(insertedDataSet, 'New data set was not inserted');
-            DS_ID = dsId;
           } catch(error) {
             done(error);
           }
@@ -101,38 +101,6 @@ describe('Testing methods', function(done) {
         });
       });
     });
-
-    describe('Update data set by admin', function(done) {
-      it('allows an admin user to update a data set', function(done) {
-        var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateDataSet', {_id: DS_ID}, modifier, function(err, dataSet) {
-          try {
-            chai.assert.isUndefined(err, 'Error was called');
-            var updatedDataSet = DataSets.findOne({_id: DS_ID});
-            chai.assert.equal(updatedDataSet.spatialLevel, "MultipleSite", 'Data set was not updated');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Remove data set by admin', function(done) {
-      it('allows an admin user to remove a data set', function(done) {
-        Meteor.call('removeDataSet', {_id: DS_ID}, function(err, doc) {
-          try {
-            chai.assert.isUndefined(err, 'Error was called');
-            var ds = DataSets.findOne({_id: DS_ID});
-            chai.assert.isUndefined(ds, 'Data set was not removed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
 
     describe('Insert new experiment template by admin', function(done) {
       it('allows an admin user to insert an experiment template', function(done) {
@@ -140,9 +108,11 @@ describe('Testing methods', function(done) {
         Meteor.call('insertExperiment', newExperiment, function(err, expId) {
           try {
             chai.assert.isUndefined(err, 'Error was called');
-            var insertedExperiment = Experiments.findOne({_id: expId});
-            chai.assert.isDefined(insertedExperiment, 'New experiment template was not inserted');
-            EXP_ID = expId
+            Meteor.call('test.Experiments.findOne', expId, function(err, insertedExperiment) {
+              console.log('insertedExperiment', insertedExperiment);
+              chai.assert.isDefined(insertedExperiment, 'New experiment template was not inserted');
+            });
+            myExpId = expId;
           } catch(error) {
             done(error);
           }
@@ -154,10 +124,10 @@ describe('Testing methods', function(done) {
     describe('Update experiment by admin', function(done) {
       it('allows an admin user to update an experiment', function(done) {
         var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateExperiment', {_id: EXP_ID}, modifier, function(err, doc) {
+        Meteor.call('updateExperiment', {_id: myExpId}, modifier, function(err, doc) {
           try {
             chai.assert.isUndefined(err, 'Error was called');
-            var updatedExperiment = Experiments.findOne({_id: EXP_ID});
+            var updatedExperiment = Experiments.findOne({_id: myExpId});
             chai.assert.equal(updatedExperiment.spatialLevel, "MultipleSite", 'experiment was not updated');
           } catch(error) {
             done(error);
@@ -169,12 +139,12 @@ describe('Testing methods', function(done) {
 
     describe('Remove experiment by admin', function(done) {
       it('allows an admin user to remove an experiment', function(done) {
-        Meteor.call('deleteExperiment', {_id: EXP_ID}, function(err, doc) {
+        Meteor.call('deleteExperiment', {_id: myExpId}, function(err, doc) {
           try {
             console.log('Error removing experiment: ', err);
             chai.assert.isUndefined(err, 'Error was called');
             if (err) console.log('Error removing experiment', err);
-            var exp = Experiments.findOne({_id: EXP_ID});
+            var exp = Experiments.findOne({_id: myExpId});
             chai.assert.isUndefined(exp, 'experiment was not removed');
           } catch(error) {
             done(error);
@@ -210,13 +180,13 @@ describe('Testing methods', function(done) {
     describe('Updating model when not logged in', function(done) {
       it('does not allow unregistered user to update a model', function(done) {
         var modifier = {$set: {references: "All kinds of references to be sure"}};
-        Meteor.call('updateModel', {_id: MODEL_ID}, modifier, function(err, doc) {
+        Meteor.call('updateModel', {_id: myModelId}, modifier, function(err, doc) {
           try {
             chai.assert.isDefined(err, 'Error was mistakenly not called');
             console.log('Updating model error', err);
-            Meteor.call('test.Models.findOne', MODEL_ID, function(err, updatedModel) {
+            Meteor.call('test.Models.findOne', myModelId, function(err, updatedModel) {
               chai.assert.isUndefined(err);
-              chai.assert.isUndefined(updatedModel.references, 'Model was mistakenly updated');
+              chai.assert.notEqual(updatedModel.references, " ", 'Model was mistakenly updated');
             });
           } catch(error) {
             done(error);
@@ -226,6 +196,11 @@ describe('Testing methods', function(done) {
       });
     });
 
+    describe('NEED TO FILL IN - Removing model when not logged in', function() {
+      it('UNFINISHED', function(done) {
+	done();
+      });
+    });
 
     describe('inserting data set when not logged in', function(done) {
       it('does not allow unregistered user to insert a data set', function(done) {
@@ -248,12 +223,12 @@ describe('Testing methods', function(done) {
     describe('inserting experiment template when not logged in', function(done) {
       it('does not allow unregistered user to insert an experiment', function(done) {
         var newExperiment = makeExperiment("Experiment Template 3", "template");
-        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
+        Meteor.call('insertExperiment', newExperiment, function(err, expId) {
           try {
             chai.assert.isDefined(err);
             chai.assert.equal(err.error, "not-authorized");
             console.log(err);
-            var insertedExperiment = Experiments.findOne({_id: dsId});
+            var insertedExperiment = Experiments.findOne({_id: expId});
             chai.assert.isUndefined(insertedExperiment);
           } catch(error) {
             done(error);
@@ -283,10 +258,11 @@ describe('Testing methods', function(done) {
 
   });
 
+
   describe('Registered user functions', function() {
 
-/*    describe('Login registered user', function() {
-      before(function(done){
+    describe('Login registered user', function() {
+      beforeEach(function(done){
         var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
         if (testUser && testUser._id)
           Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
@@ -294,13 +270,11 @@ describe('Testing methods', function(done) {
       });
 
       it('allows a registered user to login', function(done) {
-        this.timeout(20000);
-        console.log('User logged in? ' + Meteor.user());
+
         Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
           try {
             chai.assert.isUndefined(err);
             var user = Meteor.user();
-            console.log('login - user: ', user);
             chai.assert.equal(user.emails[0].address, 'test0@testing.com');
           } catch(error) {
             done(error);
@@ -309,21 +283,19 @@ describe('Testing methods', function(done) {
         });
       });
     });
-*/
+
     describe('Insert new model', function(done) {
       it('allows a registered user to insert a model', function(done) {
         var newModel = makeModel("Model 1");
-        console.log('here1');
         Meteor.call('insertModel', newModel, function(err, modelId) {
-          console.log('here2');
-          try {
-            chai.assert.isUndefined(err);
-            var insertedModel = Models.findOne({_id: modelId});
-            chai.assert.equal(insertedModel.name, 'Model 1');
-          } catch(error) {
-            done(error);
-          }
-          done();
+        try {
+          chai.assert.isUndefined(err);
+          var insertedModel = Models.findOne({_id: modelId});
+          chai.assert.equal(insertedModel.name, 'Model 1');
+        } catch(error) {
+          done(error);
+        }
+        done();
         });
       });
     });
@@ -355,7 +327,6 @@ describe('Testing methods', function(done) {
         Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
           try {
             chai.assert.isDefined(err);
-            console.log('duplicate workspaces error', err);
           } catch(error) {
             done(error);
           }
@@ -367,13 +338,12 @@ describe('Testing methods', function(done) {
     });
 
     describe('Insert new data set by non-admin', function(done) {
-      it('does not allow a non-admin user to insert a data set', function(done) {
+      it('does not allow a non-admin user to insert a model', function(done) {
 
         var newDataSet = makeDataSet("Data Set 2");
         Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
           try {
             chai.assert.isDefined(err);
-            console.log('new data set by non-admin', err);
             var insertedDataSet = DataSets.findOne({_id: dsId});
             chai.assert.isUndefined(insertedDataSet);
           } catch(error) {
@@ -406,12 +376,14 @@ describe('Testing methods', function(done) {
     describe('inserting experiment template by non-data admin', function(done) {
       it('does not allow a registered, non-admin user to insert an experiment template', function(done) {
         var newExperiment = makeExperiment("Experiment Set 3", "template");
-        Meteor.call('insertExperiment', newExperiment, function(err, dsId) {
+        Meteor.call('insertExperiment', newExperiment, function(err, expId) {
           try {
             console.log('experiment template error', err);
             chai.assert.isDefined(err);
-            var insertedExperiment = Experiments.findOne({_id: dsId});
-            chai.assert.isUndefined(insertedExperiment);
+            Meteor.call('test.Experiments.findOne', expId, function(err, insertedExperiment) {
+              console.log('insertedExperiment', insertedExperiment);
+              chai.assert.isUndefined(insertedExperiment);
+            });
           } catch(error) {
             done(error);
           }
@@ -428,7 +400,6 @@ describe('Testing methods', function(done) {
             if (err) console.log('insert clone error', err)
             else console.log('expId', expId);
             chai.assert.isUndefined(err);
-            Meteor.subscribe('experiments');
             Meteor.call('test.Experiments.findOne', expId, function(err, insertedExperiment) {
               console.log('insertedExperiment', insertedExperiment);
               chai.assert.equal(insertedExperiment.name, "Experiment 1");
@@ -468,38 +439,12 @@ describe('Testing methods', function(done) {
 
 });
 
-/*  The system currently doesn't prevent duplicate models per user
-    describe('Insert duplicate model', function(done) {
-      it('does not allow a registered user to insert a duplicate model', function(done) {
-        var newModel = makeModel("Model 1");
-        Meteor.call('insertModel', newModel, function(err, modelId) {
-  //        chai.assert.isUndefined(err);
-          var insertedModel = Models.findOne({_id: modelId});
-  //        chai.assert.equal(insertedModel.name, 'Model 1');
-          done();
-        });
-
-        var newModel = makeModel("Model 1");
-        Meteor.call('insertModel', newModel, function(err, modelId) {
-          try {
-            chai.assert.isDefined(err);
-          } catch(error) {
-            done(error);
-          }
-          var insertedModel = Models.findOne({_id: modelId});
-          done();
-        });
-
-      });
-    });
-*/
-
 
 
 function makeModel(modelName) {
   var model = {
     name: modelName,
-    references: null
+    references: " "
   };
 
   return model;
@@ -528,7 +473,7 @@ function makeExperiment(experimentName, recordType) {
 function makeModelOutput(modelOutputName) {
   var modelOutput = {
     name: modelOutputName,
-    experiment: 'Experiment 1',
+    experiment: 'randomExp',
     model: 'testModel'
   }
   return modelOutput;
