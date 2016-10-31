@@ -8,8 +8,16 @@ Meteor.methods({
     return model;
   },
 
+  'test.Models.insert': function(modelDoc) {
+    return Models.insert(modelDoc);
+  },
+
   'test.Experiments.findOne': function(expDoc) {
     return Experiments.findOne(expDoc);
+  },
+
+  'test.Experiments.insert': function(expDoc) {
+    return Experiments.insert(expDoc);
   },
 
   'test.ModelOutputs.findOne': function(moDoc) {
@@ -18,6 +26,10 @@ Meteor.methods({
 
   'test.DataSets.findOne': function(dsDoc) {
     return DataSets.findOne(dsDoc);
+  },
+
+  'test.DataSets.insert': function(dsDoc) {
+    return DataSets.insert(dsDoc);
   },
 
   'test.Workspaces.findOne': function(wsDoc) {

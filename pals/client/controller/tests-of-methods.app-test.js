@@ -13,6 +13,7 @@ Meteor.methods({
   }
 });*/
 
+/*
 describe('Testing methods', function(done) {
   before(function(done) {
     Meteor.call('test.resetDatabase', done);
@@ -638,9 +639,6 @@ describe('Testing methods', function(done) {
             Meteor.call('test.Workspaces.findOne', {_id: myWsId4}, function(err, ws) {
               chai.assert.isDefined(ws, 'Workspace was erroneously removed');
             });
-/*            var ws = Workspaces.findOne({_id: myWsId4});
-            chai.assert.isDefined(err, 'Error was not called');
-            chai.assert.isDefined(ws, 'Workspace was erroneously removed');*/
           } catch(error) {
             done(error);
           }
@@ -685,7 +683,7 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('Removing data set when not logged in', function() {
+    describe('Removing data set', function() {
       it('does not allow unregistered user to remove a data set', function(done) {
         Meteor.call('removeDataSet', {_id: myDsId2}, function(err, doc) {
           try {
@@ -699,7 +697,7 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('inserting experiment template by non-data admin', function(done) {
+    describe('Inserting experiment template', function(done) {
       it('does not allow a registered, non-admin user to insert an experiment template', function(done) {
         var newExperiment = makeExperiment("Experiment Set 3", "template");
         Meteor.call('insertExperiment', newExperiment, function(err, expId) {
@@ -707,6 +705,39 @@ describe('Testing methods', function(done) {
             chai.assert.isDefined(err);
             chai.assert.equal(err.error, 'not-authorized');
             chai.assert.isUndefined(expId, 'experiment document was erroneously inserted');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Updating experiment template', function(done) {
+      it('does not allow a registered non-admin user to update an experiment template', function(done) {
+        var modifier = {$set: {spatialLevel: "MultipleSite"}};
+        Meteor.call('updateExperiment', {_id: myExpId2}, modifier, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Error was erroneously not called');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
+            Meteor.call('test.Experiments.findOne', {_id: myExpId2}, function(err, updatedExperiment) {
+              chai.assert.isUndefined(err);
+              chai.assert.equal(updatedExperiment.spatialLevel, "SingleSite", 'Experiment was erroneously updated');
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Removing experiment template', function() {
+      it('does not allow a non-admin user to remove an experiment template', function(done) {
+        Meteor.call('removeExperiment', {_id: myExpId2}, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Experiment template was erroneously removed');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
           } catch(error) {
             done(error);
           }
@@ -732,7 +763,7 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('inserting model output by non-admin', function(done) {
+    describe('Inserting model output', function(done) {
 
       it('allows a registered user to insert a model output', function(done) {
         var newModelOutput = makeModelOutput("Model Output 3");
@@ -742,6 +773,40 @@ describe('Testing methods', function(done) {
             Meteor.call('test.ModelOutputs.findOne', {_id: moId}, function(err, insertedModelOutput) {
               chai.assert.equal(insertedModelOutput.name, "Model Output 3");
             });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+
+    describe('Updating model output', function(done) {
+      it('does not allow non-data admin user to update a model output', function(done) {
+        var modifier = {$set: {experiment: "notRandom"}};
+        Meteor.call('updateModelOutput', {_id: myMoId2}, modifier, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'Error was erroneously not called');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
+            Meteor.call('test.ModelOutputs.findOne', {_id: myMoId2}, function(err, updatedModelOutput) {
+              chai.assert.isUndefined(err);
+              chai.assert.equal(updatedModelOutput.experiment, "randomExp", 'ModelOutput was erroneously updated');
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Removing model output', function() {
+      it('does not allow non-data admin user to remove a model output', function(done) {
+        Meteor.call('removeModelOutput', {_id: myMoId2}, function(err, doc) {
+          try {
+            chai.assert.isDefined(err, 'model output was erroneously removed');
+            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
           } catch(error) {
             done(error);
           }
@@ -795,3 +860,4 @@ function makeModelOutput(modelOutputName) {
   }
   return modelOutput;
 }
+*/
