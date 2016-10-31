@@ -7,6 +7,9 @@ import '../../both/collections.js';
 
 import { Random } from 'meteor/random';
 
+ownModel = makeModel("My Model");
+notOwnModel = makeModel("Another's model");
+
 describe('Testing methods', function(done) {
   before(function(done) {
     Meteor.call('test.resetDatabase', done);
@@ -91,25 +94,30 @@ describe('Testing methods', function(done) {
     before(function(done){
       var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
       if (testUser && testUser._id)
-        Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
+      Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
 
       Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
         try {
+          if (err) console.log(err);
           chai.assert.isUndefined(err);
           var user = Meteor.user();
           chai.assert.equal(user.emails[0].address, 'test0@testing.com');
         } catch(error) {
           done(error);
         }
-        done();
       });
+
+      eval("Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {roles: {'model " + ownModel._id + "' : [ 'edit' ]} }});");
+      done();
     });
 
-    describe('Models', function(done) {
-      var newModel = makeModel("Model 2");
-      testObjectMethods('Model', 'an unregistered user', newModel, 'references', 'All of them', 'allows', done);
-    })
+    describe("Models - one's own", function(done) {
+      testObjectMethods('Model', 'a registered user', ownModel, 'references', 'All of them', 'allows', done);
+    });
 
+    describe("Models - another's", function(done) {
+      testObjectMethods('Model', 'a registered user', notOwnModel, 'references', 'All of them', 'does not allow', done);
+    });
   });
 
   after(function(done) {
@@ -535,11 +543,11 @@ function testInsertMethod(method, collection, docToInsert, expectedOutcome, done
   Meteor.call(method, docToInsert, function(err, docId) {
     try {
       if (expectedOutcome == 'allows') {
+        if (err) console.log(err);
         chai.assert.isUndefined(err, 'Error was called');
         chai.assert.isDefined(docId, 'Document was not inserted');
         Meteor.call(findOneMethodName, {_id: docId}, function(err, insertedDoc) {
           console.log(insertedDoc);
-          if (err) console.log(err);
           chai.assert.isUndefined(err);
           chai.assert.equal(insertedDoc.name, docToInsert.name, 'Document was not inserted');
         });
@@ -679,7 +687,7 @@ function makeObject(objectType) {
 function makeModel(modelName) {
   var model = {
     name: modelName,
-    references: " "
+    references: "some"
   };
 
   return model;
@@ -689,8 +697,7 @@ function makeDataSet(dataSetName) {
   var dataSet = {
     name: dataSetName,
     type: 'flux tower',
-    spatialLevel: 'SingleSite',
-    references: "some"
+    spatialLevel: 'SingleSite'
   };
 
   return dataSet;
