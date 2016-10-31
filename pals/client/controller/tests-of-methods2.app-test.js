@@ -116,7 +116,10 @@ describe('Testing methods', function(done) {
     });
 
     describe("Models - another's", function(done) {
-      testObjectMethods('Model', 'a registered user', notOwnModel, 'references', 'All of them', 'does not allow', done);
+      it('does not allow a user to update the model of another user', function(done) {
+        testUpdateMethod('updateModel', {_id: notOwnModel._id}, 'Models', 'references', 'A random ref', "does not allow", done)        
+      });
+
     });
   });
 
