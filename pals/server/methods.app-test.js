@@ -9,6 +9,7 @@ Meteor.methods({
   },
 
   'test.Models.insert': function(modelDoc) {
+  
     return Models.insert(modelDoc);
   },
 

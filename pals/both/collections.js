@@ -121,7 +121,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
     regEx: SimpleSchema.RegEx.Id,
     label: "Created By",
     autoValue: function() {
-      if (this.isInsert) {
+      if (this.isInsert && Meteor.userId()) {
         return Meteor.userId()
       }
     }
@@ -193,7 +193,7 @@ modelSchema = new SimpleSchema({
     regEx: SimpleSchema.RegEx.Id,
     label: "Created By",
     autoValue: function() {
-      if (this.isInsert) {
+      if (this.isInsert && Meteor.userId()) {
         return Meteor.userId()
       }
     }
@@ -246,7 +246,7 @@ Experiments.attachSchema(new SimpleSchema({
     regEx: SimpleSchema.RegEx.Id,
     label: "Created By",
     autoValue: function() {
-      if (this.isInsert) {
+      if (this.isInsert && Meteor.userId()) {
         return Meteor.userId()
       }
     }
@@ -331,7 +331,7 @@ dataSetSchema = new SimpleSchema({
     label: "Created By",
     autoValue: function() {
       if (this.isInsert) {
-        return Meteor.userId()
+        return Meteor.userId();
       }
     }
   },
@@ -363,7 +363,7 @@ dataSetSchema = new SimpleSchema({
     type: Number,
     label: "Version",
     autoValue: function() {
-      if (this.isInsert) {
+      if (this.isInsert && Meteor.userId()) {
         return 1
       }
     }
