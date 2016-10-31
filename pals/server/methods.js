@@ -14,9 +14,12 @@ var fs = Npm.require('fs');
 
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
+    if (modelOutputDoc) {
+      if (modelOutputDoc.name) console.log('Model Output to insert: ', modelOutputDoc.name);
       var userId = this.userId;
       if( !userId ) {
-          throw new Meteor.Error('not-authorized');
+        console.log('Error - not authorized\n');
+        throw new Meteor.Error('not-authorized');
       }
       else {
         var moId = ModelOutputs.insert(modelOutputDoc);
@@ -24,117 +27,188 @@ Meteor.methods({
         Roles.addUsersToRoles(userId, 'edit', group);
         return moId;
       }
+    } else throw new Meteor.Error('No document provided to insert');
   },
+
   'updateModelOutput': function(currentDoc, updateDoc) {
       var userId = this.userId;
       var group = 'modelOutput: ' + currentDoc._id;
-      if( Roles.userIsInRole(userId, 'edit', group) ) {
-          mo = ModelOutputs.update(currentDoc, updateDoc);
-          return mo;
-      }
-      else {
-          throw new Meteor.Error('not-authorized');
-      }
+        if (currentDoc && currentDoc._id) {
+          var modelOutput = ModelOutputs.findOne(currentDoc);
+          if (modelOutput && modelOutput.name) console.log('Model Output to update', modelOutput.name);
+          if( Roles.userIsInRole(userId, 'edit', group) ) {
+              moResult = ModelOutputs.update(currentDoc, updateDoc);
+              return moResult;
+          }
+          else {
+            console.log('Error - not authorized\n');
+            throw new Meteor.Error('not-authorized');
+          }
+        } else throw new Meteor.Error('no document specified to update');
   },
 
   'removeModelOutput': function(modelOutputDoc) {
       var userId = this.userId;
       var group = 'modelOutput: ' + modelOutputDoc._id;
-      if( Roles.userIsInRole(userId, 'edit', group) ) {
-        mo = ModelOutputs.remove(modelOutputDoc);
-        return mo;
-      }
-      else {
-          throw new Meteor.Error('not-authorized');
-      }
-  },
-
-  'updateDataSet': function(currentDoc, dataSetDoc) {
-        var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            throw new Meteor.Error('not-authorized')
+      if (modelOutputDoc) {
+        if( Roles.userIsInRole(userId, 'edit', group) ) {
+          mo = ModelOutputs.remove(modelOutputDoc);
+          return mo;
         }
         else {
-            return DataSets.update(currentDoc, dataSetDoc);
+          console.log('Error - not authorized\n');
+          throw new Meteor.Error('not-authorized');
         }
+      } else throw new Meteor.Error('no model output specified to remove');
+  },
 
-    },
-    'insertDataSet': function(dataSetDoc) {
+  'insertDataSet': function(dataSetDoc) {
+      if (dataSetDoc) {
+        if (dataSetDoc.name) console.log('Data set to insert: ', dataSetDoc.name);
         var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            throw new Meteor.Error('not-authorized')
+          console.log('Error - not authorized\n');
+          throw new Meteor.Error('not-authorized')
         }
         else {
           var dsId = DataSets.insert(dataSetDoc);
           var group = 'dataSet ' + dsId;
           Roles.addUsersToRoles(userId, 'edit', group);
-          console.log('Data set inserted: ' + dataSetDoc.name);
+          console.log('inserted\n');
           return dsId;
         }
-    },
-    'removeDataSet': function(dataSetDoc) {
+      } else {
+        throw new Meteor.error('No document to insert');
+      }
+  },
+
+  'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
+        if (currentDoc && currentDoc._id) {
+          var ds = DataSets.findOne(currentDoc);
+          if (ds && ds.name) console.log('Dataset to update', ds.name);
+          if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
+            console.log('Error - not-authorized\n');
             throw new Meteor.Error('not-authorized')
-        }
-        else {
-          return DataSets.remove(dataSetDoc);
-        }
-    },
-    'updateExperiment': function(currentDoc, updateDoc) {
-        var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
-            throw new Meteor.Error('not-authorized')
-        }
-        else {
-              var exp = Experiments.update(currentDoc, updateDoc);
-              return exp;
+          }
+          else {
+            var result = DataSets.update(currentDoc, dataSetDoc);
+            console.log('updated\n');
+            return result;
+          }
+        } else {
+          throw new Meteor.Error('No document selected to update');
         }
 
     },
+
+    'removeDataSet': function(dataSetDoc) {
+        if (dataSetDoc && dataSetDoc._id) {
+          var ds = DataSets.findOne(dataSetDoc);
+          if (ds && ds.name) console.log('Dataset to remove', ds.name);
+          var userId = this.userId;
+          if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
+            console.log('Error - not authorized');
+            throw new Meteor.Error('not-authorized')
+          }
+          else {
+            result = DataSets.remove(dataSetDoc);
+            console.log('removed\n');
+            return result;
+          }
+        } else throw new Meteor.Error('No data set selected');
+    },
+
+    'updateExperiment': function(currentDoc, updateDoc) {
+        var userId = this.userId;
+        if (currentDoc && currentDoc._id) {
+          var exp = Experiments.findOne(currentDoc);
+          if (exp && exp.name) console.log('Experiment to update', exp.name);
+
+          if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
+              console.log('Error - not authorized\n');
+              throw new Meteor.Error('not-authorized');
+          }
+          else {
+            console.log('updated\n');
+            var exp = Experiments.update(currentDoc, updateDoc);
+            return exp;
+          }
+        } else throw new Meteor.Error('no experiment selected to update');
+    },
+
     'insertExperiment': function(expDoc) {
         var userId = this.userId;
         var docId;
-        if (userId && expDoc.recordType == 'instance') {
+        if (expDoc) {
+          if (expDoc.name) console.log('Experiment to insert: ', expDoc.name);
+          if (userId && expDoc.recordType == 'instance') {
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
             Roles.addUsersToRoles(userId, 'edit', group);
+            console.log('inserted\n')
             return docId;
-        }
-        else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
+          }
+          else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
             var expId = Experiments.insert(expDoc);
             var group = 'experiment ' + expId;
             Roles.addUsersToRoles(userId, 'edit', group);
+            console.log('inserted\n')
             return expId;
-        }
-        else {
+          }
+          else {
+            console.log('Error - not authorized\n');
             throw new Meteor.Error('not-authorized')
+          }
+        } else {
+          throw new Meteor.Error('no document given to insert');
         }
     },
-    'removeExperiment': function(dataSetDoc) {
+    'removeExperiment': function(expDoc) {
         var userId = this.userId;
-        var group = 'experiment ' + dataSetDoc._id;
-        if( !Roles.userIsInRole(userId, 'edit', group) ) {
+        var group = 'experiment ' + expDoc._id;
+        if (expDoc && expDoc._id) {
+          var exp = Experiments.findOne(expDoc);
+          if (exp && exp.name) console.log('Experiment to remove', exp.name);
+
+          if( !Roles.userIsInRole(userId, 'edit', group) ) {
+            console.log('Error - not authorized\n');
             throw new Meteor.Error('not-authorized')
-        }
-        else {
-          return Experiments.remove(dataSetDoc);
-        }
+          }
+          else {
+            result = Experiments.remove(expDoc);
+            console.log('removed\n');
+            return result;
+          }
+        } else throw new Meteor.Error('no document selected to remove');
     },
+
     'updateModel': function(currentDoc, modelDoc) {
         var userId = this.userId;
         var group = 'model ' + currentDoc._id;
-        if( !Roles.userIsInRole(userId, 'edit', group)) {
-            throw new Meteor.Error('not-authorized')
+        if (currentDoc && currentDoc._id) {
+          var model = Models.findOne(currentDoc);
+          if (model && model.name) console.log('Model to remove', model.name);
+          if( !Roles.userIsInRole(userId, 'edit', group)) {
+              console.log('Error - not authorized\n');
+              throw new Meteor.Error('not-authorized')
+          }
+          else {
+              result = Models.update(currentDoc, modelDoc);
+              console.log('updated\n');
+              return result;
+          }
+        } else {
+          throw new Meteor.Error('no document specified to update');
         }
-        else {
-            return Models.update(currentDoc, modelDoc);
-        }
-
     },
+
     'insertModel': function(modelDoc) {
+      if(modelDoc) {
         var userId = this.userId;
+        if (modelDoc.name) console.log('Model to insert: ', modelDoc.name);
         if( !userId ) {
+          console.log('Error - not authorized\n');
           throw new Meteor.Error('not-authorized')
         }
         else if(Models.findOne({name:modelDoc.name, owner: userId })) {
@@ -144,21 +218,28 @@ Meteor.methods({
           var docId = Models.insert(modelDoc);
           var group = 'model ' + docId;
           Roles.addUsersToRoles(userId, 'edit', group);
-
+          console.log('inserted\n');
           return docId;
         }
+      } else throw new Meteor.Error('no document to insert');
     },
 
     'removeModel': function(modelDoc) {
         var userId = this.userId;
         var group = 'model ' + modelDoc._id;
-        if( Roles.userIsInRole(userId, 'edit', group) ) {
-          mo = Models.remove(modelDoc);
-          return mo;
-        }
-        else {
+        if (modelDoc && modelDoc._id) {
+          var model = Models.findOne(modelDoc);
+          if (model && model.name) console.log('Model to remove', model.name);
+          if( Roles.userIsInRole(userId, 'edit', group) ) {
+            mo = Models.remove(modelDoc);
+            console.log('removed\n');
+            return mo;
+          }
+          else {
+            console.log('Error - not authorized\n');
             throw new Meteor.Error('not-authorized');
-        }
+          }
+        } else throw new Meteor.Error('no document specified for removal')
     },
 
     'insertWorkspace': function(name) {
@@ -173,6 +254,7 @@ Meteor.methods({
           var docId =  Workspaces.insert({owner: userId, name: name});
           Roles.addUsersToRoles(userId, 'edit', 'workspace ' + docId);
 
+          console.log(Workspaces.find().fetch());
           return docId;
         }
     },
@@ -192,6 +274,7 @@ Meteor.methods({
     'changeWorkspace': function(workspaceId) {
       var userId = this.userId;
       var workspace = Workspaces.findOne({_id: workspaceId});
+      console.log(Workspaces.find().fetch());
       if( userId && workspace ) {
         return Meteor.users.update({_id: userId}, {$set: {'profile.currentWorkspace': workspaceId}});
       }

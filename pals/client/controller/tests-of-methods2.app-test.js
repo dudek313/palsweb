@@ -111,17 +111,150 @@ describe('Testing methods', function(done) {
       done();
     });
 
-    describe("Models - one's own", function(done) {
-      testObjectMethods('Model', 'a registered user', ownModel, 'references', 'All of them', 'allows', done);
-    });
 
-    describe("Models - another's", function(done) {
-      it('does not allow a user to update the model of another user', function(done) {
-        testUpdateMethod('updateModel', {_id: notOwnModel._id}, 'Models', 'references', 'A random ref', "does not allow", done)        
+    describe("Models - one's own", function(done) {
+
+      describe('Updating own model', function(done) {
+        before(function(done) {
+          Meteor.call('test.resetDatabase', done);
+          documentInsert('ownModel', 'Models', done);
+        });
+
+        it('allows a registered user to update own model', function(done) {
+          var myModelId = Session.get('currentDocId');
+          testUpdateMethod('updateModel', {_id: myModelId}, 'Models', 'references', 'all references', 'allows', done);
+        });
+
       });
 
     });
+/*
+    describe("Models - another's", function(done) {
+
+      beforeEach(function(done) {
+        Meteor.call('test.resetDatabase', done);
+      });
+
+      it('does not allow a user to update the model of another user', function(done) {
+        notOwnModelId = documentInsert('Models', done);
+        testUpdateMethod('updateModel', {_id: notOwnModelId}, 'Models', 'references', 'A random ref', "does not allow", done);
+      });
+
+      it('does not allow a user to remove the model of another user', function(done) {
+        notOwnModelId = documentInsert('Models', done);
+        testRemoveMethod('removeModel', {_id: notOwnModelId}, 'Models', 'does not allow', done);
+      });
+    });
+*/
+
+/*    describe('Adding new Workspace', function(done) {
+      it('allows a registered user to insert a new workspace', function(done) {
+        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+          try {
+            chai.assert.isUndefined(err);
+          } catch(error) {
+            done(error);
+          }
+
+          var insertedWS = Workspaces.findOne({_id: wsId});
+          try {
+            chai.assert.equal(insertedWS.name, 'WS 1');
+            myWsId = wsId;
+          } catch(error) {
+            done(error);
+          }
+
+          done(err);
+        });
+      });
+    });
+
+    describe('Change workspace', function(done) {
+      before(function(done) {
+        Meteor.call('test.Workspace.insert', "WS 2", function(err, doc) {
+          try {
+            chai.assert.isUndefined(err);
+          } catch(error) {
+            done(error);
+          }
+          myWs = doc;
+          done();
+        })
+      });
+
+      it('allows a non-admin user to change workspaces', function(done) {
+//        var ws = Workspaces.findOne({name: 'WS 1'});
+        console.log(Workspaces.find().fetch());
+        Meteor.call('changeWorkspace', myWs._id, function(err, success) {
+          try {
+            console.log(Workspaces.find().fetch());
+            if (err) console.log(err);
+            chai.assert.isUndefined(err);
+            console.log(success);
+            chai.assert.isDefined(success);
+            var currentWorkspace = getCurrentWorkspace();
+            chai.assert.equal(currentWorkspace.name, "WS 2", 'Not in the correct workspace.');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe('Inserting duplicate workspace', function(done) {
+      it('does not allow a registered user to insert duplicate workspaces', function(done) {
+
+        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+          try {
+            if (err) console.log(err);
+            chai.assert.isDefined(err);
+          } catch(error) {
+            done(error);
+          }
+
+          done();
+        });
+
+      });
+    });
+
+    describe('Removing own workspace', function(done) {
+      it('allows a registered user to remove their own workspace', function(done) {
+        Meteor.call('removeWorkspace', {_id: myWsId}, function(err, doc) {
+          try {
+            if (err) console.log(err);
+            chai.assert.isUndefined(err, 'Error was called');
+            var ws = Workspaces.findOne({_id: myWsId});
+            chai.assert.isUndefined(ws, 'Workspace was not removed');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    describe("Removing another user's workspace", function(done) {
+      it("does not allow a registered user to remove another user's workspace", function(done) {
+        Meteor.call('removeWorkspace', {_id: myWsId4}, function(err, doc) {
+          try {
+            if (err) console.log(err);
+            chai.assert.isDefined(err, 'Error was not called');
+            Meteor.call('test.Workspaces.findOne', {_id: myWsId4}, function(err, ws) {
+              chai.assert.isDefined(ws, 'Workspace was erroneously removed');
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+    */
   });
+
 
   after(function(done) {
     var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
@@ -139,111 +272,6 @@ describe('Testing methods', function(done) {
 
   describe('Registered user functions', function() {
 
-    describe('Login', function() {
-      beforeEach(function(done){
-        var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
-        if (testUser && testUser._id)
-          Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
-        done();
-      });
-
-      it('allows a registered user to login', function(done) {
-
-        Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
-          try {
-            chai.assert.isUndefined(err);
-            var user = Meteor.user();
-            chai.assert.equal(user.emails[0].address, 'test0@testing.com');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting new model', function(done) {
-      it('allows a registered user to insert a model', function(done) {
-        var newModel = makeModel("Model 1");
-        Meteor.call('insertModel', newModel, function(err, modelId) {
-        try {
-          chai.assert.isUndefined(err);
-          var insertedModel = Models.findOne({_id: modelId});
-          chai.assert.equal(insertedModel.name, 'Model 1');
-          myModelId = modelId;
-        } catch(error) {
-          done(error);
-        }
-        done();
-        });
-      });
-    });
-
-    describe('Updating own model', function(done) {
-      it('allows a registered user to update their own model', function(done) {
-        var modifier = {$set: {references: "some references"}};
-        Meteor.call('updateModel', {_id: myModelId}, modifier, function(err, doc) {
-          try {
-            chai.assert.isUndefined(err, 'Error was called');
-            var updatedModel = Models.findOne({_id: myModelId});
-            chai.assert.equal(updatedModel.references, "some references", 'Model was not updated');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe("Updating another's model", function(done) {
-      it("does not allow a registered user to update another user's model", function(done) {
-        var modifier = {$set: {references: "All kinds of references to be sure"}};
-        Meteor.call('updateModel', {_id: myModelId4}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.Models.findOne', {_id: myModelId4}, function(err, updatedModel) {
-              chai.assert.isUndefined(err);
-              chai.assert.notEqual(updatedModel.references, " ", 'Model was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Removing own model', function(done) {
-      it('allows a registered user to remove their own model', function(done) {
-        Meteor.call('removeModel', {_id: myModelId}, function(err, doc) {
-          try {
-            chai.assert.isUndefined(err, 'Error was called');
-            Meteor.call('test.Models.findOne', {_id: myModelId}, function(err, model) {
-              chai.assert.isUndefined(err);
-              chai.assert.isUndefined(model, 'Model was not removed');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe("Removing another's model", function() {
-      it("does not allow a registered user to remove another user's model", function(done) {
-        Meteor.call('removeModel', {_id: myModelId4}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Model was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
 
     describe('Adding new Workspace', function(done) {
       it('allows a registered user to insert a new workspace', function(done) {
@@ -520,22 +548,25 @@ function testObjectMethods(objectName, userType, objectToInsert, attributeUpdate
 
   describe('Updating a ' + objectName, function(done) {
     before(function(done) {
-      myObjectId = documentInsert(collectionName, done);
+      documentInsert('docToUpdate', collectionName, done);
     });
 
     it(expectedOutcome + ' ' + userType + ' to update a ' + objectName, function(done) {
       var methodName = 'update' + objectName;
+      myObjectId = Session.get('currentDocId');
       testUpdateMethod(methodName, {_id: myObjectId}, collectionName, attributeUpdated, updatedValue, expectedOutcome, done);
     });
   });
 
   describe('Removing a ' + objectName, function(done) {
     before(function(done) {
-      myObjectId2 = documentInsert(collectionName, done);
+      documentInsert('docToRemove', collectionName, done);
     });
 
     it(expectedOutcome + ' ' + userType + ' to remove a ' + objectName, function(done) {
       var methodName = 'remove' + objectName;
+      myObjectId2 = Session.get('currentDocId');
+      console.log(myObjectId2);
       testRemoveMethod(methodName, {_id: myObjectId2}, collectionName, expectedOutcome, done);
     });
   });
@@ -567,13 +598,15 @@ function testInsertMethod(method, collection, docToInsert, expectedOutcome, done
   });
 }
 
-
 function testUpdateMethod(method, selector, collection, updatedAttribute, updatedValue, expectedOutcome, done) {
   var findOneMethodName = 'test.' + collection + '.findOne';
   eval('var modifier = {$set: {' + updatedAttribute + ': "' + updatedValue + '"}}')
+  console.log('selector', selector);
   Meteor.call(method, selector, modifier, function(err, doc) {
     try {
       if (expectedOutcome == "allows") {
+        if (err) console.log(err);
+        if (doc) console.log(doc);
         chai.assert.isUndefined(err, 'Error was called');
         Meteor.call(findOneMethodName, selector, function(err, newDoc) {
           console.log(newDoc);
@@ -583,9 +616,9 @@ function testUpdateMethod(method, selector, collection, updatedAttribute, update
         });
       }
       else {
+        chai.assert.isUndefined(doc, 'Document was updated');
         chai.assert.isDefined(err, 'Error was not called');
         chai.assert.equal(err.error, "not-authorized", 'Wrong error called');
-        chai.assert.isUndefined(doc, 'Document was updated');
       }
     } catch(error) {
       done(error);
@@ -596,6 +629,7 @@ function testUpdateMethod(method, selector, collection, updatedAttribute, update
 
 function testRemoveMethod(method, selector, collection, expectedOutcome, done) {
   findOneMethodName = 'test.' + collection + '.findOne';
+  console.log('testRemoveMethod selector: ', selector);
   Meteor.call(method, selector, function(err, success) {
     try {
       if (expectedOutcome == "allows") {
@@ -624,15 +658,15 @@ function testRemoveMethod(method, selector, collection, expectedOutcome, done) {
 //////////////////////////
 // Need to include owner
 //////////////////////////
-function documentInsert(collectionName, done) {
+function documentInsert(docName, collectionName, done) {
   if (collectionName == "DataSets")
-    var newDocument = makeDataSet("Data Set 2");
+    var newDocument = makeDataSet(docName);
   else if (collectionName == "Experiments")
-    var newDocument = makeExperiment("Experiment 2", "template");
+    var newDocument = makeExperiment(docName, "template");
   else if (collectionName == "ModelOutputs")
-    var newDocument = makeModelOutput("Model Output 2");
+    var newDocument = makeModelOutput(docName);
   else if (collectionName == "Models")
-    var newDocument = makeModel("Model 2");
+    var newDocument = makeModel(docName);
 
   if (!newDocument.owner) newDocument.owner = Random.id();
 
@@ -644,6 +678,7 @@ function documentInsert(collectionName, done) {
     } catch(error) {
       done(error);
     }
+    Session.set('currentDocId', docId);
     done();
   });
 

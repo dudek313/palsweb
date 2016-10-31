@@ -40,6 +40,11 @@ Meteor.methods({
     return Workspaces.findOne(wsDoc);
   },
 
+  'test.Workspaces.insert': function(wsName, ownerId) {
+    var docId =  Workspaces.insert({owner: ownerId, name: name});
+    return docId;
+  },
+
   'test.resetDatabase': function(callback) {
     resetDatabase({excludedCollections: ['users']}, callback)
   },
