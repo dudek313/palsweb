@@ -67,7 +67,7 @@ describe('Testing methods', function(done) {
 
     describe('Model methods', function() {
       var newModel = makeModel("Model 1");
-      testObjectMethods('Model', 'an unregistered user', newModel, 'spatialLevel', 'MultipleSite', 'does not allow', done);
+      testObjectMethods('Model', 'an unregistered user', newModel, 'references', 'All of them', 'does not allow', done);
     });
 
     describe('Data Sets', function(done) {
@@ -87,6 +87,31 @@ describe('Testing methods', function(done) {
 
   });
 
+  describe('Registered user functions', function() {
+    before(function(done){
+      var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+      if (testUser && testUser._id)
+        Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
+
+      Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
+        try {
+          chai.assert.isUndefined(err);
+          var user = Meteor.user();
+          chai.assert.equal(user.emails[0].address, 'test0@testing.com');
+        } catch(error) {
+          done(error);
+        }
+        done();
+      });
+    });
+
+    describe('Models', function(done) {
+      var newModel = makeModel("Model 2");
+      testObjectMethods('Model', 'an unregistered user', newModel, 'references', 'All of them', 'allows', done);
+    })
+
+  });
+
   after(function(done) {
     var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
     if (testUser) {
@@ -100,59 +125,6 @@ describe('Testing methods', function(done) {
 
 });
 /*
-
-    describe('Inserting model output when not logged in', function(done) {
-      it('does not allow unregistered user to insert a model output', function(done) {
-        var newModelOutput = makeModelOutput("modelOutput 3");
-        Meteor.call('insertModelOutput', newModelOutput, function(err, moId) {
-          try {
-            chai.assert.isDefined(err);
-            chai.assert.equal(err.error, "not-authorized");
-            var insertedExperiment = Experiments.findOne({_id: moId});
-            chai.assert.isUndefined(insertedExperiment);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        })
-      });
-    });
-
-    describe('Updating model output when not logged in', function(done) {
-      it('does not allow unregistered user to update a model output', function(done) {
-        var modifier = {$set: {experiment: "notRandom"}};
-        Meteor.call('updateModelOutput', {_id: myMoId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.ModelOutputs.findOne', {_id: myMoId2}, function(err, updatedModelOutput) {
-              chai.assert.isUndefined(err);
-              chai.assert.equal(updatedModelOutput.experiment, "randomExp", 'ModelOutput was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Removing model output when not logged in', function() {
-      it('does not allow unregistered user to remove a model output', function(done) {
-        Meteor.call('removeModelOutput', {_id: myMoId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'model output was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-  });
-
 
   describe('Registered user functions', function() {
 
@@ -567,6 +539,7 @@ function testInsertMethod(method, collection, docToInsert, expectedOutcome, done
         chai.assert.isDefined(docId, 'Document was not inserted');
         Meteor.call(findOneMethodName, {_id: docId}, function(err, insertedDoc) {
           console.log(insertedDoc);
+          if (err) console.log(err);
           chai.assert.isUndefined(err);
           chai.assert.equal(insertedDoc.name, docToInsert.name, 'Document was not inserted');
         });
@@ -593,6 +566,7 @@ function testUpdateMethod(method, selector, collection, updatedAttribute, update
         chai.assert.isUndefined(err, 'Error was called');
         Meteor.call(findOneMethodName, selector, function(err, newDoc) {
           console.log(newDoc);
+          if (err) console.log(err);
           chai.assert.isUndefined(err);
           chai.assert.equal(newDoc[updatedAttribute], updatedValue, collection + ' collection was not updated');
         });
@@ -617,6 +591,7 @@ function testRemoveMethod(method, selector, collection, expectedOutcome, done) {
         chai.assert.isUndefined(err, 'Error was called');
         Meteor.call(findOneMethodName, selector, function(err, doc) {
           console.log(doc);
+          if (err) console.log(err);
           chai.assert.isUndefined(err, 'An error message was given');
           chai.assert.isUndefined(doc, 'Document was not removed');
         });
@@ -715,7 +690,7 @@ function makeDataSet(dataSetName) {
     name: dataSetName,
     type: 'flux tower',
     spatialLevel: 'SingleSite',
-    references: " "
+    references: "some"
   };
 
   return dataSet;
