@@ -330,7 +330,7 @@ dataSetSchema = new SimpleSchema({
     regEx: SimpleSchema.RegEx.Id,
     label: "Created By",
     autoValue: function() {
-      if (this.isInsert) {
+      if (this.isInsert && Meteor.userId()) {
         return Meteor.userId();
       }
     }
@@ -363,7 +363,7 @@ dataSetSchema = new SimpleSchema({
     type: Number,
     label: "Version",
     autoValue: function() {
-      if (this.isInsert && Meteor.userId()) {
+      if (this.isInsert) {
         return 1
       }
     }

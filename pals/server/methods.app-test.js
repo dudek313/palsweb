@@ -9,7 +9,6 @@ Meteor.methods({
   },
 
   'test.Models.insert': function(modelDoc) {
-  
     return Models.insert(modelDoc);
   },
 
@@ -23,6 +22,10 @@ Meteor.methods({
 
   'test.ModelOutputs.findOne': function(moDoc) {
     return ModelOutputs.findOne(moDoc);
+  },
+
+  'test.ModelOutputs.insert': function(modelDoc) {
+    return ModelOutputs.insert(modelDoc);
   },
 
   'test.DataSets.findOne': function(dsDoc) {
