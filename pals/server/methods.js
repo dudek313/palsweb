@@ -15,7 +15,7 @@ var fs = Npm.require('fs');
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
     if (modelOutputDoc) {
-      if (modelOutputDoc.name) console.log('Model Output to insert: ', modelOutputDoc.name);
+      if (modelOutputDoc.name) console.log('Model Output to insert:', modelOutputDoc.name);
       var userId = this.userId;
       if( !userId ) {
         console.log('Error - not authorized\n');
@@ -35,7 +35,7 @@ Meteor.methods({
       var group = 'modelOutput: ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
           var modelOutput = ModelOutputs.findOne(currentDoc);
-          if (modelOutput && modelOutput.name) console.log('Model Output to update', modelOutput.name);
+          if (modelOutput && modelOutput.name) console.log('Model Output to update:', modelOutput.name);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
               moResult = ModelOutputs.update(currentDoc, updateDoc);
               return moResult;
@@ -51,6 +51,8 @@ Meteor.methods({
       var userId = this.userId;
       var group = 'modelOutput: ' + modelOutputDoc._id;
       if (modelOutputDoc) {
+        var modelOutput = ModelOutputs.findOne(modelOutputDoc);
+        if (modelOutput.name) console.log('Model Output to remove:', modelOutput.name);
         if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = ModelOutputs.remove(modelOutputDoc);
           return mo;
@@ -64,7 +66,7 @@ Meteor.methods({
 
   'insertDataSet': function(dataSetDoc) {
       if (dataSetDoc) {
-        if (dataSetDoc.name) console.log('Data set to insert: ', dataSetDoc.name);
+        if (dataSetDoc.name) console.log('Dataset to insert:', dataSetDoc.name);
         var userId = this.userId;
         if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
           console.log('Error - not authorized\n');
@@ -86,7 +88,7 @@ Meteor.methods({
         var userId = this.userId;
         if (currentDoc && currentDoc._id) {
           var ds = DataSets.findOne(currentDoc);
-          if (ds && ds.name) console.log('Dataset to update', ds.name);
+          if (ds && ds.name) console.log('Dataset to update:', ds.name);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
             console.log('Error - not-authorized\n');
             throw new Meteor.Error('not-authorized')
@@ -105,10 +107,10 @@ Meteor.methods({
     'removeDataSet': function(dataSetDoc) {
         if (dataSetDoc && dataSetDoc._id) {
           var ds = DataSets.findOne(dataSetDoc);
-          if (ds && ds.name) console.log('Dataset to remove', ds.name);
+          if (ds && ds.name) console.log('Dataset to remove:', ds.name);
           var userId = this.userId;
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            console.log('Error - not authorized');
+            console.log('Error - not authorized\n');
             throw new Meteor.Error('not-authorized')
           }
           else {
@@ -123,7 +125,7 @@ Meteor.methods({
         var userId = this.userId;
         if (currentDoc && currentDoc._id) {
           var exp = Experiments.findOne(currentDoc);
-          if (exp && exp.name) console.log('Experiment to update', exp.name);
+          if (exp && exp.name) console.log('Experiment to update:', exp.name);
 
           if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
               console.log('Error - not authorized\n');
@@ -141,7 +143,7 @@ Meteor.methods({
         var userId = this.userId;
         var docId;
         if (expDoc) {
-          if (expDoc.name) console.log('Experiment to insert: ', expDoc.name);
+          if (expDoc.name) console.log('Experiment to insert:', expDoc.name);
           if (userId && expDoc.recordType == 'instance') {
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
@@ -169,7 +171,7 @@ Meteor.methods({
         var group = 'experiment ' + expDoc._id;
         if (expDoc && expDoc._id) {
           var exp = Experiments.findOne(expDoc);
-          if (exp && exp.name) console.log('Experiment to remove', exp.name);
+          if (exp && exp.name) console.log('Experiment to remove:', exp.name);
 
           if( !Roles.userIsInRole(userId, 'edit', group) ) {
             console.log('Error - not authorized\n');
@@ -188,7 +190,7 @@ Meteor.methods({
         var group = 'model ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
           var model = Models.findOne(currentDoc);
-          if (model && model.name) console.log('Model to remove', model.name);
+          if (model && model.name) console.log('Model to update:', model.name);
           if( !Roles.userIsInRole(userId, 'edit', group)) {
               console.log('Error - not authorized\n');
               throw new Meteor.Error('not-authorized')
@@ -206,7 +208,7 @@ Meteor.methods({
     'insertModel': function(modelDoc) {
       if(modelDoc) {
         var userId = this.userId;
-        if (modelDoc.name) console.log('Model to insert: ', modelDoc.name);
+        if (modelDoc.name) console.log('Model to insert:', modelDoc.name);
         if( !userId ) {
           console.log('Error - not authorized\n');
           throw new Meteor.Error('not-authorized')
@@ -229,7 +231,7 @@ Meteor.methods({
         var group = 'model ' + modelDoc._id;
         if (modelDoc && modelDoc._id) {
           var model = Models.findOne(modelDoc);
-          if (model && model.name) console.log('Model to remove', model.name);
+          if (model && model.name) console.log('Model to remove:', model.name);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
             mo = Models.remove(modelDoc);
             console.log('removed\n');
