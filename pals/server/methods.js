@@ -24,7 +24,8 @@ Meteor.methods({
       else {
         var moId = ModelOutputs.insert(modelOutputDoc);
         var group = 'modelOutput: ' + moId;
-        Roles.addUsersToRoles(userId, 'edit', group);
+        if (!Roles.userIsInRole(userId, 'edit', group))
+          Roles.addUsersToRoles(userId, 'edit', group);
         return moId;
       }
     } else throw new Meteor.Error('No document provided to insert');
@@ -64,6 +65,7 @@ Meteor.methods({
       } else throw new Meteor.Error('no model output specified to remove');
   },
 
+/*  Not sure why I have it creating new role for the owner if they already have dataset edit rights
   'insertDataSet': function(dataSetDoc) {
       if (dataSetDoc) {
         if (dataSetDoc.name) console.log('Dataset to insert:', dataSetDoc.name);
@@ -76,6 +78,24 @@ Meteor.methods({
           var dsId = DataSets.insert(dataSetDoc);
           var group = 'dataSet ' + dsId;
           Roles.addUsersToRoles(userId, 'edit', group);
+          console.log('inserted\n');
+          return dsId;
+        }
+      } else {
+        throw new Meteor.error('No document to insert');
+      }
+  },*/
+
+'insertDataSet': function(dataSetDoc) {
+      if (dataSetDoc) {
+        if (dataSetDoc.name) console.log('Dataset to insert:', dataSetDoc.name);
+        var userId = this.userId;
+        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
+          console.log('Error - not authorized\n');
+          throw new Meteor.Error('not-authorized')
+        }
+        else {
+          var dsId = DataSets.insert(dataSetDoc);
           console.log('inserted\n');
           return dsId;
         }
@@ -147,14 +167,16 @@ Meteor.methods({
           if (userId && expDoc.recordType == 'instance') {
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
-            Roles.addUsersToRoles(userId, 'edit', group);
+            if (!Roles.userIsInRole(userId, 'edit', group))
+              Roles.addUsersToRoles(userId, 'edit', group);
             console.log('inserted\n')
             return docId;
           }
           else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
             var expId = Experiments.insert(expDoc);
             var group = 'experiment ' + expId;
-            Roles.addUsersToRoles(userId, 'edit', group);
+            if (!Roles.userIsInRole(userId, 'edit', group))
+              Roles.addUsersToRoles(userId, 'edit', group);
             console.log('inserted\n')
             return expId;
           }
@@ -189,7 +211,8 @@ Meteor.methods({
         var userId = this.userId;
         var group = 'model ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
-          var model = Models.findOne(currentDoc);
+//          var model = Models.findOne(currentDoc);
+          var model = Models.findOne({_id: currentDoc._id});
           if (model && model.name) console.log('Model to update:', model.name);
           if( !Roles.userIsInRole(userId, 'edit', group)) {
               console.log('Error - not authorized\n');
@@ -219,7 +242,8 @@ Meteor.methods({
         else {
           var docId = Models.insert(modelDoc);
           var group = 'model ' + docId;
-          Roles.addUsersToRoles(userId, 'edit', group);
+          if (!Roles.userIsInRole(userId, 'edit', group))
+            Roles.addUsersToRoles(userId, 'edit', group);
           console.log('inserted\n');
           return docId;
         }
@@ -254,7 +278,9 @@ Meteor.methods({
         }
         else {
           var docId =  Workspaces.insert({owner: userId, name: name});
-          Roles.addUsersToRoles(userId, 'edit', 'workspace ' + docId);
+          var group = 'workspace ' + docId;
+          if (Roles.userIsInRole(userId, 'edit', group))
+            Roles.addUsersToRoles(userId, 'edit', group);
 
           console.log(Workspaces.find().fetch());
           return docId;
@@ -276,9 +302,12 @@ Meteor.methods({
     'changeWorkspace': function(workspaceId) {
       var userId = this.userId;
       var workspace = Workspaces.findOne({_id: workspaceId});
-      console.log(Workspaces.find().fetch());
       if( userId && workspace ) {
-        return Meteor.users.update({_id: userId}, {$set: {'profile.currentWorkspace': workspaceId}});
+        result = Meteor.users.update({_id: userId}, {$set: {'profile.currentWorkspace': workspaceId}});
+        return result;
+      } else {
+        if (!userId) throw new Meteor.Error('User not logged in');
+        else throw new Meteor.Error('Workspace not found');
       }
     },
 

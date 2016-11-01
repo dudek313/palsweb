@@ -7,6 +7,7 @@ import '../../both/collections.js';
 
 import { Random } from 'meteor/random';
 
+myModelId = "";
 ownModel = makeModel("My Model");
 notOwnModel = makeModel("Another's model");
 
@@ -130,23 +131,6 @@ describe('Testing methods', function(done) {
 
       });
 
-/*      var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
-      if (testUser && testUser._id)
-      Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
-
-      Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
-        try {
-          if (err) console.log(err);
-          chai.assert.isUndefined(err);
-          var user = Meteor.user();
-          console.log('Logged in')
-          chai.assert.equal(user.emails[0].address, 'test0@testing.com');
-        } catch(error) {
-          done(error);
-        }
-        done();
-      });
-*/
     });
 
     describe("Models - one's own", function() {
@@ -164,34 +148,30 @@ describe('Testing methods', function(done) {
 
       describe('Updating own model', function(done) {
         before(function(done) {
-          documentInsert('ownModel', 'Models', function() {
-
-            var myModelId = Session.get('currentDocId');
+          documentInsert('ownModel', 'Models', function(err, docId) {
+            ownModelId = docId
             var testUserId = Meteor.userId();
-            eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'model " + myModelId + "' : [ 'edit' ]} }}, done);");
+            eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'model " + ownModelId + "' : [ 'edit' ]} }}, done);");
           });
         });
 
         it('allows a registered user to update own model', function(done) {
-          var myModelId = Session.get('currentDocId');
-          testUpdateMethod('updateModel', {_id: myModelId}, 'Models', 'references', 'all references', 'allows', done);
+          testUpdateMethod('updateModel', {_id: ownModelId}, 'Models', 'references', 'all references', 'allows', done);
         });
 
       });
 
       describe('Removing own model', function(done) {
         before(function(done) {
-          documentInsert('ownModelToRemove', 'Models', function() {
-
-            var myModelId = Session.get('currentDocId');
+          documentInsert('ownModelToRemove', 'Models', function(err, docId) {
             var testUserId = Meteor.userId();
-            eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'model " + myModelId + "' : [ 'edit' ]} }}, done);");
+            ownModelToRemoveId = docId;
+            eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'model " + docId + "' : [ 'edit' ]} }}, done);");
           });
         });
 
-        it('allows a registered user to update own model', function(done) {
-          var myModelId = Session.get('currentDocId');
-          testRemoveMethod('removeModel', {_id: myModelId}, 'Models', 'allows', done);
+        it('allows a registered user to remove own model', function(done) {
+          testRemoveMethod('removeModel', {_id: ownModelToRemoveId}, 'Models', 'allows', done);
         });
 
       });
@@ -199,37 +179,43 @@ describe('Testing methods', function(done) {
     });
 
     describe("Models - another's", function(done) {
-      beforeEach(function(done) {
+      afterEach(function(done) {
         resetDatabase(done);
       });
 
-      it('does not allow a user to update the model of another user', function(done) {
-        documentInsert("Someone else's model", 'Models', done);
-        var notOwnModelId = Session.get('currentDocId');
-        console.log(notOwnModelId);
-        testUpdateMethod('updateModel', {_id: notOwnModelId}, 'Models', 'references', 'A random ref', "does not allow", done);
+      describe("Updating", function(done) {
+        before(function(done) {
+          documentInsert("Someone_elses_model", 'Models', function(err, docId) {
+            if (err) done(error);
+            notOwnModelId = docId;
+            console.log('docId', docId);
+            done();
+          });
+        });
+
+        it('does not allow a user to update the model of another user', function(done) {
+          console.log(Models.findOne({_id: notOwnModelId}));
+          testUpdateMethod('updateModel', {_id: notOwnModelId}, 'Models', 'references', 'A random ref', "does not allow", done);
+        });
       });
 
-      it('does not allow a user to remove the model of another user', function(done) {
-        documentInsert("Someone else's other model", 'Models', done);
-        var notOwnModelId2 = Session.get('currentDocId');
-        console.log(notOwnModelId2);
-        testRemoveMethod('removeModel', {_id: notOwnModelId2}, 'Models', 'does not allow', done);
+      describe("Removing", function(done) {
+        before(function(done) {
+          documentInsert("Someone_elses_other_model", 'Models', function(err, docId) {
+            if (err) done(error);
+            notOwnModelToRemoveId = docId;
+            done();
+          });
+        });
+
+        it('does not allow a user to remove the model of another user', function(done) {
+          testRemoveMethod('removeModel', {_id: notOwnModelToRemoveId}, 'Models', 'does not allow', done);
+        });
+
       });
-
     });
 
-
-    after(function(done) {
-      logout(done);
-    });
-/*
-
-
-    });
-*/
-
-/*    describe('Adding new Workspace', function(done) {
+    describe('Adding new Workspace', function(done) {
       it('allows a registered user to insert a new workspace', function(done) {
         Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
           try {
@@ -245,37 +231,33 @@ describe('Testing methods', function(done) {
           } catch(error) {
             done(error);
           }
-
+          console.log(Meteor.user());
           done(err);
         });
       });
     });
 
-    describe('Change workspace', function(done) {
+    describe('Change workspace', function() {
       before(function(done) {
-        Meteor.call('test.Workspace.insert', "WS 2", function(err, doc) {
+        Meteor.call('test.Workspaces.insert', "WS 2", function(err, docId) {
           try {
+            console.log(err);
             chai.assert.isUndefined(err);
           } catch(error) {
             done(error);
           }
-          myWs = doc;
+          myWsId = docId;
           done();
         })
       });
 
       it('allows a non-admin user to change workspaces', function(done) {
-//        var ws = Workspaces.findOne({name: 'WS 1'});
-        console.log(Workspaces.find().fetch());
-        Meteor.call('changeWorkspace', myWs._id, function(err, success) {
+        Meteor.call('changeWorkspace', myWsId, function(err, success) {
           try {
-            console.log(Workspaces.find().fetch());
-            if (err) console.log(err);
             chai.assert.isUndefined(err);
-            console.log(success);
             chai.assert.isDefined(success);
-            var currentWorkspace = getCurrentWorkspace();
-            chai.assert.equal(currentWorkspace.name, "WS 2", 'Not in the correct workspace.');
+            var currentWorkspaceId = getCurrentWorkspaceId();
+            chai.assert.equal(currentWorkspaceId, myWsId, 'Not in the correct workspace.');
           } catch(error) {
             done(error);
           }
@@ -285,9 +267,21 @@ describe('Testing methods', function(done) {
     });
 
     describe('Inserting duplicate workspace', function(done) {
+      before(function(done) {
+        Meteor.call('test.Workspaces.insert', "WS 3", function(err, docId) {
+          try {
+            console.log(err);
+            chai.assert.isUndefined(err);
+          } catch(error) {
+            done(error);
+          }
+          done();
+        })
+      });
+
       it('does not allow a registered user to insert duplicate workspaces', function(done) {
 
-        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+        Meteor.call('insertWorkspace', "WS 3", function(err, wsId) {
           try {
             if (err) console.log(err);
             chai.assert.isDefined(err);
@@ -297,9 +291,58 @@ describe('Testing methods', function(done) {
 
           done();
         });
-
       });
     });
+
+    describe('Removing own workspace', function(done) {
+      before(function(done) {
+        Meteor.call('test.Workspaces.insert', "WS 4", function(err, docId) {
+          try {
+            console.log(err);
+            chai.assert.isUndefined(err);
+            var userId = Meteor.userId();
+            ownWsToRemoveId = docId;
+            var group = 'workspace ' + docId;
+            var selector = {_id: userId};
+            eval("var modifier = {$set: {'roles' : { '" + group + "' : ['edit'] }}};");
+            console.log(modifier);
+            Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
+              try {
+                chai.assert.isUndefined(err, 'user roles - error message given');
+                chai.assert.isDefined(doc, 'user roles were not updated');
+              } catch(error) {
+                done(error);
+              }
+              done();
+            });
+          } catch(error) {
+            done(error);
+          }
+        });
+      });
+
+      it('allows a registered user to remove their own workspace', function(done) {
+        Meteor.call('removeWorkspace', {_id: ownWsToRemoveId}, function(err, doc) {
+          try {
+            if (err) console.log(err);
+            chai.assert.isUndefined(err, 'Error was called');
+            var ws = Workspaces.findOne({_id: ownWsToRemoveId});
+            chai.assert.isUndefined(ws, 'Workspace was not removed');
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
+
+
+
+    after(function(done) {
+      logout(done);
+    });
+
+/*
 
     describe('Removing own workspace', function(done) {
       it('allows a registered user to remove their own workspace', function(done) {
@@ -634,25 +677,31 @@ function testObjectMethods(objectName, userType, objectToInsert, attributeUpdate
 
   describe('Updating a ' + objectName, function(done) {
     before(function(done) {
-      documentInsert('docToUpdate', collectionName, done);
+      documentInsert('docToUpdate', collectionName, function(err, docId) {
+        if (err) done(err);
+        docToUpdateId = docId;
+        done();
+      });
     });
 
     it(expectedOutcome + ' ' + userType + ' to update a ' + objectName, function(done) {
       var methodName = 'update' + objectName;
-      myObjectId = Session.get('currentDocId');
-      testUpdateMethod(methodName, {_id: myObjectId}, collectionName, attributeUpdated, updatedValue, expectedOutcome, done);
+      testUpdateMethod(methodName, {_id: docToUpdateId}, collectionName, attributeUpdated, updatedValue, expectedOutcome, done);
     });
   });
 
   describe('Removing a ' + objectName, function(done) {
     before(function(done) {
-      documentInsert('docToRemove', collectionName, done);
+      documentInsert('docToRemove', collectionName, function(err, docId) {
+        if (err) done(err);
+        docToRemoveId = docId;
+        done();
+      });
     });
 
     it(expectedOutcome + ' ' + userType + ' to remove a ' + objectName, function(done) {
       var methodName = 'remove' + objectName;
-      myObjectId2 = Session.get('currentDocId');
-      testRemoveMethod(methodName, {_id: myObjectId2}, collectionName, expectedOutcome, done);
+      testRemoveMethod(methodName, {_id: docToRemoveId}, collectionName, expectedOutcome, done);
     });
   });
 }
@@ -757,7 +806,8 @@ function testRemoveMethod(method, selector, collection, expectedOutcome, done) {
 //////////////////////////
 // Need to include owner
 //////////////////////////
-function documentInsert(docName, collectionName, done) {
+
+function documentInsert(docName, collectionName, callback) {
   if (collectionName == "DataSets")
     var newDocument = makeDataSet(docName);
   else if (collectionName == "Experiments")
@@ -775,10 +825,9 @@ function documentInsert(docName, collectionName, done) {
       chai.assert.isUndefined(err, 'Error was called');
       chai.assert.isDefined(docId, 'Document was not inserted to collection ' + collectionName);
     } catch(error) {
-      done(error);
+      callback(error);
     }
-    Session.set('currentDocId', docId);
-    done();
+    callback(null, docId);
   });
 
 }

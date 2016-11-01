@@ -14,7 +14,8 @@ Meteor.methods({
   },
 
   'test.Models.insert': function(modelDoc) {
-    return Models.insert(modelDoc);
+    result = Models.insert(modelDoc);
+    return result;
   },
 
   'test.Experiments.findOne': function(expDoc) {
@@ -46,7 +47,7 @@ Meteor.methods({
   },
 
   'test.Workspaces.insert': function(wsName, ownerId) {
-    var docId =  Workspaces.insert({owner: ownerId, name: name});
+    var docId =  Workspaces.insert({owner: ownerId, name: wsName});
     return docId;
   },
 
