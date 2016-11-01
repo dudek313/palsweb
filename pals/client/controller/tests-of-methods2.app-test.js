@@ -215,373 +215,174 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('Adding new Workspace', function(done) {
-      it('allows a registered user to insert a new workspace', function(done) {
-        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
-          try {
-            chai.assert.isUndefined(err);
-          } catch(error) {
-            done(error);
-          }
-
-          var insertedWS = Workspaces.findOne({_id: wsId});
-          try {
-            chai.assert.equal(insertedWS.name, 'WS 1');
-            myWsId = wsId;
-          } catch(error) {
-            done(error);
-          }
-          console.log(Meteor.user());
-          done(err);
-        });
-      });
-    });
-
-    describe('Change workspace', function() {
-      before(function(done) {
-        Meteor.call('test.Workspaces.insert', "WS 2", function(err, docId) {
-          try {
-            console.log(err);
-            chai.assert.isUndefined(err);
-          } catch(error) {
-            done(error);
-          }
-          myWsId = docId;
-          done();
-        })
-      });
-
-      it('allows a non-admin user to change workspaces', function(done) {
-        Meteor.call('changeWorkspace', myWsId, function(err, success) {
-          try {
-            chai.assert.isUndefined(err);
-            chai.assert.isDefined(success);
-            var currentWorkspaceId = getCurrentWorkspaceId();
-            chai.assert.equal(currentWorkspaceId, myWsId, 'Not in the correct workspace.');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting duplicate workspace', function(done) {
-      before(function(done) {
-        Meteor.call('test.Workspaces.insert', "WS 3", function(err, docId) {
-          try {
-            console.log(err);
-            chai.assert.isUndefined(err);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        })
-      });
-
-      it('does not allow a registered user to insert duplicate workspaces', function(done) {
-
-        Meteor.call('insertWorkspace', "WS 3", function(err, wsId) {
-          try {
-            if (err) console.log(err);
-            chai.assert.isDefined(err);
-          } catch(error) {
-            done(error);
-          }
-
-          done();
-        });
-      });
-    });
-
-    describe('Removing own workspace', function(done) {
-      before(function(done) {
-        Meteor.call('test.Workspaces.insert', "WS 4", function(err, docId) {
-          try {
-            console.log(err);
-            chai.assert.isUndefined(err);
-            var userId = Meteor.userId();
-            ownWsToRemoveId = docId;
-            var group = 'workspace ' + docId;
-            var selector = {_id: userId};
-            eval("var modifier = {$set: {'roles' : { '" + group + "' : ['edit'] }}};");
-            console.log(modifier);
-            Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
-              try {
-                chai.assert.isUndefined(err, 'user roles - error message given');
-                chai.assert.isDefined(doc, 'user roles were not updated');
-              } catch(error) {
-                done(error);
-              }
-              done();
-            });
-          } catch(error) {
-            done(error);
-          }
-        });
-      });
-
-      it('allows a registered user to remove their own workspace', function(done) {
-        Meteor.call('removeWorkspace', {_id: ownWsToRemoveId}, function(err, doc) {
-          try {
-            if (err) console.log(err);
-            chai.assert.isUndefined(err, 'Error was called');
-            var ws = Workspaces.findOne({_id: ownWsToRemoveId});
-            chai.assert.isUndefined(ws, 'Workspace was not removed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-
-
-    after(function(done) {
-      logout(done);
-    });
-
-/*
-
-    describe('Removing own workspace', function(done) {
-      it('allows a registered user to remove their own workspace', function(done) {
-        Meteor.call('removeWorkspace', {_id: myWsId}, function(err, doc) {
-          try {
-            if (err) console.log(err);
-            chai.assert.isUndefined(err, 'Error was called');
-            var ws = Workspaces.findOne({_id: myWsId});
-            chai.assert.isUndefined(ws, 'Workspace was not removed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe("Removing another user's workspace", function(done) {
-      it("does not allow a registered user to remove another user's workspace", function(done) {
-        Meteor.call('removeWorkspace', {_id: myWsId4}, function(err, doc) {
-          try {
-            if (err) console.log(err);
-            chai.assert.isDefined(err, 'Error was not called');
-            Meteor.call('test.Workspaces.findOne', {_id: myWsId4}, function(err, ws) {
-              chai.assert.isDefined(ws, 'Workspace was erroneously removed');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    */
-  });
-
-
-  after(function(done) {
-    var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
-    if (testUser) {
-      Meteor.call('test.removeUser', {_id: testUser._id}, function(err, docId) {
-        if (err) done(err);
-      });
-      done();
-    }
-    else done();
-  });
-
-});
-/*
-
-  describe('Registered user functions', function() {
-
-
-    describe('Adding new Workspace', function(done) {
-      it('allows a registered user to insert a new workspace', function(done) {
-        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
-          try {
-            chai.assert.isUndefined(err);
-          } catch(error) {
-            done(error);
-          }
-
-          var insertedWS = Workspaces.findOne({_id: wsId});
-          try {
-            chai.assert.equal(insertedWS.name, 'WS 1');
-            myWsId = wsId;
-          } catch(error) {
-            done(error);
-          }
-
-          done(err);
-        });
-      });
-    });
-
-    describe('Change workspace', function(done) {
-      it('allows a non-admin user to change workspaces', function(done) {
-        var ws = Workspaces.findOne({name: 'WS 1'});
-        Meteor.call('changeWorkspace', ws._id, function(err, success) {
-          try {
-            chai.assert.isUndefined(err);
-            chai.assert.isDefined(success);
-            var currentWorkspace = getCurrentWorkspace();
-            chai.assert.equal(currentWorkspace.name, "WS 1", 'Not in the correct workspace.');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting duplicate workspace', function(done) {
-      it('does not allow a registered user to insert duplicate workspaces', function(done) {
-
-        Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
-          try {
-            chai.assert.isDefined(err);
-          } catch(error) {
-            done(error);
-          }
-
-          done();
-        });
-
-      });
-    });
-
-    describe('Removing own workspace', function(done) {
-      it('allows a registered user to remove their own workspace', function(done) {
-        Meteor.call('removeWorkspace', {_id: myWsId}, function(err, doc) {
-          try {
-            chai.assert.isUndefined(err, 'Error was called');
-            var ws = Workspaces.findOne({_id: myWsId});
-            chai.assert.isUndefined(ws, 'Workspace was not removed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe("Removing another user's workspace", function(done) {
-      it("does not allow a registered user to remove another user's workspace", function(done) {
-        Meteor.call('removeWorkspace', {_id: myWsId4}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was not called');
-            Meteor.call('test.Workspaces.findOne', {_id: myWsId4}, function(err, ws) {
-              chai.assert.isDefined(ws, 'Workspace was erroneously removed');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting new data set', function(done) {
-      it('does not allow a non-admin user to insert a data set', function(done) {
-
-        var newDataSet = makeDataSet("Data Set 2");
-        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
-          try {
-            chai.assert.isDefined(err);
-            var insertedDataSet = DataSets.findOne({_id: dsId});
-            chai.assert.isUndefined(insertedDataSet);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Updating data set', function(done) {
-      it('does not allow a non-admin user to update a data set', function(done) {
-        var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateDataSet', {_id: myDsId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.DataSets.findOne', {_id: myDsId2}, function(err, updatedDataSet) {
+    describe('Workspaces', function() {
+      describe('Adding new Workspace', function(done) {
+        it('allows a registered user to insert a new workspace', function(done) {
+          Meteor.call('insertWorkspace', "WS 1", function(err, wsId) {
+            try {
               chai.assert.isUndefined(err);
-              chai.assert.equal(updatedDataSet.spatialLevel, "SingleSite", 'Data set was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
+            } catch(error) {
+              done(error);
+            }
+
+            var insertedWS = Workspaces.findOne({_id: wsId});
+            try {
+              chai.assert.equal(insertedWS.name, 'WS 1');
+              myWsId = wsId;
+            } catch(error) {
+              done(error);
+            }
+            console.log(Meteor.user());
+            done(err);
+          });
         });
       });
-    });
 
-    describe('Removing data set', function() {
-      it('does not allow unregistered user to remove a data set', function(done) {
-        Meteor.call('removeDataSet', {_id: myDsId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Data set was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting experiment template', function(done) {
-      it('does not allow a registered, non-admin user to insert an experiment template', function(done) {
-        var newExperiment = makeExperiment("Experiment Set 3", "template");
-        Meteor.call('insertExperiment', newExperiment, function(err, expId) {
-          try {
-            chai.assert.isDefined(err);
-            chai.assert.equal(err.error, 'not-authorized');
-            chai.assert.isUndefined(expId, 'experiment document was erroneously inserted');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Updating experiment template', function(done) {
-      it('does not allow a registered non-admin user to update an experiment template', function(done) {
-        var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateExperiment', {_id: myExpId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.Experiments.findOne', {_id: myExpId2}, function(err, updatedExperiment) {
+      describe('Change workspace', function() {
+        before(function(done) {
+          Meteor.call('test.Workspaces.insert', "WS 2", function(err, docId) {
+            try {
+              if (err) console.log(err);
               chai.assert.isUndefined(err);
-              chai.assert.equal(updatedExperiment.spatialLevel, "SingleSite", 'Experiment was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
+            } catch(error) {
+              done(error);
+            }
+            myWsId = docId;
+            done();
+          })
+        });
+
+        it('allows a non-admin user to change workspaces', function(done) {
+          Meteor.call('changeWorkspace', myWsId, function(err, success) {
+            try {
+              chai.assert.isUndefined(err);
+              chai.assert.isDefined(success);
+              var currentWorkspaceId = getCurrentWorkspaceId();
+              chai.assert.equal(currentWorkspaceId, myWsId, 'Not in the correct workspace.');
+            } catch(error) {
+              done(error);
+            }
+            done();
+          });
         });
       });
+
+      describe('Inserting duplicate workspace', function(done) {
+        before(function(done) {
+          Meteor.call('test.Workspaces.insert', "WS 3", function(err, docId) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err);
+            } catch(error) {
+              done(error);
+            }
+            done();
+          })
+        });
+
+        it('does not allow a registered user to insert duplicate workspaces', function(done) {
+
+          Meteor.call('insertWorkspace', "WS 3", function(err, wsId) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isDefined(err);
+            } catch(error) {
+              done(error);
+            }
+
+            done();
+          });
+        });
+      });
+
+      describe('Removing own workspace', function(done) {
+        before(function(done) {
+          Meteor.call('test.Workspaces.insert', "WS 4", function(err, docId) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err);
+              var userId = Meteor.userId();
+              ownWsToRemoveId = docId;
+              var group = 'workspace ' + docId;
+              var selector = {_id: userId};
+              eval("var modifier = {$set: {'roles' : { '" + group + "' : ['edit'] }}};");
+              console.log(modifier);
+              Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
+                try {
+                  chai.assert.isUndefined(err, 'user roles - error message given');
+                  chai.assert.isDefined(doc, 'user roles were not updated');
+                } catch(error) {
+                  done(error);
+                }
+                done();
+              });
+            } catch(error) {
+              done(error);
+            }
+          });
+        });
+
+        it('allows a registered user to remove their own workspace', function(done) {
+          Meteor.call('removeWorkspace', {_id: ownWsToRemoveId}, function(err, doc) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err, 'Error was called');
+              var ws = Workspaces.findOne({_id: ownWsToRemoveId});
+              chai.assert.isUndefined(ws, 'Workspace was not removed');
+            } catch(error) {
+              done(error);
+            }
+            done();
+          });
+        });
+      });
+
+      describe("Removing another user's workspace", function(done) {
+        before(function(done) {
+          Meteor.call('test.Workspaces.insert', "WS 5", function(err, docId) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err);
+            } catch(error) {
+              done(error);
+            }
+            othersWsToRemoveId = docId;
+            done();
+          });
+        });
+
+        it("does not allow a registered user to remove another user's workspace", function(done) {
+          Meteor.call('removeWorkspace', {_id: othersWsToRemoveId}, function(err, doc) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isDefined(err, 'Error was not called');
+              Meteor.call('test.Workspaces.findOne', {_id: othersWsToRemoveId}, function(err, ws) {
+                try {
+                  chai.assert.isDefined(ws, 'Workspace was erroneously removed');
+                } catch (error) {
+                  done(error)
+                }
+                done();
+              });
+            } catch(error) {
+              done(error);
+            }
+          });
+        });
+      });
+
     });
 
-    describe('Removing experiment template', function() {
-      it('does not allow a non-admin user to remove an experiment template', function(done) {
-        Meteor.call('removeExperiment', {_id: myExpId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Experiment template was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
+    describe('Data Sets', function(done) {
+
+      newDataSet = makeDataSet("DS registered");
+      testObjectMethods('DataSet', 'a registered user', newDataSet, 'spatialLevel', 'MultipleSite', 'does not allow', done);
     });
+
+    describe('Experiment Templates', function(done) {
+      var newExperiment = makeExperiment("Exp registered", "template");
+      testObjectMethods('Experiment', 'a registered user', newExperiment, 'spatialLevel', 'MultipleSite', 'does not allow', done);
+    })
 
     describe('clone experiment into workspace', function(done) {
       it('allows a registered non-admin user to clone an experiment into their own workspace', function(done) {
@@ -600,63 +401,127 @@ describe('Testing methods', function(done) {
       });
     });
 
-    describe('Inserting model output', function(done) {
+    describe("Model Outputs", function(done){
+      describe("Model Outputs - one's own", function(done) {
 
-      it('allows a registered user to insert a model output', function(done) {
-        var newModelOutput = makeModelOutput("Model Output 3");
-        Meteor.call('insertModelOutput', newModelOutput, function(err, moId) {
-          try {
-            chai.assert.isUndefined(err);
-            Meteor.call('test.ModelOutputs.findOne', {_id: moId}, function(err, insertedModelOutput) {
-              chai.assert.equal(insertedModelOutput.name, "Model Output 3");
+        describe("Inserting", function(done) {
+          it('allows a registered user to insert a model output', function(done) {
+            var newModelOutput = makeModelOutput("MO registered");
+            testInsertMethod('insertModelOutput', 'ModelOutputs', newModelOutput, "allows", done);
+          });
+        });
+
+
+        describe('Updating', function(done) {
+          before(function(done) {
+            documentInsert('ownModelOutput', 'ModelOutputs', function(err, docId) {
+              ownModelOutputId = docId
+              var testUserId = Meteor.userId();
+              eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'modelOutput " + docId + "' : [ 'edit' ]} }}, done);");
             });
-          } catch(error) {
-            done(error);
-          }
-          done();
+          });
+
+          it('allows a registered user to update own model output', function(done) {
+            testUpdateMethod('updateModelOutput', {_id: ownModelOutputId}, 'ModelOutputs', 'experiment', 'different experiment', 'allows', done);
+          });
+
+        });
+
+        describe('Removing', function(done) {
+          before(function(done) {
+            documentInsert('removableModelOutput', 'ModelOutputs', function(err, docId) {
+              var testUserId = Meteor.userId();
+              anotherModelOutputId = docId;
+              eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'modelOutput " + docId + "' : [ 'edit' ]} }}, done);");
+            });
+          });
+
+          it('allows a registered user to remove own model output', function(done) {
+            testRemoveMethod('removeModelOutput', {_id: anotherModelOutputId}, 'ModelOutputs', 'allows', done);
+          });
+
         });
       });
+
+      describe("Model outputs - another's", function(done) {
+        afterEach(function(done) {
+          resetDatabase(done);
+        });
+
+        describe("Updating", function(done) {
+          before(function(done) {
+            documentInsert("Someone_elses_modelOutput", 'ModelOutputs', function(err, docId) {
+              if (err) done(error);
+              notOwnModelOutputId = docId;
+              console.log('docId', docId);
+              done();
+            });
+          });
+
+          it('does not allow a user to update the modelOutput of another user', function(done) {
+            console.log(ModelOutputs.findOne({_id: notOwnModelOutputId}));
+            testUpdateMethod('updateModelOutput', {_id: notOwnModelOutputId}, 'ModelOutputs', 'references', 'A random ref', "does not allow", done);
+          });
+        });
+
+        describe("Removing", function(done) {
+          before(function(done) {
+            documentInsert("Someone_elses_other_modelOutput", 'ModelOutputs', function(err, docId) {
+              if (err) done(error);
+              notOwnModelOutputToRemoveId = docId;
+              done();
+            });
+          });
+
+          it('does not allow a user to remove the modelOutput of another user', function(done) {
+            testRemoveMethod('removeModelOutput', {_id: notOwnModelOutputToRemoveId}, 'ModelOutputs', 'does not allow', done);
+          });
+
+        });
+
+      });
+
     });
 
 
-    describe('Updating model output', function(done) {
-      it('does not allow non-data admin user to update a model output', function(done) {
-        var modifier = {$set: {experiment: "notRandom"}};
-        Meteor.call('updateModelOutput', {_id: myMoId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.ModelOutputs.findOne', {_id: myMoId2}, function(err, updatedModelOutput) {
-              chai.assert.isUndefined(err);
-              chai.assert.equal(updatedModelOutput.experiment, "randomExp", 'ModelOutput was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Removing model output', function() {
-      it('does not allow non-data admin user to remove a model output', function(done) {
-        Meteor.call('removeModelOutput', {_id: myMoId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'model output was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
+    after(function(done) {
+      logout(done);
     });
 
   });
 
 
-});
+  after(function(done) {
+    var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+    if (testUser) {
+      Meteor.call('test.removeUser', {_id: testUser._id}, function(err, docId) {
+        if (err) done(err);
+      });
+      done();
+    }
+    else done();
+  });
 
+});
+/*  describe('Registered user functions', function() {
+
+
+    describe('clone experiment into workspace', function(done) {
+      it('allows a registered non-admin user to clone an experiment into their own workspace', function(done) {
+        var expInstance = makeExperiment("Experiment 1", "instance");
+        Meteor.call('insertExperiment', expInstance, function(err, expId) {
+          try {
+            chai.assert.isUndefined(err);
+            Meteor.call('test.Experiments.findOne', {_id: expId}, function(err, insertedExperiment) {
+              chai.assert.equal(insertedExperiment.name, "Experiment 1");
+            });
+          } catch(error) {
+            done(error);
+          }
+          done();
+        });
+      });
+    });
 
 */
 
@@ -712,11 +577,10 @@ function testInsertMethod(method, collection, docToInsert, expectedOutcome, done
     if (expectedOutcome == 'allows') {
       if (err) console.log(err);
       try {
-        chai.assert.isUndefined(err, 'Error was called'); ////// Should be undefined
+        chai.assert.isUndefined(err, 'Error was called');
         chai.assert.isDefined(docId, 'Document was not inserted');
         Meteor.call(findOneMethodName, {_id: docId}, function(err, insertedDoc) {
           try {
-            console.log(insertedDoc);
             chai.assert.isUndefined(err, 'findOne method returned error');
             chai.assert.equal(insertedDoc.name, docToInsert.name, 'Document was not inserted');
           } catch(error) {

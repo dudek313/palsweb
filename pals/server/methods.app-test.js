@@ -27,7 +27,8 @@ Meteor.methods({
   },
 
   'test.ModelOutputs.findOne': function(moDoc) {
-    return ModelOutputs.findOne(moDoc);
+    var result = ModelOutputs.findOne(moDoc);
+    return result;
   },
 
   'test.ModelOutputs.insert': function(modelDoc) {

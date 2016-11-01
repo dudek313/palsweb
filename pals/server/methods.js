@@ -23,9 +23,10 @@ Meteor.methods({
       }
       else {
         var moId = ModelOutputs.insert(modelOutputDoc);
-        var group = 'modelOutput: ' + moId;
+        var group = 'modelOutput ' + moId;
         if (!Roles.userIsInRole(userId, 'edit', group))
           Roles.addUsersToRoles(userId, 'edit', group);
+        console.log('inserted\n');
         return moId;
       }
     } else throw new Meteor.Error('No document provided to insert');
@@ -33,7 +34,7 @@ Meteor.methods({
 
   'updateModelOutput': function(currentDoc, updateDoc) {
       var userId = this.userId;
-      var group = 'modelOutput: ' + currentDoc._id;
+      var group = 'modelOutput ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
           var modelOutput = ModelOutputs.findOne(currentDoc);
           if (modelOutput && modelOutput.name) console.log('Model Output to update:', modelOutput.name);
@@ -50,7 +51,7 @@ Meteor.methods({
 
   'removeModelOutput': function(modelOutputDoc) {
       var userId = this.userId;
-      var group = 'modelOutput: ' + modelOutputDoc._id;
+      var group = 'modelOutput ' + modelOutputDoc._id;
       if (modelOutputDoc) {
         var modelOutput = ModelOutputs.findOne(modelOutputDoc);
         if (modelOutput.name) console.log('Model Output to remove:', modelOutput.name);

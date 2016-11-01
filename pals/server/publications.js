@@ -90,7 +90,7 @@ Meteor.publish('modelOutputs',function() {
 function getAvailableModelOutputs(userId) {
     var wsSelector = {};
     var modelOutputs = null;
-  
+
     var workspaceIds = getAvailableWorkspaceIds(userId);
 
     var expSelector = {workspace: {$in:workspaceIds}, recordType: 'instance'};
@@ -139,11 +139,11 @@ Files.allow({
     },
     remove: function(userId, doc) {
       if (fileObj.type == 'dataSet')
-        return Roles.userIsInRole(userId, 'edit', 'dataSet: ' + doc.dataSetId);
+        return Roles.userIsInRole(userId, 'edit', 'dataSet ' + doc.dataSetId);
       else if (fileObj.type == 'modelOutput')
-        return Roles.userIsInRole(userId, 'edit', 'modelOutput: ' + doc.modelOutputId);
+        return Roles.userIsInRole(userId, 'edit', 'modelOutput ' + doc.modelOutputId);
       else if (fileObj.type == 'analysisScript')
-        return Roles.userIsInRole(userId, 'edit', 'experiment: ' + doc.experimentId);
+        return Roles.userIsInRole(userId, 'edit', 'experiment ' + doc.experimentId);
       else {
         console.log('File is not one of the valid types');
         return false;

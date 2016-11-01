@@ -276,7 +276,7 @@ Template.modelOutput.events = {
         var currentModelOutputId = getCurrentObjectId();
         var currentModelOutput = getCurrentModelOutput();
         if (currentModelOutput && currentModelOutput.file) {
-          var group = 'modelOutput: ' + currentModelOutputId;
+          var group = 'modelOutput ' + currentModelOutputId;
           if( Roles.userIsInRole(userId, 'edit', group) ) {
             //            var key = $(event.target).attr('id');
             /*            Meteor.call('checkIfAnalyserOnline', function(error, online) {
