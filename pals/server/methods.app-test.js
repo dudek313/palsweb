@@ -3,6 +3,11 @@ import { Accounts } from 'meteor/accounts-base';
 
 Meteor.methods({
 
+  'test.users.findOne': function(selector) {
+    var user = Meteor.users.findOne(selector);
+    return user;
+  },
+
   'test.Models.findOne': function(modelDoc) {
     var model = Models.findOne(modelDoc);
     return model;
@@ -46,6 +51,7 @@ Meteor.methods({
   },
 
   'test.resetDatabase': function(callback) {
+
     resetDatabase({excludedCollections: ['users']}, callback)
   },
 
@@ -65,10 +71,10 @@ Meteor.methods({
     Meteor.users.remove(selector, callback);
   },
 
-  'test.updateUser': function(selector, modifier, callback) {
-    var user = Meteor.users.findOne(selector);
-    if (user)
-      Meteor.users.update(selector, modifier, callback);
+  'test.updateUser': function(selector, modifier) {
+    console.log('Updating user:', selector, modifier);
+    var result = Meteor.users.update(selector, modifier);
+    return result;
   }
 
 });

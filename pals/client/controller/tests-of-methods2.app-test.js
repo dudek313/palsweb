@@ -12,7 +12,17 @@ notOwnModel = makeModel("Another's model");
 
 describe('Testing methods', function(done) {
   before(function(done) {
-    Meteor.call('test.resetDatabase', done);
+
+    Meteor.call('test.resetDatabase', function() {
+      Meteor.call('test.users.findOne', {username: 'gab'}, function(err, gabUser) {
+        var selector = {_id: gabUser._id};
+        var modifier = {$set: {"roles" : { "__global_roles__" : [ "edit", "workspaceAccess", "admin" ]}}};
+        Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
+          if (err) console.log('Admin user roles were not reset');
+          done();
+        });
+      });
+    });
   });
 
   afterEach(function(done) {
@@ -22,26 +32,25 @@ describe('Testing methods', function(done) {
 
   describe('Admin functions', function() {
     before(function(done) {
-
-      // log in data admin
       Meteor.loginWithPassword('gabsun@gmail.com', 'password', function(err) {
         try {
           chai.assert.isUndefined(err);
           var user = Meteor.user();
           chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
+        // create test user for later tests
+          Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err);
+            } catch(error) {
+              done(error);
+            }
+            done();
+          });
         } catch(error) {
           done(error);
         }
-        // create test user for later tests
-        Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
-          try {
-            if (err) console.log(err);
-            chai.assert.isUndefined(err);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
+
       });
 
 
@@ -113,6 +122,16 @@ describe('Testing methods', function(done) {
 
     describe("Models - one's own", function() {
 
+      afterEach(function(done) {
+        Meteor.call('test.resetDatabase', done);
+      });
+
+      describe('Inserting', function(done) {
+        it('allows a registered user to insert a model', function(done) {
+          var newModel = makeModel("Registered model");
+          testInsertMethod('insertModel', 'Models', newModel, "allows", done);
+        });
+      });
 
       describe('Updating own model', function(done) {
         before(function(done) {
@@ -131,6 +150,27 @@ describe('Testing methods', function(done) {
 
       });
 
+      describe('Removing own model', function(done) {
+        before(function(done) {
+          documentInsert('ownModelToRemove', 'Models', function() {
+
+            var myModelId = Session.get('currentDocId');
+            var testUserId = Meteor.userId();
+            eval("Meteor.call('test.updateUser', {_id : testUserId}, {$set: {roles: {'model " + myModelId + "' : [ 'edit' ]} }}, done);");
+          });
+        });
+
+        it('allows a registered user to update own model', function(done) {
+          var myModelId = Session.get('currentDocId');
+          testRemoveMethod('removeModel', {_id: myModelId}, 'Models', 'allows', done);
+        });
+
+      });
+
+    });
+
+    after(function(done) {
+      logout(done);
     });
 /*
     describe("Models - another's", function(done) {
@@ -547,6 +587,10 @@ function testObjectMethods(objectName, userType, objectToInsert, attributeUpdate
       var methodName = 'insert' + objectName;
       testInsertMethod(methodName, collectionName, objectToInsert, expectedOutcome, done);
     });
+
+    after(function(done) {
+      Meteor.call('test.resetDatabase', done);
+    });
   });
 
 
@@ -578,26 +622,36 @@ function testObjectMethods(objectName, userType, objectToInsert, attributeUpdate
 function testInsertMethod(method, collection, docToInsert, expectedOutcome, done) {
   findOneMethodName = 'test.' + collection + '.findOne';
   Meteor.call(method, docToInsert, function(err, docId) {
-    try {
-      if (expectedOutcome == 'allows') {
-        if (err) console.log(err);
-        chai.assert.isUndefined(err, 'Error was called');
+    if (expectedOutcome == 'allows') {
+      if (err) console.log(err);
+      try {
+        chai.assert.isUndefined(err, 'Error was called'); ////// Should be undefined
         chai.assert.isDefined(docId, 'Document was not inserted');
         Meteor.call(findOneMethodName, {_id: docId}, function(err, insertedDoc) {
-          console.log(insertedDoc);
-          chai.assert.isUndefined(err);
-          chai.assert.equal(insertedDoc.name, docToInsert.name, 'Document was not inserted');
+          try {
+            console.log(insertedDoc);
+            chai.assert.isUndefined(err, 'findOne method returned error');
+            chai.assert.equal(insertedDoc.name, docToInsert.name, 'Document was not inserted');
+          } catch(error) {
+            done(error);
+          };
+          done()
         });
+      } catch(error) {
+        done(error);
       }
-      else {
+    }
+    else {
+      try {
         chai.assert.isDefined(err, 'Error was not called');
         chai.assert.equal(err.error, "not-authorized", 'Wrong error called');
         chai.assert.isUndefined(docId, 'Document was inserted');
       }
-    } catch(error) {
-      done(error);
+      catch(error) {
+        done(error);
+      }
+      done();
     }
-    done();
   });
 }
 
@@ -605,47 +659,58 @@ function testUpdateMethod(method, selector, collection, updatedAttribute, update
   var findOneMethodName = 'test.' + collection + '.findOne';
   eval('var modifier = {$set: {' + updatedAttribute + ': "' + updatedValue + '"}}')
   Meteor.call(method, selector, modifier, function(err, doc) {
-    try {
-      if (expectedOutcome == "allows") {
+
+    if (expectedOutcome == "allows") {
+      try {
         chai.assert.isUndefined(err, 'Error was called');
         Meteor.call(findOneMethodName, selector, function(err, newDoc) {
           chai.assert.isUndefined(err);
           chai.assert.equal(newDoc[updatedAttribute], updatedValue, collection + ' collection was not updated');
         });
+      } catch(error) {
+        done(error)
       }
-      else {
+      done();
+    } else {
+      try {
         chai.assert.isUndefined(doc, 'Document was updated');
         chai.assert.isDefined(err, 'Error was not called');
         chai.assert.equal(err.error, "not-authorized", 'Wrong error called');
+      } catch(error) {
+        done(error)
       }
-    } catch(error) {
-      done(error);
+      done();
     }
-    done();
   });
 }
 
 function testRemoveMethod(method, selector, collection, expectedOutcome, done) {
   findOneMethodName = 'test.' + collection + '.findOne';
   Meteor.call(method, selector, function(err, success) {
-    try {
-      if (expectedOutcome == "allows") {
+
+    if (expectedOutcome == "allows") {
+      try {
         chai.assert.isUndefined(err, 'Error was called');
         Meteor.call(findOneMethodName, selector, function(err, doc) {
           if (err) console.log(err);
           chai.assert.isUndefined(err, 'An error message was given');
           chai.assert.isUndefined(doc, 'Document was not removed');
         });
+      } catch(error) {
+        done(error)
       }
-      else {
+      done();
+    }
+    else {
+      try {
         chai.assert.isDefined(err, 'Error was not called');
         chai.assert.equal(err.error, "not-authorized", 'Wrong error called');
         chai.assert.isUndefined(success, 'Remove was performed');
+      } catch(error) {
+        done(error)
       }
-    } catch(error) {
-      done(error);
+      done();
     }
-    done();
   });
 };
 
