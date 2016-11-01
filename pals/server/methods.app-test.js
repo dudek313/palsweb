@@ -72,7 +72,6 @@ Meteor.methods({
   },
 
   'test.updateUser': function(selector, modifier) {
-    console.log('Updating user:', selector, modifier);
     var result = Meteor.users.update(selector, modifier);
     return result;
   }

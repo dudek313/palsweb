@@ -12,21 +12,7 @@ notOwnModel = makeModel("Another's model");
 
 describe('Testing methods', function(done) {
   before(function(done) {
-
-    Meteor.call('test.resetDatabase', function() {
-      Meteor.call('test.users.findOne', {username: 'gab'}, function(err, gabUser) {
-        var selector = {_id: gabUser._id};
-        var modifier = {$set: {"roles" : { "__global_roles__" : [ "edit", "workspaceAccess", "admin" ]}}};
-        Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
-          if (err) console.log('Admin user roles were not reset');
-          done();
-        });
-      });
-    });
-  });
-
-  afterEach(function(done) {
-    Meteor.call('test.resetDatabase', done);
+    resetDatabase(done);
   });
 
 
@@ -38,22 +24,17 @@ describe('Testing methods', function(done) {
           var user = Meteor.user();
           chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
         // create test user for later tests
-          Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err) {
-            try {
-              if (err) console.log(err);
-              chai.assert.isUndefined(err);
-            } catch(error) {
-              done(error);
-            }
-            done();
-          });
         } catch(error) {
           done(error);
         }
-
+        done();
       });
 
 
+    });
+
+    afterEach(function(done) {
+      resetDatabase(done);
     });
 
     describe('Data set methods', function(done) {
@@ -75,6 +56,10 @@ describe('Testing methods', function(done) {
   });
 
   describe('Unregistered user', function() {
+
+    afterEach(function(done) {
+      resetDatabase(done);
+    });
 
     describe('Model methods', function() {
       var newModel = makeModel("Model 1");
@@ -101,7 +86,51 @@ describe('Testing methods', function(done) {
   describe('Registered user functions', function() {
 
     before(function(done){
-      var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+
+      // Logs in the admin user in order to create a test user, who is then logged in.
+      Meteor.loginWithPassword('gabsun@gmail.com', 'password', function(err) {
+        try {
+          chai.assert.isUndefined(err);
+          var user = Meteor.user();
+          chai.assert.equal(user.emails[0].address, 'gabsun@gmail.com');
+        // create test user for later tests
+
+          Meteor.call('test.createUser', {email:'test0@testing.com', password: 'password1', profile: {fullname: "test test"}}, function(err, testUserId) {
+            try {
+              if (err) console.log(err);
+              chai.assert.isUndefined(err);
+              var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
+
+              if (testUser && testUser._id)
+              Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}}, function() {
+
+                Meteor.loginWithPassword('test0@testing.com', 'password1', function(err) {
+                  try {
+                    console.log(Meteor.user());
+                    if (err) console.log(err);
+                    chai.assert.isUndefined(err);
+                    var user = Meteor.user();
+                    console.log('Logged in')
+                    chai.assert.equal(user.emails[0].address, 'test0@testing.com');
+                  } catch(error) {
+                    done(error);
+                  }
+                  done();
+                });
+
+              });
+
+            } catch(error) {
+              done(error);
+            }
+          });
+        } catch(error) {
+          done(error);
+        }
+
+      });
+
+/*      var testUser = Meteor.users.findOne({'profile.fullname':'test test'});
       if (testUser && testUser._id)
       Meteor.call('test.updateUser', {_id : testUser._id}, {$set: {emails: [{address: 'test0@testing.com', verified: true}]}});
 
@@ -117,13 +146,13 @@ describe('Testing methods', function(done) {
         }
         done();
       });
-
+*/
     });
 
     describe("Models - one's own", function() {
 
       afterEach(function(done) {
-        Meteor.call('test.resetDatabase', done);
+        resetDatabase(done);
       });
 
       describe('Inserting', function(done) {
@@ -169,25 +198,34 @@ describe('Testing methods', function(done) {
 
     });
 
-    after(function(done) {
-      logout(done);
-    });
-/*
     describe("Models - another's", function(done) {
-
       beforeEach(function(done) {
-        Meteor.call('test.resetDatabase', done);
+        resetDatabase(done);
       });
 
       it('does not allow a user to update the model of another user', function(done) {
-        notOwnModelId = documentInsert('Models', done);
+        documentInsert("Someone else's model", 'Models', done);
+        var notOwnModelId = Session.get('currentDocId');
+        console.log(notOwnModelId);
         testUpdateMethod('updateModel', {_id: notOwnModelId}, 'Models', 'references', 'A random ref', "does not allow", done);
       });
 
       it('does not allow a user to remove the model of another user', function(done) {
-        notOwnModelId = documentInsert('Models', done);
-        testRemoveMethod('removeModel', {_id: notOwnModelId}, 'Models', 'does not allow', done);
+        documentInsert("Someone else's other model", 'Models', done);
+        var notOwnModelId2 = Session.get('currentDocId');
+        console.log(notOwnModelId2);
+        testRemoveMethod('removeModel', {_id: notOwnModelId2}, 'Models', 'does not allow', done);
       });
+
+    });
+
+
+    after(function(done) {
+      logout(done);
+    });
+/*
+
+
     });
 */
 
@@ -589,7 +627,7 @@ function testObjectMethods(objectName, userType, objectToInsert, attributeUpdate
     });
 
     after(function(done) {
-      Meteor.call('test.resetDatabase', done);
+      resetDatabase(done);
     });
   });
 
@@ -820,3 +858,16 @@ function makeModelOutput(modelOutputName) {
   }
   return modelOutput;
 }
+
+function resetDatabase(done) {
+  Meteor.call('test.resetDatabase', function() {
+    Meteor.call('test.users.findOne', {username: 'gab'}, function(err, gabUser) {
+      var selector = {_id: gabUser._id};
+      var modifier = {$set: {"roles" : { "__global_roles__" : [ "edit", "workspaceAccess", "admin" ]}}};
+      Meteor.call('test.updateUser', selector, modifier, function(err, doc) {
+        if (err) console.log('Admin user roles were not reset');
+        done();
+      });
+    });
+  });
+};
