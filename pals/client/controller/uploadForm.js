@@ -23,10 +23,16 @@ Template.uploadForm.events({
       // multiple files were selected
 
       var currentFile = e.currentTarget.files[0];
+      clientLog.info('Uploading file', currentFile, userId);
       var fileExtension = getFileExtension(currentFile);
+      console.log('filetype: ', template.data.filetype);
+      console.log('fileExtension', fileExtension);
       if (template.data.fileType == 'experiment script' && fileExtension != "R") {
-        clientLog.error('Error: Only R files allowed', currentFile, userId)
+        clientLog.error('Error: Only R files allowed', currentFile, userId);
         alert('Error: Only R files allowed');
+      } else if(template.data.fileType != 'experiment script' && fileExtension != "nc") {
+        clientLog.error('Error: Only NetCDF files allowed', currentFile, userId);
+        alert('Error: Only NetCDF files allowed');
       } else {
         var userId = Meteor.userId();
         var upload = StoredFiles.insert({
@@ -37,7 +43,6 @@ Template.uploadForm.events({
 
         upload.on('start', function () {
           template.currentUpload.set(this);
-          clientLog.info('Uploading file', currentFile, userId);
         });
 
         upload.on('end', function (error, fileObj) {
@@ -47,16 +52,34 @@ Template.uploadForm.events({
           } else {
             clientLog.info('File "' + fileObj.name + '" successfully uploaded', fileObj , userId);
             alert('File "' + fileObj.name + '" successfully uploaded');
-            var nameWithExtension = fileObj._id + '.' + fileObj.extension;
 
-            if (template.data.fileType == 'experiment script') {
+            var nameWithExtension = fileObj._id + '.' + fileObj.extension;
+            if (template.data == 'dataSet') {
+              var isDownloadable = document.getElementById('downloadable').checked;
+              var fileType = $("input[type='radio'][name='fileType']:checked").val();
+              var fileRecord = {
+                path: fileObj.path,
+                name: fileObj.name,
+                storedName: nameWithExtension,
+                downloadable: isDownloadable,
+                size: fileObj.size,
+                key: fileObj._id,
+                created: new Date(),
+                type: fileType
+              };
+              var tempFiles = Session.get('tempFiles');
+              tempFiles.push(fileRecord);
+              Session.set('tempFiles', tempFiles);
+              Session.set('uploadButtonClicked', false);
+            }
+            else if (template.data == 'experiment script') {
               var fileRecord = {
                 path: fileObj.path,
                 filename: fileObj.name,
                 storedName: nameWithExtension,
                 size: fileObj.size,
                 key: fileObj._id,
-                created: new Date()
+                created: new Date(),
               };
               var tempScripts = Session.get('tempScripts');
               tempScripts.push(fileRecord);

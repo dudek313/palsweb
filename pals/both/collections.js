@@ -110,7 +110,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
   experiment:       {type: String, label: "Experiment"},
   'experiments':    {type: [String], optional: true}, // Post-MVP - will want to make this required with minCount: 1. Will have to change interface
   model:            {type: String, label: "Model"},
-  createdAt: {
+  created: {
     type: Date,
     autoValue: function() {
       if (this.isInsert) {
@@ -118,7 +118,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
       }
     }
   },
-  modifiedAt: {
+  modified: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -179,7 +179,7 @@ modelSchema = new SimpleSchema({
       }
     }
   },
-  createdAt: {
+  created: {
     type: Date,
     autoValue: function() {
       if (this.isInsert) {
@@ -187,7 +187,7 @@ modelSchema = new SimpleSchema({
       }
     }
   },
-  modifiedAt: {
+  modified: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -232,7 +232,7 @@ Experiments.attachSchema(new SimpleSchema({
       }
     }
   },
-  createdAt: {
+  created: {
     type: Date,
     autoValue: function() {
       if (this.isInsert) {
@@ -240,7 +240,7 @@ Experiments.attachSchema(new SimpleSchema({
       }
     }
   },
-  modifiedAt: {
+  modified: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -292,7 +292,7 @@ dataSetSchema = new SimpleSchema({
   },
   name:           {type: String, label: "Name", unique: true},
   type:           {type: String, label: "Type", allowedValues: DataSetType},
-  createdAt: {
+  created: {
     type: Date,
     autoValue: function() {
       if (this.isInsert) {
@@ -300,7 +300,7 @@ dataSetSchema = new SimpleSchema({
       }
     }
   },
-  modifiedAt: {
+  modified: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -328,6 +328,8 @@ dataSetSchema = new SimpleSchema({
                   max: 180, decimal: true, optional: true},
   elevation:      {type: Number, label: "Elevation (m)", min: 0, decimal: true, optional: true},
   maxVegHeight:   {type: Number, label: "Max Vegetation Height (m)", min: 0, decimal: true, optional: true},
+  towerHeight:    {type: Number, label: "Tower Height (m)", min: 0, optional: true},
+  measurementAggregation: {type: String, label: "Measurement Aggregation", optional: true},
   utcOffset:      {type: Number, label: "UTC Offset (hours)", min: -12, max: 12, optional: true},
   siteContact:    {type: String, label: "Site Contact", optional: true},
   references:     {type: String, label: "References", optional: true},
@@ -340,6 +342,8 @@ dataSetSchema = new SimpleSchema({
   "variables.SWnet":    {type: Boolean, label: "Swnet"},
   region:         {type: String, label: "Region", optional: true},
   resolution:     {type: String, label: "Resolution", allowedValues: Resolution, optional: true},
+  startdate:      {type: Date, label: "Start Date", optional: true},
+  enddate:        {type: Date, label: "End Date", optional: true},
   _version: {
     type: Number,
     label: "Version",
@@ -356,15 +360,6 @@ dataSetSchema = new SimpleSchema({
   'files.$.key':  {type: String, optional: true},
   'files.$.downloadable':   {type: Boolean, optional: true},
   'files.$.type': {type: String, optional: true},
-/*  'files.$.file': {
-    type: String,
-    autoform: {
-      afFieldInput: {
-        type: 'fileUpload',
-        collection: 'StoredFiles'
-      }
-    }
-  }*/
   modifierId: {
     type: String,
     regEx: SimpleSchema.RegEx.Id,
@@ -441,7 +436,7 @@ Schema.User = new SimpleSchema({
     "emails.$.verified": {
         type: Boolean
     },
-    createdAt: {
+    created: {
         type: Date
     },
     profile: {

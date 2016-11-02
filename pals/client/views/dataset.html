@@ -1,11 +1,5 @@
 <template name="dataSet">
   <div class="detail-form">
-<!--  {{#autoForm id="upload-file" type="insert" collection="Docs"}}
-      {{> afQuickField id="name"}}
-      {{> afQuickField name="fileId" type="cfs-file" collection="files"}}
-      <button type="submit">Upload File</button>
-  {{/autoForm}}
--->
   {{#if authorized 'dataSet' _id}}
     {{#if inEditMode}}
       {{#autoForm collection="DataSets" id=formId doc=this type="normal" validation='blur'}}
@@ -99,12 +93,14 @@
                       <input type="radio" name="fileType" value="other">Other
                     </div>
 
+                    {{> uploadForm "dataSet"}}
+<!--
                     {{#with currentUpload}}
                       Uploading <b>{{file.name}}</b>:
                       <span id="progress">{{progress.get}}%</span>
                     {{else}}
                       <input id="fileInput" type="file" />
-                    {{/with}}
+                    {{/with}} -->
 <!--
                     <input type="file" class="file-select" name="file-select">
                     <div class="progress progress-striped active">
@@ -339,7 +335,7 @@
                     <td>{{isDownloadable}}</td>
                     {{#if downloadable}}
                       <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
-                        onclick="window.location.href='/file/{{key}}/{{name}}'" {{disabledIfNotLoggedIn}}>Download</button></td>
+                        onclick="window.location.href='/file/{{storedName}}/{{name}}'" {{disabledIfNotLoggedIn}}>Download</button></td>
                     {{else}}
                         <td></td>
                     {{/if}}

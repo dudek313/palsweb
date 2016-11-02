@@ -147,7 +147,7 @@ Template.dataSet.events = {
         Router.go('/dataSet/update/' + dataSetId);
     },
 
-    'change #fileInput': function (e, template) {
+/*    'change #fileInput': function (e, template) {
       if (e.currentTarget.files && e.currentTarget.files[0]) {
         var file = e.currentTarget.files[0];
         // We upload only one file, in case
@@ -193,10 +193,6 @@ Template.dataSet.events = {
             Session.set('tempFiles', tempFiles);
             Session.set('uploadButtonClicked', false);
 
-/*            keep track of what files have been uploaded so that they can be deleted if the create/update is cancelled
-            var filesUploaded = Session.get('filesUploaded');
-            filesUploaded.push(name);
-            Session.set('filesUploaded', filesUploaded); */
           }
           template.currentUpload.set(false);
         });
@@ -206,7 +202,7 @@ Template.dataSet.events = {
 
       }
     }
-
+*/
 /*    'change .file-select':function(event, template){
         FS.Utility.eachFile(event, function(file) {
             while(filenameAlreadyExists(filename = file.name)) {
