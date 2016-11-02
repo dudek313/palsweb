@@ -44,3 +44,5 @@ accounts-ui-unstyled
 accounts-ui
 practicalmeteor:sinon
 random
+ostrio:logger
+ostrio:loggerfile

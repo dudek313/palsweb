@@ -12,19 +12,31 @@ FILE_BUCKET = '/pals/data/';
 var fileBucket = FILE_BUCKET;
 var fs = Npm.require('fs');
 
-function userTitle (userId) {
-    return userId ? "User " + userId : "Unregistered user";
-}
+// Initialize Logger:
+this.serverLog = new Logger();
+
+// Initialize LoggerFile and enable with default settings:
+var serverLogFile = new LoggerFile(serverLog, {
+  fileNameFormat: function() {return 'server.log'},
+  path: '/pals/logs/'
+}).enable();
 
 function generateError(errMsg) {
-    console.log('Error: ', errMsg, '\n');
+    console.log('Error: ', errMsg);
+    throw serverLog.error(errMsg);
     throw new Meteor.Error(errMsg);
+}
+
+function generateMessage(msg, data, userId) {
+  var dataContent = data ? data : "";
+  console.log(msg, dataContent, "UserId: ", userId);
+  serverLog.info(msg, data, userId);
 }
 
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
     var userId = this.userId;
-    console.log(userTitle(userId) + " attempted to insert model output:\n", modelOutputDoc);
+    generateMessage("Inserting model output", modelOutputDoc, userId);
     if (modelOutputDoc) {
       if( !userId ) {
         generateError("not-authorized");
@@ -34,7 +46,7 @@ Meteor.methods({
         var group = 'modelOutput ' + moId;
         if (!Roles.userIsInRole(userId, 'edit', group))
           Roles.addUsersToRoles(userId, 'edit', group);
-        if (moId) console.log('Model output inserted. Id: ', moId, "\n");
+        if (moId) generateMessage('Model output inserted', moId, userId);
         return moId;
       }
     } else {
@@ -44,7 +56,7 @@ Meteor.methods({
 
   'updateModelOutput': function(currentDoc, updateDoc) {
       var userId = this.userId;
-      console.log(userTitle(userId) + " attempted to update model output:", currentDoc);
+      generateMessage("Updating model output", currentDoc);
       if (currentDoc.name)
       var moName = currentDoc.name;
       else {
@@ -55,8 +67,9 @@ Meteor.methods({
           var modelOutput = ModelOutputs.findOne(currentDoc);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
               moResult = ModelOutputs.update(currentDoc, updateDoc);
-              if (moResult == 1)
-                console.log("Model output updated\n");
+              if (moResult == 1) {
+                generateMessage("Model output updated", updateDoc, userId);
+              }
               return moResult;
           }
           else {
@@ -69,14 +82,14 @@ Meteor.methods({
 
   'removeModelOutput': function(modelOutputDoc) {
       var userId = this.userId;
-      console.log(userTitle(userId) + " attempted to remove model output:", modelOutputDoc);
+      generateMessage("Removing model output", modelOutputDoc, userId);
       var group = 'modelOutput ' + modelOutputDoc._id;
       if (modelOutputDoc) {
         var modelOutput = ModelOutputs.findOne(modelOutputDoc);
         if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = ModelOutputs.remove(modelOutputDoc);
           if (mo == 1)
-            console.log("Model output removed\n")
+            generateMessage("Model output removed", null, userId)
           return mo;
         }
         else {
@@ -110,14 +123,14 @@ Meteor.methods({
 
   'insertDataSet': function(dataSetDoc) {
     var userId = this.userId;
-    console.log(userTitle(userId) + " attempted to insert data set: ", dataSetDoc);
+    generateMessage("Inserting data set", dataSetDoc, userId);
     if (dataSetDoc) {
       if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
         generateError("not-authorized");
       }
       else {
         var dsId = DataSets.insert(dataSetDoc);
-        if (dsId) console.log('Data set inserted. Id: ', dsId, "\n");
+        if (dsId) generateMessage('Data set inserted', dsId, userId);
         return dsId;
       }
     } else {
@@ -127,7 +140,7 @@ Meteor.methods({
 
   'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to update data set:", currentDoc);
+        generateMessage("Updating data set", currentDoc, userId);
         if (currentDoc && currentDoc._id) {
           var ds = DataSets.findOne(currentDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
@@ -135,7 +148,7 @@ Meteor.methods({
           }
           else {
             var result = DataSets.update(currentDoc, dataSetDoc);
-            if (result == 1) console.log('Data set updated\n');
+            if (result == 1) generateMessage('Data set updated', dataSetDoc, userId);
             return result;
           }
         } else {
@@ -146,7 +159,7 @@ Meteor.methods({
 
     'removeDataSet': function(dataSetDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to remove data set:", dataSetDoc);
+        generateMessage("Removing data set", dataSetDoc, userId);
         if (dataSetDoc && dataSetDoc._id) {
           var ds = DataSets.findOne(dataSetDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
@@ -154,7 +167,7 @@ Meteor.methods({
           } else {
             result = DataSets.remove(dataSetDoc);
             if (result == 1)
-              console.log('Data set removed\n');
+              generateMessage('Data set removed', null, userId);
             return result;
           }
         } else generateError('No data set selected');
@@ -162,14 +175,14 @@ Meteor.methods({
 
     'updateExperiment': function(currentDoc, updateDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to update experiment:", updateDoc);
+        generateMessage("Updating experiment", updateDoc, userId);
         if (currentDoc && currentDoc._id) {
           var exp = Experiments.findOne(currentDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
               generateError('not-authorized');
           } else {
             var exp = Experiments.update(currentDoc, updateDoc);
-            if (exp == 1) console.log('Experiment updated\n');
+            if (exp == 1) generateMessage('Experiment updated', updateDoc, userId);
             return exp;
           }
         } else {
@@ -183,21 +196,21 @@ Meteor.methods({
         if (expDoc) {
           if ((userId && expDoc.recordType == 'instance') ||
               (expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments'))) {
-            console.log(userTitle(userId) + " attempted to insert experiment " + expDoc.recordType + ": ", expDoc);
+            generateMessage("Inserting experiment" + expDoc.recordType, expDoc, userId);
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
             if (!Roles.userIsInRole(userId, 'edit', group))
               Roles.addUsersToRoles(userId, 'edit', group);
-            if (docId) console.log('Experiment ' + expDoc.recordType + " inserted. Id: ", docId, "\n");
+            if (docId) generateMessage('Experiment ' + expDoc.recordType + " inserted", docId, userId);
             return docId;
           }
           else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
-            console.log(userTitle(userId) + " attempted to insert experiment template: ", expDoc);
+            generateMessage("Inserting experiment template", expDoc, userId);
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
             if (!Roles.userIsInRole(userId, 'edit', group))
               Roles.addUsersToRoles(userId, 'edit', group);
-            if (docId) console.log('Experiment template inserted. Id: ', docId, "\n")
+            if (docId) generateMessage('Experiment template inserted', docId, userId)
             return docId;
           }
           else {
@@ -209,7 +222,7 @@ Meteor.methods({
     },
     'removeExperiment': function(expDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to remove experiment:", expDoc);
+        generateMessage("Removing experiment", expDoc, userId);
         var group = 'experiment ' + expDoc._id;
         if (expDoc && expDoc._id) {
           var exp = Experiments.findOne(expDoc);
@@ -218,7 +231,7 @@ Meteor.methods({
           }
           else {
             result = Experiments.remove(expDoc);
-            if (result == 1) console.log('Experiment removed\n');
+            if (result == 1) generateMessage('Experiment removed', null, userId);
             return result;
           }
         } else generateError('No document specified to remove');
@@ -226,7 +239,7 @@ Meteor.methods({
 
     'updateModel': function(currentDoc, modelDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to update model:", currentDoc);
+        generateMessage("Updating model", currentDoc, userId);
         var group = 'model ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
 //          var model = Models.findOne(currentDoc);
@@ -237,7 +250,7 @@ Meteor.methods({
           else {
               result = Models.update(currentDoc, modelDoc);
               if (result == 1)
-                console.log('Model updated\n');
+                generateMessage('Model updated', modelDoc, userId);
               return result;
           }
         } else {
@@ -247,7 +260,7 @@ Meteor.methods({
 
     'insertModel': function(modelDoc) {
       var userId = this.userId;
-      console.log(userTitle(userId) + " attempted to insert model: ", modelDoc);
+      generateMessage("Inserting model", modelDoc, userId);
       if(modelDoc) {
         if( !userId ) {
           generateError('not-authorized');
@@ -257,7 +270,7 @@ Meteor.methods({
         }
         else {
           var docId = Models.insert(modelDoc);
-          if (docId) console.log('Model inserted. Id: ', docId, "\n");
+          if (docId) generateMessage('Model inserted', docId, userId);
           var group = 'model ' + docId;
           if (!Roles.userIsInRole(userId, 'edit', group))
             Roles.addUsersToRoles(userId, 'edit', group);
@@ -268,13 +281,13 @@ Meteor.methods({
 
     'removeModel': function(modelDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to remove model:", modelDoc);
+        generateMessage("Removing model", modelDoc, userId);
         var group = 'model ' + modelDoc._id;
         if (modelDoc && modelDoc._id) {
           var model = Models.findOne(modelDoc);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
             result = Models.remove(modelDoc);
-            if (result == 1) console.log('Model removed\n');
+            if (result == 1) generateMessage('Model removed', null, userId);
             return result;
           }
           else {
@@ -285,7 +298,7 @@ Meteor.methods({
 
     'insertWorkspace': function(name) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to insert workspace: ", name);
+        generateMessage("Inserting workspace", name, userId);
         if (!name)
           generateError('Workspace was not given a name. Insert failed.');
         if( !userId ) {
@@ -299,21 +312,21 @@ Meteor.methods({
           var group = 'workspace ' + docId;
           if (Roles.userIsInRole(userId, 'edit', group))
             Roles.addUsersToRoles(userId, 'edit', group);
-          if (docId) console.log('Workspace inserted. Id: ', docId, "\n")
+          if (docId) generateMessage('Workspace inserted', docId, userId)
           return docId;
         }
     },
 
     'updateWorkspace': function(currentDoc, updateDoc) {
         var userId = this.userId;
-        console.log(userTitle(userId) + " attempted to update workspace:", currentDoc);
+        generateMessage("Updating workspace", currentDoc, userId);
         var group = 'workspace ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
             generateError('not-authorized');
         }
         else {
             var result = Workspaces.update(currentDoc, updateDoc);
-            if (result == 1) console.log('Workspace updated\n');
+            if (result == 1) generateMessage('Workspace updated', updateDoc, userId);
             return result;
         }
 
@@ -333,7 +346,7 @@ Meteor.methods({
 
     'removeWorkspace': function(workspaceDoc) {
       var userId = this.userId;
-      console.log(userTitle(userId) + " attempted to remove workspace:", workspaceDoc);
+      generateMessage("Removing workspace", workspaceDoc, userId);
       var group = 'workspace ' + workspaceDoc._id;
       if ( !Roles.userIsInRole(userId, 'edit', group)) {
         throw new Meteor.Error('not-authorized')
@@ -341,7 +354,7 @@ Meteor.methods({
       else {
         var result = Workspaces.remove(workspaceDoc);
         if (result == 1)
-          console.log('Workspace removed.\n')
+          generateMessage('Workspace removed', null, userId)
         return result;
       }
 /*      var workspace = Workspaces.findOne({_id: workspaceId});
@@ -360,26 +373,26 @@ Meteor.methods({
       if (userId && file && file.userId == userId) {
         this.unblock();
         NetCdfFiles.update({_id: _id}, {$set: set});
-        console.log('updateNetCdfFiles id: ' + _id + ' set: ', set);
+        generateMessage('updateNetCdfFiles id: ' + _id + ' set: ', set);
         return true;
       }
       else return null;
     },
 
     deleteAnalysis: function(id) {
-        console.log('deleting analysis ' + id);
+        generateMessage('deleting analysis ' + id);
         var analysis = Analyses.findOne({_id:id});
         if( analysis ) {
              if( analysis.results && analysis.results.length > 0 ) {
                 analysis.results.forEach(function(result) {
                     if (result && result.path) {
-                        console.log('Deleting file ' + result.path)
+                        generateMessage('Deleting file ' + result.path)
                         deleteFile(result.path);
                     }
                 });
              }
              Analyses.remove({'_id':id},function(error){
-                  if( error ) console.log(error);
+                  if( error ) generateMessage(error);
              });
         }
         return null;
@@ -387,7 +400,7 @@ Meteor.methods({
 
     removeFileByUrl: function(url) {
         fs.unlink(url,function(){
-            console.log('deleted file ' + url);
+            generateMessage('deleted file ' + url);
         })
     },
 
