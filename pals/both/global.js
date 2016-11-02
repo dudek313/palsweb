@@ -83,7 +83,7 @@ getSource = function() {
 
 setFileDirtyStatus = function(fileId, status) {
   var modifier = {meta: {dirty: status}}
-  Meteor.call('updateNetCdfFiles', fileId, modifier);
+  Meteor.call('updateStoredFiles', fileId, modifier);
 }
 
 displayError = function(errMessage, error) {

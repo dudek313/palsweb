@@ -185,7 +185,7 @@ Template.modelOutput.events = {
         // We upload only one file, in case
         // multiple files were selected
 
-        var upload = NetCdfFiles.insert({
+        var upload = StoredFiles.insert({
           file: file,
           streams: 'dynamic',
           chunkSize: 'dynamic',

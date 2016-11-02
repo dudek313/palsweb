@@ -116,7 +116,7 @@ Template.experiment.events = {
   'click .cancel-create':function(event){
     event.preventDefault();
     window.history.back();
-  }, 
+  },
   // when user clicks on delete script button,
   //removes script from the tempScripts session variable
   'click .delete-script':function(event) {
@@ -140,13 +140,13 @@ Template.experiment.events = {
     Router.go('/experiment/update/' + currentExperiment._id);
   },
 
-  'change #fileInput': function (e, template) {
+/*  'change #fileInput': function (e, template) {
     if (e.currentTarget.files && e.currentTarget.files[0]) {
       var file = e.currentTarget.files[0];
       // We upload only one file, in case
       // multiple files were selected
 
-      var upload = RFiles.insert({
+      var upload = StoredFiles.insert({
         file: file,
         streams: 'dynamic',
         chunkSize: 'dynamic'
@@ -178,7 +178,7 @@ Template.experiment.events = {
 
     }
   },
-
+*/
 /*  // uploads script files after selection
   'change .file-select':function(event, template){
 //    var CurrentExperimentId = getCurrentExperiment()._id;

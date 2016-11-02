@@ -229,20 +229,22 @@
                         </tr>
                         {{#each tempScripts}}
                           <tr>
-                            <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                            <td onclick="window.location.href='/file/{{storedName}}/{{encode "text/plain"}}'">{{filename}}</td>
                             <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                           </tr>
                         {{/each}}
                       </table>
                     {{/if}}
                     <label>Upload a new script</label>
+                    {{> uploadForm fileType='experiment script'}}
+<!--
                     {{#with currentUpload}}
                       Uploading <b>{{file.name}}</b>:
                       <span id="progress">{{progress.get}}%</span>
                     {{else}}
                       <input id="fileInput" type="file" />
                     {{/with}}
-                    
+-->
                 </div>
               </div>
 

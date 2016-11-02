@@ -17,20 +17,15 @@ StateSelection = ['values measured at site','model spin-up on site data','defaul
 ParameterSelection = ['automated calibration','manual calibration','no calibration (model default values)','other'];
 Resolution = ['0.01 deg','0.5 deg','1 deg','2 deg','Other'];
 
-/* Code for yogiben:admin package - package currently not being used
-AdminConfig = {
-  name: 'My App',
-  adminEmails: ['gabsun@gmail.com'],
-  collections: {
-    Workspaces: {},
-    DataSets:{},
-    DraftDataSets:{},
-    Experiments:{},
-    ModelOutputs:{},
-    Analyses:{},
-    Models:{},
-  }
-};*/
+// Initialize Logger:
+this.clientLog = new Logger();
+
+// Initialize LoggerFile and enable with default settings:
+var clientLogFile = new LoggerFile(clientLog, {
+  fileNameFormat: function() {return 'client.log'},
+  path: '/pals/logs/'
+}).enable();
+
 
 GetCollectionByName = function(name) {
     switch(name) {
@@ -48,51 +43,37 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
-this.NetCdfFiles = new FilesCollection({
-  collectionName: 'NetCdfFiles',
+this.StoredFiles = new FilesCollection({
+  collectionName: 'StoredFiles',
   storagePath: '/pals/data',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
-    if (/nc/i.test(file.extension)) {
+    if (/nc|R/i.test(file.extension)) {
       return true;
     } else {
-      return 'Only NetCDF files allowed';
-    }
-  }
-});
-
-this.RFiles = new FilesCollection({
-  collectionName: 'RFiles',
-  storagePath: '/pals/data',
-  allowClientCode: false, // Disallow remove files from Client
-  onBeforeUpload: function (file) {
-    // Allow upload of nc and r files only
-    if (/R/i.test(file.extension)) {
-      return true;
-    } else {
-      return 'Only R files allowed';
+      return 'Only NetCDF and R files allowed';
     }
   }
 });
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.NetCdfFiles.all');
+  Meteor.subscribe('files.StoredFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.NetCdfFiles.all', function() {
-    return NetCdfFiles.collection.find().cursor;
+  Meteor.publish('files.StoredFiles.all', function() {
+    return StoredFiles.collection.find().cursor;
   });
 }
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.rFiles.all');
+  Meteor.subscribe('files.storedFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.rFiles.all', function() {
-    return RFiles.collection.find().cursor;
+  Meteor.publish('files.storedFiles.all', function() {
+    return StoredFiles.collection.find().cursor;
   });
 }
 

@@ -90,7 +90,7 @@ describe('Testing file upload', function(done) {
       getFileObject('img/test.nc', function (file) {
 
         var filename = 'testfile.nc';
-        var upload = NetCdfFiles.insert({
+        var upload = StoredFiles.insert({
           file: file,
           fileName: filename,
           streams: 'dynamic',
