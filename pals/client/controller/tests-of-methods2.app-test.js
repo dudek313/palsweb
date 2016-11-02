@@ -68,48 +68,22 @@ describe('Testing methods', function(done) {
     describe('Model methods', function() {
       var newModel = makeModel("Model 1");
       testObjectMethods('Model', 'an unregistered user', newModel, 'spatialLevel', 'MultipleSite', 'does not allow', done);
-
-      describe('Inserting model when not logged in', function(done) {
-        it('does not allow unregistered user to insert a model', function(done) {
-          console.log(Meteor.user());
-          var newModel = makeModel("Model 1", "template");
-          testInsertMethod('insertModel', 'Models', newModel, "failure", done);
-        });
-      });
-
-      describe('Updating model', function(done) {
-        before(function(done) {
-          myModelId = documentInsert("Models", done);
-        });
-
-        it('does not allow an unregistered user to update a model', function(done) {
-          testUpdateMethod('updateModel', {_id: myModelId}, 'Models', 'references', 'All kinds', "failure", done);
-        });
-      });
-
-      describe('Removing model', function(done) {
-        before(function(done) {
-          myModelId2 = documentInsert("Models", done);
-        });
-
-        it('does not allow an unregistered user to remove a model', function(done) {
-          testRemoveMethod('removeModel', {_id: myModelId2}, 'Models', "failure", done);
-        });
-      });
-
     });
 
     describe('Data Sets', function(done) {
-
-      describe('Inserting data set', function(done) {
-        it('does not allow unregistered user to insert a data set', function(done) {
-          var newDataSet = makeDataSet("Data Set 3");
-          testInsertMethod('insertModel', 'Models', newDataSet, "failure", done);
-        });
-      });
-
+      var newDataSet = makeDataSet("Data Set 3");
+      testObjectMethods('DataSet', 'an unregistered user', newDataSet, 'spatialLevel', 'MultipleSite', 'does not allow', done);
     })
 
+    describe('Experiment Templates', function(done) {
+      var newExperiment = makeExperiment("Experiment Template 3", "template");
+      testObjectMethods('Experiment', 'an unregistered user', newExperiment, 'spatialLevel', 'MultipleSite', 'does not allow', done);
+    })
+
+    describe('Model Outputs', function(done) {
+      var newModelOutput = makeModelOutput("modelOutput 3");
+      testObjectMethods('ModelOutput', 'an unregistered user', newModelOutput, 'experiment', 'A random experiment', 'does not allow', done);
+    })
 
   });
 
@@ -126,107 +100,6 @@ describe('Testing methods', function(done) {
 
 });
 /*
-
-
-    describe('Inserting data set when not logged in', function(done) {
-      it('does not allow unregistered user to insert a data set', function(done) {
-        var newDataSet = makeDataSet("Data Set 3");
-        Meteor.call('insertDataSet', newDataSet, function(err, dsId) {
-          try {
-            chai.assert.isDefined(err);
-            chai.assert.equal(err.error, "not-authorized");
-            var insertedDataSet = DataSets.findOne({_id: dsId});
-            chai.assert.isUndefined(insertedDataSet);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Updating data set when not logged in', function(done) {
-      it('does not allow unregistered user to update a data set', function(done) {
-        var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateDataSet', {_id: myDsId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.DataSets.findOne', {_id: myDsId2}, function(err, updatedDataSet) {
-              chai.assert.isUndefined(err);
-              chai.assert.equal(updatedDataSet.spatialLevel, "SingleSite", 'Data set was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Removing data set when not logged in', function() {
-      it('does not allow unregistered user to remove a data set', function(done) {
-        Meteor.call('removeDataSet', {_id: myDsId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Data set was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Inserting experiment template when not logged in', function(done) {
-      it('does not allow unregistered user to insert an experiment', function(done) {
-        var newExperiment = makeExperiment("Experiment Template 3", "template");
-        Meteor.call('insertExperiment', newExperiment, function(err, expId) {
-          try {
-            chai.assert.isDefined(err);
-            chai.assert.equal(err.error, "not-authorized");
-            var insertedExperiment = Experiments.findOne({_id: expId});
-            chai.assert.isUndefined(insertedExperiment);
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Updating experiment template when not logged in', function(done) {
-      it('does not allow unregistered user to update an experiment template', function(done) {
-        var modifier = {$set: {spatialLevel: "MultipleSite"}};
-        Meteor.call('updateExperiment', {_id: myExpId2}, modifier, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Error was erroneously not called');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-            Meteor.call('test.Experiments.findOne', {_id: myExpId2}, function(err, updatedExperiment) {
-              chai.assert.isUndefined(err);
-              chai.assert.equal(updatedExperiment.spatialLevel, "SingleSite", 'Experiment was erroneously updated');
-            });
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
-
-    describe('Removing experiment template when not logged in', function() {
-      it('does not allow unregistered user to remove an experiment', function(done) {
-        Meteor.call('removeExperiment', {_id: myExpId2}, function(err, doc) {
-          try {
-            chai.assert.isDefined(err, 'Experiment template was erroneously removed');
-            chai.assert.equal(err.error, 'not-authorized', 'incorrect error message displayed');
-          } catch(error) {
-            done(error);
-          }
-          done();
-        });
-      });
-    });
 
     describe('Inserting model output when not logged in', function(done) {
       it('does not allow unregistered user to insert a model output', function(done) {
