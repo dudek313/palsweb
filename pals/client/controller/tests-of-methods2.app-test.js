@@ -384,7 +384,7 @@ describe('Testing methods', function(done) {
       testObjectMethods('Experiment', 'a registered user', newExperiment, 'spatialLevel', 'MultipleSite', 'does not allow', done);
     })
 
-    describe('clone experiment into workspace', function(done) {
+    describe('Cloning experiment into workspace', function(done) {
       it('allows a registered non-admin user to clone an experiment into their own workspace', function(done) {
         var expInstance = makeExperiment("Experiment 1", "instance");
         Meteor.call('insertExperiment', expInstance, function(err, expId) {

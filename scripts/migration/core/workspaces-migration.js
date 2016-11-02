@@ -44,13 +44,13 @@ function loadWorkspaces(pgInstance,callback) {
 
 function loadSharedList(pgInstance,workspace,callback) {
     var loadSharedListQuery = "SELECT sharedlist_username FROM experiment_palsuser WHERE experiments_id = " + workspace.id;
-    
+
     pgInstance.sql(loadSharedListQuery,function(result,client){
         workspace.users = [];
         result.rows.forEach(function(row){
             workspace.users.push(row);
         });
-    
+
         callback(false);
     });
 }
@@ -70,7 +70,7 @@ function mapWorkspaces(pgInstance,workspaces,users) {
                 var guest = users[workspace.users[j].sharedlist_username];
                 if( guest ) guests.push(guest._id);
             }
-            
+
             var newWorkspace = {
                 _id : workspace.id.toString(),
                 name : workspace.name,
@@ -107,4 +107,3 @@ function saveWorkspace(mongoInstance,mongoWorkspace,callback) {
     });
 
 }
-

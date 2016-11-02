@@ -10,8 +10,6 @@ Template.dataSet.onCreated(function () {
 });
 
 
-
-
 // Currently not working - probably issue with publish & subscribe - for old cfs package
 function removeDeletedFiles(fileIds) {
 

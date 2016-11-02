@@ -12,58 +12,79 @@ FILE_BUCKET = '/pals/data/';
 var fileBucket = FILE_BUCKET;
 var fs = Npm.require('fs');
 
+function userTitle (userId) {
+    return userId ? "User " + userId : "Unregistered user";
+}
+
+function generateError(errMsg) {
+    console.log('Error: ', errMsg, '\n');
+    throw new Meteor.Error(errMsg);
+}
+
 Meteor.methods({
   'insertModelOutput': function(modelOutputDoc) {
+    var userId = this.userId;
+    console.log(userTitle(userId) + " attempted to insert model output:\n", modelOutputDoc);
     if (modelOutputDoc) {
-      if (modelOutputDoc.name) console.log('Model Output to insert:', modelOutputDoc.name);
-      var userId = this.userId;
       if( !userId ) {
-        console.log('Error - not authorized\n');
-        throw new Meteor.Error('not-authorized');
+        generateError("not-authorized");
       }
       else {
         var moId = ModelOutputs.insert(modelOutputDoc);
         var group = 'modelOutput ' + moId;
         if (!Roles.userIsInRole(userId, 'edit', group))
           Roles.addUsersToRoles(userId, 'edit', group);
-        console.log('inserted\n');
+        if (moId) console.log('Model output inserted. Id: ', moId, "\n");
         return moId;
       }
-    } else throw new Meteor.Error('No document provided to insert');
+    } else {
+      generateError('No document provided to insert');
+    }
   },
 
   'updateModelOutput': function(currentDoc, updateDoc) {
       var userId = this.userId;
+      console.log(userTitle(userId) + " attempted to update model output:", currentDoc);
+      if (currentDoc.name)
+      var moName = currentDoc.name;
+      else {
+        var moName = "";
+      }
       var group = 'modelOutput ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
           var modelOutput = ModelOutputs.findOne(currentDoc);
-          if (modelOutput && modelOutput.name) console.log('Model Output to update:', modelOutput.name);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
               moResult = ModelOutputs.update(currentDoc, updateDoc);
+              if (moResult == 1)
+                console.log("Model output updated\n");
               return moResult;
           }
           else {
-            console.log('Error - not authorized\n');
-            throw new Meteor.Error('not-authorized');
+            generateError("not-authorized");
           }
-        } else throw new Meteor.Error('no document specified to update');
+        } else {
+          generateError("no document specified to update");
+        }
   },
 
   'removeModelOutput': function(modelOutputDoc) {
       var userId = this.userId;
+      console.log(userTitle(userId) + " attempted to remove model output:", modelOutputDoc);
       var group = 'modelOutput ' + modelOutputDoc._id;
       if (modelOutputDoc) {
         var modelOutput = ModelOutputs.findOne(modelOutputDoc);
-        if (modelOutput.name) console.log('Model Output to remove:', modelOutput.name);
         if( Roles.userIsInRole(userId, 'edit', group) ) {
           mo = ModelOutputs.remove(modelOutputDoc);
+          if (mo == 1)
+            console.log("Model output removed\n")
           return mo;
         }
         else {
-          console.log('Error - not authorized\n');
-          throw new Meteor.Error('not-authorized');
+          generateError("not-authorized");
         }
-      } else throw new Meteor.Error('no model output specified to remove');
+      } else {
+          generateError("no document specified to remove");
+      }
   },
 
 /*  Not sure why I have it creating new role for the owner if they already have dataset edit rights
@@ -87,215 +108,213 @@ Meteor.methods({
       }
   },*/
 
-'insertDataSet': function(dataSetDoc) {
-      if (dataSetDoc) {
-        if (dataSetDoc.name) console.log('Dataset to insert:', dataSetDoc.name);
-        var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-          console.log('Error - not authorized\n');
-          throw new Meteor.Error('not-authorized')
-        }
-        else {
-          var dsId = DataSets.insert(dataSetDoc);
-          console.log('inserted\n');
-          return dsId;
-        }
-      } else {
-        throw new Meteor.error('No document to insert');
+  'insertDataSet': function(dataSetDoc) {
+    var userId = this.userId;
+    console.log(userTitle(userId) + " attempted to insert data set: ", dataSetDoc);
+    if (dataSetDoc) {
+      if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
+        generateError("not-authorized");
       }
+      else {
+        var dsId = DataSets.insert(dataSetDoc);
+        if (dsId) console.log('Data set inserted. Id: ', dsId, "\n");
+        return dsId;
+      }
+    } else {
+      generateError('No document provided to insert');
+    }
   },
 
   'updateDataSet': function(currentDoc, dataSetDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to update data set:", currentDoc);
         if (currentDoc && currentDoc._id) {
           var ds = DataSets.findOne(currentDoc);
-          if (ds && ds.name) console.log('Dataset to update:', ds.name);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            console.log('Error - not-authorized\n');
-            throw new Meteor.Error('not-authorized')
+            generateError('not-authorized');
           }
           else {
             var result = DataSets.update(currentDoc, dataSetDoc);
-            console.log('updated\n');
+            if (result == 1) console.log('Data set updated\n');
             return result;
           }
         } else {
-          throw new Meteor.Error('No document selected to update');
+          generateError('No document selected to update');
         }
 
     },
 
     'removeDataSet': function(dataSetDoc) {
+        var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to remove data set:", dataSetDoc);
         if (dataSetDoc && dataSetDoc._id) {
           var ds = DataSets.findOne(dataSetDoc);
-          if (ds && ds.name) console.log('Dataset to remove:', ds.name);
-          var userId = this.userId;
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            console.log('Error - not authorized\n');
-            throw new Meteor.Error('not-authorized')
-          }
-          else {
+            generateError('not-authorized');
+          } else {
             result = DataSets.remove(dataSetDoc);
-            console.log('removed\n');
+            if (result == 1)
+              console.log('Data set removed\n');
             return result;
           }
-        } else throw new Meteor.Error('No data set selected');
+        } else generateError('No data set selected');
     },
 
     'updateExperiment': function(currentDoc, updateDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to update experiment:", updateDoc);
         if (currentDoc && currentDoc._id) {
           var exp = Experiments.findOne(currentDoc);
-          if (exp && exp.name) console.log('Experiment to update:', exp.name);
-
           if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
-              console.log('Error - not authorized\n');
-              throw new Meteor.Error('not-authorized');
-          }
-          else {
-            console.log('updated\n');
+              generateError('not-authorized');
+          } else {
             var exp = Experiments.update(currentDoc, updateDoc);
+            if (exp == 1) console.log('Experiment updated\n');
             return exp;
           }
-        } else throw new Meteor.Error('no experiment selected to update');
+        } else {
+          generateError('No document selected to update');
+        }
     },
 
     'insertExperiment': function(expDoc) {
         var userId = this.userId;
         var docId;
         if (expDoc) {
-          if (expDoc.name) console.log('Experiment to insert:', expDoc.name);
-          if (userId && expDoc.recordType == 'instance') {
+          if ((userId && expDoc.recordType == 'instance') ||
+              (expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments'))) {
+            console.log(userTitle(userId) + " attempted to insert experiment " + expDoc.recordType + ": ", expDoc);
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
             if (!Roles.userIsInRole(userId, 'edit', group))
               Roles.addUsersToRoles(userId, 'edit', group);
-            console.log('inserted\n')
+            if (docId) console.log('Experiment ' + expDoc.recordType + " inserted. Id: ", docId, "\n");
             return docId;
           }
           else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
-            var expId = Experiments.insert(expDoc);
-            var group = 'experiment ' + expId;
+            console.log(userTitle(userId) + " attempted to insert experiment template: ", expDoc);
+            docId = Experiments.insert(expDoc);
+            var group = 'experiment ' + docId;
             if (!Roles.userIsInRole(userId, 'edit', group))
               Roles.addUsersToRoles(userId, 'edit', group);
-            console.log('inserted\n')
-            return expId;
+            if (docId) console.log('Experiment template inserted. Id: ', docId, "\n")
+            return docId;
           }
           else {
-            console.log('Error - not authorized\n');
-            throw new Meteor.Error('not-authorized')
+            generateError('not-authorized');
           }
         } else {
-          throw new Meteor.Error('no document given to insert');
+          generateError('No document provided to insert');
         }
     },
     'removeExperiment': function(expDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to remove experiment:", expDoc);
         var group = 'experiment ' + expDoc._id;
         if (expDoc && expDoc._id) {
           var exp = Experiments.findOne(expDoc);
-          if (exp && exp.name) console.log('Experiment to remove:', exp.name);
-
           if( !Roles.userIsInRole(userId, 'edit', group) ) {
-            console.log('Error - not authorized\n');
-            throw new Meteor.Error('not-authorized')
+            generateError('not-authorized');
           }
           else {
             result = Experiments.remove(expDoc);
-            console.log('removed\n');
+            if (result == 1) console.log('Experiment removed\n');
             return result;
           }
-        } else throw new Meteor.Error('no document selected to remove');
+        } else generateError('No document specified to remove');
     },
 
     'updateModel': function(currentDoc, modelDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to update model:", currentDoc);
         var group = 'model ' + currentDoc._id;
         if (currentDoc && currentDoc._id) {
 //          var model = Models.findOne(currentDoc);
           var model = Models.findOne({_id: currentDoc._id});
-          if (model && model.name) console.log('Model to update:', model.name);
           if( !Roles.userIsInRole(userId, 'edit', group)) {
-              console.log('Error - not authorized\n');
-              throw new Meteor.Error('not-authorized')
+              generateError('not-authorized');
           }
           else {
               result = Models.update(currentDoc, modelDoc);
-              console.log('updated\n');
+              if (result == 1)
+                console.log('Model updated\n');
               return result;
           }
         } else {
-          throw new Meteor.Error('no document specified to update');
+          generateError('no document specified to update');
         }
     },
 
     'insertModel': function(modelDoc) {
+      var userId = this.userId;
+      console.log(userTitle(userId) + " attempted to insert model: ", modelDoc);
       if(modelDoc) {
-        var userId = this.userId;
-        if (modelDoc.name) console.log('Model to insert:', modelDoc.name);
         if( !userId ) {
-          console.log('Error - not authorized\n');
-          throw new Meteor.Error('not-authorized')
+          generateError('not-authorized');
         }
         else if(Models.findOne({name:modelDoc.name, owner: userId })) {
-          throw new Meteor.Error('You already have a model with called ' + modelDoc.name);
+          generateError('Model already exists with name: ' + modelDoc.name);
         }
         else {
           var docId = Models.insert(modelDoc);
+          if (docId) console.log('Model inserted. Id: ', docId, "\n");
           var group = 'model ' + docId;
           if (!Roles.userIsInRole(userId, 'edit', group))
             Roles.addUsersToRoles(userId, 'edit', group);
-          console.log('inserted\n');
           return docId;
         }
-      } else throw new Meteor.Error('no document to insert');
+      } else generateError('No document provided to insert');
     },
 
     'removeModel': function(modelDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to remove model:", modelDoc);
         var group = 'model ' + modelDoc._id;
         if (modelDoc && modelDoc._id) {
           var model = Models.findOne(modelDoc);
-          if (model && model.name) console.log('Model to remove:', model.name);
           if( Roles.userIsInRole(userId, 'edit', group) ) {
-            mo = Models.remove(modelDoc);
-            console.log('removed\n');
-            return mo;
+            result = Models.remove(modelDoc);
+            if (result == 1) console.log('Model removed\n');
+            return result;
           }
           else {
-            console.log('Error - not authorized\n');
-            throw new Meteor.Error('not-authorized');
+            generateError('not-authorized');
           }
-        } else throw new Meteor.Error('no document specified for removal')
+        } else generateError('no document specified for removal')
     },
 
     'insertWorkspace': function(name) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to insert workspace: ", name);
+        if (!name)
+          generateError('Workspace was not given a name. Insert failed.');
         if( !userId ) {
-          throw new Meteor.Error('not-authorized')
+          generateError('not-authorized');
         }
         else if(Workspaces.findOne({name: name})) {
-          throw new Meteor.Error('There is already a workspace with name ' + name);
+          generateError('There is already a workspace with name ' + name + ". Insert failed.");
         }
         else {
           var docId =  Workspaces.insert({owner: userId, name: name});
           var group = 'workspace ' + docId;
           if (Roles.userIsInRole(userId, 'edit', group))
             Roles.addUsersToRoles(userId, 'edit', group);
-
-          console.log(Workspaces.find().fetch());
+          if (docId) console.log('Workspace inserted. Id: ', docId, "\n")
           return docId;
         }
     },
 
     'updateWorkspace': function(currentDoc, updateDoc) {
         var userId = this.userId;
+        console.log(userTitle(userId) + " attempted to update workspace:", currentDoc);
         var group = 'workspace ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
-            throw new Meteor.Error('not-authorized')
+            generateError('not-authorized');
         }
         else {
-            return Workspaces.update(currentDoc, updateDoc);
+            var result = Workspaces.update(currentDoc, updateDoc);
+            if (result == 1) console.log('Workspace updated\n');
+            return result;
         }
 
     },
@@ -314,12 +333,16 @@ Meteor.methods({
 
     'removeWorkspace': function(workspaceDoc) {
       var userId = this.userId;
+      console.log(userTitle(userId) + " attempted to remove workspace:", workspaceDoc);
       var group = 'workspace ' + workspaceDoc._id;
       if ( !Roles.userIsInRole(userId, 'edit', group)) {
         throw new Meteor.Error('not-authorized')
       }
       else {
-        return Workspaces.remove(workspaceDoc);
+        var result = Workspaces.remove(workspaceDoc);
+        if (result == 1)
+          console.log('Workspace removed.\n')
+        return result;
       }
 /*      var workspace = Workspaces.findOne({_id: workspaceId});
       if( userId && workspace && workspace.owner && workspace.owner == userId) {
