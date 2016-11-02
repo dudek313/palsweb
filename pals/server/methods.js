@@ -21,9 +21,9 @@ var serverLogFile = new LoggerFile(serverLog, {
   path: '/pals/logs/'
 }).enable();
 
-function generateError(errMsg) {
-    console.log('Error: ', errMsg);
-    throw serverLog.error(errMsg);
+function generateError(errMsg, data, userId) {
+    console.log('Error: ', errMsg, "UserId: ", userId);
+    serverLog.error(errMsg, data, userId);
     throw new Meteor.Error(errMsg);
 }
 
@@ -39,7 +39,7 @@ Meteor.methods({
     generateMessage("Inserting model output", modelOutputDoc, userId);
     if (modelOutputDoc) {
       if( !userId ) {
-        generateError("not-authorized");
+        generateError("not-authorized", null, userId);
       }
       else {
         var moId = ModelOutputs.insert(modelOutputDoc);
@@ -50,13 +50,13 @@ Meteor.methods({
         return moId;
       }
     } else {
-      generateError('No document provided to insert');
+      generateError('No document provided to insert', null, userId);
     }
   },
 
   'updateModelOutput': function(currentDoc, updateDoc) {
       var userId = this.userId;
-      generateMessage("Updating model output", currentDoc);
+      generateMessage("Updating model output", currentDoc, userId);
       if (currentDoc.name)
       var moName = currentDoc.name;
       else {
@@ -73,10 +73,10 @@ Meteor.methods({
               return moResult;
           }
           else {
-            generateError("not-authorized");
+            generateError("not-authorized", null, userId);
           }
         } else {
-          generateError("no document specified to update");
+          generateError("no document specified to update", currentDoc, userId);
         }
   },
 
@@ -93,40 +93,19 @@ Meteor.methods({
           return mo;
         }
         else {
-          generateError("not-authorized");
+          generateError("not-authorized", null, userId);
         }
       } else {
-          generateError("no document specified to remove");
+          generateError("no document specified to remove", modelOutputDoc, userId);
       }
   },
-
-/*  Not sure why I have it creating new role for the owner if they already have dataset edit rights
-  'insertDataSet': function(dataSetDoc) {
-      if (dataSetDoc) {
-        if (dataSetDoc.name) console.log('Dataset to insert:', dataSetDoc.name);
-        var userId = this.userId;
-        if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-          console.log('Error - not authorized\n');
-          throw new Meteor.Error('not-authorized')
-        }
-        else {
-          var dsId = DataSets.insert(dataSetDoc);
-          var group = 'dataSet ' + dsId;
-          Roles.addUsersToRoles(userId, 'edit', group);
-          console.log('inserted\n');
-          return dsId;
-        }
-      } else {
-        throw new Meteor.error('No document to insert');
-      }
-  },*/
 
   'insertDataSet': function(dataSetDoc) {
     var userId = this.userId;
     generateMessage("Inserting data set", dataSetDoc, userId);
     if (dataSetDoc) {
       if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-        generateError("not-authorized");
+        generateError("not-authorized", null, userId);
       }
       else {
         var dsId = DataSets.insert(dataSetDoc);
@@ -134,7 +113,7 @@ Meteor.methods({
         return dsId;
       }
     } else {
-      generateError('No document provided to insert');
+      generateError('No document provided to insert', dataSetDoc, userId);
     }
   },
 
@@ -144,7 +123,7 @@ Meteor.methods({
         if (currentDoc && currentDoc._id) {
           var ds = DataSets.findOne(currentDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
           }
           else {
             var result = DataSets.update(currentDoc, dataSetDoc);
@@ -152,7 +131,7 @@ Meteor.methods({
             return result;
           }
         } else {
-          generateError('No document selected to update');
+          generateError('No document selected to update', currentDoc, userId);
         }
 
     },
@@ -163,30 +142,30 @@ Meteor.methods({
         if (dataSetDoc && dataSetDoc._id) {
           var ds = DataSets.findOne(dataSetDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'dataSets') ) {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
           } else {
             result = DataSets.remove(dataSetDoc);
             if (result == 1)
               generateMessage('Data set removed', null, userId);
             return result;
           }
-        } else generateError('No data set selected');
+        } else generateError('No data set selected', dataSetDoc, userId);
     },
 
     'updateExperiment': function(currentDoc, updateDoc) {
         var userId = this.userId;
-        generateMessage("Updating experiment", updateDoc, userId);
+        generateMessage("Updating experiment " + currentDoc.recordType, updateDoc, userId);
         if (currentDoc && currentDoc._id) {
           var exp = Experiments.findOne(currentDoc);
           if( !Roles.userIsInRole(userId, 'edit', 'experiment ' + currentDoc._id) ) {
-              generateError('not-authorized');
+              generateError('not-authorized', null, userId);
           } else {
             var exp = Experiments.update(currentDoc, updateDoc);
             if (exp == 1) generateMessage('Experiment updated', updateDoc, userId);
             return exp;
           }
         } else {
-          generateError('No document selected to update');
+          generateError('No document selected to update', currentDoc, userId);
         }
     },
 
@@ -196,7 +175,7 @@ Meteor.methods({
         if (expDoc) {
           if ((userId && expDoc.recordType == 'instance') ||
               (expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments'))) {
-            generateMessage("Inserting experiment" + expDoc.recordType, expDoc, userId);
+            generateMessage("Inserting experiment " + expDoc.recordType, expDoc, userId);
             docId = Experiments.insert(expDoc);
             var group = 'experiment ' + docId;
             if (!Roles.userIsInRole(userId, 'edit', group))
@@ -204,20 +183,11 @@ Meteor.methods({
             if (docId) generateMessage('Experiment ' + expDoc.recordType + " inserted", docId, userId);
             return docId;
           }
-          else if( expDoc.recordType == 'template' && Roles.userIsInRole(userId, 'edit', 'experiments')) {
-            generateMessage("Inserting experiment template", expDoc, userId);
-            docId = Experiments.insert(expDoc);
-            var group = 'experiment ' + docId;
-            if (!Roles.userIsInRole(userId, 'edit', group))
-              Roles.addUsersToRoles(userId, 'edit', group);
-            if (docId) generateMessage('Experiment template inserted', docId, userId)
-            return docId;
-          }
           else {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
           }
         } else {
-          generateError('No document provided to insert');
+          generateError('No document provided to insert', expDoc, userId);
         }
     },
     'removeExperiment': function(expDoc) {
@@ -227,14 +197,14 @@ Meteor.methods({
         if (expDoc && expDoc._id) {
           var exp = Experiments.findOne(expDoc);
           if( !Roles.userIsInRole(userId, 'edit', group) ) {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
           }
           else {
             result = Experiments.remove(expDoc);
             if (result == 1) generateMessage('Experiment removed', null, userId);
             return result;
           }
-        } else generateError('No document specified to remove');
+        } else generateError('No document specified to remove', expDoc, userId);
     },
 
     'updateModel': function(currentDoc, modelDoc) {
@@ -245,7 +215,7 @@ Meteor.methods({
 //          var model = Models.findOne(currentDoc);
           var model = Models.findOne({_id: currentDoc._id});
           if( !Roles.userIsInRole(userId, 'edit', group)) {
-              generateError('not-authorized');
+              generateError('not-authorized', null, userId);
           }
           else {
               result = Models.update(currentDoc, modelDoc);
@@ -254,7 +224,7 @@ Meteor.methods({
               return result;
           }
         } else {
-          generateError('no document specified to update');
+          generateError('no document specified to update', modelDoc, userId);
         }
     },
 
@@ -263,7 +233,7 @@ Meteor.methods({
       generateMessage("Inserting model", modelDoc, userId);
       if(modelDoc) {
         if( !userId ) {
-          generateError('not-authorized');
+          generateError('not-authorized', null, userId);
         }
         else if(Models.findOne({name:modelDoc.name, owner: userId })) {
           generateError('Model already exists with name: ' + modelDoc.name);
@@ -276,7 +246,7 @@ Meteor.methods({
             Roles.addUsersToRoles(userId, 'edit', group);
           return docId;
         }
-      } else generateError('No document provided to insert');
+      } else generateError('No document provided to insert', modelDoc, userId);
     },
 
     'removeModel': function(modelDoc) {
@@ -291,9 +261,9 @@ Meteor.methods({
             return result;
           }
           else {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
           }
-        } else generateError('no document specified for removal')
+        } else generateError('no document specified for removal', modelDoc, userId)
     },
 
     'insertWorkspace': function(name) {
@@ -302,7 +272,7 @@ Meteor.methods({
         if (!name)
           generateError('Workspace was not given a name. Insert failed.');
         if( !userId ) {
-          generateError('not-authorized');
+          generateError('not-authorized', null, userId);
         }
         else if(Workspaces.findOne({name: name})) {
           generateError('There is already a workspace with name ' + name + ". Insert failed.");
@@ -322,7 +292,7 @@ Meteor.methods({
         generateMessage("Updating workspace", currentDoc, userId);
         var group = 'workspace ' + currentDoc._id;
         if( !Roles.userIsInRole(userId, 'edit', group)) {
-            generateError('not-authorized');
+            generateError('not-authorized', null, userId);
         }
         else {
             var result = Workspaces.update(currentDoc, updateDoc);
@@ -339,8 +309,8 @@ Meteor.methods({
         result = Meteor.users.update({_id: userId}, {$set: {'profile.currentWorkspace': workspaceId}});
         return result;
       } else {
-        if (!userId) throw new Meteor.Error('User not logged in');
-        else throw new Meteor.Error('Workspace not found');
+        if (!userId) generateError('User not logged in', "Method: changeWorkspace", userId);
+        else generateError('Workspace not found', workspaceId, userId);
       }
     },
 
@@ -349,7 +319,7 @@ Meteor.methods({
       generateMessage("Removing workspace", workspaceDoc, userId);
       var group = 'workspace ' + workspaceDoc._id;
       if ( !Roles.userIsInRole(userId, 'edit', group)) {
-        throw new Meteor.Error('not-authorized')
+        generateError('not-authorized', null, userId)
       }
       else {
         var result = Workspaces.remove(workspaceDoc);
@@ -413,15 +383,15 @@ Meteor.methods({
         var currentModelOutput = ModelOutputs.findOne({'_id':modelOutputId});
         console.log('Benchmarks: '); console.log(currentModelOutput.benchmarks);
         if( !currentModelOutput )
-            throw new Meteor.Error(500,'Error: Unable to load model output.');
+            generateError('Error: Unable to load model output.', "Model output Id: "+modelOutputId, userId);
 
         // Confirm there are experiments associated with the model output
         if( !currentModelOutput.experiments || currentModelOutput.experiments.length == 0 ) {
-            throw new Meteor.Error(500,'Error: No experiment associated with model output');
+            generateError('Error: No experiment associated with model output', "Model output Id: "+modelOutputId, userId);
         }
         var experiment = Experiments.findOne({_id:currentModelOutput.experiments[0]});
         if (!experiment)
-            throw new Meteor.Error(500,'Error: Unable to load experiment.');
+            generateError('Error: Unable to load experiment.', "Model output Id: "+modelOutputId, userId);
 
 /*        if( currentModelOutput.versions ) {
             var currentVersion = undefined;
@@ -449,7 +419,7 @@ Meteor.methods({
 
             // add the analysis script details
             if( !experiment.scripts || experiment.scripts.length <=0 ) {
-                throw new Meteor.Error(500,'The chosen experiment does not have a script');
+                generateError('The chosen experiment does not have a script', "Model Output Id: " + modelOutputId, userId);
             }
             else {
                 // using [0] just to test it out
@@ -516,7 +486,7 @@ addBenchmarks = function(files, benchmarkIds) {
                 console.log('processing file: ' + benchmark.file.name);
             }
             else {
-                throw new Meteor.Error('Benchmark details invalid');
+                generateError('Benchmark details invalid', benchmarkIds, userId);
             }
 
         }
@@ -528,7 +498,7 @@ addBenchmarks = function(files, benchmarkIds) {
 addDataSets = function(files,dataSets,type) {
 
     if( !dataSets || dataSets.length <= 0 ) {
-        throw new Meteor.Error(500, 'The chosen experiment does not have any data sets of type: '+type);
+        generateError('The chosen experiment does not have any data sets of type: '+type, null, userId);
     }
 
 	console.log('Number of data sets: ' + dataSets.length);
@@ -552,12 +522,12 @@ addDataSets = function(files,dataSets,type) {
                     console.log('processing file: ' + file.name);
                 });
             else {
-                throw new Meteor.Error('Data set details invalid');
+                generateError('Data set details invalid', dataSet, userId);
             }
 
         }
         else
-            throw new Meteor.Error('Data set details invalid');
+            generateError('Data set details invalid', dsDetails, userId);
     }
 }
 
