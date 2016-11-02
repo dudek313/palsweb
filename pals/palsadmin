@@ -1,6 +1,0 @@
-cd ~/palsweb/pals-admin
-export REDIS_HOST=172.17.0.3
-export BIND_IP=0.0.0.0 # (*for meteor in dev mode)
-export MONGO_URL=mongodb://172.17.0.2/meteor
-ROOT_URL=http://192.168.56.120:4000 meteor -p 4000
-
