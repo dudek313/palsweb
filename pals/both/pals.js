@@ -170,13 +170,15 @@ Router.map(function () {
     this.route('analyses');
     this.route('file',{
         where: 'server',
-        path: '/file/:id/:type',
+        path: '/file/:id/:type/:saveAs',
         action: function() {
             var id = this.params.id;
             var filename = '/pals/data/'+id;
             var fs = Npm.require('fs');
             var file = fs.readFileSync(filename);
-            var headers = {'Content-type': this.params.type};
+            var headers = {
+              'Content-type': this.params.type,
+              'Content-Disposition': "attachment; filename=" + this.params.saveAs};
             this.response.writeHead(200, headers);
             return this.response.end(file);
         }

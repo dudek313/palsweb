@@ -57,7 +57,7 @@
                 <tr>
                   <td>{{file.filename}}</td>
                   <td><button class='download-file btn btn-primary btn-xs' id='{{file.key}}'
-                        onclick="window.location.href='/file/{{file.key}}/{{file.filename}}'">Download</button></td>
+                        onclick="window.location.href='/file/{{file.key}}/{{encode "application/x-netcdf"}}/{{file.filename}}'">Download</button></td>
                 </tr>
               </table>
             {{else}}
@@ -181,25 +181,17 @@
                         <th>Delete</th>
                       </tr>
                       <tr>
-                        <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "text/plain"}}'">{{tempFile.filename}}</td>
+                        <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "application/x-netcdf"}}'/tempFile.filename">{{tempFile.filename}}</td>
                         <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                       </tr>
                     </table>
 
                   {{else}}
-
                     <label>Upload a model output file</label>
-                    {{#with currentUpload}}
-                      Uploading <b>{{file.name}}</b>:
-                      <span id="progress">{{progress.get}}%</span>
-                    {{else}}
-                      <input id="fileInput" type="file" />
-                    {{/with}}
-
-<!--                 If using meteor-autoform-file package
-                    {{> afQuickField name="file"}} -->
+                    {{>uploadForm 'modelOutput'}}
 
                   {{/if}}
+
                 </div>
               </div>
 

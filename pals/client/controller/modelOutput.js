@@ -157,29 +157,7 @@ Template.modelOutput.events = {
     },
     // if user selects a new model output file to upload
     // Uses collection-fs package, which has been deprecated, but is still widely used
-/*    'change .file-select':function(event, template){
-        FS.Utility.eachFile(event, function(file) {
-            file.type = 'modelOutput';
-            file.modelOutputId = getCurrentObjectId();
-            Files.insert(file, function (err, fileObj) {
-                if(err) console.log(err);
-                else {
-                    var originalFilename = fileObj.name();
-                    var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    var fileRecord = {
-                        path: FILE_BUCKET+'/'+name,
-                        size: fileObj.size(),
-                        filename: originalFilename,
-                        key: name,
-                        created: new Date()
-                    };
-                    Session.set('tempFile', fileRecord);
-                }
-            });
-        });
-    },
-*/
-    'change #fileInput': function (e, template) {
+/*    'change #fileInput': function (e, template) {
       if (e.currentTarget.files && e.currentTarget.files[0]) {
         var file = e.currentTarget.files[0];
         // We upload only one file, in case
@@ -218,7 +196,7 @@ Template.modelOutput.events = {
 
       }
     },
-
+*/
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {

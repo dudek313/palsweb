@@ -97,7 +97,7 @@
                   <tbody>
                     {{#each scripts}}
                       <tr>
-                        <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}'">{{filename}}</td>
+                        <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}/{{filename}}'">{{filename}}</td>
                       </tr>
                     {{/each}}
                   </tbody>
@@ -229,7 +229,8 @@
                         </tr>
                         {{#each tempScripts}}
                           <tr>
-                            <td onclick="window.location.href='/file/{{storedName}}/{{encode "text/plain"}}'">{{filename}}</td>
+<!--                            <td><a href='/pals/data/{{key}}' type="application/octet" download='{{filename}}'>{{filename}}</a></td>-->
+                            <td onclick="window.location.href='/file/{{key}}/{{encode "text/plain"}}/{{filename}}'">{{filename}}</td>
                             <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                           </tr>
                         {{/each}}

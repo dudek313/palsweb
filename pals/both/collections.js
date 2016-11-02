@@ -273,6 +273,8 @@ Experiments.attachSchema(new SimpleSchema({
   'scripts.$.path':     {type: String, optional: true},
   'scripts.$.filename': {type: String, optional: true},
   'scripts.$.key':      {type: String, optional: true},
+  'scripts.$.created':  {type: Date, optional: true},
+  'scripts.$.size':     {type: Number, optional: true},
   'dataSets.$._id':     {type: String, optional: true},
   'dataSets.$._version':    {type: Number, optional: true},
   templateId:   {type: String, optional: true},
