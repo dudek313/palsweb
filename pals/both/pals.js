@@ -183,16 +183,19 @@ Router.map(function () {
     this.route('analyses');
     this.route('file',{
         where: 'server',
-        path: '/file/:id/:type/:saveAs',
+        path: '/file/:id/:type/:saveAs/:userId',
         action: function() {
+            var userId = this.params.userId;
             var id = this.params.id;
             var filename = '/pals/data/'+id;
+            serverLog.info("Downloading file", {_id: id}, userId);
             var fs = Npm.require('fs');
             var file = fs.readFileSync(filename);
             var headers = {
               'Content-type': this.params.type,
               'Content-Disposition': "attachment; filename=" + this.params.saveAs};
             this.response.writeHead(200, headers);
+            serverLog.info("File downloaded", this.params.saveAs, userId);
             return this.response.end(file);
         }
     });
@@ -210,18 +213,3 @@ Router.map(function () {
         }
     });
 });
-
-/** Confirms before allowing a user to navigate away from a page before saving edits.
-/* Doesn't work
-Router.onBeforeAction(function(pause) {
-    if(Session.get('dirty')) {
-        if(confirm("Are you sure you want to navigate away?")) {
-            Session.set('dirty', false);
-            this.next();
-        }
-    }
-    else {
-        this.next();
-    }
-});
-*/

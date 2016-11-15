@@ -57,7 +57,7 @@
                 <tr>
                   <td>{{file.filename}}</td>
                   <td><button class='download-file btn btn-primary btn-xs' id='{{file.key}}'
-                        onclick="window.location.href='/file/{{file.key}}/{{encode "application/x-netcdf"}}/{{file.filename}}'">Download</button></td>
+                        onclick="window.location.href='/file/{{file.key}}.nc/{{encode "application/x-netcdf"}}/{{file.filename}}/{{currentUser._id}}'">Download</button></td>
                 </tr>
               </table>
             {{else}}
@@ -181,7 +181,7 @@
                         <th>Delete</th>
                       </tr>
                       <tr>
-                        <td onclick="window.location.href='/file/{{tempFile.key}}/{{encode "application/x-netcdf"}}'/tempFile.filename">{{tempFile.filename}}</td>
+                        <td onclick="window.location.href='/file/{{tempFile.key}}.nc/{{encode "application/x-netcdf"}}/tempFile.filename/{{currentUser._id}}'">{{tempFile.filename}}</td>
                         <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                       </tr>
                     </table>

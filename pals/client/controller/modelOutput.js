@@ -155,48 +155,7 @@ Template.modelOutput.events = {
         }*/
         Router.go('/modelOutput/update/' + currentModelOutputId);
     },
-    // if user selects a new model output file to upload
-    // Uses collection-fs package, which has been deprecated, but is still widely used
-/*    'change #fileInput': function (e, template) {
-      if (e.currentTarget.files && e.currentTarget.files[0]) {
-        var file = e.currentTarget.files[0];
-        // We upload only one file, in case
-        // multiple files were selected
 
-        var upload = StoredFiles.insert({
-          file: file,
-          streams: 'dynamic',
-          chunkSize: 'dynamic',
-          meta: {
-            dirty: true
-          }
-        }, false);
-
-        upload.on('start', function () {
-          template.currentUpload.set(this);
-        });
-
-        upload.on('end', function (error, fileObj) {
-          if (error) {
-            alert('Error during upload: ' + error);
-          } else {
-            var fileRecord = {
-                path: fileObj.path,
-                filename: fileObj.name,
-                size: fileObj.size,
-                key: fileObj._id,
-                created: new Date()
-            };
-            Session.set('tempFile', fileRecord);
-          };
-          template.currentUpload.set(false);
-        });
-
-        upload.start();
-
-      }
-    },
-*/
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {
@@ -207,7 +166,7 @@ Template.modelOutput.events = {
         }
     },
 
-// Not sure if this is needed ?
+
     'click .download-file':function(event, template){
         event.preventDefault();
     },

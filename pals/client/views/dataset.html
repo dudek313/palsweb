@@ -66,8 +66,8 @@
                       <td>{{name}}</td>
                       <td>{{type}}</td>
                       <td>{{isDownloadable}}</td>
-                      <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
-                            onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}'">Download</button></td>
+                      <td><button class='download-file btn btn-primary btn-xs' id='{{key}}' {{disabledIfNotLoggedIn}}
+                            onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
                       <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                   </tr>
                   {{/each}}
@@ -94,21 +94,6 @@
                     </div>
 
                     {{> uploadForm "dataSet"}}
-<!--
-                    {{#with currentUpload}}
-                      Uploading <b>{{file.name}}</b>:
-                      <span id="progress">{{progress.get}}%</span>
-                    {{else}}
-                      <input id="fileInput" type="file" />
-                    {{/with}} -->
-<!--
-                    <input type="file" class="file-select" name="file-select">
-                    <div class="progress progress-striped active">
-                      <div class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-                          style="width:0%">
-                      </div>
-                    </div>
--->
 
                   </div>
                 </div>
@@ -334,8 +319,11 @@
                     <td>{{type}}</td>
                     <td>{{isDownloadable}}</td>
                     {{#if downloadable}}
-                      <td><button class='download-file btn btn-primary btn-xs' id='{{key}}'
-                        onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}'">Download</button></td>
+<!--                      <td><button class='btn btn-primary btn-xs' id='{{key}}' {{disabledIfNotLoggedIn}}
+                        onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td> -->
+
+                      <td><button class='download-file btn btn-primary btn-xs' id='{{key}}' {{disabledIfNotLoggedIn}}
+                        onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
                     {{else}}
                       <td></td>
                     {{/if}}

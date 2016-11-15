@@ -102,12 +102,12 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
               }
               else {
                   var fileData = {
-                      path : newDataDir + '/' + newFilename,
+                      path : newDataDir + '/' + newFilename + '.nc',
                       name : filenameHead + '_' + filetype + '.nc',
                       oldName: filename,
                       size : stats['size'],
                       key : newFilename,
-                      createdAt : row.dsv_uploaddate,
+                      created : row.dsv_uploaddate,
                       type : filetype,
                       downloadable : forDownload,
                       _version : 1
@@ -202,9 +202,9 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
         created : dataSet.created,
         spatialLevel : 'SingleSite',
         scripts : [{
-            path : '/pals/data/SingleSiteExperiment.R',
+            path : '/pals/data/SingleSiteExperiment.r',
             filename : 'SingleSiteExperiment.R',
-            key : 'SingleSiteExperiment.R',
+            key : 'SingleSiteExperiment',
         }],
         dataSets : [{_id: dataSet._id, _version: null}],
         owner : dataSet.owner,
@@ -227,13 +227,13 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             templateId : experimentTemplate._id,
             templateVersion: 1,
             latest : true,
-            createdAt : dataSet.created,
-            modifiedAt : dataSet.created,
+            created : dataSet.created,
+            modified : dataSet.created,
             spatialLevel : 'SingleSite',
             scripts : [{
-                path : '/pals/data/SingleSiteExperiment.R',
+                path : '/pals/data/SingleSiteExperiment.r',
                 filename : 'SingleSiteExperiment.R',
-                key : 'SingleSiteExperiment.R',
+                key : 'SingleSiteExperiment',
             }],
             dataSets : [{_id: dataSet._id, _version:1}],
             owner : dataSet.owner,

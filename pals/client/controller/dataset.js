@@ -104,12 +104,14 @@ Template.dataSet.events = {
         event.preventDefault();
         Session.set('uploadButtonClicked', true);
     },
+
     'click .cancel-update':function(event){
         event.preventDefault();
         Session.set('tempFiles', null);
         Session.set('deletedFileIds', []);
         Router.go('/dataSet/display/' + getCurrentObjectId());
     },
+
     'click .cancel-create':function(event){
         event.preventDefault();
         Session.set('tempFiles', null);
@@ -117,6 +119,11 @@ Template.dataSet.events = {
 //        Session.set('filesUploaded', []);
         window.history.back();
     },
+
+    'click .download-file':function(event, template){
+        event.preventDefault();
+    },
+
     'click .delete-file':function(event) {
         event.preventDefault();
         var selectedFileId = $(event.target).attr('id');
@@ -141,6 +148,7 @@ Template.dataSet.events = {
           displayError('Error removing data set, please try again', error);
         }
     },
+
     'click .enable-update':function(event){
         event.preventDefault();
         var dataSetId = getCurrentObjectId();
