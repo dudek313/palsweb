@@ -3,6 +3,19 @@
 FILE_BUCKET = '/pals/data'; // From the old file upload package
 FILE_DIR = '/pals/data';
 
+// Initialize Logger:
+this.serverLog = new Logger();
+
+// Initialize LoggerFile and enable with default settings:
+var serverLogFile = new LoggerFile(serverLog, {
+  fileNameFormat: function() {return 'server.log'},
+  path: '/pals/logs/'
+}).enable({
+  enable: true,
+  client: false,
+  server: true
+});
+
 Router.configure({
     layoutTemplate: 'main',
     notFoundTemplate: 'notFound',

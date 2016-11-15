@@ -81,9 +81,21 @@ getSource = function() {
     return Router.current().params.source;
 }
 
+// returns id and name details about an object
+getDetails = function(object) {
+  var details = {};
+  if (object) {
+    if (object._id)
+      details._id = object._id;
+    if (object.name)
+      details.name = object.name;
+  }
+  return details;
+}
+
 setFileDirtyStatus = function(fileId, status) {
-  var modifier = {meta: {dirty: status}}
-  Meteor.call('updateStoredFiles', fileId, modifier);
+  var set = {'meta': {'dirty': status}};
+  Meteor.call('updateStoredFiles', fileId, set);
 }
 
 displayError = function(errMessage, error) {

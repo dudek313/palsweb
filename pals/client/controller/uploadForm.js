@@ -23,22 +23,24 @@ Template.uploadForm.events({
       // multiple files were selected
 
       var currentFile = e.currentTarget.files[0];
-      clientLog.info('Uploading file', currentFile, userId);
+      serverLog.info('Uploading file', e.currentTarget.files[0], userId);
       var fileExtension = getFileExtension(currentFile);
-      console.log('filetype: ', template.data);
-      console.log('fileExtension', fileExtension);
-      if (template.data.fileType == 'experiment script' && fileExtension != "R") {
-        clientLog.error('Error: Only R files allowed', currentFile, userId);
+      if (template.data == 'experiment script' && fileExtension != "R") {
+        serverLog.error('Error: Only R files allowed', currentFile, userId);
         alert('Error: Only R files allowed');
       } else if(template.data != 'experiment script' && fileExtension != "nc") {
-        clientLog.error('Error: Only NetCDF files allowed', currentFile, userId);
+        serverLog.error('Error: Only NetCDF files allowed', currentFile, userId);
         alert('Error: Only NetCDF files allowed');
       } else {
         var userId = Meteor.userId();
+        var dirtyValue = (template.data != 'experiment script') ? true : false; // experiment scripts won't use dirty flag
         var upload = StoredFiles.insert({
           file: currentFile,
           streams: 'dynamic',
-          chunkSize: 'dynamic'
+          chunkSize: 'dynamic',
+          meta: {
+            dirty: dirtyValue
+          }
         }, false);
 
         upload.on('start', function () {
@@ -47,13 +49,13 @@ Template.uploadForm.events({
 
         upload.on('end', function (error, fileObj) {
           if (error) {
-            clientLog.error('Error during upload', currentFile, userId);
+            serverLog.error('Error during upload', currentFile, userId);
             alert('Error during upload: ' + error);
           } else {
-            clientLog.info('File "' + fileObj.name + '" successfully uploaded', fileObj , userId);
+            serverLog.info('File "' + fileObj.name + '" successfully uploaded', getDetails(fileObj) , userId);
             alert('File "' + fileObj.name + '" successfully uploaded');
 
-            var nameWithExtension = fileObj._id + '.' + fileObj.extension;
+//            var nameWithExtension = fileObj._id + '.' + fileObj.extension;
 
             if (template.data == 'dataSet') {
               var isDownloadable = document.getElementById('downloadable').checked;
@@ -63,7 +65,7 @@ Template.uploadForm.events({
                 name: fileObj.name,
                 downloadable: isDownloadable,
                 size: fileObj.size,
-                key: nameWithExtension,
+                key: fileObj._id,
                 created: new Date(),
                 type: fileType
               };
@@ -77,7 +79,7 @@ Template.uploadForm.events({
                 path: fileObj.path,
                 filename: fileObj.name,
                 size: fileObj.size,
-                key: nameWithExtension,
+                key: fileObj._id,
                 created: new Date(),
               };
 

@@ -17,15 +17,6 @@ StateSelection = ['values measured at site','model spin-up on site data','defaul
 ParameterSelection = ['automated calibration','manual calibration','no calibration (model default values)','other'];
 Resolution = ['0.01 deg','0.5 deg','1 deg','2 deg','Other'];
 
-// Initialize Logger:
-this.clientLog = new Logger();
-
-// Initialize LoggerFile and enable with default settings:
-var clientLogFile = new LoggerFile(clientLog, {
-  fileNameFormat: function() {return 'client.log'},
-  path: '/pals/logs/'
-}).enable();
-
 
 GetCollectionByName = function(name) {
     switch(name) {
@@ -346,6 +337,7 @@ dataSetSchema = new SimpleSchema({
   resolution:     {type: String, label: "Resolution", allowedValues: Resolution, optional: true},
   startdate:      {type: Date, label: "Start Date", optional: true},
   enddate:        {type: Date, label: "End Date", optional: true},
+  versionDescription:   {type: String, optional: true},
   _version: {
     type: Number,
     label: "Version",
