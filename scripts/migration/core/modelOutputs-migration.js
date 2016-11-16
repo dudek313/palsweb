@@ -80,7 +80,7 @@ exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstan
                         }
                         else {
                             var fileData = {
-                                path : newDataDir + '/' + newFilename + '.nc',
+                                path : newDataDir + '/modelOutputs/' + newFilename + '.nc',
                                 filename : 'mo' + row.mo_id + '.nc',
                                 size : stats['size'],
                                 key : newFilename,

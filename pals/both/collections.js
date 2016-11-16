@@ -26,6 +26,15 @@ GetCollectionByName = function(name) {
         case 'Models':
             return Models;
             break;
+        case 'ModelOutputFiles':
+            return ModelOutputFiles;
+            break;
+        case 'DataSetFiles':
+            return DataSetFiles;
+            break;
+        case 'ScriptFiles':
+            return ScriptFiles;
+            break;
     }
 }
 
@@ -34,39 +43,78 @@ Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
 
-this.StoredFiles = new FilesCollection({
-  collectionName: 'StoredFiles',
-  storagePath: '/pals/data',
+this.ModelOutputFiles = new FilesCollection({
+  collectionName: 'ModelOutputFiles',
+  storagePath: '/pals/data/modelOutputs',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
-    if (/nc|R/i.test(file.extension)) {
+    if (/nc/i.test(file.extension)) {
       return true;
     } else {
-      return 'Only NetCDF and R files allowed';
+      return 'Only NetCDF files allowed';
     }
   }
 });
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.StoredFiles.all');
+  Meteor.subscribe('files.ModelOutputFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.StoredFiles.all', function() {
-    return StoredFiles.collection.find().cursor;
+  Meteor.publish('files.ModelOutputFiles.all', function() {
+    return ModelOutputFiles.collection.find().cursor;
   });
 }
+
+this.DataSetFiles = new FilesCollection({
+  collectionName: 'DataSetFiles',
+  storagePath: '/pals/data/dataSets',
+  allowClientCode: false, // Disallow remove files from Client
+  onBeforeUpload: function (file) {
+    // Allow upload of nc and r files only
+    if (/nc/i.test(file.extension)) {
+      return true;
+    } else {
+      return 'Only NetCDF files allowed';
+    }
+  }
+});
 
 if (Meteor.isClient) {
-  Meteor.subscribe('files.storedFiles.all');
+  Meteor.subscribe('files.DataSetFiles.all');
 }
 
 if (Meteor.isServer) {
-  Meteor.publish('files.storedFiles.all', function() {
-    return StoredFiles.collection.find().cursor;
+  Meteor.publish('files.DataSetFiles.all', function() {
+    return DataSetFiles.collection.find().cursor;
   });
 }
+
+this.ScriptFiles = new FilesCollection({
+  collectionName: 'ScriptFiles',
+  storagePath: '/pals/data/scripts',
+  allowClientCode: false, // Disallow remove files from Client
+  onBeforeUpload: function (file) {
+    // Allow upload of nc and r files only
+    if (/R/i.test(file.extension)) {
+      return true;
+    } else {
+      return 'Only R files allowed';
+    }
+  }
+});
+
+if (Meteor.isClient) {
+  Meteor.subscribe('files.ScriptFiles.all');
+}
+
+if (Meteor.isServer) {
+  Meteor.publish('files.ScriptFiles.all', function() {
+    return ScriptFiles.collection.find().cursor;
+  });
+}
+
 
 ModelOutputs.attachSchema(new SimpleSchema({
   _id: {

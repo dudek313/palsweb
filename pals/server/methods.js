@@ -337,6 +337,26 @@ Meteor.methods({
     },
 
     // used to update 'dirty' status for NetCDF Files
+    updateFileStatus: function(collectionName, _id, set) {
+      check(_id, String);
+      check(set, Object);
+      check(set.meta, Object);
+      check(set.meta.dirty, Boolean);
+      var userId = this.userId;
+      var fileCollection = GetCollectionByName(collectionName);
+      var file = fileCollection.findOne({_id: _id});
+      if (userId && file && file.userId == userId) {
+        this.unblock();
+        fileCollection.update({_id: _id}, {$set: set});
+        generateMessage('Setting ' + collectionName + ' file dirty status to ' + set.meta.dirty, {'_id': _id}, userId);
+        return true;
+      }
+      else {
+        return null;
+      }
+
+    },
+
     updateStoredFiles: function(_id, set) {
       check(_id, String);
       check(set, Object);

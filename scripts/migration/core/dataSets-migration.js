@@ -102,7 +102,7 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
               }
               else {
                   var fileData = {
-                      path : newDataDir + '/' + newFilename + '.nc',
+                      path : newDataDir + '/dataSets/' + newFilename + '.nc',
                       name : filenameHead + '_' + filetype + '.nc',
                       oldName: filename,
                       size : stats['size'],
@@ -156,7 +156,6 @@ function copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, works
         lat : row.ds_latitude,
         lon : row.ds_longitude,
         maxVegHeight : row.ds_maxvegheight,
-        "public" : true,
         references : row.ds_refs,
         siteContact : row.ds_sitecontact,
         soilType : row.ds_soiltype,
@@ -202,7 +201,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
         created : dataSet.created,
         spatialLevel : 'SingleSite',
         scripts : [{
-            path : '/pals/data/SingleSiteExperiment.r',
+            path : '/pals/data/scripts/SingleSiteExperiment.r',
             filename : 'SingleSiteExperiment.R',
             key : 'SingleSiteExperiment',
         }],
@@ -231,7 +230,7 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
             modified : dataSet.created,
             spatialLevel : 'SingleSite',
             scripts : [{
-                path : '/pals/data/SingleSiteExperiment.r',
+                path : '/pals/data/scripts/SingleSiteExperiment.r',
                 filename : 'SingleSiteExperiment.R',
                 key : 'SingleSiteExperiment',
             }],

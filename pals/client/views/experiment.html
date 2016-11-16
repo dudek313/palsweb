@@ -97,7 +97,7 @@
                   <tbody>
                     {{#each scripts}}
                       <tr>
-                        <td onclick="window.location.href='/file/{{key}}.r/{{encode "text/plain"}}/{{filename}}/{{currentUser._id}}'">{{filename}}</td>
+                        <td onclick="window.location.href='/file/scripts/{{key}}.r/{{encode "text/plain"}}/{{filename}}/{{currentUser._id}}'">{{filename}}</td>
                       </tr>
                     {{/each}}
                   </tbody>
@@ -229,7 +229,7 @@
                         </tr>
                         {{#each tempScripts}}
                           <tr>
-                            <td onclick="window.location.href='/file/{{key}}.r/{{encode "text/plain"}}/{{filename}}/{{currentUser._id}}'">{{filename}}</td>
+                            <td onclick="window.location.href='/file/scripts/{{key}}.r/{{encode "text/plain"}}/{{filename}}/{{currentUser._id}}'">{{filename}}</td>
                             <td><button class='delete-script btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                           </tr>
                         {{/each}}
