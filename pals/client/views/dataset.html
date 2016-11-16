@@ -67,7 +67,7 @@
                       <td>{{type}}</td>
                       <td>{{isDownloadable}}</td>
                       <td><button class='download-file btn btn-primary btn-xs' id='{{key}}' {{disabledIfNotLoggedIn}}
-                            onclick="window.location.href='/file/dataSets/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
+                            onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
                       <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                   </tr>
                   {{/each}}
@@ -320,7 +320,7 @@
                     <td>{{isDownloadable}}</td>
                     {{#if downloadable}}
                       <td><button class='download-file btn btn-primary btn-xs' id='{{key}}' {{disabledIfNotLoggedIn}}
-                        onclick="window.location.href='/file/dataSets/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
+                        onclick="window.location.href='/file/{{key}}.nc/{{encode "application/x-netcdf"}}/{{name}}/{{currentUser._id}}'">Download</button></td>
                     {{else}}
                       <td></td>
                     {{/if}}

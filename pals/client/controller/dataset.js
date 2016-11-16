@@ -53,7 +53,7 @@ AutoForm.hooks({
                 // set uploaded files as not dirty
                 insertDoc.files.forEach(function(file) {
                   if (file && file.key)
-                    setFileDirtyStatus("DataSetFiles", file.key, false);
+                    setFileDirtyStatus(file.key, false);
                 });
 
                 //display the created data set
@@ -78,13 +78,13 @@ AutoForm.hooks({
                     // set uploaded files as clean
                     updateDoc.$set.files.forEach(function(file) {
                       if (file && file.key)
-                        setFileDirtyStatus("DataSetFiles", file.key, false);
+                        setFileDirtyStatus(file.key, false);
                     });
 
                     // mark deleted files as dirty
                     var deletedFileIds = Session.get('deletedFileIds');
                     deletedFileIds.forEach(function(fileId) {
-                      setFileDirtyStatus("DataSetFiles", fileId, true);
+                      setFileDirtyStatus(fileId, true);
                     });
                     Session.set('deletedFileIds', []);
 

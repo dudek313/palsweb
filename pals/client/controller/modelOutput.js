@@ -33,8 +33,7 @@ AutoForm.hooks({
 
                     // if successful
                     // set uploaded files as not dirty
-                    console.log('insertDoc', insertDoc);
-                    setFileDirtyStatus("ModelOutputFiles", insertDoc.file.key, false);
+                    setFileDirtyStatus(insertDoc.file.key, false);
 
                     Meteor.subscribe('modelOutputs'); // Refresh the publication to allow user access to new model output
                     Router.go('/modelOutput/display/' + docId);
@@ -103,12 +102,12 @@ AutoForm.hooks({
                     else {
                         // if successful
                         // set uploaded file as clean
-                        setFileDirtyStatus("ModelOutputFiles", updateDoc.$set.file.key, false);
+                        setFileDirtyStatus(updateDoc.$set.file.key, false);
 
                         // mark deleted files as dirty
                         var deletedFileIds = Session.get('deletedFileIds');
                         deletedFileIds.forEach(function(fileId) {
-                          setFileDirtyStatus("ModelOutputFiles", fileId, true);
+                          setFileDirtyStatus(fileId, true);
                         });
                         Session.set('deletedFileIds', []);
 
@@ -160,7 +159,6 @@ Template.modelOutput.events = {
     'click .delete-file':function(event) {
         event.preventDefault();
         if( confirm("Are you sure?")) {
-            var selectedFileId = $(event.target).attr('id');
             Session.set('tempFile', null);
             var deletedFileIds = Session.get('deletedFileIds');
             deletedFileIds.push(selectedFileId);
