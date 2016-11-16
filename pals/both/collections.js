@@ -407,6 +407,8 @@ dataSetSchema = new SimpleSchema({
   'files.$.key':  {type: String, optional: true},
   'files.$.downloadable':   {type: Boolean, optional: true},
   'files.$.type': {type: String, optional: true},
+  'files.$.oldName':  {type: String, optional: true},
+  'files.$._version':  {type: Number, optional: true},
   modifierId: {
     type: String,
     regEx: SimpleSchema.RegEx.Id,

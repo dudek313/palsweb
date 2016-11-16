@@ -1,5 +1,5 @@
 var executions = '/pals/executions';
-var localDatabase = '/pals/data';
+var localDatabase = '/pals/data/plots';
 
 var http = require('http');
 var https = require('https');
@@ -65,7 +65,7 @@ exports.executeScript = function(message, callback) {
     var exec = require('child_process').exec;
     console.log('about to get original dir');
     var originalDir = process.cwd();
-    console.log(originalDir);
+    console.log('here')
     console.log('changing dir: ' + message.dir);
     process.chdir(message.dir);
     console.log('running script: ' + scriptFilename);
@@ -73,9 +73,7 @@ exports.executeScript = function(message, callback) {
         console.log('exec finished');
         if (err) {
             process.chdir(originalDir);
-	    var origDir = process.cwd();
-	    console.log('Dir after error: ' + origDir);
-	    callback(err, message);
+            callback(err, message);
         } else {
             //console.log(stdout);
             message.outputFilename = message.dir + '/' + 'output.json';
@@ -166,6 +164,7 @@ exports.handleMessage = function(message, sendMessage) {
     });
 
     d.run(function() {
+        fs.mkdirSync(localDatabase);
         console.log('processing message: ' + message._id);
         result = exports.createDir(message);
         console.log('Created working directory');
