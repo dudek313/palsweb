@@ -181,7 +181,8 @@
                         <th>Delete</th>
                       </tr>
                       <tr>
-                        <td onclick="window.location.href='/file/{{tempFile.key}}.nc/{{encode "application/x-netcdf"}}/tempFile.filename/{{currentUser._id}}'">{{tempFile.filename}}</td>
+<!--                        <td onclick="window.location.href='/file/{{tempFile.key}}.nc/{{encode "application/x-netcdf"}}/{{tempFile.filename}}/{{currentUser._id}}'">{{tempFile.filename}}</td> -->
+                        <td> <a href='/file/{{tempFile.key}}.nc/{{encode "application/x-netcdf"}}/{{tempFile.filename}}/{{currentUser._id}}' download target='_parent'>{{tempFile.filename}}</a></td>
                         <td><button class='delete-file btn btn-danger btn-xs' id='{{key}}'>Delete</button></td>
                       </tr>
                     </table>

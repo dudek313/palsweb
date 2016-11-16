@@ -187,15 +187,16 @@ Router.map(function () {
         action: function() {
             var userId = this.params.userId;
             var id = this.params.id;
+            var saveAs = this.params.saveAs;
             var filename = '/pals/data/'+id;
             serverLog.info("Downloading file", {_id: id}, userId);
             var fs = Npm.require('fs');
             var file = fs.readFileSync(filename);
-            var headers = {
-              'Content-type': this.params.type,
-              'Content-Disposition': "attachment; filename=" + this.params.saveAs};
+            var headers = { 'Content-type': this.params.type };
+            if (saveAs != "display")
+              headers['Content-Disposition'] = "attachment; filename=" + saveAs;
             this.response.writeHead(200, headers);
-            serverLog.info("File downloaded", this.params.saveAs, userId);
+            serverLog.info("File downloaded", saveAs, userId);
             return this.response.end(file);
         }
     });

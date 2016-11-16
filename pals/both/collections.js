@@ -109,7 +109,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
       }
     }
   },
-  modified: {
+  modifiedAt: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -178,7 +178,7 @@ modelSchema = new SimpleSchema({
       }
     }
   },
-  modified: {
+  modifiedAt: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -231,7 +231,7 @@ Experiments.attachSchema(new SimpleSchema({
       }
     }
   },
-  modified: {
+  modifiedAt: {
     type: Date,
     optional: true,
     label: "Last modified"
@@ -293,7 +293,7 @@ dataSetSchema = new SimpleSchema({
       }
     }
   },
-  modified: {
+  modifiedAt: {
     type: Date,
     optional: true,
     label: "Last modified"
