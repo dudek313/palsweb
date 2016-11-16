@@ -38,6 +38,11 @@ GetCollectionByName = function(name) {
     }
 }
 
+function directoryDate() {
+  var date = new Date();
+  var dateString = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+  return dateString;
+}
 
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
@@ -45,7 +50,7 @@ Files = new FS.Collection("files", {
 
 this.ModelOutputFiles = new FilesCollection({
   collectionName: 'ModelOutputFiles',
-  storagePath: '/pals/data/modelOutputs',
+  storagePath: function() { return '/pals/data/'+directoryDate()+'/modelOutputs'},
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
@@ -69,7 +74,7 @@ if (Meteor.isServer) {
 
 this.DataSetFiles = new FilesCollection({
   collectionName: 'DataSetFiles',
-  storagePath: '/pals/data/dataSets',
+  storagePath: function() { return '/pals/data/'+directoryDate()+'/dataSets'},
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
@@ -93,7 +98,7 @@ if (Meteor.isServer) {
 
 this.ScriptFiles = new FilesCollection({
   collectionName: 'ScriptFiles',
-  storagePath: '/pals/data/scripts',
+  storagePath: function() { return '/pals/data/'+directoryDate()+'/scripts' },
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload: function (file) {
     // Allow upload of nc and r files only
