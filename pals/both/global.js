@@ -93,9 +93,9 @@ getDetails = function(object) {
   return details;
 }
 
-setFileDirtyStatus = function(fileId, status) {
+setFileDirtyStatus = function(fileCollection, fileId, status) {
   var set = {'meta': {'dirty': status}};
-  Meteor.call('updateStoredFiles', fileId, set);
+  Meteor.call('updateFileStatus', fileCollection, fileId, set);
 }
 
 displayError = function(errMessage, error) {

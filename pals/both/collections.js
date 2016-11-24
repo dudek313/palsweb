@@ -1,3 +1,5 @@
+//import pkgcloud from 'pkgcloud';
+
 Workspaces = new Meteor.Collection("workspaces");
 DataSets = new Meteor.Collection("dataSets").vermongo({timestamps: true, userId: 'modifierId'});
 Experiments = new Meteor.Collection("experiments").vermongo({timestamps: true, userId: 'modifierId'});
@@ -29,10 +31,52 @@ GetCollectionByName = function(name) {
     }
 }
 
-
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
+/*
+import Swifft from 'swifft';
+
+console.log('URL: ', process.env.OS_AUTH_URL);
+var options = {
+    provider: 'openstack',
+    authUrl: process.env.OS_AUTH_URL + '/v2.0',
+    username: process.env.OS_USERNAME,
+    password: process.env.OS_PASSWORD,
+    tenant_id: "2bcd99d3e00d418fb799bfabf82572de",
+    tenant_name: process.env.OS_TENANT_NAME,
+    region: 'Melbourne',
+    version: process.env.version
+};
+
+var account = Swifft.create(options);
+
+account.list(function (err, containers) {
+  console.log('Err: ', err);
+  console.log('containers: ', containers);
+});
+*/
+/*
+import '../node_modules/pkgcloud/lib/pkgcloud/core/compute/';
+import '../node_modules/pkgcloud/lib/pkgcloud/core/storage/';
+import '../node_modules/pkgcloud/lib/pkgcloud/openstack/';
+*/
+
+if (Meteor.isServer) {
+  var pkgcloud = require('pkgcloud')
+
+  var client = pkgcloud.storage.createClient({
+      provider: 'openstack',
+      username: process.env.OS_USERNAME,
+      password: process.env.OS_PASSWORD,
+      tenantId: "2bcd99d3e00d418fb799bfabf82572de",
+      region: 'Melbourne',
+      authUrl: process.env.OS_AUTH_URL,
+      version: process.env.version
+  });
+
+
+}
 
 this.StoredFiles = new FilesCollection({
   collectionName: 'StoredFiles',
@@ -45,18 +89,64 @@ this.StoredFiles = new FilesCollection({
     } else {
       return 'Only NetCDF and R files allowed';
     }
-  }
+  }/*,
+  onAfterUpload: function(fileRef) {
+    var self = this;
+    _.each(fileRef.versions, function(vRef, version) {
+      var filePath = "files/" + (Random.id()) + "-" + version + "." + fileRef.extension;
+      var options = {
+        container: 'data-store',
+        remote: filePath
+      };
+
+      var writeStream = client.upload(options);
+      writeStream.on('error', function(err) {
+        console.error(err);
+      });
+
+      writeStream.on('success', function(file) {
+        bound(function() {
+          var upd = {
+            $set: {}
+          };
+          upd['$set']["versions." + version + ".meta.pipeFrom"] = endPoint + '/' + filePath;
+          upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
+          self.collection.update({
+            _id: fileRef._id
+          }, upd, function(error) {
+            if (error) {
+              console.error(error);
+            } else {
+                // Unlink original files from FS
+                // after successful upload to AWS:S3
+              self.unlink(self.collection.findOne(fileRef._id), version);
+            }
+          });
+        });
+      });
+    });
+  },
+
+  interceptDownload: function(http, fileRef, version) {
+    var path, ref, ref1, ref2;
+    path = (ref = fileRef.versions) != null ? (ref1 = ref[version]) != null ? (ref2 = ref1.meta) != null ? ref2.pipeFrom : void 0 : void 0 : void 0;
+    if (path) {
+      // If file is moved to S3
+      // We will pipe request to S3
+      // So, original link will stay always secure
+      Request({
+        url: path,
+        headers: _.pick(http.request.headers, 'range', 'accept-language', 'accept', 'cache-control', 'pragma', 'connection', 'upgrade-insecure-requests', 'user-agent')
+      }).pipe(http.response);
+      return true;
+    } else {
+      // While file is not yet uploaded to S3
+      // We will serve file from FS
+      return false;
+    }
+  }*/
+
 });
-
-if (Meteor.isClient) {
-  Meteor.subscribe('files.StoredFiles.all');
-}
-
-if (Meteor.isServer) {
-  Meteor.publish('files.StoredFiles.all', function() {
-    return StoredFiles.collection.find().cursor;
-  });
-}
 
 if (Meteor.isClient) {
   Meteor.subscribe('files.storedFiles.all');
