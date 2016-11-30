@@ -1,0 +1,51 @@
+FROM    ubuntu:14.04
+
+RUN     apt-get update
+RUN     apt-get install -y make g++ curl initscripts git
+RUN     apt-get install -y libssl-dev git-core pkg-config build-essential curl gcc g++ initscripts
+
+# for ./configure of nodejs
+RUN     apt-get install -y python python-dev
+
+WORKDIR ~
+
+#build our own nodejs and make it local so we can switch versions easily
+RUN     mkdir ~/local
+RUN     mkdir ~/install/nodejs -p
+WORKDIR ~/install/nodejs
+RUN 	apt-get remove --purge node
+RUN     apt-get remove --purge nodejs
+
+RUN	curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+RUN	sudo apt-get install -y nodejs
+
+ENV     PATH /root/local/bin:$PATH
+RUN     curl https://www.npmjs.com/install.sh | sh
+
+RUN     npm -v
+RUN     node -v
+
+WORKDIR /root
+
+RUN     git clone # my project's source code
+RUN     curl https://install.meteor.com/ | sh
+
+ENV     PATH /root/pals/.meteor:$PATH
+WORKDIR /root/palsweb/pals
+
+#migrate project to new meteor
+RUN     meteor list
+RUN     meteor remove accounts-ui accounts-password jquery standard-app-packages
+RUN     meteor update
+RUN     npm install -g meteorite
+
+RUN     meteor add iron:router
+RUN     meteor add mrt:redis
+RUN     meteor add cfs:standard-packages
+RUN     meteor add cfs:filesystem
+RUN     meteor add accounts-ui
+RUN     meteor add accounts-password
+RUN     meteor add standard-app-packages
+RUN     meteor add jquery
+RUN	meteor add meteorhacks:npm
+RUN	npm install pg

@@ -1,0 +1,8 @@
+# Starts up the palsweb web application on Meteor
+# Assumes the Docker containers for Meteor, redis and mongoDb have already been setup
+
+sudo docker start mongo
+sudo docker start redis
+sudo docker start palsweb
+
+sudo docker exec -it palsweb /bin/sh -c "sudo -i -u pals -H /bin/sh -c "cd /home/pals/palsweb/pals;export PATH=/home/pals/.meteor:$PATH;export REDIS_HOST=192.168.100.151;export BIND_IP=0.0.0.0 # (*for meteor in dev mode);export MONGO_URL=mongodb://172.17.0.3/meteor;meteor run""

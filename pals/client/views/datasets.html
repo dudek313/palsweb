@@ -1,67 +1,85 @@
-<template name="datasets">
+<template name="dataSets">
 <div class="text-content">
-    <h1>
-        {{#if currentSpatialResolution}}{{currentSpatialResolution}}{{/if}}
-        Data Sets
-    </h1>
-    <div class="alert alert-danger error"></div>
+
+  <div class="alert alert-danger error"></div>
+
+    <h3>Data Sets
+        {{#if areEqual source 'workspace'}}In Current Workspace{{/if}}
+    </h3>
+    <div class="form-group">
+      <input type="radio" name="spatialLevel" value="All" {{isChecked 'All'}}>All&nbsp;
+      <input type="radio" name="spatialLevel" value="SingleSite" {{isChecked 'SingleSite'}}>SingleSite&nbsp;
+      <input type="radio" name="spatialLevel" value="MultipleSite" {{isChecked 'MultipleSite'}}>MultipleSite&nbsp;
+      <input type="radio" name="spatialLevel" value="Catchment" {{isChecked 'Catchment'}}>Catchment&nbsp;
+      <input type="radio" name="spatialLevel" value="Regional" {{isChecked 'Regional'}}>Regional&nbsp;
+      <input type="radio" name="spatialLevel" value="Global" {{isChecked 'Global'}}>Global&nbsp;
+    </div>
+
+    {{> reactiveTable class="table table-hover table-framed" collection=dataSets fields=fields settings=tableSettings}}
+<!--
     <table class="table table-hover">
         <thead>
         <tr>
-            {{#if currentSpatialResolution}}
-                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+            {{#if areEqual currentSpatialLevel 'All'}}
+                <th>Name</th>
+                <th>Spatial Level</th>
+                <th>Resolution</th>
+                <th>Time Step Size</th>
+                <th>Variables</th>
+                <th>Created By</th>
+            {{else}}
+                {{#if areEqual currentSpatialLevel 'SingleSite'}}
                     {{> singleSiteHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
                     {{> multipleSiteHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                {{#if areEqual currentSpatialLevel 'Catchment'}}
                     {{> catchmentHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Regional'}}
+                {{#if areEqual currentSpatialLevel 'Regional'}}
                     {{> regionalHeadings}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Global'}}
+                {{#if areEqual currentSpatialLevel 'Global'}}
                     {{> globalHeadings}}
                 {{/if}}
-            {{else}}
-            <th>Name</th>
-            <th>Spatial Level</th>
-            <th>Resolution</th>
-            <th>Created By</th>
             {{/if}}
-            {{#if currentUser.admin}}<th>Delete</th>{{/if}}
+            {{#if authorisedToEdit 'dataSet'}}<th>Delete</th>{{/if}}
         </tr>
         </thead>
         <tbody>
-        {{#each dataSets}}
-        <tr id="{{_id}}">
-            {{#if currentSpatialResolution}}
-                {{#if areEqual currentSpatialResolution 'SingleSite'}}
+          {{#each dataSets}}
+          <tr id="{{_id}}">
+            {{#if areEqual currentSpatialLevel 'All'}}
+                <td>{{name}}</td>
+                <td>{{spatialLevel}}</td>
+                <td>{{resolution}}</td>
+                <td>{{timeStepSize}}</td>
+                <td>{{variableList this}}</td>
+                <td>{{userEmail owner}}</td>
+            {{else}}
+                {{#if areEqual currentSpatialLevel 'SingleSite'}}
                     {{> singleSiteRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'MultipleSite'}}
+                {{#if areEqual currentSpatialLevel 'MultipleSite'}}
                     {{> multipleSiteRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Catchment'}}
+                {{#if areEqual currentSpatialLevel 'Catchment'}}
                     {{> catchmentRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Regional'}}
+                {{#if areEqual currentSpatialLevel 'Regional'}}
                     {{> regionalRow}}
                 {{/if}}
-                {{#if areEqual currentSpatialResolution 'Global'}}
+                {{#if areEqual currentSpatialLevel 'Global'}}
                     {{> globalRow}}
                 {{/if}}
-            {{else}}
-            <td>{{name}}</td>
-            <td>{{spatialLevel}}</td>
-            <td>{{resolution}}</td>
-            <td>{{userEmail owner}}</td>
-            {{/if}}
-            {{#if currentUser.admin}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
-         </tr>
-        {{/each}}
+              {{/if}}
+              {{#if authorisedToEdit 'dataSet'}}<td><button class='delete btn btn-danger btn-xs' id="{{_id}}">Delete</button></td>{{/if}}
+           </tr>
+          {{/each}}
+          {{> defaultBootstrapPaginator pagination=templatePagination limit=10 containerClass="text-center" onClick=clickEvent}}
         </tbody>
     </table>
+  -->
 </div>
 </template>

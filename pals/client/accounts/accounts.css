@@ -1,0 +1,17 @@
+.at-error {
+    color: red;
+}
+
+.at-result {
+    color: green;
+}
+
+.registration-form {
+    max-width:600px;
+    margin: 20px auto;
+}
+
+.login-form {
+    max-width:400px;
+    margin: 20px auto;
+}

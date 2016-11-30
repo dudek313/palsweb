@@ -1,0 +1,76 @@
+#!/bin/bash
+# Sets up the palsweb environment to run automatically
+
+# Note: This script assumes that all the setup files are in the host Download folder,
+# that the Download folder is set as a shared folder and that it has been mounted
+# to the /mnt/sharing directory using:
+#  sudo mount -t vboxsf Download /mnt/sharing
+
+# Install docker
+#sudo apt-get update
+#sudo apt-get install apt-transport-https ca-certificates
+#sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+#echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list
+#sudo apt-get update
+#sudo apt-get purge lxc-docker
+#sudo apt-cache policy docker-engine
+#sudo apt-get install linux-image-extra-$(uname -r)
+#sudo apt-get install docker-engine
+#sudo service docker start
+#sudo docker run hello-world
+
+# Copying setup files to here
+#sudo cp /mnt/sharing/palsweb_docker /home/dannye/setup/
+#sudo cp /mnt/sharing/mongo_docker /home/dannye/setup/
+#sudo cp /mnt/sharing/redis_docker /home/dannye/setup/
+#sudo mkdir /home/dannye/setup/docker
+
+# Copy relevant files from host to here
+#sudo cp /mnt/sharing/
+
+# Remove old docker containers that might exist
+sudo docker rm -f mongo redis palsweb
+
+
+# If the working hard drive is too small, set different default installation drive for images
+#sudo service docker stop
+#sudo mount /dev/sdb /home/dannye/setup/containers/
+#sudo sed -i.bak '/DOCKER_OPTS=/d' /etc/default/docker
+#sudo sed -i.bak '$ a\DOCKER_OPTS="-dns 8.8.8.8 -dns 8.8.4.4 -g /home/dannye/setup/containers"' /etc/default/docker
+#sudo service docker restart
+
+# Create redis dockerfile, build redis image and run redis service
+sudo cp /home/dannye/setup/redis_docker /home/dannye/setup/docker/Dockerfile
+cd /home/dannye/setup/docker
+sudo docker build -t dannye/setup/redis .
+sudo docker run --name redis -d ravdanny/redis
+
+redis_ip="$(sudo docker inspect redis | grep IPAddress | cut -d '"' -f 4 | tail -1)"
+
+# Install mongoDB
+sudo apt-get install mongodb-clients
+
+# Write MongoDb dockerfile
+sudo cp /home/dannye/setup/mongo_docker /home/dannye/setup/docker/Dockerfile
+
+# Build mongoDb docker image
+cd /home/dannye/setup/docker
+sudo docker build --tag ravdanny/mongo .
+
+# Create an instance of the image
+sudo docker run -p 27017:27017 --name mongo -d ravdannye/setup/mongo
+mongo_ip="$(sudo docker inspect mongo | grep IPAddress | cut -d '"' -f 4 | tail -1)"
+
+sleep 2
+# Database migration to mongoDb
+# Note: I already untarred the database dump, although in future will have to do that here. But for now:
+
+# For now we won't restore the database, but will migrate it from postgreSQL
+#sudo mongorestore -h $mongo_ip -p 27017 --db 'Meteor' /home/dannye/setup/mongo-data/dump/meteor
+
+#sudo docker run -it --link mongo -v /home/dannye/setup/mongo-data/dump/meteor:/tmp mon                                                                                                                                                             go bash -c 'mongorestore -h 172.17.0.2:27017 --db 'meteor' /tmp'
+
+# Create palsweb dockerfile and build palweb image
+sudo cp /home/dannye/setup/palsweb_docker /home/dannye/setup/docker/Dockerfile
+cd /home/dannye/setup/docker
+sudo docker build -t ravdannye/setup/palsweb --build-arg MONGO_URL="mongodb://"$mongo_ip"/meteor" --build-arg REDIS_HOST=$redis_ip .

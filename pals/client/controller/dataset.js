@@ -1,167 +1,238 @@
-Template.dataset.rendered = function() {
-    window['directives']();
-    templateSharedObjects.progress().hide();
-};
+import '../views/dataset.html';
 
-var events = {
-    'click .delete-version':function(event) {
-        if( Meteor.user().admin ) {
-            var key = $(event.target).attr('id');
+Template.dataSet.onCreated(function () {
+  this.currentUpload = new ReactiveVar(false);
+  window['directives']();
+  templateSharedObjects.progress().hide();
+  Session.set('deletedFileIds', []);
+//    Session.set('filesUploaded', []);
+  SimpleSchema.debug = true;
+});
 
-            var currentDataSet = Template.dataset.dataSet();
-            if( currentDataSet.versions ) {
-                var currentVersion = undefined;
-                currentDataSet.versions.forEach(function(version) {
-                    if( version.key == key ) {
-                        currentVersion = version;
-                    }
-                });
-                if( currentVersion ) {
-                    DataSets.update({'_id':currentDataSet._id},
-                        {$pull : {'versions':{ 'key':key }}}, function(error) {
-                            if( error ) {
-                                $('.error').html('Failed to delete version, please try again');
-                                $('.error').show();
-                            }
-                        }
-                    );
-                    Files.remove({_id:currentVersion.fileObjId},function(err){
-                       if(err) console.log(err);
-                    });
-                }
-            }
-        }
-    },
-    'click .add-variable':function(event){
-        if( Meteor.user().admin ) {
-            var variableId = $('select[name="variable"]').val();
-            var user = Meteor.user();
-            currentDataSetId = Session.get('currentDataSet');
-            variable = Variables.findOne({'_id':variableId});
 
-            if( currentDataSetId && variable) {
-                var selector = {'_id':currentDataSetId};
-                var modifier = {'$addToSet': {variables:variable}};
-                DataSets.update(selector,modifier,function(error){
-                    if( error ) {
-                        $('.error').html('There was an error adding the variable, please try again');
-                        $('.error').show();
+// Currently not working - probably issue with publish & subscribe - for old cfs package
+function removeDeletedFiles(fileIds) {
+
+/*    if (fileIds && fileIds.length > 0) {
+        fileIds.forEach(function(fileId) {
+            var fileDoc = Files.findOne({_id:fileId});
+            console.log(fileDoc);
+            if (fileDoc) {
+                Files.remove(fileDoc, function(err, doc) {
+                    if (err)
+                        console.log('Unable to delete file: ' + fileId);
+                    else {
+                        console.log('Deleted file: ' + fileId);
                     }
                 });
             }
-        }
+            else console.log('File not found: ' + fileId);
+        });
+    }*/
+}
+
+function testFiles() {
+    console.log(Files.find().fetch());
+}
+
+AutoForm.hooks({
+    createDatasetForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+
+//            insertDoc._version = 1;
+//            insertDoc.owner = Meteor.user()._id;
+            insertDoc.files = Session.get('tempFiles');
+
+            // insert data set document to the mongodb collection
+            Meteor.call('insertDataSet', insertDoc, function(error, docId){
+              if(error) {
+                displayError('Failed to create the data set. Please try again.', error);
+              }
+              else {
+                // if successful
+                // set uploaded files as not dirty
+                insertDoc.files.forEach(function(file) {
+                  if (file && file.key)
+                    setFileDirtyStatus(file.key, false);
+                });
+
+                //display the created data set
+                Meteor.subscribe('dataSets');   // refresh the publication to ensure the user has access to the new experiment document
+                Router.go('/dataSet/display/' + docId);
+              }
+            });
+
+
+            this.done();
+            return false;
+        },
     },
-    'click a.remove-variable':function(event){
-        if( Meteor.user().admin ) {
-            var variableId = $(event.target).parent().attr('id');
-            currentDataSetId = Session.get('currentDataSet');
-            console.log('removing variable: ' + variableId);
-            DataSets.update({'_id':currentDataSetId},
-                {$pull : {'variables':{ '_id':variableId }}}, function(error) {
-                    if( error ) {
-                        $('.error').html('Failed to remove variable, please try again');
-                        $('.error').show();
-                    }
+    updateDatasetForm: {
+        onSubmit: function(insertDoc, updateDoc, currentDoc) {
+            updateDoc.$set.files = Session.get('tempFiles');
+            Meteor.call('updateDataSet', currentDoc, updateDoc, function(error, docId){
+                if(error) {
+                  displayError('Failed to update the data set. Please try again.', error);
                 }
-            );
-        }
-    },
-    'change .file-select':function(event, template){
-        
-        var currentDataSetId = Session.get('currentDataSet');
-        if( !currentDataSetId ) {
-            alert("Please enter a data set name before uploading scripts");
-            return;
-        }
-        
-        FS.Utility.eachFile(event, function(file) {
-            Files.insert(file, function (err, fileObj) {
-                if(err) console.log(err);
                 else {
-                    var originalFilename = fileObj.name();
-                    var name = 'files-' + fileObj._id + '-' + originalFilename;
-                    
-                    var fileRecord = {
-                        path: FILE_BUCKET+'/'+name,
-                        filename: originalFilename,
-                        size: fileObj.size(),
-                        key: name,
-                        fileObjId: fileObj._id,
-                        created: new Date()
-                    };
-                    DataSets.update({'_id':currentDataSetId},
-                        {'$push':{'versions':fileRecord}},function(error){
-                            if( error ) {
-                                console.log(error);
-                                console.log('Failed to add uploaded version to the data set');
-                            }
+                    // set uploaded files as clean
+                    updateDoc.$set.files.forEach(function(file) {
+                      if (file && file.key)
+                        setFileDirtyStatus(file.key, false);
                     });
+
+                    // mark deleted files as dirty
+                    var deletedFileIds = Session.get('deletedFileIds');
+                    deletedFileIds.forEach(function(fileId) {
+                      setFileDirtyStatus(fileId, true);
+                    });
+                    Session.set('deletedFileIds', []);
+
+                    var currentDataSetId = getCurrentObjectId();
+                    Router.go('/dataSet/display/' + currentDataSetId);
                 }
             });
-        });
-    }
-};
 
-Template.dataset.events(templateSharedObjects.form({
-    meteorSessionId: 'currentDataSet',
-    collectionName: 'DataSets'
-}).events().extend(events));
-
-Template.dataset.dataSet = function() {
-    var currentDataSetId = Session.get('currentDataSet');
-    var currentDataSet = DataSets.findOne({'_id':currentDataSetId});
-    return currentDataSet;
-}
-
-function getVersions(dataSet) {
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) {
-        var versions = new Array();
-        for( var i=0; i < dataSet.versions.length; ++i ) {
-            var version = dataSet.versions[i];
-            versions.push(version);
+            this.done();
+            return false;
         }
-        return versions;
+    }
+})
+
+Template.dataSet.events = {
+    'click .upload-btn':function(event){
+        event.preventDefault();
+        Session.set('uploadButtonClicked', true);
+    },
+
+    'click .cancel-update':function(event){
+        event.preventDefault();
+        Session.set('tempFiles', null);
+        Session.set('deletedFileIds', []);
+        Router.go('/dataSet/display/' + getCurrentObjectId());
+    },
+
+    'click .cancel-create':function(event){
+        event.preventDefault();
+        Session.set('tempFiles', null);
+        Session.set('deletedFileIds', []);
+//        Session.set('filesUploaded', []);
+        window.history.back();
+    },
+
+    'click .download-file':function(event, template){
+        event.preventDefault();
+    },
+
+    'click .delete-file':function(event) {
+        event.preventDefault();
+        var selectedFileId = $(event.target).attr('id');
+        var currentFiles = Session.get('tempFiles');
+
+        var deletedFileIds = Session.get('deletedFileIds');
+        deletedFileIds.push(selectedFileId);
+        Session.set('deletedFileIds', deletedFileIds);
+
+        var newFiles = [];
+        if (currentFiles && currentFiles.length > 0) {
+          // remove file from tempFiles session variable
+            currentFiles.forEach(function(file) {
+                if (file.key != selectedFileId)
+                    newFiles.push(file);
+            });
+            Session.set('tempFiles', newFiles);
+
+        }
+
+        else {
+          displayError('Error removing data set, please try again', error);
+        }
+    },
+
+    'click .enable-update':function(event){
+        event.preventDefault();
+        var dataSetId = getCurrentObjectId();
+        Router.go('/dataSet/update/' + dataSetId);
+    },
+
+};
+
+function filenameAlreadyExists(filename) {
+    var tempFiles = Session.get('tempFiles');
+    var tempFileNames = getAttributeArrayFromObjects(tempFiles, "name");
+    return (tempFileNames.indexOf(filename) != -1)
+}
+
+function getCurrentDataSet() {
+  if(Router.current().data && Router.current().data())
+    return Router.current().data();
+}
+
+function getFiles(dataSet) {
+    if( dataSet && dataSet.files && dataSet.files.length > 0 ) {
+        var files = new Array();
+        for( var i=0; i < dataSet.files.length; ++i ) {
+            var file = dataSet.files[i];
+            files.push(file);
+        }
+        return files;
     }
 }
 
-Template.dataset.versions = function() {
-    var dataSet = Template.dataset.dataSet();
-    return getVersions(dataSet);
-}
-
-Template.dataset.reference = function() {
-    var reference = Reference.findOne();
-    return reference;
-};
-
-Template.dataset.hasVersions = function() {
-    var dataSet = Template.dataset.dataSet();
-    if( dataSet && dataSet.versions && dataSet.versions.length > 0 ) return true;
-    else return false;
-};
-
-Template.dataset.uploadDisabled = function() {
-    var currentDataSet = Template.dataset.dataSet();
-    if( currentDataSet ) return '';
-    else return 'disabled="disabled"';
-}
-
-Template.dataset.variables = function() {
-    return Variables.find();
-}
-
-Template.dataset.helpers({
+Template.dataSet.helpers({
+  uploadButtonClicked: function() {
+    return Session.get('uploadButtonClicked');
+  },
+  formId: function() {
+    var screenMode = getScreenMode();
+    if(screenMode == 'create') return "createDatasetForm"
+    else if(screenMode == 'update') return "updateDatasetForm"
+    else return null;
+  },
+  dataIfNeeded: function() {
+    var screenMode = getScreenMode();
+    if(screenMode == 'create') return null
+    else if(screenMode == 'update') return getCurrentDataSet()
+    else return null;
+  },
+  isDownloadable: function() {
+      if (this.downloadable)
+          return "Yes"
+      else {
+          return "No"
+      }
+  },
+  dataSet: function() {
+      return getCurrentDataSet();
+  },
+  files: function() {
+      var dataSet = getCurrentDataSet();
+      return getFiles(dataSet);
+  },
+  draftFiles: function() {
+      return Session.get('tempFiles');
+  },
+  hasFiles: function() {
+      var dataSet = getCurrentDataSet();
+      if( dataSet && dataSet.files && dataSet.files.length > 0 ) return true;
+      else return false;
+  },
+  draftHasFiles: function() {
+      var tempFiles = Session.get('tempFiles');
+      if( tempFiles && tempFiles.length > 0 ) return true;
+      else return false;
+  },
   isPublic: function() {
-    var dataSet = Template.dataset.dataSet();
-    if( dataSet ) {
-        if( !dataSet.public ) return 'checked'
-        if( dataSet.public === 'true') return 'checked'
-        else return undefined
-    }
-    else return 'checked';
+      var dataSet = getCurrentDataSet();
+      if( dataSet ) {
+          if( !dataSet.public ) return 'checked'
+          if( dataSet.public === 'true') return 'checked'
+          else return undefined
+      }
+      else return 'checked';
   },
   isPublicOrOwner: function() {
-    var dataSet = Template.dataset.dataSet();
+    var dataSet = getCurrentDataSet();
     if( dataSet ) {
         if( !dataSet.public ) return true
         if( dataSet.public === 'true') return true
@@ -172,5 +243,42 @@ Template.dataset.helpers({
         }
     }
     else return true;
+  },
+  inCreateMode: function() {
+    var screenMode = getScreenMode();
+    return (screenMode == 'create')
+  },
+  latestVersion: function() {
+    var currentDataSet = getCurrentDataSet();
+    if(currentDataSet)
+        return currentDataSet.latest
+    else {
+        return false;
+    }
+  },
+  noVariablesRecorded: function() {
+    var currentDataSet = getCurrentDataSet();
+    if (currentDataSet && currentDataSet.variables) {
+        variables = currentDataSet.variables;
+        return (!(variables.NEE || variables.Qg || variables.Qh || variables.Qle ||
+              variables.Rnet || variables.SWnet));
+    }
+    else return true;
+
+  },
+  userName: function(userId) {
+    var user = Meteor.users.findOne({'_id':userId});
+    if (user && user.profile) {
+      if (user.profile.fullname)
+        return user.profile.fullname;
+      else if (user.profile.firstName && user.profile.lastName)
+        return user.profile.firstName + " " + user.profile.lastName;
+      else {
+        return '';
+      }
+    }
+    else {
+      return '';
+    }
   }
 });

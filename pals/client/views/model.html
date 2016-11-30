@@ -1,46 +1,117 @@
 <template name="model">
-<div class="row">
-<div class="col-md-8">
-<form role="form">
-    <h1>Model: {{model.name}}</h1>
-    <div class="alert alert-danger error"></div>
-    <div class="form-group">
-       {{#if owner}}
-           <div class="form-group">
-               <label>Model Name</label>
-               <input class="modifier form-control" type="text" name="name" value="{{model.name}}">
-           </div>
-           <div class="form-group">
-               <label>URL</label>
-               <input class="modifier form-control" type="text" name="url" value="{{model.url}}">
-           </div>
-           <div class="form-group">
-                   <label>References</label>
-                   <textarea class="modifier form-control" type="text" name="references">{{model.references}}</textarea>
-           </div>
-           <div class="form-group">
-                   <label>Comments</label>
-                   <textarea class="modifier form-control" type="text" name="comments">{{model.comments}}</textarea>
-           </div>
-           <div class="form-group">
-               <input type="button" class="btn btn-primary" value="Save">
-           </div>
-       {{else}}
-           <br/>
-           <label>Model Name</label>
-           <div class="display">{{model.name}}</div>
-           <br/>
-           <label>URL</label>
-           <div class="display">{{model.url}}</div>
-           <br/>
-           <label>References</label>
-           <div class="display">{{{breaklines model.references}}}</div>
-           <br/>
-           <label>Comments</label>
-           <div class="display">{{{breaklines model.comments}}}</div>
-       {{/if}}
-   </div>
-</form>
-</div><!--/col-md-8-->
-</div><!--/row-->
+  <div class="detail-form">
+  <div class="alert alert-danger error"></div>
+
+  {{#if authorized 'model' _id}}
+    {{#if inEditMode}}  <!-- in create or update mode -->
+      {{#autoForm collection="Models" id=formId doc=dataIfNeeded type='normal' validation='blur'}}
+        <h3>Create New Model Profile</h3>
+        <fieldset>
+          {{#if areEqual screenMode 'create'}}
+          {{else}} <!-- if in update mode -->
+            <h3>Model: {{model.name}}</h3>
+            <br>
+          {{/if}}
+
+          <div class="panel panel-primary">
+            <div class="panel-heading">Details</div>
+            <div class="panel-body">
+
+              {{> afQuickField name='name' placeholder="Include model version information e.g. repository version"}}
+              <label>Owner</label>
+              {{#if areEqual screenMode 'create'}}<div class="display">{{userFullName}}</div>
+              {{else}} <div class="display">{{model.ownerName}}</div>
+              {{/if}}
+              <br/>
+              {{> afQuickField name='url' placeholder="E.g. homepage or repository link"}}
+              {{> afQuickField name='references' rows=6}}
+              {{> afQuickField name='comments' rows=6
+                placeholder="Include any additional information specific to this model version that could help reproduce simulations"}}
+
+            </div>
+          </div>
+
+        </fieldset>
+
+        {{#if areEqual screenMode 'create'}}
+          <div class="col-md-12">
+            <button type="submit" class="create-btn btn btn-success">Save</button>
+            <button type="reset" class="create-btn btn btn-default cancel-create">Cancel</button>
+          </div>
+        {{else}}
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="reset" class="cancel-update btn btn-default">Cancel</button>
+        {{/if}}
+      {{/autoForm}}
+
+      {{else}} <!-- in display mode -->
+        {{#if areEqual screenMode 'display'}}
+
+          {{#if authorisedToEdit 'model' model._id}}<a class="btn btn-primary enable-update pull-right">Edit Model Profile</a>{{/if}}
+          <h3>Model Profile: {{model.name}}</h3>
+          <br/>
+
+          <div class="panel panel-primary">
+            <div class="panel-heading">Details</div>
+            <div class="panel-body">
+
+              <label>Model Name</label>
+              <div class="display">{{model.name}}</div>
+              <br/>
+              <label>Owner</label>
+              <div class="display">{{model.ownerName}}</div>
+              <br/>
+              <label>Created</label>
+              <div class="display">{{model.created}}</div>
+              <br/>
+              {{#if model.modified}}
+                <label>Last Modified</label>
+                <div class="display">{{model.modified}}</div>
+                <br/>
+              {{/if}}
+              {{#if model.url}}
+                <label>URL</label>
+                <div class="display">{{model.url}}</div>
+                <br/>
+              {{/if}}
+              {{#if model.references}}
+                <label>References</label>
+                <div class="display break-word">{{{breaklines model.references}}}</div>
+                <br/>
+              {{/if}}
+              {{#if model.comments}}
+                <label>Comments</label>
+                <div class="display break-word">{{{breaklines model.comments}}}</div>
+              {{/if}}
+            </div>
+          </div>
+        {{else}}
+          {{> notFound}}
+        {{/if}}
+      {{/if}}
+    {{else}}
+      {{> unauthorized}}
+    {{/if}}
+  </div>
 </template>
+
+<!--           <div class="form-group">
+           <label>Model Name</label>
+           <input class="modifier form-control" type="text" name="name" value="{{model.name}}">
+       </div>
+       <div class="form-group">
+           <label>URL</label>
+           <input class="modifier form-control" type="text" name="url" value="{{model.url}}">
+       </div>
+       <div class="form-group">
+               <label>References</label>
+               <textarea class="modifier form-control" type="text" name="references">{{model.references}}</textarea>
+       </div>
+       <div class="form-group">
+               <label>Comments</label>
+               <textarea class="modifier form-control" type="text" name="comments">{{model.comments}}</textarea>
+       </div>
+       <div class="form-group">
+           <input type="button" class="btn btn-primary" value="Save">
+       </div>
+-->
