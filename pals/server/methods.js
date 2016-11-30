@@ -26,6 +26,35 @@ var serverLogFile = new LoggerFile(serverLog, {
   server: true
 });
 */
+
+var pkgcloud = require('pkgcloud')
+
+var swiftClient = pkgcloud.storage.createClient({
+  provider: 'openstack',
+  username: process.env.OS_USERNAME,
+  password: process.env.OS_PASSWORD,
+  tenantId: "2bcd99d3e00d418fb799bfabf82572de",
+  region: 'Melbourne',
+  authUrl: process.env.OS_AUTH_URL,
+  version: process.env.version
+});
+/*
+var options = {
+  container: 'public-store',
+  remote: 'testpath'
+};
+
+var writeStream = swiftClient.upload(options);
+writeStream.on('error', function(err) {
+  console.log(err);
+});
+
+writeStream.on('success', function(file) {
+  console.log('Success: file: ' + file);
+});
+ 
+console.log('writeStream: ', writeStream);
+*/
 function generateError(errMsg, data, userId) {
     console.log('Error: ', errMsg, "UserId: ", userId);
     serverLog.error(errMsg, data, userId);
@@ -39,6 +68,48 @@ function generateMessage(msg, data, userId) {
 }
 
 Meteor.methods({
+  'uploadFile': function(filePath, options) {
+
+// need to add validation
+
+    var readStream = fs.createReadStream(filePath);
+    var writeStream = swiftClient.upload(options);
+    var userId = this.userId;
+    console.log('writeStream: ', writeStream);
+    console.log('writeStreamFn: ', writeStream.on);
+
+    writeStream.on('error', function(err) {
+      generateError('Error uploading file', null, userId);
+    });
+
+    writeStream.on('success', function(file) {
+      generateMessage("File upload successful", file, userId);
+    });
+
+    readStream.pipe(writeStream);
+/*      bound(function() {
+        var upd = {
+          $set: {}
+        };
+        upd['$set']["versions." + version + ".meta.pipeFrom"] = endPoint + '/' + filePath;
+        upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
+        self.collection.update({
+          _id: fileRef._id
+        }, upd, function(error) {
+          if (error) {
+            console.error(error);
+          } else {
+              // Unlink original files from FS
+              // after successful upload to AWS:S3
+            self.unlink(self.collection.findOne(fileRef._id), version);
+          }
+        });
+      });
+    });*/
+
+    
+  },
+
   'insertModelOutput': function(modelOutputDoc) {
     var userId = this.userId;
     generateMessage("Inserting model output", getDetails(modelOutputDoc), userId);
