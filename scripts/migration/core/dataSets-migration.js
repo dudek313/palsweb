@@ -6,11 +6,11 @@ var Future = require('fibers/future');
 
 //var fs = require('fs-extra');
 var fs = Future.wrap(require('fs-extra'));
-var uuid = require('node-uuid')
+var uuid = require('uuid')
 var mooHelpers = require('./modelOutputs-migration.js')
 
 //exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
-exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance) {
+exports.migrateDataSets = function(oldDataDir, newDataDir, swiftClient, username, users,mongoInstance,workspaces,pgInstance) {
 
     console.log("Processing data sets");
 
@@ -52,45 +52,32 @@ exports.migrateDataSets = function(oldDataDir, newDataDir, users,mongoInstance,w
         WHERE dsv.datasetid = e.id AND dsv.datasetid=ds.id AND\
         a.id=dsv.datasetid AND c.id = ds.country_id AND dsv.id = ds.latestversion_id AND\
         ((e.experiment_id = 35209 OR e.experiment_id = 19106) OR\
-        (e.experiment_id IS NULL AND e.id IN (995,1004,997,4353,871,4113,5660,3993,6802,5630,7032,7002,6772,1003,994,4233,1005,4203,4083,4053,4143,4173)))\
+        (e.experiment_id IS NULL AND e.id IN (995,1004,997,4353,871,4113,5660,3993,6802,5630,7032,7002,6772,1003,994,4233,1005,4203,4083,4053,4143,4173))) AND\
+        a.owner_username = '" + username + "'\
         ORDER BY a.name;"
 
-/*    mongoInstance.dropIndexes('dataSets',function(err){
-        if(err) console.log(err)
-        else {
-          mongoInstance.dropIndexes('experiments', function(err){
-            if(err) console.log(err)
-            else {
-*/
-              pgInstance.sql(loadDataSetsQuery,function(result,client){
-                  result.rows.forEach(function(row){
-                      //console.log(row);
-                      var filenameHead = row.dsv_originalfilename.substr(0, row.dsv_originalfilename.length - 4);
+    pgInstance.sql(loadDataSetsQuery,function(result,client){
+        result.rows.forEach(function(row){
+            //console.log(row);
+            var filenameHead = row.dsv_originalfilename.substr(0, row.dsv_originalfilename.length - 4);
 
-                      var metFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_met.nc';
-                      var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
+            var metFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_met.nc';
+            var fluxFilename = oldDataDir + '/' + row.ds_username + '/' + 'ds' + row.ds_id + '.' + row.dsv_id + '_flux.nc';
 
-                      var future = new Future;
-                      processDataFile(metFilename, 'driving', true, newDataDir, filenameHead, row, users, workspaces, function(metFileData){
-                          processDataFile(fluxFilename, 'evaluation', false, newDataDir, filenameHead, row, users, workspaces, function(fluxFileData) {
-                              copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
-                          });
-                      });
-                  });
+            var future = new Future;
+            processDataFile(metFilename, 'driving', true, newDataDir, swiftClient, filenameHead, row, users, workspaces, function(metFileData){
+                processDataFile(fluxFilename, 'evaluation', false, newDataDir, swiftClient, filenameHead, row, users, workspaces, function(fluxFileData) {
+                    copyDataSet(row, users, metFileData, fluxFileData, mongoInstance, workspaces);
+                });
+            });
+        });
 
-                  client.end();
-              });
-/*
-            }
-          });
-        }
-
+        client.end();
     });
-*/
 }
 
 
-function processDataFile(filename, filetype, forDownload, newDataDir, filenameHead, row, users, workspaces, callback) {
+function processDataFile(filename, filetype, forDownload, newDataDir, swiftClient, filenameHead, row, users, workspaces, callback) {
   fs.exists(filename, function (exists) {
       if( exists ) {
           console.log('File exists: ' + filename);
@@ -115,7 +102,7 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
                   console.log(fileData);
                   user = users[row.ds_username];
                   if( user ) {
-                      copyDataFile(filename,fileData);
+                      copyDataFile(filename,fileData, swiftClient);
                       callback(fileData);
 
                   }
@@ -131,9 +118,9 @@ function processDataFile(filename, filetype, forDownload, newDataDir, filenameHe
 }
 
 //function copyDataSet(filename,fileData,row,user,mongoInstance,workspaces,publicWorkspace) {
-function copyDataFile(filename,fileData,row) {
+function copyDataFile(filename,fileData,swiftClient, row) {
     console.log('Copying data file: ' + fileData.name + ' to ' + fileData.path);
-    copyFile(filename,fileData.path,function(err){
+    copyFile(filename,fileData.path, swiftClient, function(err){
         if( err ) console.log(err);
     });
 }
@@ -266,7 +253,29 @@ function insertDefaultExperiment(dataSet, row, mongoInstance) {
 
 }
 
-function copyFile(source, target, cb) {
+/*function copyFile(source, target, cb) {
     fs.copySync(source,target);
     cb();
 }
+*/
+
+function copyFile(source, target, swiftClient, cb) {
+    var readStream = fs.createReadStream(source);
+    var options = {
+      container: 'data-store',
+      remote: target
+    };
+    var writeStream = swiftClient.upload(options);
+
+    writeStream.on('error', function(err) {
+      console.log('Error uploading file: ' + source);
+      console.log(err);
+    });
+
+    writeStream.on('success', function(file) {
+      console.log("File upload successful: " + source);
+    });
+
+    readStream.pipe(writeStream);
+}
+

@@ -1,7 +1,7 @@
 //var exports = module.exports = {};
 
 var fs = require('fs-extra');
-var uuid = require('node-uuid')
+var uuid = require('uuid');
 
 exports.postgres = function () {
 
@@ -137,9 +137,16 @@ function copyFile(source, target, cb) {
     cb();
 }
 
-
-exports.loadUsers = function(mongoI,callback) {
+exports.loadUsers = function(mongoI, callback) {
+//exports.loadUsers = function(mongoI, username, callback) {
     console.log('Loading Users');
+
+/*    mongoI.find('users',{'username': username},function(docs,db){
+        var users = {};
+        docs.nextObject(function(err, doc){
+            processUser(docs,err,doc,callback,users,db);
+        });
+    }) */
 
     mongoI.find('users',{},function(docs,db){
         var users = {};
@@ -147,11 +154,11 @@ exports.loadUsers = function(mongoI,callback) {
             processUser(docs,err,doc,callback,users,db);
         });
     })
+
 }
 
 
 function processUser(docs,err,doc,callback,users,db) {
-//    console.log('Danny was here ' + doc.username);
     if( err ) {
         console.log(err);
         callback(err, users);
@@ -171,7 +178,7 @@ function processUser(docs,err,doc,callback,users,db) {
 
 
 
-exports.loadPgWorkspaces = function(pgInstance,callback) {
+exports.loadPgWorkspaces = function(pgInstance, callback) {
 
     var loadWorkspacesQuery = "SELECT id, name, owner_username from experiment";
 

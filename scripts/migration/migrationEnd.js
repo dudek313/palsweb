@@ -1,5 +1,5 @@
-var oldDataDir = '/mnt/sharing/pals-nci/webappdata'
-var newDataDir = '/pals/data'
+var oldDataDir = '/mnt/legacy_data'
+var newDataDir = ''
 //DF: var baseDir = '/vagrant/data/pals/webappdata'
 //DF: var palsDataDir = '/pals/data-new'
 
@@ -7,8 +7,8 @@ var Fiber  = require('fibers')
 var Future = require('fibers/future');
 //var fs = Future.wrap(require('fs'));
 var fs = Future.wrap(require('fs-extra'));
-var uuid = require('node-uuid')
-
+var uuid = require('node-uuid');
+var prompt = require('prompt');
 
 
 var helpers = require('./core/helpers.js');
@@ -17,10 +17,32 @@ var moHelpers = require('./core/models-migration.js')
 var mooHelpers = require('./core/modelOutputs-migration.js')
 var dsHelpers = require('./core/dataSets-migration.js')
 
+var swiftClient = require('pkgcloud').storage.createClient({
+    provider: 'openstack',
+    username: process.env.OS_USERNAME,
+    password: process.env.OS_PASSWORD,
+    tenantId: process.env.OS_TENANT_ID,
+    region: process.env.OS_REGION_NAME,
+    authUrl: process.env.OS_AUTH_URL,
+    version: process.env.version
+});
 
 
 
-function process() {
+function migrationProcess() {
+
+  prompt.start();
+  var promptSchema = {
+    properties: {
+      username: {
+        description: 'Please enter username of the user requiring data migration',
+        required: true
+      }
+    }
+  }
+  prompt.get(promptSchema, function(err, result) {
+    if(err) { return onErr(err); }
+    var username = result.username;
 
     Fiber(function(){
         var mongoInstance = helpers.mongo();
@@ -94,11 +116,12 @@ function process() {
         *
         *******************************************************/
 
-        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, users, mongoInstance, pgWorkspaces, pgInstance);
+        mooHelpers.migrateModelOutputs(oldDataDir, newDataDir, swiftClient, username, users, mongoInstance, pgWorkspaces, pgInstance);
         console.log('model outputs migrated...')
 
 
       }).run();
+    });
 };
 
 
@@ -128,5 +151,5 @@ function process() {
     });
 */
 
-
-process();
+  
+migrationProcess();

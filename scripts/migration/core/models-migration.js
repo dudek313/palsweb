@@ -3,10 +3,10 @@ var Fiber  = require('fibers')
 var Future = require('fibers/future');
 
 
-exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,callback) {
+exports.migrateModels = function(pgInstance, mongoInstance, username, users, publicWorkspace, callback) {
 //    mongoInstance.dropIndexes('models', callback); /* stops it using model.name as a unique identifier */
     console.log('Loading and copying models');
-    loadModels(pgInstance,function(err, models){
+    loadModels(pgInstance, username, function(err, models){
         var mongoModels = [];
         for( var i=0; i < models.length; ++i ) {
             model = models[i];
@@ -20,11 +20,11 @@ exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,
                     name : model.modelname,
                     owner : user._id,
 //	I am adding the following. Not sure why they weren't included.
-		                version: model.version,
+		    version: model.version,
                     created: model.createddate,
-		                comments: model.commentsm,
-		                references: model.referencesm,
-		                url: model.urlm
+		    comments: model.commentsm,
+		    references: model.referencesm,
+		    url: model.urlm
 //                    workspaces : [model.experiment_id.toString()]
                 }
                 mongoModels.push(mongoModel);
@@ -35,9 +35,9 @@ exports.migrateModels = function(pgInstance,mongoInstance,users,publicWorkspace,
 }
 
 
-function loadModels(pgInstance,callback) {
+function loadModels(pgInstance, username, callback) {
 /*    var loadModelsQuery = "SELECT * FROM model"; */
-    var loadModelsQuery = "SELECT createddate, modelname, ownerusername, version, model.id, commentsm, referencesm, urlm, experimentable.experiment_id FROM model, experimentable WHERE model.id=experimentable.id AND experimentable.experiment_id IS NOT NULL AND modelname != ''";
+    var loadModelsQuery = "SELECT createddate, modelname, ownerusername, version, model.id, commentsm, referencesm, urlm, experimentable.experiment_id FROM model, experimentable WHERE model.id=experimentable.id AND experimentable.experiment_id IS NOT NULL AND modelname != '' AND ownerusername = '" + username + "'";
 
     pgInstance.sql(loadModelsQuery,function(result,client){
         var models = [];
