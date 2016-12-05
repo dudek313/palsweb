@@ -31,6 +31,11 @@ GetCollectionByName = function(name) {
     }
 }
 
+Request = require('request');
+bound = Meteor.bindEnvironment(function(callback) {
+  return callback();
+});
+
 Files = new FS.Collection("files", {
   stores: [new FS.Store.FileSystem("files", {path: "/pals/data"})]
 });
