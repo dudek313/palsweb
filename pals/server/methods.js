@@ -23,7 +23,6 @@ var swiftClient = pkgcloud.storage.createClient({
   authUrl: process.env.OS_AUTH_URL,
   version: process.env.version
 });
-console.log('SwiftClient: ', swiftClient)
 
 function generateError(errMsg, data, userId) {
     console.log('Error: ', errMsg, data, "UserId: ", userId);
@@ -39,42 +38,24 @@ function generateMessage(msg, data, userId) {
 
 Meteor.methods({
   'uploadFile': function(filePath, options) {
-
-// need to add validation
-
-    var readStream = fs.createReadStream(filePath);
-    var writeStream = swiftClient.upload(options);
     var userId = this.userId;
 
-    writeStream.on('error', function(err) {
-      generateError('Error uploading file', err, userId);
-    });
+    if (userId) {
+      var readStream = fs.createReadStream(filePath);
+      var writeStream = swiftClient.upload(options);
+      var userId = this.userId;
 
-    writeStream.on('success', function(file) {
-      generateMessage("File upload successful", file, userId);
-    });
-
-    readStream.pipe(writeStream);
-/*      bound(function() {
-        var upd = {
-          $set: {}
-        };
-        upd['$set']["versions." + version + ".meta.pipeFrom"] = endPoint + '/' + filePath;
-        upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
-        self.collection.update({
-          _id: fileRef._id
-        }, upd, function(error) {
-          if (error) {
-            console.error(error);
-          } else {
-              // Unlink original files from FS
-              // after successful upload to AWS:S3
-            self.unlink(self.collection.findOne(fileRef._id), version);
-          }
-        });
+      writeStream.on('error', function(err) {
+        generateError('Error uploading file', err, userId);
       });
-    });*/
 
+      writeStream.on('success', function(file) {
+        generateMessage("File upload successful", file.name, userId);
+      });
+
+      readStream.pipe(writeStream);
+    }
+    else generateError("Not authorized to upload file", null, userId)
 
   },
 
