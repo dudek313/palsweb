@@ -1,10 +1,10 @@
 var fs = require('fs-extra');
-var uuid = require('node-uuid')
+var uuid = require('uuid')
 
 
 //exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance,publicWorkspace) {
 
-exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstance,workspaces,pgInstance) {
+exports.migrateModelOutputs = function(oldDataDir, newDataDir, swiftClient, username, users,mongoInstance,workspaces,pgInstance) {
     console.log("Processing model outputs");
 
     var loadModelOutputsQuery =
@@ -35,6 +35,7 @@ exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstan
     AND dsv.id = ds.latestversion_id \
     AND a3.name = a2.name AND a3.id = e2.id AND a3.id=dsv2.datasetid \
     AND dsv2.datasetid=e2.id AND e.experiment_id IS NOT NULL\
+    AND mo.username = '" + username + "' \
     ORDER BY a.name ASC;";
 
 /*    "SELECT \
@@ -90,7 +91,7 @@ exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstan
                             user = users[row.mo_username];
                             if( user ) {
 				//console.log('Copying : ' + filename + ', ' + fileData)
-                                copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces);
+                                copyModelOutput(filename,fileData,row, swiftClient, user,mongoInstance,workspaces);
                             }
                             else console.log('Could not locate username ' + row.ds_username);
                         }
@@ -107,9 +108,9 @@ exports.migrateModelOutputs = function(oldDataDir, newDataDir, users,mongoInstan
 numberOfCopies = 0;
 maxCopies = 100;
 
-function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
+function copyModelOutput(filename,fileData,row, swiftClient, user,mongoInstance,workspaces) {
     console.log('Copying model output: ' + row.a_name);
-    copyFile(filename,fileData.path,function(err){
+    copyFile(filename, fileData.path, swiftClient, function(err){
         if( err ) console.log(err);
         else {
             var modelOutput = {
@@ -155,6 +156,9 @@ function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
                           if( err ) console.log(err);
                         });
                       }
+                      else {
+                        console.log('Model output copied to mongodb: ' + row.a_name);
+                      }
                     });
                 }
             });
@@ -163,8 +167,30 @@ function copyModelOutput(filename,fileData,row,user,mongoInstance,workspaces) {
     });
 }
 
-
-function copyFile(source, target, cb) {
+/*function copyFile(source, target, cb) {
     fs.copySync(source,target);
     cb();
 }
+*/
+
+function copyFile(source, target, swiftClient, cb) {
+    var readStream = fs.createReadStream(source);
+    var options = {
+      container: 'data-store',
+      remote: target
+    };
+    var writeStream = swiftClient.upload(options);
+
+    writeStream.on('error', function(err) {
+      console.log('Error uploading file: ' + source);
+      console.log(err);
+    });
+
+    writeStream.on('success', function(file) {
+      console.log("File upload successful: " + source);
+    });
+
+    readStream.pipe(writeStream);
+    cb();
+}
+

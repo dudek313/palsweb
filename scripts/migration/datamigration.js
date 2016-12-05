@@ -1,5 +1,5 @@
-var oldDataDir = '/mnt/sharing/pals-nci/webappdata'
-var newDataDir = '/pals/data'
+var oldDataDir = '/mnt/legacy_data'
+var newDataDir = ''
 //DF: var baseDir = '/vagrant/data/pals/webappdata'
 //DF: var palsDataDir = '/pals/data-new'
 
@@ -7,8 +7,13 @@ var Fiber  = require('fibers')
 var Future = require('fibers/future');
 //var fs = Future.wrap(require('fs'));
 var fs = Future.wrap(require('fs-extra'));
-var uuid = require('node-uuid')
+var uuid = require('uuid')
+var prompt = require('prompt');
 
+function onErr(err) {
+  console.log(err)
+  return 1;
+}
 
 
 var helpers = require('./core/helpers.js');
@@ -17,10 +22,35 @@ var moHelpers = require('./core/models-migration.js')
 var mooHelpers = require('./core/modelOutputs-migration.js')
 var dsHelpers = require('./core/dataSets-migration.js')
 
+var swiftClient = require('pkgcloud').storage.createClient({
+    provider: 'openstack',
+    username: process.env.OS_USERNAME,
+    password: process.env.OS_PASSWORD,
+    tenantId: process.env.OS_TENANT_ID,
+    region: process.env.OS_REGION_NAME,
+    authUrl: process.env.OS_AUTH_URL,
+    version: process.env.version
+});
 
+function migrationProcess() {
 
-
-function process() {
+  prompt.start();
+  var promptSchema = {
+    properties: {
+      username: {
+        description: 'Please enter username of the user requiring data migration',
+        required: true
+      },
+      firstRun: {
+        description: 'Is this the first run of migration? (y/N)',
+        default: 'n'
+      }
+    }
+  }
+  prompt.get(promptSchema, function(err, result) {
+    if(err) { return onErr(err); }
+    var username = result.username;
+    var firstRun = result.firstRun.substring(0, 1).toLowerCase();
 
     Fiber(function(){
         var mongoInstance = helpers.mongo();
@@ -64,9 +94,10 @@ function process() {
         * Migrate workspaces
         *
         *******************************************************/
-
-        wsHelpers.migrateWorkspaces(mongoInstance, pgInstance, users, pgWorkspaces);
-        console.log('workspaces migrated...')
+	if (firstRun == 'y') {
+          wsHelpers.migrateWorkspaces(mongoInstance, pgInstance, users, pgWorkspaces);
+          console.log('workspaces migrated...')
+        }
 
 /*	Intending to get rid of public workspace
         var future = new Future;
@@ -82,7 +113,7 @@ function process() {
         *******************************************************/
 
         var future = new Future;
-        moHelpers.migrateModels(pgInstance, mongoInstance, users, null, future.resolver())
+        moHelpers.migrateModels(pgInstance, mongoInstance, username, users, null, future.resolver())
 	      future.wait()
         console.log('models migrated...')
 
@@ -93,8 +124,8 @@ function process() {
         *
         *******************************************************/
 
-
-        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance);
+	dsHelpers.migrateDataSets(oldDataDir, newDataDir, swiftClient, username, users,mongoInstance,pgWorkspaces,pgInstance);
+//        dsHelpers.migrateDataSets(oldDataDir, newDataDir, users,mongoInstance,pgWorkspaces,pgInstance);
         console.log('data sets migrated...')
 
 
@@ -109,6 +140,7 @@ function process() {
 
 
       }).run();
+  });
 };
 
 
@@ -139,4 +171,4 @@ function process() {
 */
 
 
-process();
+migrationProcess();
