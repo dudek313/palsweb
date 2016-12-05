@@ -1,7 +1,7 @@
 Template.main.onCreated(function() {
   if (!Session.get('experiments.workspace'))
     Session.set('experiments.workspace', 'All');
- 
+
   if (!Session.get('experiments.anywhere'))
     Session.set('experiments.anywhere', 'All');
 

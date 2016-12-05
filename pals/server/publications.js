@@ -130,7 +130,7 @@ Meteor.publish('variables',function(){
 
 //Variables._ensureIndex('name', {unique: 1});
 
-Files.allow({
+/*Files.allow({
     insert: function(userId, doc) {
         return (userId);
     },
@@ -162,4 +162,4 @@ Files.allow({
      }
     },
     fetch: null
-});
+});*/
