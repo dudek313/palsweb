@@ -73,8 +73,6 @@ function process() {
         helpers.loadPublicWorkspace(mongoInstance, future.resolver());
         var publicWorkspace = future.wait();
         console.log('public workspace loaded...' + publicWorkspace)
-
-
         /*******************************************************
         *
         * Migrate models

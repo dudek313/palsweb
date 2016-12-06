@@ -1,4 +1,3 @@
-
 var Fiber  = require('fibers')
 var Future = require('fibers/future');
 
@@ -52,7 +51,6 @@ function loadModels(pgInstance,callback) {
 
 /*function loadModels(pgInstance,callback) {
     var loadModelsQuery = "SELECT * FROM model";
-
     pgInstance.sql(loadModelsQuery,function(result,client){
         var models = [];
         result.rows.forEach(function(row){
@@ -60,7 +58,6 @@ function loadModels(pgInstance,callback) {
         });
         callback(false, models);
     });
-
 }
 */
 
