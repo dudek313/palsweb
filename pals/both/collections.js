@@ -60,7 +60,7 @@ this.StoredFiles = new FilesCollection({
 
 
         if(err) console.error(err);
-/*        else {
+        else {
           bound(function() {
             var upd = {
               $set: {}
@@ -79,7 +79,7 @@ this.StoredFiles = new FilesCollection({
               }
             });
           });
-        };*/
+        };
       });
     });
   },
@@ -95,10 +95,12 @@ this.StoredFiles = new FilesCollection({
         url: path,
         headers: _.pick(http.request.headers, 'range', 'accept-language', 'accept', 'cache-control', 'pragma', 'connection', 'upgrade-insecure-requests', 'user-agent')
       }).pipe(http.response);
+      console.log('Downloading from object storage: ', fileRef.path);
       return true;
     } else {
       // While file is not yet uploaded to S3
       // We will serve file from FS
+      console.log('Not yet in object storage. Downloading from file system: ', fileRef.path);
       return false;
     }
   }
