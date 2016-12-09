@@ -8,6 +8,7 @@ RUN apt-get -y install git
 WORKDIR /root
 RUN     git clone -b devd http://github.com/dudek313/palsweb.git
 
+WORKDIR /root/palsweb/scripts/env-setup/devd
 ADD swiftcron /etc/swiftcron
 
 # Give execution rights on the cron job
