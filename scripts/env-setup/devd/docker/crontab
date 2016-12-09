@@ -1,0 +1,1 @@
+*/5 * * * * /palsweb/scripts/env-setup/devd/swiftupload >> swift.log

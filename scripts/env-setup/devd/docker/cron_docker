@@ -2,18 +2,17 @@
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get -y install cron
-RUN apt-get -y mongodb-clients
+RUN apt-get -y install mongodb-clients
 RUN apt-get -y install git
+RUN apt-get -y install python-swiftclient
 
 WORKDIR /root
 RUN     git clone -b devd http://github.com/dudek313/palsweb.git
 
-ADD swiftcron /etc/swiftcron
+COPY crontab /etc/cron.d/swiftcron
 
 # Give execution rights on the cron job
-RUN chmod 0644 /etc/swiftcron
-
-RUN echo "*/5 * * * * root ./swiftcron" >> /etc/crontab
+RUN chmod 0644 /etc/cron.d/swiftcron
 
 # Run the command on container startup
 CMD cron
