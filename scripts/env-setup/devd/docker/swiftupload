@@ -1,5 +1,5 @@
 #!/bin/bash
-
+date
 cat <<< '
 use meteor
 db.StoredFiles.find({"versions.original.meta.pipeFrom":{$exists:false}})' > mongoSwift.js
