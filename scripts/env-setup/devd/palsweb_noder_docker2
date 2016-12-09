@@ -84,7 +84,6 @@ RUN     meteor npm install --save redis
 #RUN     meteor add jquery
 
 #RUN	meteor add meteorhacks:npm
-RUN apt-get update
 RUN apt-get install -y vim
 
 # may need to check the actual ip address of the mongodb using:

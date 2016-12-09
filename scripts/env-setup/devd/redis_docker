@@ -1,5 +1,6 @@
-FROM        ubuntu:14.04
+FROM        ubuntu:16.04
 RUN         apt-get update && apt-get install -y redis-server
+RUN         group add -r redis && useradd -r -g redis redis
+USER        redis
 EXPOSE      6379
 ENTRYPOINT  ["/usr/bin/redis-server"]
-

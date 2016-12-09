@@ -35,7 +35,7 @@ WORKDIR /root/palsweb/palsR-Gab
 RUN     make
 RUN     R CMD INSTALL pals_1.0.1.tar.gz
 RUN     mkdir -p /pals/data
-RUN     cp /root/palsweb/palsR-Gab/scripts/SingleSiteExperiment.R /pals/data/
+RUN     cp /root/palsweb/palsR-Gab/scripts/SingleSiteExperiment.R /pals/data/SingleSiteExperiment.r
 RUN     mkdir -p /pals/executions
 RUN     apt-get install -y libhdf5-10
 RUN     apt-get install -y zlib1g-dev

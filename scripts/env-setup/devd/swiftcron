@@ -1,0 +1,45 @@
+#!/bin/bash
+
+cat <<< '
+use meteor
+db.StoredFiles.find({"versions.original.meta.pipeFrom":{$exists:false}})' > mongoSwift.js
+
+FILE_IDS=`echo $(mongo < mongoSwift.js | grep '_id' | awk '{print $4}') | tr -d '[:punct:]'`
+rm mongoSwift.js
+word_count=`wc -w <<< $FILE_IDS`
+echo "Ids of Files to upload to object storage:"
+echo ${FILE_IDS}
+
+i=1
+
+# enter docker volume storage directory
+cd /var/lib/docker/volumes/83b7bd5c968dbf092b5c37702f605b08cdd6140a1656f0312ddf9ecd9a91937d/_data/
+
+while [ $i -le $word_count ]
+do
+  id=`awk -v i="$i" '{print $i}' <<< $FILE_IDS`
+  echo "Uploading "$id
+  i=`expr $i + 1`
+
+  # assuming Swift credentials already loaded
+  # upload the specific file to object storage
+  output=`swift upload dev-store $id.nc`
+
+  # if upload successful, update the mongodb accordingly
+  echo $output
+  echo $id'.nc'
+  if [ $output = $id'.nc' ]; then
+    cat << EOF > mongoUpdate
+    use meteor
+    db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipeFrom': "https://keystone.rc.nectar.org.au:5000/v2.0/files/$id.nc"}})
+    db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipePath': "files/$id.nc"}})
+EOF
+    echo "Displaying mongoUpdate"
+    cat mongoUpdate
+    mongo -p 27017 < mongoUpdate
+    rm mongoUpdate
+  else
+    echo "Error: Unable to upload to object store: $id"
+  fi
+done
+#cd /home/danny

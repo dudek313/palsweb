@@ -1,0 +1,19 @@
+# Creates cron job that sends all uploaded files to Swift object storage.
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get -y install cron
+RUN apt-get -y mongodb-clients
+RUN apt-get -y install git
+
+WORKDIR /root
+RUN     git clone -b devd http://github.com/dudek313/palsweb.git
+
+ADD swiftcron /etc/swiftcron
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/swiftcron
+
+RUN echo "*/5 * * * * root ./swiftcron" >> /etc/crontab
+
+# Run the command on container startup
+CMD cron
