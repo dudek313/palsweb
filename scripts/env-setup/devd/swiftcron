@@ -4,7 +4,7 @@ cat <<< '
 use meteor
 db.StoredFiles.find({"versions.original.meta.pipeFrom":{$exists:false}})' > mongoSwift.js
 
-FILE_IDS=`echo $(mongo < mongoSwift.js | grep '_id' | awk '{print $4}') | tr -d '[:punct:]'`
+FILE_IDS=`echo $(mongo --host 172.17.0.3 -p 27017 < mongoSwift.js | grep '_id' | awk '{print $4}') | tr -d '[:punct:]'`
 rm mongoSwift.js
 word_count=`wc -w <<< $FILE_IDS`
 echo "Ids of Files to upload to object storage:"
@@ -13,7 +13,7 @@ echo ${FILE_IDS}
 i=1
 
 # enter docker volume storage directory
-cd /var/lib/docker/volumes/83b7bd5c968dbf092b5c37702f605b08cdd6140a1656f0312ddf9ecd9a91937d/_data/
+cd /pals/data
 
 while [ $i -le $word_count ]
 do
@@ -36,7 +36,7 @@ do
 EOF
     echo "Displaying mongoUpdate"
     cat mongoUpdate
-    mongo -p 27017 < mongoUpdate
+    mongo --host 172.17.0.3 -p 27017 < mongoUpdate
     rm mongoUpdate
   else
     echo "Error: Unable to upload to object store: $id"
