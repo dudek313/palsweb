@@ -164,39 +164,136 @@ exports.handleMessage = function(message, sendMessage) {
     });
 
     d.run(function() {
-        fs.mkdirSync(localDatabase);
+        if (!fs.existsSync(localDatabase)) fs.mkdirSync(localDatabase);
         console.log('processing message: ' + message._id);
         result = exports.createDir(message);
         console.log('Created working directory');
         exports.writeInput(result, function(inputWritten) {
             console.log('Wrote input file');
-            exports.prepareScript(inputWritten, function(preparedScript) {
-                console.log('Prepared script');
-                exports.executeScript(preparedScript, function(err, executedScript) {
-                    console.log('Executed script');
-                    fs.unlinkSync(executedScript.scriptFilename);
-                    fs.unlinkSync(executedScript.inputFilename);
-                    console.log('Deleted script and input file');
-                    if (err) {
-                        throw new Error(err);
-                    } else {
-                        exports.readOutput(executedScript, function(err, outputRead, output) {
-                            console.log('Read output file');
-                            fs.unlinkSync(outputRead.outputFilename);
-                            console.log('Deleted output file');
-                            exports.copyFilesToDataDir(output, function(err, copiedToDataDir) {
-                                console.log('Moved files to data dir');
-                                exports.removeDirectory(copiedToDataDir);
-                                sendMessage(copiedToDataDir);
-                            });
-                        });
-                    }
-                });
-            });
+			exports.downloadFiles(message, function(err) {
+				if (err) {
+					throw new Error(err); 
+				} else {
+					console.log('Preparing script');
+					exports.prepareScript(inputWritten, function(preparedScript) {
+						console.log('Prepared script');
+						exports.executeScript(preparedScript, function(err, executedScript) {
+							console.log('Executed script');
+							fs.unlinkSync(executedScript.scriptFilename);
+							fs.unlinkSync(executedScript.inputFilename);
+							console.log('Deleted script and input file');
+							if (err) {
+								throw new Error(err);
+							} else {
+								exports.readOutput(executedScript, function(err, outputRead, output) {
+									console.log('Read output file');
+									fs.unlinkSync(outputRead.outputFilename);
+									console.log('Deleted output file');
+									exports.copyFilesToDataDir(output, function(err, copiedToDataDir) {
+										console.log('Moved files to data dir');
+										exports.removeDirectory(copiedToDataDir);
+										sendMessage(copiedToDataDir);
+									});
+								});
+							}
+						});
+					});
+				}
+			});
         });
     });
 }
 
+exports.downloadFiles = function(message, callback) {
+
+    if (message.error) {
+        callback(message.error);
+        return;
+    }
+
+    var i = 0;
+
+    var processFile = function() {
+        if( i >= message.files.length ) {
+			console.log('Finished downloading from object storage');
+            callback(null);
+            return;
+        }
+
+		file = message.files[i];
+
+        // if error is 'ok' we remove it
+        if( file.error && file.error == "ok" ) delete file.error;
+
+        if (file.type == 'DataSet' || file.type == 'ModelOutput' || file.type == 'Benchmark') {
+			console.log('Downloading from object storage: ' + file.path); 
+	        exports.downloadObject(file, function(err,fileResult){
+    	        if( err ) {
+        	        throw new Error(err);
+           		}
+            	processFile(++i);
+	        });
+		} else {
+			processFile(++i);
+		}
+    };
+
+    processFile();
+};
+
+/*
+exports.downloadFiles = function(message, callback) {
+	
+    for (var i = 0; i < message.files.length; ++i) {
+        var file = message.files[i];
+        if (file.type == 'DataSet' || file.type == 'ModelOutput' || file.type == 'Benchmark') {
+            exports.downloadObject(file.path, file.type, function(err) {
+				if (err) callback(err)
+				else callback()
+			});
+        }
+    }
+}
+*/
+
+exports.downloadObject = function(file, callback) {
+    if (!fs.existsSync('/dataSets')) fs.mkdirSync('/dataSets');
+    if (!fs.existsSync('/modelOutputs')) fs.mkdirSync('/modelOutputs');
+	
+
+	var client = require('pkgcloud').storage.createClient({
+		provider: 'openstack',
+		username: process.env.OS_USERNAME,
+		password: process.env.OS_PASSWORD,
+		tenantId: "2bcd99d3e00d418fb799bfabf82572de",
+		region: 'Melbourne',
+		authUrl: process.env.OS_AUTH_URL,
+		version: process.env.version
+	});
+
+	var options = {
+	  container: 'data-store',
+	  remote: file.path
+	};
+
+	var read = client.download(options);
+    read.on('error', function(err) {
+        callback(err);
+    });
+
+
+    var write = fs.createWriteStream(file.path);
+
+    write.on('error', function(err) {
+        callback(err);
+    });
+
+    write.on('close', function(ex) {
+        callback(null);
+    })
+    read.pipe(write);
+}
+ 
 exports.removeDirectory = function(message) {
     if (message.dir && fs.existsSync(message.dir)) {
         var contents = fs.readdirSync(message.dir);
