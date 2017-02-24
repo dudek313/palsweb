@@ -6,7 +6,7 @@ var https = require('https');
 var fs = require('fs');
 var url = require('url');
 var async = require('async');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var domain = require('domain');
 
 exports.getLocalDatabase = function() {
@@ -96,28 +96,48 @@ exports.readOutput = function(message, callback) {
     });
 }
 
-exports.copyFileToDataDir = function(file, callback) {
+exports.copyFileToPublicStore = function(file, callback) {
     if (file.error) {
         callback(null, file);
         return;
     }
+
+    var client = require('pkgcloud').storage.createClient({
+        provider: 'openstack',
+        username: process.env.OS_USERNAME,
+        password: process.env.OS_PASSWORD,
+        tenantId: "2bcd99d3e00d418fb799bfabf82572de",
+        region: 'Melbourne',
+        authUrl: process.env.OS_AUTH_URL,
+        version: process.env.version
+    });
+
+    var options = {
+      container: 'public-store',
+      remote: file.filename
+    };
+
+	console.log('Uploading to public-store: ' + file.filename);
+
     var read = fs.createReadStream(file.filename);
     read.on('error', function(err) {
+		console.log('Error reading file: ' + file.filename);
         callback(err, file);
     });
-    file.key = uuid.v4();
-    file.path = localDatabase + '/' + file.key;
-    var write = fs.createWriteStream(file.path);
+
+    var write = client.upload(options);
     write.on('error', function(err) {
+		console.log('Error uploading to public-store: ' + file.filename);
         callback(err, file);
     });
-    write.on('close', function(ex) {
+    write.on('success', function(ex) {
+		console.log('Uploaded ' + file.filename);
         callback(null, file);
     })
     read.pipe(write);
 };
 
-exports.copyFilesToDataDir = function(output, callback) {
+exports.copyFilesToPublicStore = function(output, callback) {
 
     if (output.error) {
         callback(output.error);
@@ -136,7 +156,7 @@ exports.copyFilesToDataDir = function(output, callback) {
         if( output.files[i].error && output.files[i].error == "ok" ) delete output.files[i].error;
 
         output.files[i].dir = output.dir;
-        exports.copyFileToDataDir(output.files[i],function(err,file){
+        exports.copyFileToPublicStore(output.files[i],function(err,file){
             if( err ) {
                 console.log(err);
             }
@@ -189,10 +209,11 @@ exports.handleMessage = function(message, sendMessage) {
 									console.log('Read output file');
 									fs.unlinkSync(outputRead.outputFilename);
 									console.log('Deleted output file');
-									exports.copyFilesToDataDir(output, function(err, copiedToDataDir) {
-										console.log('Moved files to data dir');
-										exports.removeDirectory(copiedToDataDir);
-										sendMessage(copiedToDataDir);
+									console.log('Uploading plot files to public store');
+									exports.copyFilesToPublicStore(output, function(err, copiedToPublicStore) {
+										console.log('Plot file upload completed');
+										exports.removeDirectory(copiedToPublicStore);
+										sendMessage(copiedToPublicStore);
 									});
 								});
 							}
@@ -240,21 +261,6 @@ exports.downloadFiles = function(message, callback) {
 
     processFile();
 };
-
-/*
-exports.downloadFiles = function(message, callback) {
-	
-    for (var i = 0; i < message.files.length; ++i) {
-        var file = message.files[i];
-        if (file.type == 'DataSet' || file.type == 'ModelOutput' || file.type == 'Benchmark') {
-            exports.downloadObject(file.path, file.type, function(err) {
-				if (err) callback(err)
-				else callback()
-			});
-        }
-    }
-}
-*/
 
 exports.downloadObject = function(file, callback) {
     if (!fs.existsSync('/dataSets')) fs.mkdirSync('/dataSets');
