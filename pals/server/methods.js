@@ -180,7 +180,7 @@ Meteor.methods({
       }
       else {
         var dsId = DataSets.insert(dataSetDoc);
-        if (dsId) generateMessage('Data set inserted', {_id:dsId}, user);
+        if (dsId) generateMessage('Data set inserted', {_id:dsId}, userId);
         return dsId;
       }
     } else {

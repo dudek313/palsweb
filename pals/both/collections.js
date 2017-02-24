@@ -51,13 +51,13 @@ this.StoredFiles = new FilesCollection({
     } else {
       return 'Only NetCDF and R files allowed';
     }
-  },
+  } /*,
   onAfterUpload: function(fileRef) {
     var self = this;
     _.each(fileRef.versions, function(vRef, version) {
       var filePath = "files/" + (Random.id()) + "-" + version + "." + fileRef.extension;
       var options = {
-        container: 'data-store',
+        container: "data-store",
         remote: filePath
       };
 
@@ -68,7 +68,7 @@ this.StoredFiles = new FilesCollection({
 
         if(err) console.error(err);
 //	console.log('writeStream: ', writeStream);
-/*        writeStream.on('error', function(err) {
+        writeStream.on('error', function(err) {
           console.error(err);
         });
 
@@ -91,7 +91,7 @@ this.StoredFiles = new FilesCollection({
               }
             });
           });
-        }); */
+        }); 
       });
     });
   },
@@ -114,7 +114,7 @@ this.StoredFiles = new FilesCollection({
       return false;
     }
   }
-
+*/
 });
 
 if (Meteor.isClient) {

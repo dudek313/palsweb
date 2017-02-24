@@ -67,7 +67,8 @@
                     {{#if image.error}}
                         <p>{{image.error}}</p>
                     {{else}}
-                        <a href="/file/{{image.key}}/{{encode image.mimetype}}/display/{{currentUser._id}}" target="_blank"><img class="img-responsive" src="/file/{{image.key}}/{{encode image.mimetype}}/display/{{currentUser._id}}" title="{{image.type}}"/></a>
+						<a href="https://swift.rc.nectar.org.au:8888/v1/AUTH_2bcd99d3e00d418fb799bfabf82572de/public-store{{filename}}" target="_blank"><img class="img-responsive" src="https://swift.rc.nectar.org.au:8888/v1/AUTH_2bcd99d3e00d418fb799bfabf82572de/public-store{{image.filename}}" title="{{type}}"></a>
+<!--                        <a href="/file/{{image.key}}/{{encode image.mimetype}}/display/{{currentUser._id}}" target="_blank"><img class="img-responsive" src="/file/{{image.key}}/{{encode image.mimetype}}/display/{{currentUser._id}}" title="{{image.type}}"/></a>-->
                     {{/if}}
                 </div>
             </div>

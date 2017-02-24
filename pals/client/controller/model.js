@@ -17,7 +17,6 @@ AutoForm.hooks({
                 }
                 else {  // if successful
                     Meteor.subscribe('models'); // Refresh publication of the models collection to ensure user has access to new model profile
-                    console.log(docId);
                     Router.go('/model/display/' + docId);
                 }
             });
