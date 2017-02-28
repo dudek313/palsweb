@@ -1,0 +1,38 @@
+FROM    ubuntu:16.04
+
+RUN     apt-get update
+RUN     apt-get install -y make g++ curl initscripts git
+RUN     apt-get install -y libssl-dev git-core pkg-config build-essential curl gcc
+
+# for ./configure of nodejs
+RUN     apt-get install -y python python-dev
+RUN	apt-get install -y nodejs
+
+RUN	apt-get install -y npm
+RUN     npm -v
+RUN     nodejs -v
+
+RUN	apt-get install -y mongodb-org cron
+
+WORKDIR /root
+
+RUN     git clone -b devd http://github.com/dudek313/palsweb.git
+RUN     curl https://install.meteor.com/ | sh
+
+ENV     PATH /root/pals/.meteor:$PATH
+
+RUN apt-get update
+RUN apt-get install -y vim
+
+RUN     mkdir -p /pals/data
+RUN     cp /root/palsweb/palsR-Gab/scripts/SingleSiteExperiment.R /pals/data/SingleSiteExperiment.r
+
+WORKDIR /root/palsweb/pals
+RUN     meteor npm install --save redis
+RUN	meteor npm install --save bcrypt
+
+WORKDIR /root/palsweb/pals
+EXPOSE 3000
+
+CMD     [ "meteor" ]
+

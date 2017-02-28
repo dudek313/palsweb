@@ -1,0 +1,79 @@
+FROM    phusion/passenger-nodejs
+
+RUN     mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+RUN     apt-get update
+RUN     apt-get apt-utils
+RUN     apt-get install -y make g++ curl initscripts git
+RUN     apt-get install -y libssl-dev git-core pkg-config build-essential curl gcc
+RUN     git clone -b devd http://github.com/dudek313/palsweb.git
+
+RUN     apt-get -y install r-base r-base-dev
+#RUN     apt-get install -y nodejs
+#RUN	ln -s "$(which nodejs)" /usr/bin/node
+RUN     apt-get install -y npm
+RUN	npm install npm -g
+#RUN     npm install redis
+#RUN     apt-get install wget
+#RUN     wget http://download.redis.io/redis-stable.tar.gz
+#RUN     tar xvzf redis-stable.tar.gz
+#WORKDIR redis-stable
+#RUN     make install
+
+# install node.js dependencies
+RUN     npm install amqp async mocha aws-sdk node-uuid underscore
+
+# R-packages
+RUN	apt-get install wget
+RUN     wget -q https://cran.r-project.org/src/contrib/RJSONIO_1.3-0.tar.gz
+RUN     R CMD INSTALL RJSONIO_1.3-0.tar.gz
+
+WORKDIR /root/palsweb/palsR-Gab
+RUN     make
+RUN     R CMD INSTALL pals_1.0.1.tar.gz
+
+RUN     mkdir -p /pals/data
+RUN     cp /root/palsweb/palsR/scripts/SingleSiteExperiment.R /pals/data/
+RUN     mkdir /pals/executions
+
+RUN     apt-get install -y libhdf5-10 # in Ubuntu 16.04
+#WORKDIR /usr/local/
+#RUN     wget ftp://ftp.hdfgroup.org/HDF5/current/src/hdf5-1.8.17.tar.gz
+#RUN     tar -xvsf hdf5-1.8.17.tar.gz
+#WORKDIR hdf5-1.8.17
+#RUN     ./configure --prefix=/usr/local --enable-shared --enable-hl
+#RUN     make
+#RUN     make install
+
+RUN     apt-get install -y zlib1g-dev
+
+RUN     apt-get install -y libnetcdf-dev # in Ubuntu 16.04
+#WORKDIR /usr/local/
+#RUN wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-4.3.3.1.tar.gz
+#RUN tar xzvf netcdf-4.3.3.1.tar.gz
+#RUN cd netcdf-4.3.3.1; \
+#    patch -p1 < largefiles.patch; \
+#    ./configure --prefix=/usr/local/netcdf \
+#                CC=mpicc \
+#                LDFLAGS=-L/usr/local/hdf5/lib \
+#                CFLAGS=-I/usr/local/hdf5/include; \
+#    make; \
+#    make install;\
+#    cd ..;\
+#    rm -rf netcdf-4.3.3.1 netcdf-4.3.3.1.tar.gz
+
+RUN apt-get install -y libnetcdf-dev
+#RUN     wget http://cirrus.ucsd.edu/~pierce/ncdf/ncdf4_1.13.tar.gz
+#RUN     R CMD INSTALL ncdf4_1.13.tar.gz
+RUN     apt-get install -y r-cran-ncdf4
+RUN     apt-get install -y r-cran-plotrix
+RUN     apt-get install -y r-cran-colorspace
+
+WORKDIR /root/palsweb/palsnoder/server
+RUN     npm install wait-until
+RUN     npm install redis
+
+EXPOSE 8080
+
+CMD ["npm", "start"]
