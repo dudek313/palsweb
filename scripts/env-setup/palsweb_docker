@@ -13,10 +13,12 @@ RUN     npm -v
 RUN     nodejs -v
 
 RUN	apt-get install -y mongodb-org cron
+RUN	service cron start
 
 WORKDIR /root
 
-RUN     git clone -b devd http://github.com/dudek313/palsweb.git
+RUN     git clone http://github.com/dudek313/palsweb.git
+COPY	/root/palsweb/scripts/env-setup/crontab /etc/crontab
 RUN     curl https://install.meteor.com/ | sh
 
 ENV     PATH /root/pals/.meteor:$PATH
@@ -25,7 +27,7 @@ RUN apt-get update
 RUN apt-get install -y vim
 
 RUN     mkdir -p /pals/data
-RUN     cp /root/palsweb/palsR-Gab/scripts/SingleSiteExperiment.R /pals/data/SingleSiteExperiment.r
+#RUN     cp /root/palsweb/palsR-Gab/scripts/SingleSiteExperiment.R /pals/data/SingleSiteExperiment.r
 
 WORKDIR /root/palsweb/pals
 RUN     meteor npm install --save redis
