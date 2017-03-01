@@ -1,45 +1,61 @@
 #!/bin/bash
 
-cat <<< '
+cron_running=`ls /pals/data/cron_running`
+if [ "$cron_running" != '/pals/data/cron_running' ]; then
+	touch /pals/data/cron_running
+
+	cat <<< '
 use meteor
-db.StoredFiles.find({"versions.original.meta.pipeFrom":{$exists:false}})' > mongoSwift.js
+db.StoredFiles.find({"versions.original.meta.pipeFrom":{$exists:false}},{"extensionWithDot":1})' > mongoSwift.js
 
-FILE_IDS=`echo $(mongo < mongoSwift.js | grep '_id' | awk '{print $4}') | tr -d '[:punct:]'`
-rm mongoSwift.js
-word_count=`wc -w <<< $FILE_IDS`
-echo "Ids of Files to upload to object storage:"
-echo ${FILE_IDS}
+	query=`echo $(mongo 130.56.255.62:27017 < mongoSwift.js | grep '_id')`
+	FILE_IDS=`echo $(awk '{print$4}' <<< $query) | tr -d '[\"\,]'`
+	FILE_NAMES=`echo $(awk '{print$4$7}' <<< $query) | tr -d '[\"\,]'`
+	rm mongoSwift.js
+	word_count=`wc -w <<< $FILE_IDS`
+	if [ "$word_count" != "0" ]; then
+		date >> /pals/data/uploads.log
+		echo "Names of Files to upload to object storage:" >> /pals/data/uploads.log
+		echo ${FILE_NAMES} >> /pals/data/uploads.log
+	fi
 
-i=1
+	i=1
 
-# enter docker volume storage directory
-cd /var/lib/docker/volumes/83b7bd5c968dbf092b5c37702f605b08cdd6140a1656f0312ddf9ecd9a91937d/_data/
+	# enter docker volume storage directory
+	cd /pals/data/
 
-while [ $i -le $word_count ]
-do
-  id=`awk -v i="$i" '{print $i}' <<< $FILE_IDS`
-  echo "Uploading "$id
-  i=`expr $i + 1`
+	while [ $i -le $word_count ]
+	do
+	  name=`awk -v i="$i" '{print $i}' <<< $FILE_NAMES`
+	  id=`awk -v i="$i" '{print $i}' <<< $FILE_IDS`
+	  echo "Uploading "$name
+	  i=`expr $i + 1`
 
-  # assuming Swift credentials already loaded
-  # upload the specific file to object storage
-  output=`swift upload dev-store $id.nc`
+	  # assuming Swift credentials already loaded
+	  # upload the specific file to object storage
+	  output=`swift upload data-store $name`
 
-  # if upload successful, update the mongodb accordingly
-  echo $output
-  echo $id'.nc'
-  if [ $output = $id'.nc' ]; then
-    cat << EOF > mongoUpdate
-    use meteor
-    db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipeFrom': "https://keystone.rc.nectar.org.au:5000/v2.0/files/$id.nc"}})
-    db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipePath': "files/$id.nc"}})
+	  # if upload successful, update the mongodb accordingly
+	  echo $output
+	  if [ "$output" = "$name" ]; then
+		# store commands to update mongodb in a temp file directed to mongo
+		cat << EOF > mongoUpdate
+use meteor
+db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipeFrom': "https://keystone.rc.nectar.org.au:5000/v2.0/files/$name"}})
+db.StoredFiles.update({_id: '$id'}, {\$set: {'versions.original.meta.pipePath': "files/$name"}})
 EOF
-    echo "Displaying mongoUpdate"
-    cat mongoUpdate
-    mongo -p 27017 < mongoUpdate
-    rm mongoUpdate
-  else
-    echo "Error: Unable to upload to object store: $id"
-  fi
-done
-
+		echo "Displaying mongoUpdate"
+		cat mongoUpdate
+		mongo 130.56.255.62:27017 < mongoUpdate
+		rm mongoUpdate
+		echo "Uploaded $output" >> /pals/data/uploads.log
+	  else
+		echo "Error: Unable to upload to object store: $name"
+		echo "Unable to upload to object store: $name" >> /pals/data/uploads.log
+	  fi
+	done
+	rm /pals/data/cron_running
+else
+	date >> /pals/data/uploads.log
+	echo "swiftcron already running" >> /pals/data/uploads.log
+fi

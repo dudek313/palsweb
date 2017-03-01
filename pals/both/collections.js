@@ -51,7 +51,7 @@ this.StoredFiles = new FilesCollection({
     } else {
       return 'Only NetCDF and R files allowed';
     }
-  } /*,
+  }, /*
   onAfterUpload: function(fileRef) {
     var self = this;
     _.each(fileRef.versions, function(vRef, version) {
@@ -94,7 +94,7 @@ this.StoredFiles = new FilesCollection({
         }); 
       });
     });
-  },
+  },*/
 
   interceptDownload: function(http, fileRef, version) {
     var path, ref, ref1, ref2;
@@ -114,7 +114,7 @@ this.StoredFiles = new FilesCollection({
       return false;
     }
   }
-*/
+
 });
 
 if (Meteor.isClient) {
