@@ -117,21 +117,21 @@ exports.copyFileToPublicStore = function(file, callback) {
       remote: file.filename
     };
 
-	console.log('Uploading to public-store: ' + file.filename);
+  console.log('Uploading to public-store: ' + file.filename);
 
     var read = fs.createReadStream(file.filename);
     read.on('error', function(err) {
-		console.log('Error reading file: ' + file.filename);
+    console.log('Error reading file: ' + file.filename);
         callback(err, file);
     });
 
     var write = client.upload(options);
     write.on('error', function(err) {
-		console.log('Error uploading to public-store: ' + file.filename);
+    console.log('Error uploading to public-store: ' + file.filename);
         callback(err, file);
     });
     write.on('success', function(ex) {
-		console.log('Uploaded ' + file.filename);
+    console.log('Uploaded ' + file.filename);
         callback(null, file);
     })
     read.pipe(write);
@@ -190,37 +190,37 @@ exports.handleMessage = function(message, sendMessage) {
         console.log('Created working directory');
         exports.writeInput(result, function(inputWritten) {
             console.log('Wrote input file');
-			exports.downloadFiles(message, function(err) {
-				if (err) {
-					throw new Error(err); 
-				} else {
-					console.log('Preparing script');
-					exports.prepareScript(inputWritten, function(preparedScript) {
-						console.log('Prepared script');
-						exports.executeScript(preparedScript, function(err, executedScript) {
-							console.log('Executed script');
-							fs.unlinkSync(executedScript.scriptFilename);
-							fs.unlinkSync(executedScript.inputFilename);
-							console.log('Deleted script and input file');
-							if (err) {
-								throw new Error(err);
-							} else {
-								exports.readOutput(executedScript, function(err, outputRead, output) {
-									console.log('Read output file');
-									fs.unlinkSync(outputRead.outputFilename);
-									console.log('Deleted output file');
-									console.log('Uploading plot files to public store');
-									exports.copyFilesToPublicStore(output, function(err, copiedToPublicStore) {
-										console.log('Plot file upload completed');
-										exports.removeDirectory(copiedToPublicStore);
-										sendMessage(copiedToPublicStore);
-									});
-								});
-							}
-						});
-					});
-				}
-			});
+      exports.downloadFiles(message, function(err) {
+        if (err) {
+          throw new Error(err); 
+        } else {
+          console.log('Preparing script');
+          exports.prepareScript(inputWritten, function(preparedScript) {
+            console.log('Prepared script');
+            exports.executeScript(preparedScript, function(err, executedScript) {
+              console.log('Executed script');
+              fs.unlinkSync(executedScript.scriptFilename);
+              fs.unlinkSync(executedScript.inputFilename);
+              console.log('Deleted script and input file');
+              if (err) {
+                throw new Error(err);
+              } else {
+                exports.readOutput(executedScript, function(err, outputRead, output) {
+                  console.log('Read output file');
+                  fs.unlinkSync(outputRead.outputFilename);
+                  console.log('Deleted output file');
+                  console.log('Uploading plot files to public store');
+                  exports.copyFilesToPublicStore(output, function(err, copiedToPublicStore) {
+                    console.log('Plot file upload completed');
+                    exports.removeDirectory(copiedToPublicStore);
+                    sendMessage(copiedToPublicStore);
+                  });
+                });
+              }
+            });
+          });
+        }
+      });
         });
     });
 }
@@ -236,27 +236,27 @@ exports.downloadFiles = function(message, callback) {
 
     var processFile = function() {
         if( i >= message.files.length ) {
-			console.log('Finished downloading from object storage');
+      console.log('Finished downloading from object storage');
             callback(null);
             return;
         }
 
-		file = message.files[i];
+    file = message.files[i];
 
         // if error is 'ok' we remove it
         if( file.error && file.error == "ok" ) delete file.error;
 
-        if (file.type == 'DataSet' || file.type == 'ModelOutput' || file.type == 'Benchmark') {
-			console.log('Downloading from object storage: ' + file.path); 
-	        exports.downloadObject(file, function(err,fileResult){
-    	        if( err ) {
-        	        throw new Error(err);
-           		}
-            	processFile(++i);
-	        });
-		} else {
-			processFile(++i);
-		}
+        if (file.type == 'DataSet' || file.type == 'ModelOutput' || file.type == 'Benchmark' || file.type == 'Script') {
+          console.log('Downloading from object storage: ' + file.path); 
+          exports.downloadObject(file, function(err,fileResult){
+              if( err ) {
+                  throw new Error(err);
+              }
+              processFile(++i);
+          });
+        } else {
+          processFile(++i);
+        }
     };
 
     processFile();
@@ -265,24 +265,24 @@ exports.downloadFiles = function(message, callback) {
 exports.downloadObject = function(file, callback) {
     if (!fs.existsSync('/dataSets')) fs.mkdirSync('/dataSets');
     if (!fs.existsSync('/modelOutputs')) fs.mkdirSync('/modelOutputs');
-	
+  
 
-	var client = require('pkgcloud').storage.createClient({
-		provider: 'openstack',
-		username: process.env.OS_USERNAME,
-		password: process.env.OS_PASSWORD,
-		tenantId: "2bcd99d3e00d418fb799bfabf82572de",
-		region: 'Melbourne',
-		authUrl: process.env.OS_AUTH_URL,
-		version: process.env.version
-	});
+  var client = require('pkgcloud').storage.createClient({
+    provider: 'openstack',
+    username: process.env.OS_USERNAME,
+    password: process.env.OS_PASSWORD,
+    tenantId: "2bcd99d3e00d418fb799bfabf82572de",
+    region: 'Melbourne',
+    authUrl: process.env.OS_AUTH_URL,
+    version: process.env.version
+  });
 
-	var options = {
-	  container: 'data-store',
-	  remote: file.path
-	};
+  var options = {
+    container: 'data-store',
+    remote: file.path
+  };
 
-	var read = client.download(options);
+  var read = client.download(options);
     read.on('error', function(err) {
         callback(err);
     });
