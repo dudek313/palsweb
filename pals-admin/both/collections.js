@@ -195,7 +195,7 @@ ModelOutputs.attachSchema(new SimpleSchema({
   'file.size':      {type: Number, optional: true},
   'file.key':       {type: String, optional: true},
   'file.created':   {type: String, optional: true},
-  comments:         {type: String, optional: true},
+  comments:         {type: String, optional: true, autoform: { rows: 3 } },
   status:           {type: String, optional: true},
   benchmarks:       {type: [String], optional: true}
 }));
@@ -209,8 +209,18 @@ modelSchema = new SimpleSchema({
   modified:   {type: Date, label: "Last Modified", optional: true},
   modifierId: {type: String, optional: true},
   url:        {type: String, regEx: SimpleSchema.RegEx.Url, label: "URL", optional: true},
-  references: {type: String, label: "References", optional: true},
-  comments:   {type: String, label: "Comments", optional: true}
+  references: {
+		type: String,
+		label: "References",
+		optional: true,
+		autoform: { rows: 5 },
+	},
+  comments:   {
+		type: String,
+		label: "Comments",
+		optional: true,
+		autoform: { rows: 5 },
+	},
 });
 
 Models.attachSchema(modelSchema);
@@ -228,8 +238,8 @@ Experiments.attachSchema(new SimpleSchema({
   otherVegType: {type: String, label: "Other Vegetation Type", optional: true},
   spatialLevel: {type: String, label: "Spatial Level", allowedValues: SpatialLevel},
   timeStepSize: {type: String, label: "Time Step Size", allowedValues: TimeStepSize, optional: true},
-  shortDescription:     {type: String, label: "Short Description", optional: true},
-  longDescription:      {type: String, label: "Long Description", optional: true},
+  shortDescription:     { type: String, label: "Short Description", optional: true },
+  longDescription:      { type: String, label: "Long Description", optional: true, autoform: { rows: 3 } },
   region:       {type: String, label: "Region", optional: true},
   resolution:   {type: String, label: "Resolution", allowedValues: Resolution, optional: true},
   _version:     {type: Number, optional: true},
@@ -267,8 +277,15 @@ dataSetSchema = new SimpleSchema({
   maxVegHeight:   {type: Number, label: "Max Vegetation Height (m)", min: 0, decimal: true, optional: true},
   utcOffset:      {type: Number, label: "UTC Offset (hours)", min: -12, max: 12, optional: true},
   siteContact:    {type: String, label: "Site Contact", optional: true},
-  references:     {type: String, label: "References", optional: true},
-  comments:       {type: String, label: "Comments", optional: true},
+  references: {
+		type: String,
+		label: "References",
+		optional: true,
+		autoform: {
+			rows: 5,
+		}
+	},
+  comments:       { type: String, label: "Comments", optional: true, autoform: { rows: 5 } },
   "variables.NEE":  {type: Boolean, label: "NEE"},
   "variables.Qg":   {type: Boolean, label: "Qg"},
   "variables.Qh":   {type: Boolean, label: "Qh"},
